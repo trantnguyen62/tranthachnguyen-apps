@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DevOps Defender - A 2D space shooter game to learn DevOps concepts through gameplay">
+    <title>DevOps Defender | Learn DevOps Through Gaming</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Main Menu -->
+        <div id="mainMenu" class="screen">
+            <div class="menu-background">
+                <div class="stars"></div>
+                <div class="stars2"></div>
+                <div class="stars3"></div>
+            </div>
+            <div class="menu-content">
+                <div class="logo-container">
+                    <h1 class="game-title">
+                        <span class="title-devops">DevOps</span>
+                        <span class="title-defender">Defender</span>
+                    </h1>
+                    <p class="tagline">Master DevOps Through Combat</p>
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-btn primary" onclick="startGame('adventure')">
+                        <span class="btn-icon">🚀</span>
+                        <span class="btn-text">Adventure Mode</span>
+                        <span class="btn-desc">Progress through topic zones</span>
+                    </button>
+                    <button class="menu-btn" onclick="startGame('endless')">
+                        <span class="btn-icon">♾️</span>
+                        <span class="btn-text">Endless Mode</span>
+                        <span class="btn-desc">Survive as long as you can</span>
+                    </button>
+                    <button class="menu-btn" onclick="startGame('speedquiz')">
+                        <span class="btn-icon">⚡</span>
+                        <span class="btn-text">Speed Quiz</span>
+                        <span class="btn-desc">Answer fast, score high</span>
+                    </button>
+                    <button class="menu-btn" onclick="showScreen('topicSelect')">
+                        <span class="btn-icon">📚</span>
+                        <span class="btn-text">Practice Mode</span>
+                        <span class="btn-desc">Focus on specific topics</span>
+                    </button>
+                    <button class="menu-btn secondary" onclick="showScreen('howToPlay')">
+                        <span class="btn-icon">❓</span>
+                        <span class="btn-text">How to Play</span>
+                    </button>
+                </div>
+                <div class="high-score-display">
+                    <span>🏆 High Score: <span id="menuHighScore">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic Selection Screen -->
+        <div id="topicSelect" class="screen hidden">
+            <div class="menu-background">
+                <div class="stars"></div>
+                <div class="stars2"></div>
+            </div>
+            <div class="topic-content">
+                <h2 class="screen-title">Select Topic Zone</h2>
+                <div class="topic-grid" id="topicGrid"></div>
+                <button class="back-btn" onclick="showScreen('mainMenu')">← Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- How to Play Screen -->
+        <div id="howToPlay" class="screen hidden">
+            <div class="menu-background">
+                <div class="stars"></div>
+            </div>
+            <div class="help-content">
+                <h2 class="screen-title">How to Play</h2>
+                <div class="instructions">
+                    <div class="instruction-item">
+                        <span class="instruction-icon">🎮</span>
+                        <div>
+                            <h3>Controls</h3>
+                            <p><strong>Arrow Keys / WASD</strong> - Move your ship</p>
+                            <p><strong>1, 2, 3, 4</strong> - Select answer</p>
+                            <p><strong>Space</strong> - Confirm / Fire</p>
+                            <p><strong>P</strong> - Pause game</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="instruction-icon">👾</span>
+                        <div>
+                            <h3>Gameplay</h3>
+                            <p>Enemy ships will approach with DevOps questions</p>
+                            <p>Answer correctly to destroy them and earn points</p>
+                            <p>Wrong answers deal damage to your ship</p>
+                            <p>Collect power-ups for shields and bonuses</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="instruction-icon">⭐</span>
+                        <div>
+                            <h3>Scoring</h3>
+                            <p><strong>+100</strong> - Correct answer</p>
+                            <p><strong>+50</strong> - Speed bonus (< 5 seconds)</p>
+                            <p><strong>x2</strong> - Streak multiplier</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="back-btn" onclick="showScreen('mainMenu')">← Back to Menu</button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen hidden">
+            <canvas id="gameCanvas"></canvas>
+            
+            <!-- HUD -->
+            <div class="hud">
+                <div class="hud-left">
+                    <div class="health-bar">
+                        <div class="health-fill" id="healthFill"></div>
+                        <span class="health-text" id="healthText">100</span>
+                    </div>
+                    <div class="shield-bar">
+                        <div class="shield-fill" id="shieldFill"></div>
+                    </div>
+                </div>
+                <div class="hud-center">
+                    <div class="score-display">
+                        <span class="score-label">SCORE</span>
+                        <span class="score-value" id="scoreValue">0</span>
+                    </div>
+                    <div class="streak-display">
+                        <span class="streak-label">STREAK</span>
+                        <span class="streak-value" id="streakValue">0</span>
+                        <span class="multiplier" id="multiplier">x1</span>
+                    </div>
+                </div>
+                <div class="hud-right">
+                    <div class="level-display">
+                        <span class="level-label" id="levelLabel">ZONE 1</span>
+                        <span class="level-name" id="levelName">Docker</span>
+                    </div>
+                    <div class="wave-display">
+                        <span>Wave <span id="waveNumber">1</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Panel -->
+            <div class="question-panel hidden" id="questionPanel">
+                <div class="question-container">
+                    <div class="question-topic" id="questionTopic">Docker</div>
+                    <div class="question-text" id="questionText">Loading question...</div>
+                    <div class="answer-grid" id="answerGrid"></div>
+                    <div class="question-timer">
+                        <div class="timer-fill" id="timerFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pause Menu -->
+            <div class="pause-menu hidden" id="pauseMenu">
+                <h2>PAUSED</h2>
+                <button class="menu-btn" onclick="resumeGame()">Resume</button>
+                <button class="menu-btn" onclick="restartGame()">Restart</button>
+                <button class="menu-btn" onclick="quitToMenu()">Quit to Menu</button>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div class="game-over hidden" id="gameOver">
+                <h2 class="game-over-title">GAME OVER</h2>
+                <div class="final-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Final Score</span>
+                        <span class="stat-value" id="finalScore">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Questions Answered</span>
+                        <span class="stat-value" id="questionsAnswered">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy</span>
+                        <span class="stat-value" id="accuracy">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Best Streak</span>
+                        <span class="stat-value" id="bestStreak">0</span>
+                    </div>
+                </div>
+                <div class="new-high-score hidden" id="newHighScore">🏆 NEW HIGH SCORE! 🏆</div>
+                <div class="game-over-buttons">
+                    <button class="menu-btn primary" onclick="restartGame()">Play Again</button>
+                    <button class="menu-btn" onclick="quitToMenu()">Main Menu</button>
+                </div>
+            </div>
+
+            <!-- Level Complete Screen -->
+            <div class="level-complete hidden" id="levelComplete">
+                <h2 class="level-complete-title">ZONE COMPLETE!</h2>
+                <div class="zone-icon" id="zoneCompleteIcon">🐳</div>
+                <div class="zone-name" id="zoneCompleteName">Docker</div>
+                <div class="level-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Zone Score</span>
+                        <span class="stat-value" id="zoneScore">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy</span>
+                        <span class="stat-value" id="zoneAccuracy">0%</span>
+                    </div>
+                </div>
+                <button class="menu-btn primary" onclick="nextZone()">Next Zone →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+.npm
+
+# Build outputs (keep dist/ - needed for pre-built deployment)
+# dist/  # REMOVED - we copy pre-built dist to containers
+build/
+.vite/
+
+# Development files
+.env.local
+.env.development
+*.log
+nohup.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in container)
+*.md
+!README.md
+
+# Test files
+*.test.js
+*.spec.js
+__tests__/
+coverage/
+
+# Misc
+*.pkg
+cloudflared.pkg

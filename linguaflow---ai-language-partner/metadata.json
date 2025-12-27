@@ -1,0 +1,7 @@
+{
+  "name": "LinguaFlow - AI Language Partner",
+  "description": "A real-time voice conversational partner for language learning using Gemini Live API.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

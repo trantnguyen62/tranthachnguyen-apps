@@ -1,0 +1,110 @@
+# Docker Compose for tranthachnguyen.com services
+# Cloudflared runs as systemd service, pointing to these exposed ports
+
+services:
+  # ==========================================================================
+  # STATIC SITES
+  # ==========================================================================
+  landing-page:
+    build:
+      context: ../../landing-page
+      dockerfile: Dockerfile
+    container_name: landing-page
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+
+  illinois-driver:
+    build:
+      context: ../../illinois-driver-study
+      dockerfile: Dockerfile
+    container_name: illinois-driver
+    restart: unless-stopped
+    ports:
+      - "4000:80"
+
+  # ==========================================================================
+  # NANOEDIT - Frontend + API backend
+  # ==========================================================================
+  nanoedit-web:
+    build:
+      context: ../../nanoedit-ai- prod
+      dockerfile: Dockerfile.web
+    container_name: nanoedit-web
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+
+  nanoedit-api:
+    build:
+      context: ../../nanoedit-ai- prod
+      dockerfile: Dockerfile.api
+    container_name: nanoedit-api
+    restart: unless-stopped
+    ports:
+      - "5174:5174"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+  # ==========================================================================
+  # PASSPORT PHOTO - Combined API + static server
+  # ==========================================================================
+  passport-photo:
+    build:
+      context: ../../passport-photo-ai
+      dockerfile: Dockerfile
+    container_name: passport-photo
+    restart: unless-stopped
+    ports:
+      - "5185:5185"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+  # ==========================================================================
+  # LINGUAFLOW - Frontend + WebSocket proxy + API
+  # ==========================================================================
+  linguaflow-web:
+    build:
+      context: ../../linguaflow---ai-language-partner
+      dockerfile: Dockerfile.web
+    container_name: linguaflow-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+
+  linguaflow-ws:
+    build:
+      context: ../../linguaflow---ai-language-partner
+      dockerfile: Dockerfile.ws
+    container_name: linguaflow-ws
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+  linguaflow-api:
+    build:
+      context: ../../linguaflow---ai-language-partner
+      dockerfile: Dockerfile.api
+    container_name: linguaflow-api
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    volumes:
+      - linguaflow_data:/app/data
+
+  # ==========================================================================
+  # COMIC NEWS - Frontend + API backend
+  # ==========================================================================
+  comic-news:
+    build:
+      context: ../../comic-news
+      dockerfile: Dockerfile
+    container_name: comic-news
+    restart: unless-stopped
+    ports:
+      - "5187:5187"
+
+volumes:
+  linguaflow_data:

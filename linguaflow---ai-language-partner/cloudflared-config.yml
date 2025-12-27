@@ -1,0 +1,32 @@
+tunnel: 9b98b08e-5af1-4448-97c6-e7479f09a68d
+credentials-file: /Users/trannguyen/.cloudflared/9b98b08e-5af1-4448-97c6-e7479f09a68d.json
+
+ingress:
+  # API routes (user profiles) - port 3002
+  - hostname: tranthachnguyen.com
+    path: /api
+    service: http://localhost:3002
+  - hostname: www.tranthachnguyen.com
+    path: /api
+    service: http://localhost:3002
+  - hostname: linguaflow.tranthachnguyen.com
+    path: /api
+    service: http://localhost:3002
+  
+  # WebSocket routes - port 3001
+  - hostname: tranthachnguyen.com
+    path: /ws
+    service: http://localhost:3001
+  - hostname: tranthachnguyen.com
+    service: http://localhost:3000
+  - hostname: www.tranthachnguyen.com
+    path: /ws
+    service: http://localhost:3001
+  - hostname: www.tranthachnguyen.com
+    service: http://localhost:3000
+  - hostname: linguaflow.tranthachnguyen.com
+    path: /ws
+    service: http://localhost:3001
+  - hostname: linguaflow.tranthachnguyen.com
+    service: http://localhost:3000
+  - service: http_status:404

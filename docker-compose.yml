@@ -1,0 +1,95 @@
+services:
+  # Cloudflare Tunnel - exposes all services to the internet
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./infra/cloudflared:/etc/cloudflared:ro
+    depends_on:
+      - landing-page
+      - nanoedit-ai
+      - passport-photo-ai
+      - illinois-driver-study
+      - linguaflow
+      - comic-news
+      - devops-study
+      - devops-game
+    restart: unless-stopped
+
+  # Landing Page - tranthachnguyen.com
+  landing-page:
+    build: ./landing-page
+    container_name: landing-page
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  # NanoEdit AI - photoedit.tranthachnguyen.com
+  nanoedit-ai:
+    build: ./nanoedit-ai- prod
+    container_name: nanoedit-ai
+    expose:
+      - "5173"
+      - "5174"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: unless-stopped
+
+  # Passport Photo AI - passportphoto.tranthachnguyen.com
+  passport-photo-ai:
+    build: ./passport-photo-ai
+    container_name: passport-photo-ai
+    expose:
+      - "5185"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: unless-stopped
+
+  # Illinois Driver Study - illinoisdriverstudy.tranthachnguyen.com
+  illinois-driver-study:
+    build: ./illinois-driver-study
+    container_name: illinois-driver-study
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  # LinguaFlow - linguaflow.tranthachnguyen.com
+  linguaflow:
+    build: ./linguaflow---ai-language-partner
+    container_name: linguaflow
+    expose:
+      - "3000"
+      - "3001"
+      - "3002"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: unless-stopped
+
+  # Comic News - comicnews.tranthachnguyen.com
+  comic-news:
+    build: ./comic-news
+    container_name: comic-news
+    expose:
+      - "5187"
+    restart: unless-stopped
+
+  # DevOps Study - devopsstudy.tranthachnguyen.com
+  devops-study:
+    build: ./devops-study
+    container_name: devops-study
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  # DevOps Game - devopsgame.tranthachnguyen.com
+  devops-game:
+    build: ./devops-game
+    container_name: devops-game
+    expose:
+      - "80"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: tranthachnguyen-network

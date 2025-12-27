@@ -1,0 +1,9 @@
+# API server only
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev && npm install express cors dotenv
+COPY server/api-server.js server/logger.js ./server/
+RUN mkdir -p /app/data
+EXPOSE 3002
+CMD ["node", "server/api-server.js"]

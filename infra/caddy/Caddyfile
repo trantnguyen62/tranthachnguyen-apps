@@ -1,0 +1,58 @@
+# =============================================================================
+# CADDY REVERSE PROXY CONFIGURATION
+# All traffic comes through Cloudflare Tunnel -> Caddy -> Services
+# Cloudflare handles SSL, so we serve HTTP only on port 80
+# =============================================================================
+
+{
+	auto_https off
+}
+
+:80 {
+	@landing host tranthachnguyen.com www.tranthachnguyen.com
+	handle @landing {
+		reverse_proxy landing-page:80
+	}
+
+	@nanoedit host photoedit.tranthachnguyen.com
+	handle @nanoedit {
+		handle /api/* {
+			reverse_proxy nanoedit-api:5174
+		}
+		handle {
+			reverse_proxy nanoedit-web:80
+		}
+	}
+
+	@passport host passportphoto.tranthachnguyen.com
+	handle @passport {
+		reverse_proxy passport-photo:5185
+	}
+
+	@illinois host illinoisdriverstudy.tranthachnguyen.com
+	handle @illinois {
+		reverse_proxy illinois-driver:80
+	}
+
+	@linguaflow host linguaflow.tranthachnguyen.com
+	handle @linguaflow {
+		handle /ws {
+			reverse_proxy linguaflow-ws:3001
+		}
+		handle /api/* {
+			reverse_proxy linguaflow-api:3002
+		}
+		handle {
+			reverse_proxy linguaflow-web:80
+		}
+	}
+
+	@resume host resume.tranthachnguyen.com
+	handle @resume {
+		reverse_proxy 192.168.0.200:80
+	}
+
+	handle {
+		respond "Not Found" 404
+	}
+}

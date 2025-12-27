@@ -1,0 +1,27 @@
+tunnel: 9b98b08e-5af1-4448-97c6-e7479f09a68d
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: tranthachnguyen.com
+    service: http://landing-page:80
+  - hostname: www.tranthachnguyen.com
+    service: http://landing-page:80
+  - hostname: photoedit.tranthachnguyen.com
+    service: http://nanoedit-ai:5173
+  - hostname: photoeditapi.tranthachnguyen.com
+    service: http://nanoedit-ai:5174
+  - hostname: passportphoto.tranthachnguyen.com
+    service: http://passport-photo-ai:5185
+  - hostname: illinoisdriverstudy.tranthachnguyen.com
+    service: http://illinois-driver-study:80
+  - hostname: linguaflow.tranthachnguyen.com
+    service: http://linguaflow:3000
+  - hostname: comicnews.tranthachnguyen.com
+    service: http://comic-news:5187
+  - hostname: devopsstudy.tranthachnguyen.com
+    service: http://devops-study:80
+  - hostname: devopsgame.tranthachnguyen.com
+    service: http://devops-game:80
+  - hostname: resume.tranthachnguyen.com
+    service: http://192.168.0.200:80
+  - service: http_status:404

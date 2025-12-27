@@ -1,0 +1,7 @@
+{
+  "name": "NanoEdit AI",
+  "description": "A powerful image editing tool powered by Gemini 2.5 Flash Image. Upload a photo and use natural language to remove backgrounds, add filters, or clean up product shots.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
