@@ -35,9 +35,9 @@ jobs:
         with:
           filters: |
             linguaflow:
-              - 'linguaflow---ai-language-partner/**'
+              - 'linguaflow/**'
             nanoedit:
-              - 'nanoedit-ai- prod/**'
+              - 'nanoedit-ai-prod/**'
             passport:
               - 'passport-photo-ai/**'
             illinois:
@@ -55,8 +55,8 @@ jobs:
               - 'infra/**'
               - '.github/workflows/**'
             any-app:
-              - 'linguaflow---ai-language-partner/**'
-              - 'nanoedit-ai- prod/**'
+              - 'linguaflow/**'
+              - 'nanoedit-ai-prod/**'
               - 'passport-photo-ai/**'
               - 'illinois-driver-study/**'
               - 'comic-news/**'
@@ -76,7 +76,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker build -t linguaflow:test ./linguaflow---ai-language-partner
+        run: docker build -t linguaflow:test ./linguaflow
 
   build-nanoedit:
     needs: detect-changes
@@ -85,7 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Docker image
-        run: docker build -t nanoedit:test "./nanoedit-ai- prod"
+        run: docker build -t nanoedit:test ./nanoedit-ai-prod
 
   build-passport:
     needs: detect-changes
