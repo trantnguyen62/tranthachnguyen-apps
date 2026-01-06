@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DevOps Defender - A 2D space shooter game to learn DevOps concepts through gameplay">
+    <meta name="description"
+        content="DevOps Defender - A 2D space shooter game to learn DevOps concepts through gameplay">
     <title>DevOps Defender | Learn DevOps Through Gaming</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="game-container">
+        <!-- Global Menu Button (always on top) -->
+        <button class="game-menu-btn" id="globalMenuBtn" onclick="togglePause()" title="Pause (P)"
+            style="display: none;">
+            <img src="assets/menu_icon.png" alt="Menu" class="menu-icon-img" onerror="this.style.display='none'">
+            <span>MENU</span>
+        </button>
+
         <!-- Main Menu -->
         <div id="mainMenu" class="screen">
             <div class="menu-background">
@@ -51,6 +63,10 @@
                     <button class="menu-btn secondary" onclick="showScreen('howToPlay')">
                         <span class="btn-icon">❓</span>
                         <span class="btn-text">How to Play</span>
+                    </button>
+                    <button class="menu-btn secondary" onclick="window.close(); history.back();">
+                        <span class="btn-icon">🚪</span>
+                        <span class="btn-text">Exit</span>
                     </button>
                 </div>
                 <div class="high-score-display">
@@ -106,7 +122,7 @@
                             <h3>Scoring</h3>
                             <p><strong>+100</strong> - Correct answer</p>
                             <p><strong>+50</strong> - Speed bonus (< 5 seconds)</p>
-                            <p><strong>x2</strong> - Streak multiplier</p>
+                                    <p><strong>x2</strong> - Streak multiplier</p>
                         </div>
                     </div>
                 </div>
@@ -117,7 +133,7 @@
         <!-- Game Screen -->
         <div id="gameScreen" class="screen hidden">
             <canvas id="gameCanvas"></canvas>
-            
+
             <!-- HUD -->
             <div class="hud">
                 <div class="hud-left">
@@ -221,4 +237,5 @@
 
     <script src="game.js"></script>
 </body>
+
 </html>

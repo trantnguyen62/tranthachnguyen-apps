@@ -27,7 +27,7 @@ services:
 
   # NanoEdit AI - photoedit.tranthachnguyen.com
   nanoedit-ai:
-    build: ./nanoedit-ai- prod
+    build: ./nanoedit-ai-prod
     container_name: nanoedit-ai
     expose:
       - "5173"
@@ -56,7 +56,7 @@ services:
 
   # LinguaFlow - linguaflow.tranthachnguyen.com
   linguaflow:
-    build: ./linguaflow---ai-language-partner
+    build: ./linguaflow
     container_name: linguaflow
     expose:
       - "3000"

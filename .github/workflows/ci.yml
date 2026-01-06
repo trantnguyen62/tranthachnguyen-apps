@@ -1,0 +1,214 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  REMOTE_PATH: /opt/tranthachnguyen
+
+jobs:
+  # ============================================
+  # Detect which apps have changed
+  # ============================================
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      linguaflow: ${{ steps.filter.outputs.linguaflow }}
+      nanoedit: ${{ steps.filter.outputs.nanoedit }}
+      passport: ${{ steps.filter.outputs.passport }}
+      illinois: ${{ steps.filter.outputs.illinois }}
+      comic: ${{ steps.filter.outputs.comic }}
+      devops-study: ${{ steps.filter.outputs.devops-study }}
+      devops-game: ${{ steps.filter.outputs.devops-game }}
+      landing: ${{ steps.filter.outputs.landing }}
+      infra: ${{ steps.filter.outputs.infra }}
+      any-app: ${{ steps.filter.outputs.any-app }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            linguaflow:
+              - 'linguaflow---ai-language-partner/**'
+            nanoedit:
+              - 'nanoedit-ai- prod/**'
+            passport:
+              - 'passport-photo-ai/**'
+            illinois:
+              - 'illinois-driver-study/**'
+            comic:
+              - 'comic-news/**'
+            devops-study:
+              - 'devops-study/**'
+            devops-game:
+              - 'devops-game/**'
+            landing:
+              - 'landing-page/**'
+            infra:
+              - 'docker-compose.yml'
+              - 'infra/**'
+              - '.github/workflows/**'
+            any-app:
+              - 'linguaflow---ai-language-partner/**'
+              - 'nanoedit-ai- prod/**'
+              - 'passport-photo-ai/**'
+              - 'illinois-driver-study/**'
+              - 'comic-news/**'
+              - 'devops-study/**'
+              - 'devops-game/**'
+              - 'landing-page/**'
+              - 'docker-compose.yml'
+              - 'infra/**'
+
+  # ============================================
+  # Build jobs for each app (only if changed)
+  # ============================================
+  build-linguaflow:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.linguaflow == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t linguaflow:test ./linguaflow---ai-language-partner
+
+  build-nanoedit:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.nanoedit == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t nanoedit:test "./nanoedit-ai- prod"
+
+  build-passport:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.passport == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t passport-photo:test ./passport-photo-ai
+
+  build-illinois:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.illinois == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t illinois-driver:test ./illinois-driver-study
+
+  build-comic:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.comic == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t comic-news:test ./comic-news
+
+  build-devops-study:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.devops-study == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t devops-study:test ./devops-study
+
+  build-devops-game:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.devops-game == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t devops-game:test ./devops-game
+
+  build-landing:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.landing == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t landing-page:test ./landing-page
+
+  # ============================================
+  # Deploy to Proxmox (only on main branch)
+  # ============================================
+  deploy:
+    needs: 
+      - detect-changes
+      - build-linguaflow
+      - build-nanoedit
+      - build-passport
+      - build-illinois
+      - build-comic
+      - build-devops-study
+      - build-devops-game
+      - build-landing
+    # Run deploy if ANY app changed OR infra changed, and only on main branch
+    if: |
+      always() &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push' &&
+      (needs.detect-changes.outputs.any-app == 'true' || needs.detect-changes.outputs.infra == 'true') &&
+      !contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROXMOX_SSH_KEY }}" | base64 -d > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.PROXMOX_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Create .env file
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+      
+      - name: Sync files to Proxmox
+        run: |
+          rsync -avz --progress \
+            --exclude 'node_modules' \
+            --exclude '.git' \
+            --exclude '.vite' \
+            --exclude '*.log' \
+            --exclude '.DS_Store' \
+            -e "ssh -i ~/.ssh/id_rsa" \
+            ./ ${{ secrets.PROXMOX_USER }}@${{ secrets.PROXMOX_HOST }}:${{ env.REMOTE_PATH }}/
+      
+      - name: Deploy with Docker Compose
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.PROXMOX_USER }}@${{ secrets.PROXMOX_HOST }} << 'EOF'
+            cd ${{ env.REMOTE_PATH }}
+            docker-compose down --remove-orphans || true
+            docker-compose up -d --build
+            docker-compose ps
+          EOF
+      
+      - name: Deployment Summary
+        run: |
+          echo "## 🚀 Deployment Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Services Deployed:" >> $GITHUB_STEP_SUMMARY
+          echo "- https://tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY
+          echo "- https://photoedit.tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY
+          echo "- https://passportphoto.tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY
+          echo "- https://illinoisdriverstudy.tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY
+          echo "- https://linguaflow.tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY
+          echo "- https://comicnews.tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY
+          echo "- https://devopsstudy.tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY
+          echo "- https://devopsgame.tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY

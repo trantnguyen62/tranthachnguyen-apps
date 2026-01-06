@@ -3,12 +3,12 @@ import { Project } from './types';
 export const PROJECTS: Project[] = [
   {
     name: 'NanoEdit AI',
-    path: 'nanoedit-ai- prod',
+    path: 'nanoedit-ai-prod',
     description: 'AI-powered photo editing with Gemini'
   },
   {
     name: 'LinguaFlow',
-    path: 'linguaflow---ai-language-partner',
+    path: 'linguaflow',
     description: 'AI language learning with Gemini Live voice'
   },
   {

@@ -1,0 +1,17 @@
+# Example terraform.tfvars file
+# =============================
+# Copy this to terraform.tfvars and fill in your values
+# DO NOT commit terraform.tfvars to git (it's gitignored)
+
+# Get from Cloudflare dashboard → API Tokens → Create Token
+# Permissions needed: Zone:DNS:Edit
+cloudflare_api_token = "your-api-token-here"
+
+# Get from Cloudflare dashboard → Your domain → Overview (right sidebar)
+cloudflare_zone_id = "your-zone-id-here"
+
+# Get from Cloudflare dashboard → Overview (right sidebar)  
+cloudflare_account_id = "your-account-id-here"
+
+# Get from: cloudflared tunnel list (or Cloudflare dashboard → Zero Trust → Tunnels)
+tunnel_id = "your-tunnel-uuid-here"

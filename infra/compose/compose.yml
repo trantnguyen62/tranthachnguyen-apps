@@ -28,7 +28,7 @@ services:
   # ==========================================================================
   nanoedit-web:
     build:
-      context: ../../nanoedit-ai- prod
+      context: ../../nanoedit-ai-prod
       dockerfile: Dockerfile.web
     container_name: nanoedit-web
     restart: unless-stopped
@@ -37,7 +37,7 @@ services:
 
   nanoedit-api:
     build:
-      context: ../../nanoedit-ai- prod
+      context: ../../nanoedit-ai-prod
       dockerfile: Dockerfile.api
     container_name: nanoedit-api
     restart: unless-stopped
@@ -65,7 +65,7 @@ services:
   # ==========================================================================
   linguaflow-web:
     build:
-      context: ../../linguaflow---ai-language-partner
+      context: ../../linguaflow
       dockerfile: Dockerfile.web
     container_name: linguaflow-web
     restart: unless-stopped
@@ -74,7 +74,7 @@ services:
 
   linguaflow-ws:
     build:
-      context: ../../linguaflow---ai-language-partner
+      context: ../../linguaflow
       dockerfile: Dockerfile.ws
     container_name: linguaflow-ws
     restart: unless-stopped
@@ -85,7 +85,7 @@ services:
 
   linguaflow-api:
     build:
-      context: ../../linguaflow---ai-language-partner
+      context: ../../linguaflow
       dockerfile: Dockerfile.api
     container_name: linguaflow-api
     restart: unless-stopped

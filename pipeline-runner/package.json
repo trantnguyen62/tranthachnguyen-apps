@@ -1,0 +1,25 @@
+{
+    "name": "pipeline-runner",
+    "version": "1.0.0",
+    "description": "Pipeline Runner - Learn DevOps Through Gaming. Navigate CI/CD pipelines and answer DevOps questions!",
+    "main": "index.html",
+    "scripts": {
+        "start": "npx serve www",
+        "build": "cp -r *.html *.css *.js www/",
+        "ios": "npx cap open ios",
+        "ios:sync": "npx cap sync ios"
+    },
+    "keywords": [
+        "devops",
+        "game",
+        "learning",
+        "ios"
+    ],
+    "author": "Tran Nguyen",
+    "license": "MIT",
+    "dependencies": {
+        "@capacitor/cli": "^8.0.0",
+        "@capacitor/core": "^8.0.0",
+        "@capacitor/ios": "^8.0.0"
+    }
+}

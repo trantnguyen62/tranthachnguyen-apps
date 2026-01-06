@@ -15,7 +15,13 @@ const CONFIG = {
     DAMAGE_WRONG: 20,
     DAMAGE_TIMEOUT: 15,
     WAVES_PER_ZONE: 5,
-    ENEMIES_PER_WAVE_BASE: 3
+    ENEMIES_PER_WAVE_BASE: 3,
+    // Shooting config
+    PROJECTILE_SPEED: 12,
+    FIRE_RATE: 150,        // ms between shots
+    ENEMY_MAX_HEALTH: 3,   // hits needed to destroy
+    SHOOT_DAMAGE: 1,
+    SHOOT_SCORE: 50        // points for shooting enemy
 };
 
 // DevOps Questions Database
@@ -32,7 +38,15 @@ const QUESTIONS = {
         { q: "What does the -d flag do in 'docker run -d'?", a: ["Runs container in detached mode", "Enables debugging", "Downloads image", "Deletes after exit"], c: 0 },
         { q: "Which port mapping is correct?", a: ["-p 8080:80", "-p 80-8080", "-port 8080:80", "--port=8080,80"], c: 0 },
         { q: "What is a multi-stage build?", a: ["Build with multiple FROM statements", "Building multiple containers", "Parallel builds", "Sequential deployments"], c: 0 },
-        { q: "What does ENTRYPOINT do in a Dockerfile?", a: ["Sets the main executable", "Defines environment variables", "Copies files", "Exposes ports"], c: 0 }
+        { q: "What does ENTRYPOINT do in a Dockerfile?", a: ["Sets the main executable", "Defines environment variables", "Copies files", "Exposes ports"], c: 0 },
+        { q: "What is Docker Hub?", a: ["Public container registry", "Container orchestrator", "Build tool", "Monitoring service"], c: 0 },
+        { q: "What does 'docker exec' do?", a: ["Runs command in running container", "Starts new container", "Stops container", "Removes container"], c: 0 },
+        { q: "What is the CMD instruction?", a: ["Default container command", "Comment line", "Copy files", "Create directory"], c: 0 },
+        { q: "What does 'docker logs' show?", a: ["Container output logs", "System logs", "Build logs", "Network logs"], c: 0 },
+        { q: "What is the difference between ADD and COPY?", a: ["ADD can extract archives", "ADD is faster", "COPY is deprecated", "No difference"], c: 0 },
+        { q: "What does 'docker network create' do?", a: ["Creates custom network", "Lists networks", "Removes network", "Inspects network"], c: 0 },
+        { q: "What is a Docker layer?", a: ["Read-only filesystem diff", "Network layer", "Security layer", "API layer"], c: 0 },
+        { q: "What does '--rm' flag do in docker run?", a: ["Removes container after exit", "Runs in read mode", "Enables root mode", "Uses RAM mount"], c: 0 }
     ],
     kubernetes: [
         { q: "What is a Kubernetes Pod?", a: ["Smallest deployable unit", "A cluster", "A service", "A volume"], c: 0 },
@@ -46,7 +60,15 @@ const QUESTIONS = {
         { q: "What does 'kubectl get pods' show?", a: ["List of Pods", "Pod logs", "Pod description", "Pod metrics"], c: 0 },
         { q: "What is a StatefulSet used for?", a: ["Stateful applications", "Stateless services", "Network policies", "Resource quotas"], c: 0 },
         { q: "What is a DaemonSet?", a: ["Runs Pod on every node", "Manages secrets", "Handles ingress", "Schedules jobs"], c: 0 },
-        { q: "What does kubelet do?", a: ["Runs containers on nodes", "Manages the API", "Stores cluster state", "Routes traffic"], c: 0 }
+        { q: "What does kubelet do?", a: ["Runs containers on nodes", "Manages the API", "Stores cluster state", "Routes traffic"], c: 0 },
+        { q: "What is etcd used for in Kubernetes?", a: ["Cluster state storage", "Container runtime", "Load balancing", "Pod scheduling"], c: 0 },
+        { q: "What is a PersistentVolumeClaim?", a: ["Request for storage", "Network policy", "Security context", "Resource limit"], c: 0 },
+        { q: "What does 'kubectl describe' show?", a: ["Detailed resource info", "Resource list", "Logs", "Metrics"], c: 0 },
+        { q: "What is a ReplicaSet?", a: ["Ensures Pod count", "Manages secrets", "Routes traffic", "Stores config"], c: 0 },
+        { q: "What is a NodePort service?", a: ["Exposes port on all nodes", "Internal only", "Load balancer", "External DNS"], c: 0 },
+        { q: "What is kubectl rollout?", a: ["Manages deployments", "Creates pods", "Deletes services", "Scales clusters"], c: 0 },
+        { q: "What is a CronJob?", a: ["Scheduled job", "Continuous job", "One-time job", "Parallel job"], c: 0 },
+        { q: "What is kube-proxy?", a: ["Network proxy", "API server", "Scheduler", "Controller"], c: 0 }
     ],
     cicd: [
         { q: "What does CI stand for?", a: ["Continuous Integration", "Code Inspection", "Container Instance", "Cloud Infrastructure"], c: 0 },
@@ -60,7 +82,15 @@ const QUESTIONS = {
         { q: "What does 'shift left' mean?", a: ["Earlier testing in pipeline", "Code formatting", "Branch merging", "Log rotation"], c: 0 },
         { q: "What is blue-green deployment?", a: ["Two identical environments", "Color-coded logs", "Branch naming", "Error highlighting"], c: 0 },
         { q: "What is a canary deployment?", a: ["Gradual rollout to subset", "Fast deployment", "Rollback strategy", "Testing approach"], c: 0 },
-        { q: "What is GitHub Actions?", a: ["CI/CD platform", "Code review tool", "Issue tracker", "Wiki system"], c: 0 }
+        { q: "What is GitHub Actions?", a: ["CI/CD platform", "Code review tool", "Issue tracker", "Wiki system"], c: 0 },
+        { q: "What is a pipeline stage?", a: ["Group of jobs", "Code branch", "Server node", "Database"], c: 0 },
+        { q: "What is ArgoCD?", a: ["GitOps CD tool", "CI tool", "Container registry", "Monitoring tool"], c: 0 },
+        { q: "What is a rollback?", a: ["Reverting to previous version", "Moving forward", "Scaling up", "Restarting"], c: 0 },
+        { q: "What is feature flagging?", a: ["Toggle features on/off", "Code commenting", "Branch naming", "Error logging"], c: 0 },
+        { q: "What is trunk-based development?", a: ["Single main branch", "Many long branches", "Feature branches", "Release branches"], c: 0 },
+        { q: "What is CircleCI?", a: ["CI/CD platform", "Code editor", "Container registry", "Cloud provider"], c: 0 },
+        { q: "What is a build matrix?", a: ["Multiple config combinations", "Single build", "Code coverage", "Deployment target"], c: 0 },
+        { q: "What is semantic versioning?", a: ["MAJOR.MINOR.PATCH format", "Date-based versioning", "Random numbering", "Alphabetic versioning"], c: 0 }
     ],
     aws: [
         { q: "What is EC2?", a: ["Elastic Compute Cloud", "Elastic Container Cloud", "Enterprise Cloud Computing", "Easy Cloud Creation"], c: 0 },
@@ -74,7 +104,15 @@ const QUESTIONS = {
         { q: "What is CloudWatch?", a: ["Monitoring and logging", "Storage service", "Compute service", "Database service"], c: 0 },
         { q: "What is an AWS Region?", a: ["Geographic location of data centers", "Pricing tier", "Account type", "Service category"], c: 0 },
         { q: "What is Route 53?", a: ["DNS service", "Routing table", "VPC component", "Load balancer"], c: 0 },
-        { q: "What is ELB?", a: ["Elastic Load Balancer", "Enterprise Linux Box", "Easy Lambda Builder", "Elastic Log Buffer"], c: 0 }
+        { q: "What is ELB?", a: ["Elastic Load Balancer", "Enterprise Linux Box", "Easy Lambda Builder", "Elastic Log Buffer"], c: 0 },
+        { q: "What is ECS?", a: ["Elastic Container Service", "Enterprise Compute Service", "Easy Cloud Storage", "Elastic CDN Service"], c: 0 },
+        { q: "What is DynamoDB?", a: ["NoSQL database", "SQL database", "Cache service", "Queue service"], c: 0 },
+        { q: "What is SNS?", a: ["Simple Notification Service", "Server Name System", "Storage Network Service", "Secure Node Service"], c: 0 },
+        { q: "What is SQS?", a: ["Simple Queue Service", "Secure Query Service", "Storage Queue System", "Server Query Service"], c: 0 },
+        { q: "What is an Availability Zone?", a: ["Isolated data center", "Service type", "Pricing tier", "Account region"], c: 0 },
+        { q: "What is Fargate?", a: ["Serverless containers", "Database service", "Storage tier", "Network type"], c: 0 },
+        { q: "What is AWS CLI?", a: ["Command-line tool", "GUI console", "Mobile app", "Desktop app"], c: 0 },
+        { q: "What is ElastiCache?", a: ["In-memory caching", "File storage", "Compute service", "Database backup"], c: 0 }
     ],
     terraform: [
         { q: "What is Terraform?", a: ["Infrastructure as Code tool", "Container runtime", "CI/CD platform", "Monitoring tool"], c: 0 },
@@ -88,7 +126,13 @@ const QUESTIONS = {
         { q: "What does 'terraform destroy' do?", a: ["Removes all resources", "Shows plan", "Applies changes", "Validates config"], c: 0 },
         { q: "What file extension does Terraform use?", a: [".tf", ".yaml", ".json", ".xml"], c: 0 },
         { q: "What is a Terraform workspace?", a: ["Isolated state environment", "Configuration file", "Module directory", "Provider setting"], c: 0 },
-        { q: "What is terraform.tfvars?", a: ["Variable values file", "State file", "Plan output", "Lock file"], c: 0 }
+        { q: "What is terraform.tfvars?", a: ["Variable values file", "State file", "Plan output", "Lock file"], c: 0 },
+        { q: "What is terraform.lock.hcl?", a: ["Dependency lock file", "State file", "Config file", "Variable file"], c: 0 },
+        { q: "What does 'terraform validate' do?", a: ["Checks config syntax", "Applies changes", "Shows state", "Destroys resources"], c: 0 },
+        { q: "What is a data source in Terraform?", a: ["Reads external data", "Creates resources", "Stores state", "Defines variables"], c: 0 },
+        { q: "What is terraform output?", a: ["Displays output values", "Creates resources", "Shows plan", "Validates config"], c: 0 },
+        { q: "What is a resource block?", a: ["Defines infrastructure", "Stores state", "Imports modules", "Sets variables"], c: 0 },
+        { q: "What is remote state?", a: ["State stored externally", "Local state", "Cached state", "Temp state"], c: 0 }
     ],
     git: [
         { q: "What does 'git clone' do?", a: ["Copies a repository", "Creates a branch", "Merges branches", "Pushes changes"], c: 0 },
@@ -102,7 +146,15 @@ const QUESTIONS = {
         { q: "What is 'git rebase'?", a: ["Reapplies commits on new base", "Creates backup", "Deletes history", "Merges repositories"], c: 0 },
         { q: "What does HEAD refer to?", a: ["Current commit reference", "Remote server", "Branch list", "Commit history"], c: 0 },
         { q: "What is a pull request?", a: ["Request to merge changes", "Download request", "Access request", "Delete request"], c: 0 },
-        { q: "What does 'git log' show?", a: ["Commit history", "Current changes", "Branch list", "Remote URLs"], c: 0 }
+        { q: "What does 'git log' show?", a: ["Commit history", "Current changes", "Branch list", "Remote URLs"], c: 0 },
+        { q: "What does 'git diff' show?", a: ["Changes between commits", "Branch list", "Remote URLs", "File list"], c: 0 },
+        { q: "What is 'git fetch'?", a: ["Downloads without merging", "Uploads changes", "Deletes branch", "Creates tag"], c: 0 },
+        { q: "What does 'git reset' do?", a: ["Undoes commits", "Creates branch", "Merges changes", "Shows log"], c: 0 },
+        { q: "What is a Git tag?", a: ["Named commit reference", "Branch type", "Remote server", "File marker"], c: 0 },
+        { q: "What does 'git cherry-pick' do?", a: ["Applies specific commit", "Deletes commit", "Creates branch", "Merges all"], c: 0 },
+        { q: "What is .gitignore?", a: ["Files to exclude from tracking", "Config file", "Branch list", "Remote list"], c: 0 },
+        { q: "What is 'git blame'?", a: ["Shows line-by-line authorship", "Deletes history", "Creates backup", "Merges branches"], c: 0 },
+        { q: "What is a Git submodule?", a: ["Repository inside repository", "Branch type", "Commit type", "Tag type"], c: 0 }
     ],
     linux: [
         { q: "What does 'ls' command do?", a: ["Lists directory contents", "Creates file", "Deletes file", "Moves file"], c: 0 },
@@ -116,7 +168,15 @@ const QUESTIONS = {
         { q: "What does 'cat' command do?", a: ["Displays file contents", "Creates files", "Concatenates commands", "Copies files"], c: 0 },
         { q: "What does 'df' show?", a: ["Disk space usage", "Directory files", "Data format", "Device info"], c: 0 },
         { q: "What does 'top' display?", a: ["System processes", "File contents", "Network status", "User list"], c: 0 },
-        { q: "What does 'ssh' do?", a: ["Secure remote connection", "File transfer", "Service start", "System shutdown"], c: 0 }
+        { q: "What does 'ssh' do?", a: ["Secure remote connection", "File transfer", "Service start", "System shutdown"], c: 0 },
+        { q: "What does 'wget' do?", a: ["Downloads files from web", "Uploads files", "Lists directories", "Edits files"], c: 0 },
+        { q: "What does 'curl' do?", a: ["Transfers data via URLs", "Creates users", "Compresses files", "Lists processes"], c: 0 },
+        { q: "What does 'tar' do?", a: ["Archives files", "Transfers files", "Terminates processes", "Tests network"], c: 0 },
+        { q: "What does 'awk' do?", a: ["Text processing", "Archive creation", "Process listing", "Disk formatting"], c: 0 },
+        { q: "What does 'sed' do?", a: ["Stream editing", "Service daemon", "System export", "Secure delete"], c: 0 },
+        { q: "What is /etc/passwd?", a: ["User account file", "Password storage", "Network config", "System log"], c: 0 },
+        { q: "What does 'crontab' manage?", a: ["Scheduled tasks", "User accounts", "Network routes", "File systems"], c: 0 },
+        { q: "What does 'htop' provide?", a: ["Interactive process viewer", "HTTP server", "Help topics", "Hash table"], c: 0 }
     ],
     monitoring: [
         { q: "What is Prometheus?", a: ["Monitoring system", "Container runtime", "CI/CD tool", "Load balancer"], c: 0 },
@@ -198,6 +258,59 @@ const TOPICS = [
     { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2' }
 ];
 
+// Assets Configuration
+const ASSETS = {
+    images: {
+        enemy: 'assets/enemy_ship.png',
+        player: 'assets/player_ship.png',
+        background: 'assets/background.png',
+        // item_health: 'assets/item_health.png', // Uncomment when available
+        // item_shield: 'assets/item_shield.png'  // Uncomment when available
+    },
+    loaded: {}
+};
+
+// ... (AssetLoader remains same) ...
+const AssetLoader = {
+    total: 0,
+    loaded: 0,
+
+    loadAll(callback) {
+        const sources = ASSETS.images;
+        const imageNames = Object.keys(sources);
+        this.total = imageNames.length;
+        this.loaded = 0;
+
+        if (this.total === 0) {
+            callback();
+            return;
+        }
+
+        imageNames.forEach(name => {
+            const img = new Image();
+            img.onload = () => {
+                this.loaded++;
+                ASSETS.loaded[name] = img;
+                if (this.loaded === this.total) {
+                    callback();
+                }
+            };
+            img.onerror = () => {
+                console.warn(`Failed to load asset: ${sources[name]}`);
+                this.loaded++; // Count error as handled
+                if (this.loaded === this.total) {
+                    callback();
+                }
+            };
+            img.src = sources[name];
+        });
+    },
+
+    getImage(name) {
+        return ASSETS.loaded[name];
+    }
+};
+
 // Game State
 let game = {
     mode: 'adventure',
@@ -206,7 +319,7 @@ let game = {
     canvas: null,
     ctx: null,
     animationId: null,
-    
+
     // Player
     player: {
         x: 0,
@@ -218,7 +331,7 @@ let game = {
         shield: 0,
         speed: CONFIG.PLAYER_SPEED
     },
-    
+
     // Game stats
     score: 0,
     streak: 0,
@@ -226,30 +339,34 @@ let game = {
     multiplier: 1,
     questionsAnswered: 0,
     correctAnswers: 0,
-    
+
     // Level/Zone
     currentZone: 0,
     currentWave: 1,
     enemiesDefeated: 0,
-    
+
     // Enemies and objects
     enemies: [],
     projectiles: [],
     particles: [],
     powerups: [],
     stars: [],
-    
+    shake: 0, // Canvas shake magnitude
+
     // Question state
     currentQuestion: null,
     questionActive: false,
     questionTimer: 0,
     selectedAnswer: -1,
-    
+
     // Input
     keys: {},
-    
+
     // High score
-    highScore: 0
+    highScore: 0,
+
+    // Shooting
+    lastFireTime: 0
 };
 
 // Initialize game on load
@@ -258,13 +375,16 @@ document.addEventListener('DOMContentLoaded', init);
 function init() {
     game.canvas = document.getElementById('gameCanvas');
     game.ctx = game.canvas.getContext('2d');
-    
-    loadHighScore();
-    setupEventListeners();
-    renderTopicGrid();
-    resizeCanvas();
-    
-    window.addEventListener('resize', resizeCanvas);
+
+    // Load assets then initialize
+    AssetLoader.loadAll(() => {
+        loadHighScore();
+        setupEventListeners();
+        renderTopicGrid();
+        resizeCanvas();
+
+        window.addEventListener('resize', resizeCanvas);
+    });
 }
 
 function loadHighScore() {
@@ -284,25 +404,30 @@ function saveHighScore() {
 function setupEventListeners() {
     document.addEventListener('keydown', (e) => {
         game.keys[e.key.toLowerCase()] = true;
-        
+
         if (game.running && !game.paused) {
             // Answer selection with number keys
             if (game.questionActive && ['1', '2', '3', '4'].includes(e.key)) {
                 selectAnswer(parseInt(e.key) - 1);
             }
-            
+
+            // Shoot with space (when not answering)
+            if (e.key === ' ' && !game.questionActive) {
+                shoot();
+            }
+
             // Pause
             if (e.key.toLowerCase() === 'p') {
                 togglePause();
             }
         }
-        
+
         // Prevent scrolling
         if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(e.key.toLowerCase())) {
             e.preventDefault();
         }
     });
-    
+
     document.addEventListener('keyup', (e) => {
         game.keys[e.key.toLowerCase()] = false;
     });
@@ -317,7 +442,7 @@ function resizeCanvas() {
 function renderTopicGrid() {
     const grid = document.getElementById('topicGrid');
     grid.innerHTML = '';
-    
+
     TOPICS.forEach(topic => {
         const card = document.createElement('div');
         card.className = 'topic-card';
@@ -343,33 +468,33 @@ function startGame(mode, topicId = null) {
     game.mode = mode;
     game.running = true;
     game.paused = false;
-    
+
     // Reset game state
     game.player.x = game.canvas.width / 2;
     game.player.y = game.canvas.height - 150;
     game.player.health = game.player.maxHealth;
     game.player.shield = 0;
-    
+
     game.score = 0;
     game.streak = 0;
     game.bestStreak = 0;
     game.multiplier = 1;
     game.questionsAnswered = 0;
     game.correctAnswers = 0;
-    
+
     game.currentZone = topicId ? TOPICS.findIndex(t => t.id === topicId) : 0;
     game.currentWave = 1;
     game.enemiesDefeated = 0;
-    
+
     game.enemies = [];
     game.projectiles = [];
     game.particles = [];
     game.powerups = [];
     game.stars = [];
-    
+
     game.currentQuestion = null;
     game.questionActive = false;
-    
+
     // Initialize stars
     for (let i = 0; i < 100; i++) {
         game.stars.push({
@@ -379,15 +504,18 @@ function startGame(mode, topicId = null) {
             speed: Math.random() * 2 + 0.5
         });
     }
-    
+
     showScreen('gameScreen');
     hideAllOverlays();
     updateHUD();
-    
+
+    // Show global menu button
+    document.getElementById('globalMenuBtn').style.display = 'flex';
+
     // Start game loop
     if (game.animationId) cancelAnimationFrame(game.animationId);
     gameLoop();
-    
+
     // Spawn first wave
     setTimeout(() => spawnWave(), 1000);
 }
@@ -402,12 +530,12 @@ function hideAllOverlays() {
 // Main game loop
 function gameLoop() {
     if (!game.running) return;
-    
+
     if (!game.paused) {
         update();
         render();
     }
-    
+
     game.animationId = requestAnimationFrame(gameLoop);
 }
 
@@ -420,7 +548,7 @@ function update() {
             star.x = Math.random() * game.canvas.width;
         }
     });
-    
+
     // Player movement
     if (!game.questionActive) {
         if (game.keys['arrowleft'] || game.keys['a']) {
@@ -436,26 +564,58 @@ function update() {
             game.player.y = Math.min(game.canvas.height - game.player.height / 2, game.player.y + game.player.speed);
         }
     }
-    
-    // Update enemies
-    game.enemies.forEach(enemy => {
-        enemy.y += enemy.speed;
-        enemy.wobble += 0.05;
-        enemy.x += Math.sin(enemy.wobble) * 0.5;
-        
-        // Check if enemy reached player zone
-        if (enemy.y > game.canvas.height - 200 && !enemy.triggered) {
-            enemy.triggered = true;
-            showQuestion(enemy);
-        }
-    });
-    
-    // Update projectiles
-    game.projectiles = game.projectiles.filter(p => {
-        p.y -= p.speed;
-        return p.y > 0;
-    });
-    
+
+    // Update enemies (pause when question is active)
+    if (!game.questionActive) {
+        game.enemies.forEach(enemy => {
+            enemy.y += enemy.speed;
+            enemy.wobble += 0.05;
+            enemy.x += Math.sin(enemy.wobble) * 0.5;
+
+            // Check collision between player ship and enemy
+            if (!enemy.triggered) {
+                const dx = game.player.x - enemy.x;
+                const dy = game.player.y - enemy.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const collisionThreshold = 45; // Combined radius of player and enemy
+
+                if (distance < collisionThreshold) {
+                    enemy.triggered = true;
+                    showQuestion(enemy);
+                    return; // Stop processing this enemy
+                }
+            }
+
+            // Check if enemy reached player zone (fallback trigger)
+            if (enemy.y > game.canvas.height - 200 && !enemy.triggered) {
+                enemy.triggered = true;
+                showQuestion(enemy);
+            }
+        });
+
+        // Update projectiles and check collisions
+        game.projectiles = game.projectiles.filter(p => {
+            p.y -= p.speed;
+            if (p.y < 0) return false;
+
+            // Check collision with each enemy
+            for (let enemy of game.enemies) {
+                const dx = p.x - enemy.x;
+                const dy = p.y - enemy.y;
+                if (Math.abs(dx) < 30 && Math.abs(dy) < 30) {
+                    enemy.health -= CONFIG.SHOOT_DAMAGE;
+                    createHitParticles(enemy.x, enemy.y);
+
+                    if (enemy.health <= 0 && !enemy.triggered) {
+                        destroyEnemyByShot(enemy);
+                    }
+                    return false; // Remove projectile
+                }
+            }
+            return true;
+        });
+    }
+
     // Update particles
     game.particles = game.particles.filter(p => {
         p.x += p.vx;
@@ -464,50 +624,79 @@ function update() {
         p.vy += 0.1; // gravity
         return p.life > 0;
     });
-    
+
     // Update powerups
     game.powerups = game.powerups.filter(p => {
         p.y += 1;
-        
+
         // Check collision with player
         const dx = p.x - game.player.x;
         const dy = p.y - game.player.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
+
         if (dist < 40) {
             applyPowerup(p.type);
             return false;
         }
-        
+
         return p.y < game.canvas.height;
     });
-    
+
     // Question timer
     if (game.questionActive && game.questionTimer > 0) {
-        game.questionTimer -= 1/60;
+        game.questionTimer -= 1 / 60;
         updateTimerDisplay();
-        
+
         if (game.questionTimer <= 0) {
             handleTimeout();
         }
+    }
+
+    // Decay shake
+    if (game.shake > 0) {
+        game.shake *= 0.9;
+        if (game.shake < 0.5) game.shake = 0;
     }
 }
 
 function render() {
     const ctx = game.ctx;
-    
+
     // Clear canvas
     ctx.fillStyle = '#0a0a1a';
     ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-    
-    // Draw stars
+
+    ctx.save(); // Save before shake
+
+    // Apply shake
+    if (game.shake > 0) {
+        const dx = (Math.random() - 0.5) * game.shake;
+        const dy = (Math.random() - 0.5) * game.shake;
+        ctx.translate(dx, dy);
+    }
+
+    // Draw Background Asset
+    const bg = AssetLoader.getImage('background');
+    if (bg) {
+        // Simple parallax or static cover
+        // Drawing slightly larger to allow for future movement/parallax if needed
+        const scale = Math.max(game.canvas.width / bg.width, game.canvas.height / bg.height);
+        const w = bg.width * scale;
+        const h = bg.height * scale;
+
+        ctx.globalAlpha = 0.5; // Dim it slightly so game elements pop
+        ctx.drawImage(bg, (game.canvas.width - w) / 2, (game.canvas.height - h) / 2, w, h);
+        ctx.globalAlpha = 1.0;
+    }
+
+    // Draw stars (keep them as they add nice depth over the background)
     game.stars.forEach(star => {
         ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + star.size / 3})`;
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fill();
     });
-    
+
     // Draw particles
     game.particles.forEach(p => {
         ctx.fillStyle = `rgba(${p.color}, ${p.life})`;
@@ -515,19 +704,19 @@ function render() {
         ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
         ctx.fill();
     });
-    
+
     // Draw powerups
     game.powerups.forEach(p => {
         ctx.font = '30px Arial';
         ctx.textAlign = 'center';
         ctx.fillText(p.type === 'health' ? '❤️' : '🛡️', p.x, p.y);
     });
-    
+
     // Draw enemies
     game.enemies.forEach(enemy => {
         drawEnemy(enemy);
     });
-    
+
     // Draw projectiles
     game.projectiles.forEach(p => {
         ctx.fillStyle = '#00d4ff';
@@ -538,97 +727,134 @@ function render() {
         ctx.fill();
         ctx.shadowBlur = 0;
     });
-    
+
     // Draw player
     drawPlayer();
+
+    ctx.restore(); // Restore after shake
 }
 
 function drawPlayer() {
     const ctx = game.ctx;
     const p = game.player;
-    
+
     ctx.save();
     ctx.translate(p.x, p.y);
-    
-    // Glow effect
-    ctx.shadowColor = '#00d4ff';
-    ctx.shadowBlur = 20;
-    
-    // Ship body
-    ctx.fillStyle = '#1a1a3a';
-    ctx.strokeStyle = '#00d4ff';
-    ctx.lineWidth = 2;
-    
-    ctx.beginPath();
-    ctx.moveTo(0, -30);
-    ctx.lineTo(-25, 25);
-    ctx.lineTo(-10, 15);
-    ctx.lineTo(0, 25);
-    ctx.lineTo(10, 15);
-    ctx.lineTo(25, 25);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    
-    // Cockpit
-    ctx.fillStyle = '#00d4ff';
-    ctx.beginPath();
-    ctx.ellipse(0, -5, 8, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Engine glow
-    if (!game.questionActive) {
-        ctx.fillStyle = '#ff6b35';
-        ctx.shadowColor = '#ff6b35';
+
+    // Check for sprite
+    const sprite = AssetLoader.getImage('player');
+
+    if (sprite) {
+        // Draw sprite
+        const size = 80;
+        ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
+
+        // Shield effect overlay
+        if (p.shield > 0) {
+            ctx.strokeStyle = `rgba(0, 212, 255, ${p.shield / 100})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, 40, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    } else {
+        // Fallback: Code-drawn ship
+        // Glow effect
+        ctx.shadowColor = '#00d4ff';
+        ctx.shadowBlur = 20;
+
+        // Ship body
+        ctx.fillStyle = '#1a1a3a';
+        ctx.strokeStyle = '#00d4ff';
+        ctx.lineWidth = 2;
+
         ctx.beginPath();
-        ctx.moveTo(-8, 20);
-        ctx.lineTo(0, 35 + Math.random() * 10);
-        ctx.lineTo(8, 20);
+        ctx.moveTo(0, -30);
+        ctx.lineTo(-25, 25);
+        ctx.lineTo(-10, 15);
+        ctx.lineTo(0, 25);
+        ctx.lineTo(10, 15);
+        ctx.lineTo(25, 25);
         ctx.closePath();
         ctx.fill();
-    }
-    
-    // Shield effect
-    if (p.shield > 0) {
-        ctx.strokeStyle = `rgba(0, 212, 255, ${p.shield / 100})`;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(0, 0, 40, 0, Math.PI * 2);
         ctx.stroke();
+
+        // Cockpit
+        ctx.fillStyle = '#00d4ff';
+        ctx.beginPath();
+        ctx.ellipse(0, -5, 8, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Engine glow
+        if (!game.questionActive) {
+            ctx.fillStyle = '#ff6b35';
+            ctx.shadowColor = '#ff6b35';
+            ctx.beginPath();
+            ctx.moveTo(-8, 20);
+            ctx.lineTo(0, 35 + Math.random() * 10);
+            ctx.lineTo(8, 20);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Shield effect
+        if (p.shield > 0) {
+            ctx.strokeStyle = `rgba(0, 212, 255, ${p.shield / 100})`;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, 40, 0, Math.PI * 2);
+            ctx.stroke();
+        }
     }
-    
+
     ctx.restore();
 }
 
 function drawEnemy(enemy) {
     const ctx = game.ctx;
-    
+
     ctx.save();
     ctx.translate(enemy.x, enemy.y);
-    
-    // Glow
-    ctx.shadowColor = enemy.color;
-    ctx.shadowBlur = 15;
-    
-    // Enemy ship (inverted triangle)
-    ctx.fillStyle = '#1a1a3a';
-    ctx.strokeStyle = enemy.color;
-    ctx.lineWidth = 2;
-    
-    ctx.beginPath();
-    ctx.moveTo(0, 25);
-    ctx.lineTo(-20, -20);
-    ctx.lineTo(0, -10);
-    ctx.lineTo(20, -20);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    
+
+    // Check for sprite
+    const sprite = AssetLoader.getImage('enemy');
+
+    if (sprite) {
+        // Draw sprite
+        const size = 60;
+        // Check if rotated - enemy ships usually point down in this game? 
+        // Original code drew inverted triangle pointing down.
+        // Assuming sprite points UP, we need to rotate 180 deg
+        ctx.rotate(Math.PI);
+        ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
+        ctx.rotate(-Math.PI); // Reset rotation for text
+    } else {
+        // Fallback drawing
+        // Glow
+        ctx.shadowColor = enemy.color;
+        ctx.shadowBlur = 15;
+
+        // Enemy ship (inverted triangle)
+        ctx.fillStyle = '#1a1a3a';
+        ctx.strokeStyle = enemy.color;
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 25);
+        ctx.lineTo(-20, -20);
+        ctx.lineTo(0, -10);
+        ctx.lineTo(20, -20);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+    }
+
     // Topic icon
     ctx.font = '20px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(enemy.icon, 0, 5);
-    
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(enemy.icon, 0, 50); // Move text below ship
+
     ctx.restore();
 }
 
@@ -637,28 +863,39 @@ function showQuestion(enemy) {
     const topic = TOPICS[game.currentZone];
     const questions = QUESTIONS[topic.id];
     const question = questions[Math.floor(Math.random() * questions.length)];
-    
-    game.currentQuestion = { ...question, enemy };
+
+    // Create shuffled answers with indices
+    const answers = question.a.map((text, originalIndex) => ({ text, originalIndex }));
+    // Fisher-Yates shuffle
+    for (let i = answers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [answers[i], answers[j]] = [answers[j], answers[i]];
+    }
+
+    // Find where the correct answer ended up after shuffle
+    const correctShuffledIndex = answers.findIndex(a => a.originalIndex === question.c);
+
+    game.currentQuestion = { ...question, enemy, correctIndex: correctShuffledIndex, shuffledAnswers: answers };
     game.questionActive = true;
     game.questionTimer = CONFIG.QUESTION_TIME;
     game.selectedAnswer = -1;
-    
+
     // Show question panel
     const panel = document.getElementById('questionPanel');
     panel.classList.remove('hidden');
-    
+
     document.getElementById('questionTopic').textContent = topic.name;
     document.getElementById('questionText').textContent = question.q;
-    
+
     const answerGrid = document.getElementById('answerGrid');
     answerGrid.innerHTML = '';
-    
-    question.a.forEach((answer, i) => {
+
+    answers.forEach((answer, i) => {
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
         btn.innerHTML = `
             <span class="answer-key">${i + 1}</span>
-            <span class="answer-text">${answer}</span>
+            <span class="answer-text">${answer.text}</span>
         `;
         btn.onclick = () => selectAnswer(i);
         answerGrid.appendChild(btn);
@@ -667,42 +904,41 @@ function showQuestion(enemy) {
 
 function selectAnswer(index) {
     if (!game.questionActive || game.selectedAnswer !== -1) return;
-    
+
     game.selectedAnswer = index;
     const btns = document.querySelectorAll('.answer-btn');
-    
+
     btns.forEach((btn, i) => {
         btn.classList.add('disabled');
         if (i === index) btn.classList.add('selected');
     });
-    
+
     // Check answer after short delay
     setTimeout(() => checkAnswer(index), 300);
 }
 
 function checkAnswer(index) {
-    const correct = index === game.currentQuestion.c;
+    const correct = index === game.currentQuestion.correctIndex;
     const btns = document.querySelectorAll('.answer-btn');
-    
-    btns[game.currentQuestion.c].classList.add('correct');
+    const enemy = game.currentQuestion.enemy; // Save reference before closeQuestion
+
+    btns[game.currentQuestion.correctIndex].classList.add('correct');
     if (!correct) {
         btns[index].classList.add('incorrect');
     }
-    
+
     game.questionsAnswered++;
-    
+
     if (correct) {
         handleCorrectAnswer();
     } else {
         handleWrongAnswer();
     }
-    
-    // Close question and continue
+
+    // Close question and destroy enemy (always remove enemy after question)
     setTimeout(() => {
         closeQuestion();
-        if (correct) {
-            destroyEnemy(game.currentQuestion.enemy);
-        }
+        destroyEnemy(enemy);
     }, 1000);
 }
 
@@ -710,26 +946,26 @@ function handleCorrectAnswer() {
     game.correctAnswers++;
     game.streak++;
     game.bestStreak = Math.max(game.bestStreak, game.streak);
-    
+
     // Calculate score
     let points = CONFIG.BASE_SCORE;
-    
+
     // Speed bonus
     if (game.questionTimer > CONFIG.QUESTION_TIME - 5) {
         points += CONFIG.SPEED_BONUS;
     }
-    
+
     // Streak multiplier
     game.multiplier = 1 + Math.floor(game.streak / 3) * CONFIG.STREAK_MULTIPLIER;
     points = Math.floor(points * game.multiplier);
-    
+
     game.score += points;
-    
+
     // Show floating score
     createScoreParticle(points);
-    
+
     updateHUD();
-    
+
     // Play sound effect (if implemented)
     // playSound('correct');
 }
@@ -737,10 +973,10 @@ function handleCorrectAnswer() {
 function handleWrongAnswer() {
     game.streak = 0;
     game.multiplier = 1;
-    
+
     // Take damage
     takeDamage(CONFIG.DAMAGE_WRONG);
-    
+
     updateHUD();
 }
 
@@ -748,17 +984,17 @@ function handleTimeout() {
     game.questionsAnswered++;
     game.streak = 0;
     game.multiplier = 1;
-    
+
     // Show correct answer
     const btns = document.querySelectorAll('.answer-btn');
     btns[game.currentQuestion.c].classList.add('correct');
-    
+
     takeDamage(CONFIG.DAMAGE_TIMEOUT);
-    
+
     setTimeout(() => {
         closeQuestion();
     }, 1000);
-    
+
     updateHUD();
 }
 
@@ -781,16 +1017,16 @@ function destroyEnemy(enemy) {
             life: 1
         });
     }
-    
+
     // Remove enemy
     game.enemies = game.enemies.filter(e => e !== enemy);
     game.enemiesDefeated++;
-    
+
     // Maybe spawn powerup
     if (Math.random() < 0.2) {
         spawnPowerup(enemy.x, enemy.y);
     }
-    
+
     // Check wave completion
     if (game.enemies.length === 0) {
         setTimeout(() => completeWave(), 500);
@@ -804,14 +1040,15 @@ function takeDamage(amount) {
         game.player.shield -= shieldDamage;
         amount -= shieldDamage;
     }
-    
+
     game.player.health = Math.max(0, game.player.health - amount);
-    
-    // Screen shake effect
+
+    // Screen shake effect (CSS + Canvas)
     game.canvas.style.animation = 'none';
     game.canvas.offsetHeight; // Trigger reflow
     game.canvas.style.animation = 'shake 0.3s ease';
-    
+    game.shake = 20; // Canvas shake magnitude
+
     // Create damage particles
     for (let i = 0; i < 10; i++) {
         game.particles.push({
@@ -824,9 +1061,9 @@ function takeDamage(amount) {
             life: 1
         });
     }
-    
+
     updateHUD();
-    
+
     if (game.player.health <= 0) {
         gameOver();
     }
@@ -840,13 +1077,81 @@ function spawnPowerup(x, y) {
     });
 }
 
+// Shooting mechanics
+function shoot() {
+    const now = Date.now();
+    if (now - game.lastFireTime < CONFIG.FIRE_RATE) return;
+    game.lastFireTime = now;
+
+    game.projectiles.push({
+        x: game.player.x,
+        y: game.player.y - 30,
+        speed: CONFIG.PROJECTILE_SPEED
+    });
+
+    // Muzzle flash particles
+    for (let i = 0; i < 3; i++) {
+        game.particles.push({
+            x: game.player.x,
+            y: game.player.y - 35,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -Math.random() * 3 - 1,
+            size: Math.random() * 3 + 1,
+            color: '0, 212, 255',
+            life: 0.3
+        });
+    }
+}
+
+function createHitParticles(x, y) {
+    for (let i = 0; i < 5; i++) {
+        game.particles.push({
+            x, y,
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            size: Math.random() * 3 + 1,
+            color: '255, 200, 50',
+            life: 0.5
+        });
+    }
+}
+
+function destroyEnemyByShot(enemy) {
+    // Explosion particles
+    for (let i = 0; i < 15; i++) {
+        game.particles.push({
+            x: enemy.x,
+            y: enemy.y,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            size: Math.random() * 4 + 2,
+            color: '0, 212, 255',
+            life: 1
+        });
+    }
+
+    game.enemies = game.enemies.filter(e => e !== enemy);
+    game.score += CONFIG.SHOOT_SCORE;
+    updateHUD();
+
+    // Maybe spawn powerup
+    if (Math.random() < 0.15) {
+        spawnPowerup(enemy.x, enemy.y);
+    }
+
+    // Check wave completion
+    if (game.enemies.length === 0) {
+        setTimeout(() => completeWave(), 500);
+    }
+}
+
 function applyPowerup(type) {
     if (type === 'health') {
         game.player.health = Math.min(game.player.maxHealth, game.player.health + 25);
     } else {
         game.player.shield = Math.min(100, game.player.shield + 50);
     }
-    
+
     // Sparkle effect
     for (let i = 0; i < 15; i++) {
         game.particles.push({
@@ -859,7 +1164,7 @@ function applyPowerup(type) {
             life: 1
         });
     }
-    
+
     updateHUD();
 }
 
@@ -881,14 +1186,14 @@ function createScoreParticle(points) {
 // Wave management
 function spawnWave() {
     if (!game.running || game.paused) return;
-    
+
     const enemyCount = CONFIG.ENEMIES_PER_WAVE_BASE + Math.floor(game.currentWave / 2);
     const topic = TOPICS[game.currentZone];
-    
+
     for (let i = 0; i < enemyCount; i++) {
         setTimeout(() => {
             if (!game.running) return;
-            
+
             game.enemies.push({
                 x: 100 + Math.random() * (game.canvas.width - 200),
                 y: -50 - i * 100,
@@ -898,7 +1203,8 @@ function spawnWave() {
                 color: topic.color,
                 icon: topic.icon,
                 triggered: false,
-                wobble: Math.random() * Math.PI * 2
+                wobble: Math.random() * Math.PI * 2,
+                health: CONFIG.ENEMY_MAX_HEALTH
             });
         }, i * 500);
     }
@@ -906,7 +1212,7 @@ function spawnWave() {
 
 function completeWave() {
     game.currentWave++;
-    
+
     if (game.currentWave > CONFIG.WAVES_PER_ZONE && game.mode === 'adventure') {
         completeZone();
     } else {
@@ -918,31 +1224,31 @@ function completeWave() {
 
 function completeZone() {
     const topic = TOPICS[game.currentZone];
-    
+
     document.getElementById('zoneCompleteIcon').textContent = topic.icon;
     document.getElementById('zoneCompleteName').textContent = topic.name;
     document.getElementById('zoneScore').textContent = game.score;
-    document.getElementById('zoneAccuracy').textContent = 
-        game.questionsAnswered > 0 
-            ? Math.round(game.correctAnswers / game.questionsAnswered * 100) + '%' 
+    document.getElementById('zoneAccuracy').textContent =
+        game.questionsAnswered > 0
+            ? Math.round(game.correctAnswers / game.questionsAnswered * 100) + '%'
             : '0%';
-    
+
     document.getElementById('levelComplete').classList.remove('hidden');
 }
 
 function nextZone() {
     game.currentZone++;
-    
+
     if (game.currentZone >= TOPICS.length) {
         // Game complete!
         gameOver(true);
         return;
     }
-    
+
     game.currentWave = 1;
     document.getElementById('levelComplete').classList.add('hidden');
     updateHUD();
-    
+
     setTimeout(() => spawnWave(), 1000);
 }
 
@@ -954,7 +1260,7 @@ function updateHUD() {
     document.getElementById('scoreValue').textContent = game.score;
     document.getElementById('streakValue').textContent = game.streak;
     document.getElementById('multiplier').textContent = `x${game.multiplier.toFixed(1)}`;
-    
+
     const topic = TOPICS[game.currentZone];
     document.getElementById('levelLabel').textContent = `ZONE ${game.currentZone + 1}`;
     document.getElementById('levelName').textContent = topic.name;
@@ -988,25 +1294,26 @@ function quitToMenu() {
         cancelAnimationFrame(game.animationId);
     }
     hideAllOverlays();
+    document.getElementById('globalMenuBtn').style.display = 'none';
     showScreen('mainMenu');
     loadHighScore();
 }
 
 function gameOver(victory = false) {
     game.running = false;
-    
+
     const isNewHighScore = saveHighScore();
-    
+
     document.getElementById('finalScore').textContent = game.score;
     document.getElementById('questionsAnswered').textContent = game.questionsAnswered;
-    document.getElementById('accuracy').textContent = 
-        game.questionsAnswered > 0 
-            ? Math.round(game.correctAnswers / game.questionsAnswered * 100) + '%' 
+    document.getElementById('accuracy').textContent =
+        game.questionsAnswered > 0
+            ? Math.round(game.correctAnswers / game.questionsAnswered * 100) + '%'
             : '0%';
     document.getElementById('bestStreak').textContent = game.bestStreak;
-    
+
     document.getElementById('newHighScore').classList.toggle('hidden', !isNewHighScore);
-    
+
     if (victory) {
         document.querySelector('.game-over-title').textContent = 'VICTORY!';
         document.querySelector('.game-over-title').style.color = '#22c55e';
@@ -1014,7 +1321,7 @@ function gameOver(victory = false) {
         document.querySelector('.game-over-title').textContent = 'GAME OVER';
         document.querySelector('.game-over-title').style.color = '#ef4444';
     }
-    
+
     document.getElementById('gameOver').classList.remove('hidden');
 }
 

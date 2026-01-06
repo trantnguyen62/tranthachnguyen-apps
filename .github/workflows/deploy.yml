@@ -1,0 +1,79 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force rebuild all containers'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  REMOTE_PATH: /opt/tranthachnguyen
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROXMOX_SSH_KEY }}" | base64 -d > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.PROXMOX_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create .env file
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+
+      - name: Sync files to Proxmox
+        run: |
+          rsync -avz --progress \
+            --exclude 'node_modules' \
+            --exclude '.git' \
+            --exclude '.vite' \
+            --exclude '*.log' \
+            --exclude '.DS_Store' \
+            -e "ssh -i ~/.ssh/id_rsa" \
+            ./ ${{ secrets.PROXMOX_USER }}@${{ secrets.PROXMOX_HOST }}:${{ env.REMOTE_PATH }}/
+
+      - name: Deploy with Docker Compose
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.PROXMOX_USER }}@${{ secrets.PROXMOX_HOST }} << 'EOF'
+            cd ${{ env.REMOTE_PATH }}
+            docker-compose down --remove-orphans || true
+            
+            # Force rebuild if requested
+            if [ "${{ inputs.force_rebuild }}" = "true" ]; then
+              docker-compose build --no-cache
+            fi
+            
+            docker-compose up -d --build
+            
+            echo ""
+            echo "=== Container Status ==="
+            docker-compose ps
+          EOF
+
+      - name: Deployment Summary
+        run: |
+          echo "## 🚀 Manual Deployment Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Force Rebuild:** ${{ inputs.force_rebuild }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Services:" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| Landing | https://tranthachnguyen.com |" >> $GITHUB_STEP_SUMMARY
+          echo "| NanoEdit | https://photoedit.tranthachnguyen.com |" >> $GITHUB_STEP_SUMMARY
+          echo "| Passport | https://passportphoto.tranthachnguyen.com |" >> $GITHUB_STEP_SUMMARY
+          echo "| IL Driver | https://illinoisdriverstudy.tranthachnguyen.com |" >> $GITHUB_STEP_SUMMARY
+          echo "| LinguaFlow | https://linguaflow.tranthachnguyen.com |" >> $GITHUB_STEP_SUMMARY
+          echo "| Comic News | https://comicnews.tranthachnguyen.com |" >> $GITHUB_STEP_SUMMARY
+          echo "| DevOps Study | https://devopsstudy.tranthachnguyen.com |" >> $GITHUB_STEP_SUMMARY
+          echo "| DevOps Game | https://devopsgame.tranthachnguyen.com |" >> $GITHUB_STEP_SUMMARY
