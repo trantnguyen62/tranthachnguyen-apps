@@ -15,6 +15,7 @@ services:
       - comic-news
       - devops-study
       - devops-game
+      - pipeline-runner
     restart: unless-stopped
 
   # Landing Page - tranthachnguyen.com
@@ -86,6 +87,14 @@ services:
   devops-game:
     build: ./devops-game
     container_name: devops-game
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  # Pipeline Runner - pipelinerunner.tranthachnguyen.com
+  pipeline-runner:
+    build: ./pipeline-runner
+    container_name: pipeline-runner
     expose:
       - "80"
     restart: unless-stopped

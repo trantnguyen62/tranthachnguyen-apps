@@ -58,5 +58,9 @@ variable "apps" {
       subdomain   = "devopsgame"
       description = "DevOps Defender Game"
     }
+    pipelinerunner = {
+      subdomain   = "pipelinerunner"
+      description = "Pipeline Runner - Learn DevOps Through Gaming"
+    }
   }
 }

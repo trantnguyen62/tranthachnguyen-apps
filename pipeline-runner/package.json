@@ -15,7 +15,7 @@
         "learning",
         "ios"
     ],
-    "author": "Tran Nguyen",
+    "author": "Pipeline Runner Team",
     "license": "MIT",
     "dependencies": {
         "@capacitor/cli": "^8.0.0",

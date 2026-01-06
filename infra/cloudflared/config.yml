@@ -22,6 +22,8 @@ ingress:
     service: http://devops-study:80
   - hostname: devopsgame.tranthachnguyen.com
     service: http://devops-game:80
+  - hostname: pipelinerunner.tranthachnguyen.com
+    service: http://pipeline-runner:80
   - hostname: resume.tranthachnguyen.com
     service: http://192.168.0.200:80
   - service: http_status:404

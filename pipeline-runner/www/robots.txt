@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://tranthachnguyen.com/pipeline-runner/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Block ad-related paths (not applicable but good practice)
+Disallow: /ads/
