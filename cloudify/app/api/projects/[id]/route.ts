@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { deleteSite } from "@/lib/build/site-deployer";
+import { sanitizeSlug } from "@/lib/security/validation";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -109,6 +110,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (error && typeof error === "object" && "code" in error) {
       const prismaError = error as { code: string };
+
+      // Record not found (deleted by concurrent request)
+      if (prismaError.code === "P2025") {
+        return NextResponse.json(
+          { error: "Project not found" },
+          { status: 404 }
+        );
+      }
+
+      // Connection errors
       if (prismaError.code === "P1001" || prismaError.code === "P1002") {
         return NextResponse.json(
           { error: "Service temporarily unavailable" },
@@ -144,8 +155,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Clean up K8s deployment and DNS record
-    const siteSlug = existing.slug || existing.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
+    // Clean up K8s deployment and DNS record using same slug format as deployment
+    const siteSlug = sanitizeSlug(existing.slug || existing.name);
     try {
       await deleteSite(siteSlug);
     } catch (err) {

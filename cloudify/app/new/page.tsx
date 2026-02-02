@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Github,
@@ -17,6 +18,8 @@ import {
   Check,
   Upload,
   RefreshCw,
+  AlertCircle,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,48 +32,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const repositories = [
-  {
-    id: "repo-1",
-    name: "my-portfolio",
-    fullName: "johndoe/my-portfolio",
-    private: false,
-    updatedAt: "2 hours ago",
-    defaultBranch: "main",
-  },
-  {
-    id: "repo-2",
-    name: "ecommerce-store",
-    fullName: "johndoe/ecommerce-store",
-    private: true,
-    updatedAt: "1 day ago",
-    defaultBranch: "main",
-  },
-  {
-    id: "repo-3",
-    name: "blog-app",
-    fullName: "johndoe/blog-app",
-    private: false,
-    updatedAt: "3 days ago",
-    defaultBranch: "main",
-  },
-  {
-    id: "repo-4",
-    name: "api-service",
-    fullName: "johndoe/api-service",
-    private: true,
-    updatedAt: "1 week ago",
-    defaultBranch: "develop",
-  },
-  {
-    id: "repo-5",
-    name: "mobile-app",
-    fullName: "johndoe/mobile-app",
-    private: false,
-    updatedAt: "2 weeks ago",
-    defaultBranch: "main",
-  },
-];
+// Repository type from API
+interface Repository {
+  id: number;
+  name: string;
+  fullName: string;
+  description: string | null;
+  private: boolean;
+  htmlUrl: string;
+  defaultBranch: string;
+  language: string | null;
+  updatedAt: string;
+  imported: boolean;
+  projectId?: string;
+  projectSlug?: string;
+}
 
 const templates = [
   { name: "Next.js", icon: "▲", color: "from-black to-gray-700" },
@@ -84,8 +60,9 @@ const templates = [
 type Step = "source" | "configure" | "deploy";
 
 export default function NewProjectPage() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>("source");
-  const [selectedRepo, setSelectedRepo] = useState<typeof repositories[0] | null>(null);
+  const [selectedRepo, setSelectedRepo] = useState<Repository | null>(null);
   const [projectName, setProjectName] = useState("");
   const [framework, setFramework] = useState("Next.js");
   const [isDeploying, setIsDeploying] = useState(false);
@@ -93,23 +70,117 @@ export default function NewProjectPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [gitProvider, setGitProvider] = useState("github");
 
-  const filteredRepos = repositories.filter((repo) =>
-    repo.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Real data states
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [createdProject, setCreatedProject] = useState<{
+    id: string;
+    slug: string;
+    name: string;
+  } | null>(null);
 
-  const handleSelectRepo = (repo: typeof repositories[0]) => {
+  // Fetch repositories from real API
+  const fetchRepositories = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/github/repos?search=${encodeURIComponent(searchQuery)}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError("Please sign in to view your repositories");
+        } else if (response.status === 400 && data.error?.includes("GitHub account not connected")) {
+          setError("GitHub account not connected. Please sign in with GitHub.");
+        } else {
+          setError(data.error || "Failed to load repositories");
+        }
+        setRepositories([]);
+        return;
+      }
+
+      setRepositories(data.repos || []);
+    } catch (err) {
+      console.error("Failed to fetch repositories:", err);
+      setError("Failed to connect to server");
+      setRepositories([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [searchQuery]);
+
+  // Fetch repos on mount and when search changes (debounced)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchRepositories();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [fetchRepositories]);
+
+  const filteredRepos = repositories;
+
+  const handleSelectRepo = (repo: Repository) => {
+    if (repo.imported && repo.projectSlug) {
+      // Already imported - go to project page
+      router.push(`/projects/${repo.projectSlug}`);
+      return;
+    }
     setSelectedRepo(repo);
     setProjectName(repo.name);
     setStep("configure");
   };
 
   const handleDeploy = async () => {
+    if (!selectedRepo) return;
+
     setIsDeploying(true);
-    // Simulate deployment
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    setIsDeploying(false);
-    setDeployComplete(true);
-    setStep("deploy");
+    setError(null);
+
+    try {
+      const response = await fetch("/api/github/repos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          repoFullName: selectedRepo.fullName,
+          projectName: projectName,
+          branch: selectedRepo.defaultBranch,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          // Already imported
+          setCreatedProject({
+            id: data.projectId,
+            slug: data.projectSlug,
+            name: projectName,
+          });
+        } else {
+          throw new Error(data.error || "Failed to import repository");
+        }
+      } else {
+        setCreatedProject({
+          id: data.project.id,
+          slug: data.project.slug,
+          name: data.project.name,
+        });
+      }
+
+      setDeployComplete(true);
+      setStep("deploy");
+    } catch (err) {
+      console.error("Failed to import repository:", err);
+      setError(err instanceof Error ? err.message : "Failed to import repository");
+    } finally {
+      setIsDeploying(false);
+    }
   };
 
   return (
@@ -224,42 +295,91 @@ export default function NewProjectPage() {
                       className="pl-10"
                     />
                   </div>
-                  <Button variant="ghost" size="icon">
-                    <RefreshCw className="h-4 w-4" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={fetchRepositories}
+                    disabled={isLoading}
+                  >
+                    <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
                   </Button>
                 </div>
 
                 {/* Repository List */}
                 <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                  {filteredRepos.map((repo) => (
-                    <button
-                      key={repo.id}
-                      onClick={() => handleSelectRepo(repo)}
-                      className="w-full flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 dark:border-gray-800 dark:hover:border-blue-500 dark:hover:bg-blue-900/10 transition-colors text-left"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Folder className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-900 dark:text-white">
-                              {repo.name}
-                            </span>
-                            {repo.private && (
-                              <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                                Private
+                  {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
+                      <p className="text-gray-500 dark:text-gray-400">Loading repositories...</p>
+                    </div>
+                  ) : error ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
+                      <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+                      {error.includes("sign in") || error.includes("GitHub account") ? (
+                        <Button asChild>
+                          <Link href="/login">Sign in with GitHub</Link>
+                        </Button>
+                      ) : (
+                        <Button variant="outline" onClick={fetchRepositories}>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Retry
+                        </Button>
+                      )}
+                    </div>
+                  ) : filteredRepos.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <Folder className="h-8 w-8 text-gray-400 mb-4" />
+                      <p className="text-gray-500 dark:text-gray-400">
+                        {searchQuery ? "No repositories found matching your search" : "No repositories found"}
+                      </p>
+                    </div>
+                  ) : (
+                    filteredRepos.map((repo) => (
+                      <button
+                        key={repo.id}
+                        onClick={() => handleSelectRepo(repo)}
+                        className={cn(
+                          "w-full flex items-center justify-between p-4 rounded-lg border transition-colors text-left",
+                          repo.imported
+                            ? "border-green-200 bg-green-50/50 hover:border-green-400 dark:border-green-800 dark:bg-green-900/10"
+                            : "border-gray-200 hover:border-blue-500 hover:bg-blue-50 dark:border-gray-800 dark:hover:border-blue-500 dark:hover:bg-blue-900/10"
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Folder className="h-5 w-5 text-gray-400" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-900 dark:text-white">
+                                {repo.name}
                               </span>
-                            )}
+                              {repo.private && (
+                                <span className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                                  Private
+                                </span>
+                              )}
+                              {repo.imported && (
+                                <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 flex items-center gap-1">
+                                  <CheckCircle className="h-3 w-3" />
+                                  Imported
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {repo.fullName}
+                              {repo.description && ` • ${repo.description.substring(0, 50)}${repo.description.length > 50 ? '...' : ''}`}
+                            </p>
                           </div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {repo.fullName}
-                          </p>
                         </div>
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {repo.updatedAt}
-                      </div>
-                    </button>
-                  ))}
+                        <div className="text-sm text-gray-500 dark:text-gray-400 text-right">
+                          <div>{new Date(repo.updatedAt).toLocaleDateString()}</div>
+                          {repo.language && (
+                            <div className="text-xs">{repo.language}</div>
+                          )}
+                        </div>
+                      </button>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -427,9 +547,19 @@ export default function NewProjectPage() {
               </CardContent>
             </Card>
 
+            {/* Error display */}
+            {error && (
+              <div className="p-4 rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800">
+                <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                  <AlertCircle className="h-5 w-5" />
+                  <span>{error}</span>
+                </div>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="flex items-center justify-between">
-              <Button variant="ghost" onClick={() => setStep("source")}>
+              <Button variant="ghost" onClick={() => { setStep("source"); setError(null); }}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
@@ -437,11 +567,11 @@ export default function NewProjectPage() {
                 {isDeploying ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Deploying...
+                    Importing...
                   </>
                 ) : (
                   <>
-                    Deploy
+                    Import Project
                     <ChevronRight className="h-4 w-4" />
                   </>
                 )}
@@ -451,7 +581,7 @@ export default function NewProjectPage() {
         )}
 
         {/* Step 3: Deploy Success */}
-        {step === "deploy" && deployComplete && (
+        {step === "deploy" && deployComplete && createdProject && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -461,40 +591,36 @@ export default function NewProjectPage() {
               <Check className="h-10 w-10 text-green-600 dark:text-green-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Congratulations!
+              Project Imported Successfully!
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mb-8">
-              Your project has been successfully deployed.
+              Your project has been imported from GitHub. The first deployment will start automatically.
             </p>
             <Card className="max-w-md mx-auto mb-8">
               <CardContent className="p-6">
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  Your project is live at
+                  Your project will be available at
                 </p>
                 <a
-                  href={`https://${projectName}.cloudify.app`}
+                  href={`https://${createdProject.slug}.tranthachnguyen.com`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-lg font-medium text-blue-600 hover:underline dark:text-blue-400"
                 >
-                  {projectName}.cloudify.app
+                  {createdProject.slug}.tranthachnguyen.com
                 </a>
               </CardContent>
             </Card>
             <div className="flex items-center justify-center gap-4">
               <Button variant="outline" asChild>
-                <Link href={`/projects/${projectName}`}>
-                  View Project
+                <Link href={`/projects/${createdProject.slug}`}>
+                  View Project Dashboard
                 </Link>
               </Button>
               <Button variant="primary" asChild>
-                <a
-                  href={`https://${projectName}.cloudify.app`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Visit Site
-                </a>
+                <Link href="/new">
+                  Import Another Project
+                </Link>
               </Button>
             </div>
           </motion.div>

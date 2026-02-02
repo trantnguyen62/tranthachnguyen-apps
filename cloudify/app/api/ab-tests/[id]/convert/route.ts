@@ -15,7 +15,18 @@ interface RouteParams {
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const body = await request.json();
+
+    // Parse body with error handling
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON body" },
+        { status: 400 }
+      );
+    }
+
     const { visitorId, conversionType = "goal_reached", value, metadata } = body;
 
     if (!visitorId) {

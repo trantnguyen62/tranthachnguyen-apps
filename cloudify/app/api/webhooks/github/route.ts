@@ -240,6 +240,14 @@ async function triggerDeployment(config: {
 
 // Handle GitHub push events
 async function handlePush(payload: GitHubPushEvent) {
+  // Validate required fields
+  if (!payload.ref || !payload.repository?.full_name) {
+    return {
+      message: "Invalid push event payload: missing required fields",
+      triggered: false,
+    };
+  }
+
   const branch = payload.ref.replace("refs/heads/", "");
   const repoFullName = payload.repository.full_name;
   const isDefaultBranch = branch === payload.repository.default_branch;
@@ -372,27 +380,39 @@ export async function POST(request: NextRequest) {
 
     console.log(`GitHub webhook received: ${event} (${deliveryId})`);
 
-    // Verify signature - REQUIRED in production
+    // Verify signature - REQUIRED for all webhook requests
     const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
-    const isProduction = process.env.NODE_ENV === "production";
 
-    if (isProduction && !webhookSecret) {
-      console.error("GITHUB_WEBHOOK_SECRET is required in production");
-      return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
+    // Webhook secret must be configured
+    if (!webhookSecret) {
+      console.error("GITHUB_WEBHOOK_SECRET is not configured");
+      return NextResponse.json(
+        { error: "Webhook not configured" },
+        { status: 400 }
+      );
     }
 
-    if (webhookSecret) {
-      if (!signature) {
-        console.error("Missing webhook signature");
-        return NextResponse.json({ error: "Missing signature" }, { status: 401 });
-      }
-      if (!verifySignature(payload, signature, webhookSecret)) {
-        console.error("Invalid webhook signature");
-        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-      }
+    // Signature header must be present
+    if (!signature) {
+      console.error("Missing webhook signature");
+      return NextResponse.json({ error: "Missing signature" }, { status: 401 });
     }
 
-    const data = JSON.parse(payload);
+    // Verify the signature
+    if (!verifySignature(payload, signature, webhookSecret)) {
+      console.error("Invalid webhook signature");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    // Parse JSON payload with error handling
+    let data;
+    try {
+      data = JSON.parse(payload);
+    } catch {
+      console.error("Invalid JSON payload");
+      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+    }
+
     let result;
 
     switch (event) {
