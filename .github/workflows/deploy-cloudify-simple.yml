@@ -1,0 +1,69 @@
+name: Deploy Cloudify (Simple)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cloudify/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Cloudflare Tunnel
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+
+      - name: Deploy via SSH through Cloudflare Tunnel
+        env:
+          PROXMOX_HOST: ${{ secrets.CLOUDFLARE_TUNNEL_HOST }}
+          PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
+          PROXMOX_PASSWORD: ${{ secrets.PROXMOX_PASSWORD }}
+        run: |
+          # Install sshpass for password auth
+          sudo apt-get update && sudo apt-get install -y sshpass
+
+          # Create SSH config for cloudflare tunnel
+          mkdir -p ~/.ssh
+          cat >> ~/.ssh/config << EOF
+          Host proxmox
+            HostName $PROXMOX_HOST
+            User $PROXMOX_USER
+            ProxyCommand cloudflared access ssh --hostname %h
+            StrictHostKeyChecking no
+          EOF
+
+          # Deploy to LXC 203
+          sshpass -p "$PROXMOX_PASSWORD" ssh proxmox "
+            set -e
+            echo '=== Deploying Cloudify to LXC 203 ==='
+
+            pct exec 203 -- bash -c '
+              set -e
+              cd /opt/cloudify
+
+              echo \"Pulling latest code...\"
+              git fetch origin main
+              git reset --hard origin/main
+
+              echo \"Building and restarting container...\"
+              docker compose down || true
+              docker compose build --no-cache
+              docker compose up -d
+
+              echo \"Waiting for health check...\"
+              sleep 15
+
+              echo \"Container status:\"
+              docker compose ps
+
+              echo \"=== Deployment complete ===\"
+            '
+          "
