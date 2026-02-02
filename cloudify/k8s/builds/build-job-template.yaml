@@ -1,0 +1,234 @@
+# Build Job Template for Cloudify
+# This is a template - values are substituted at runtime by the K8s executor
+# Placeholders: ${DEPLOYMENT_ID}, ${PROJECT_ID}, ${SITE_SLUG}, ${REPO_URL},
+#               ${BRANCH}, ${NODE_VERSION}, ${INSTALL_CMD}, ${BUILD_CMD}, ${OUTPUT_DIR}, ${ROOT_DIR}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: build-scripts
+  namespace: cloudify-builds
+data:
+  build.sh: |
+    #!/bin/bash
+    set -e
+
+    echo "=== Cloudify Build Started ==="
+    echo "Deployment ID: $DEPLOYMENT_ID"
+    echo "Site Slug: $SITE_SLUG"
+    echo "Branch: $BRANCH"
+    echo "Node Version: $NODE_VERSION"
+    echo ""
+
+    # Clone repository
+    echo ">>> Cloning repository..."
+    git clone --depth 1 --branch "$BRANCH" "$REPO_URL" /workspace/repo
+    cd /workspace/repo
+
+    # Navigate to root directory if specified
+    if [ -n "$ROOT_DIR" ] && [ "$ROOT_DIR" != "./" ]; then
+      echo ">>> Changing to root directory: $ROOT_DIR"
+      cd "$ROOT_DIR"
+    fi
+
+    # Install dependencies
+    echo ""
+    echo ">>> Installing dependencies..."
+    eval "$INSTALL_CMD"
+
+    # Run build
+    echo ""
+    echo ">>> Running build..."
+    eval "$BUILD_CMD"
+
+    # Copy output
+    echo ""
+    echo ">>> Copying build output..."
+    if [ -d "$OUTPUT_DIR" ]; then
+      cp -r "$OUTPUT_DIR"/* /workspace/artifacts/
+      echo "Build artifacts copied successfully"
+    else
+      echo "ERROR: Output directory '$OUTPUT_DIR' not found!"
+      exit 1
+    fi
+
+    echo ""
+    echo "=== Build Completed Successfully ==="
+
+---
+# Example build job (for reference)
+# In production, this is generated dynamically by lib/build/k8s-executor.ts
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: build-example-deployment-id
+  namespace: cloudify-builds
+  labels:
+    cloudify.io/component: build
+    cloudify.io/deployment-id: example-deployment-id
+    cloudify.io/project-id: example-project-id
+    cloudify.io/site-slug: myapp-abc123
+spec:
+  backoffLimit: 0  # No retries - fail fast
+  ttlSecondsAfterFinished: 3600  # Cleanup after 1 hour
+  activeDeadlineSeconds: 600  # 10 minute timeout
+  template:
+    metadata:
+      labels:
+        cloudify.io/component: build-pod
+        cloudify.io/deployment-id: example-deployment-id
+    spec:
+      restartPolicy: Never
+      serviceAccountName: build-runner
+
+      # Init container: Clone repository
+      initContainers:
+        - name: clone
+          image: alpine/git:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Cloning $REPO_URL branch $BRANCH..."
+              git clone --depth 1 --branch "$BRANCH" "$REPO_URL" /workspace/repo
+          env:
+            - name: REPO_URL
+              value: "https://github.com/user/repo.git"
+            - name: BRANCH
+              value: "main"
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+      # Main container: Build
+      containers:
+        - name: build
+          image: node:20-slim
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cd /workspace/repo
+
+              # Install dependencies
+              echo "Installing dependencies..."
+              npm install
+
+              # Run build
+              echo "Running build..."
+              npm run build
+
+              # Copy output
+              echo "Copying artifacts..."
+              cp -r .next/* /workspace/artifacts/ 2>/dev/null || \
+              cp -r dist/* /workspace/artifacts/ 2>/dev/null || \
+              cp -r build/* /workspace/artifacts/ 2>/dev/null || \
+              cp -r out/* /workspace/artifacts/
+
+              echo "Build complete!"
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: DEPLOYMENT_ID
+              value: "example-deployment-id"
+          envFrom:
+            - secretRef:
+                name: env-vars-example-deployment-id
+                optional: true
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+
+        # Sidecar: Upload artifacts to MinIO
+        - name: uploader
+          image: minio/mc:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Waiting for build to complete..."
+              while [ ! -f /workspace/artifacts/.build-complete ]; do
+                sleep 2
+              done
+
+              echo "Uploading artifacts to MinIO..."
+              mc alias set minio http://minio.cloudify-system:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+              mc cp -r /workspace/artifacts/ minio/cloudify-builds/$SITE_SLUG/
+
+              echo "Upload complete!"
+          env:
+            - name: SITE_SLUG
+              value: "myapp-abc123"
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: root-user
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: root-password
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+
+      volumes:
+        - name: workspace
+          emptyDir:
+            sizeLimit: 5Gi
+
+---
+# ServiceAccount for build jobs
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build-runner
+  namespace: cloudify-builds
+
+---
+# Allow build jobs to read secrets from cloudify-system namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: build-secrets-reader
+  namespace: cloudify-system
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["minio-credentials"]
+    verbs: ["get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: build-runner-secrets
+  namespace: cloudify-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: build-secrets-reader
+subjects:
+  - kind: ServiceAccount
+    name: build-runner
+    namespace: cloudify-builds

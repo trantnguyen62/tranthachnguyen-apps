@@ -1,0 +1,124 @@
+# Redis for Cloudify
+# Used for:
+# - KV Store backend
+# - Job queue (BullMQ)
+# - Function warm pool coordination
+# - Session caching
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: cloudify-system
+  labels:
+    app: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: cloudify-system
+data:
+  redis.conf: |
+    # Persistence
+    appendonly yes
+    appendfsync everysec
+
+    # Memory management
+    maxmemory 512mb
+    maxmemory-policy allkeys-lru
+
+    # Security (set password in production)
+    # requirepass your-redis-password
+
+    # Performance
+    tcp-keepalive 300
+    timeout 0
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: cloudify-system
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          command:
+            - redis-server
+            - /etc/redis/redis.conf
+          ports:
+            - name: redis
+              containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /etc/redis
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: redis-pvc
+        - name: config
+          configMap:
+            name: redis-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: cloudify-system
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+  selector:
+    app: redis

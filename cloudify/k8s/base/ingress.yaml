@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudify
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  tls:
+    - hosts:
+        - cloudify.tranthachnguyen.com
+      secretName: cloudify-tls
+  rules:
+    - host: cloudify.tranthachnguyen.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cloudify
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudify-wildcard
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  tls:
+    - hosts:
+        - "*.tranthachnguyen.com"
+      secretName: cloudify-wildcard-tls
+  rules:
+    - host: "*.tranthachnguyen.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cloudify
+                port:
+                  number: 80

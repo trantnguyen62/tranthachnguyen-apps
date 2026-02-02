@@ -1,0 +1,1274 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USERS & AUTH ============
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  passwordHash  String?
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Billing fields
+  plan               String    @default("free") // free, pro, team, enterprise
+  stripeCustomerId   String?   @unique
+  subscriptionId     String?   @unique
+  subscriptionStatus String?   // active, canceled, past_due, unpaid
+  currentPeriodEnd   DateTime?
+
+  sessions                Session[]
+  accounts                Account[]
+  projects                Project[]
+  apiTokens               ApiToken[]
+  activities              Activity[]
+  teamMembers             TeamMember[]
+  usageRecords            UsageRecord[]
+  notificationPreferences NotificationPreference[]
+  sentInvitations         TeamInvitation[] @relation("InvitedBy")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userAgent String?
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// ============ PROJECTS & DEPLOYMENTS ============
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String
+  userId      String
+  repoUrl     String?
+  repoBranch  String   @default("main")
+  framework   String   @default("nextjs")
+  buildCmd    String   @default("npm run build")
+  outputDir   String   @default(".next")
+  installCmd  String   @default("npm install")
+  rootDir         String   @default("./")
+  nodeVersion     String   @default("20")
+  monorepoTool    String?  // turborepo, nx, lerna, pnpm, yarn, npm
+  monorepoPackage String?  // Package name within monorepo
+  createdAt       DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deployments        Deployment[]
+  envVariables       EnvVariable[]
+  domains            Domain[]
+  activities         Activity[]
+  teamProjects       TeamProject[]
+  usageRecords       UsageRecord[]
+  featureFlags       FeatureFlag[]
+  analyticsEvents    AnalyticsEvent[]
+  functions          ServerlessFunction[]
+  blobStores         BlobStore[]
+  kvStores           KVStore[]
+  edgeConfigs        EdgeConfig[]
+  integrations       Integration[]
+  cronJobs           CronJob[]
+  managedDatabases   ManagedDatabase[]
+  edgeFunctions      EdgeFunction[]
+  edgeKVs            EdgeKV[]
+  abTests            ABTest[]
+
+  @@unique([userId, slug])
+  @@index([userId])
+}
+
+enum DeploymentStatus {
+  QUEUED
+  BUILDING
+  DEPLOYING
+  READY
+  ERROR
+  CANCELLED
+}
+
+model Deployment {
+  id            String           @id @default(cuid())
+  projectId     String
+  status        DeploymentStatus @default(QUEUED)
+  commitSha     String?
+  commitMessage String?          @db.Text
+  commitMsg     String?          // Deprecated, use commitMessage
+  branch        String           @default("main")
+  url           String?
+  buildTime     Int?
+  artifactPath  String?          // Path to built files: /data/builds/{siteSlug}
+  siteSlug      String?          // Subdomain for serving: {slug}.projects.tranthachnguyen.com
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  finishedAt    DateTime?
+
+  // Rollback support
+  isActive      Boolean          @default(false) // Currently serving traffic
+  promotedAt    DateTime?        // When this deployment was promoted/rolled back to
+  promotedBy    String?          // User who promoted this deployment
+
+  // Preview deployment support
+  isPreview     Boolean          @default(false)
+  prNumber      Int?             // PR number for preview deployments
+
+  project Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  logs    DeploymentLog[]
+
+  @@index([projectId])
+  @@index([status])
+  @@index([projectId, isActive])
+}
+
+model DeploymentLog {
+  id           String   @id @default(cuid())
+  deploymentId String
+  level        String   @default("info")
+  message      String   @db.Text
+  timestamp    DateTime @default(now())
+
+  deployment Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade)
+
+  @@index([deploymentId])
+}
+
+model EnvVariable {
+  id        String   @id @default(cuid())
+  projectId String
+  key       String
+  value     String   @db.Text
+  isSecret  Boolean  @default(false)
+  target    String   @default("production")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, key, target])
+  @@index([projectId])
+}
+
+// ============ CUSTOM DOMAINS ============
+
+model Domain {
+  id                String   @id @default(cuid())
+  domain            String   @unique
+  projectId         String
+  verified          Boolean  @default(false)
+  sslStatus         String   @default("pending") // pending, provisioning, active, error
+  verificationToken String
+  sslCertPath       String?
+  sslKeyPath        String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([domain])
+}
+
+// ============ ACME ACCOUNT ============
+
+model AcmeAccount {
+  id          String   @id @default(cuid())
+  environment String   @unique // "production" or "staging"
+  accountUrl  String   // ACME account URL from Let's Encrypt
+  privateKey  String   // PEM-encoded ECDSA private key (encrypted)
+  email       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============ CRON JOBS ============
+
+model CronJob {
+  id          String    @id @default(cuid())
+  projectId   String
+  name        String
+  schedule    String    // Cron expression (e.g., "0 * * * *")
+  path        String    // API route to call (e.g., "/api/cron/cleanup")
+  enabled     Boolean   @default(true)
+  timezone    String    @default("UTC")
+  timeout     Int       @default(60) // seconds
+  retryCount  Int       @default(0)
+  lastRunAt   DateTime?
+  nextRunAt   DateTime?
+  lastStatus  String?   // "success", "failed"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project    Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  executions CronExecution[]
+
+  @@index([projectId])
+  @@index([enabled, nextRunAt])
+}
+
+model CronExecution {
+  id           String    @id @default(cuid())
+  jobId        String
+  status       String    // "pending", "running", "success", "failed"
+  startedAt    DateTime
+  finishedAt   DateTime?
+  duration     Int?      // milliseconds
+  response     String?   @db.Text
+  error        String?   @db.Text
+  retryAttempt Int       @default(0)
+
+  job CronJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([status])
+}
+
+// ============ API TOKENS ============
+
+model ApiToken {
+  id          String    @id @default(cuid())
+  name        String
+  token       String    @unique
+  tokenPrefix String    // First 8 chars for display (e.g., "cl_abc123...")
+  userId      String
+  scopes      String[]  // ["read", "write", "deploy", "admin"]
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ============ ACTIVITY FEED ============
+
+model Activity {
+  id          String   @id @default(cuid())
+  userId      String
+  projectId   String?
+  type        String   // deployment, domain, env_var, project, team, etc.
+  action      String   // created, updated, deleted, deployed, verified, etc.
+  description String
+  metadata    Json?    // Additional context
+  createdAt   DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+// ============ TEAMS & ORGANIZATIONS ============
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  avatar      String?
+  plan        String   @default("free") // free, pro, enterprise
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members      TeamMember[]
+  teamProjects TeamProject[]
+  invitations  TeamInvitation[]
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      String   @default("member") // owner, admin, member, viewer
+  joinedAt  DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+}
+
+model TeamProject {
+  id        String   @id @default(cuid())
+  teamId    String
+  projectId String
+
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, projectId])
+  @@index([teamId])
+  @@index([projectId])
+}
+
+model TeamInvitation {
+  id         String    @id @default(cuid())
+  teamId     String
+  email      String
+  role       String    @default("member") // owner, admin, member, viewer
+  token      String    @unique
+  invitedBy  String
+  status     String    @default("pending") // pending, accepted, declined, expired
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  acceptedAt DateTime?
+
+  team    Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  inviter User @relation("InvitedBy", fields: [invitedBy], references: [id])
+
+  @@unique([teamId, email])
+  @@index([token])
+  @@index([email])
+  @@index([status])
+}
+
+// ============ USAGE TRACKING ============
+
+model UsageRecord {
+  id         String   @id @default(cuid())
+  userId     String
+  projectId  String?
+  type       String   // build_minutes, bandwidth, requests, function_invocations, blob_storage, deployments
+  value      Float    // Usage amount in the appropriate unit
+  metadata   Json?    // Additional context (deploymentId, functionId, etc.)
+  recordedAt DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId, recordedAt])
+  @@index([projectId, recordedAt])
+  @@index([type, recordedAt])
+}
+
+// ============ FEATURE FLAGS ============
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  projectId   String
+  key         String
+  name        String
+  description String?
+  enabled     Boolean  @default(false)
+  percentage  Int      @default(100) // Rollout percentage
+  conditions  Json?    // Targeting rules
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, key])
+  @@index([projectId])
+}
+
+// ============ ANALYTICS ============
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  projectId  String
+  domainId   String?
+  type       String   // pageview, event, vitals
+  path       String?
+  referrer   String?
+  userAgent  String?
+  country    String?
+  device     String?  // desktop, mobile, tablet
+  browser    String?
+  os         String?
+  eventName  String?
+  eventData  Json?
+  sessionId  String?
+  visitorId  String?
+  createdAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+  @@index([projectId, path])
+  @@index([sessionId])
+}
+
+// ============ SERVERLESS FUNCTIONS ============
+
+model ServerlessFunction {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  runtime     String   @default("nodejs20") // nodejs18, nodejs20, python3.9, etc.
+  entrypoint  String   @default("api/index.js")
+  memory      Int      @default(128) // MB
+  timeout     Int      @default(10)  // seconds
+  regions     String[] // ["iad1", "sfo1", "cdg1"]
+  envVars     Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project     Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invocations FunctionInvocation[]
+
+  @@unique([projectId, name])
+  @@index([projectId])
+}
+
+model FunctionInvocation {
+  id         String   @id @default(cuid())
+  functionId String
+  status     String   // success, error, timeout
+  duration   Int      // ms
+  memory     Int      // MB used
+  region     String
+  statusCode Int?
+  error      String?
+  createdAt  DateTime @default(now())
+
+  function ServerlessFunction @relation(fields: [functionId], references: [id], onDelete: Cascade)
+
+  @@index([functionId, createdAt])
+}
+
+// ============ BLOB STORAGE ============
+
+model BlobStore {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  blobs   Blob[]
+
+  @@unique([projectId, name])
+  @@index([projectId])
+}
+
+model Blob {
+  id          String   @id @default(cuid())
+  storeId     String
+  pathname    String
+  contentType String
+  size        Int      // bytes
+  url         String
+  downloadUrl String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store BlobStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, pathname])
+  @@index([storeId])
+}
+
+// ============ KV STORE ============
+
+model KVStore {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  entries KVEntry[]
+
+  @@unique([projectId, name])
+  @@index([projectId])
+}
+
+model KVEntry {
+  id        String   @id @default(cuid())
+  storeId   String
+  key       String
+  value     String   @db.Text
+  expiresAt DateTime?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store KVStore @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, key])
+  @@index([storeId])
+  @@index([expiresAt])
+}
+
+// ============ EDGE CONFIG ============
+
+model EdgeConfig {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  slug      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items   EdgeConfigItem[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+}
+
+model EdgeConfigItem {
+  id        String   @id @default(cuid())
+  configId  String
+  key       String
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  config EdgeConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+
+  @@unique([configId, key])
+  @@index([configId])
+}
+
+// ============ INTEGRATIONS ============
+
+model Integration {
+  id           String   @id @default(cuid())
+  projectId    String
+  type         String   // github, slack, discord, vercel-postgres, etc.
+  name         String
+  config       Json?    // Integration-specific configuration
+  credentials  Json?    // Encrypted credentials
+  enabled      Boolean  @default(true)
+  webhookUrl   String?
+  lastSyncAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, type])
+  @@index([projectId])
+}
+
+// ============ NOTIFICATIONS ============
+
+model NotificationPreference {
+  id           String   @id @default(cuid())
+  userId       String
+  channel      String   // email, slack, webhook
+  type         String   // deployment_success, deployment_failure, domain_verified, etc.
+  enabled      Boolean  @default(true)
+  destination  String?  // email address, slack channel, webhook URL
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, channel, type])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([createdAt])
+}
+
+// ============ WEB VITALS ============
+
+model WebVital {
+  id        String   @id @default(cuid())
+  projectId String
+  url       String
+  metric    String   // LCP, FID, CLS, TTFB, FCP, INP
+  value     Float
+  rating    String   // good, needs-improvement, poor
+  device    String?  // desktop, mobile
+  browser   String?
+  country   String?
+  createdAt DateTime @default(now())
+
+  @@index([projectId, metric, createdAt])
+  @@index([projectId, url])
+}
+
+// ============ SPEED INSIGHTS ============
+
+model SpeedInsight {
+  id        String   @id @default(cuid())
+  projectId String
+  url       String
+  path      String
+
+  // Core Web Vitals
+  ttfb      Float?   // Time to First Byte (ms)
+  fcp       Float?   // First Contentful Paint (ms)
+  lcp       Float?   // Largest Contentful Paint (ms)
+  fid       Float?   // First Input Delay (ms)
+  cls       Float?   // Cumulative Layout Shift (score)
+  inp       Float?   // Interaction to Next Paint (ms)
+
+  // Extended Navigation Timing
+  dnsLookupTime      Float?   // DNS resolution (ms)
+  tcpConnectTime     Float?   // TCP handshake (ms)
+  tlsHandshakeTime   Float?   // TLS negotiation (ms)
+  serverResponseTime Float?   // Server processing (ms)
+  domInteractive     Float?   // DOM interactive (ms)
+  domComplete        Float?   // DOM complete (ms)
+  resourceLoadTime   Float?   // Total resource loading (ms)
+
+  // Resource Breakdown
+  jsExecutionTime    Float?   // JavaScript execution (ms)
+  cssParseTime       Float?   // CSS parsing (ms)
+  imageLoadTime      Float?   // Image loading (ms)
+  fontLoadTime       Float?   // Font loading (ms)
+  thirdPartyTime     Float?   // Third-party scripts (ms)
+
+  // Context
+  device         String?  // desktop, mobile, tablet
+  browser        String?
+  os             String?
+  country        String?
+  region         String?
+  connectionType String?  // 4g, 3g, wifi, etc
+
+  // Session tracking
+  sessionId  String?
+  visitorId  String?
+
+  createdAt DateTime @default(now())
+
+  @@index([projectId, createdAt])
+  @@index([projectId, path])
+  @@index([path, device])
+  @@index([country, createdAt])
+}
+
+model PerformanceRecommendation {
+  id          String   @id @default(cuid())
+  projectId   String
+  path        String?
+
+  category    String   // images, javascript, css, server, caching, fonts, layout
+  severity    String   // critical, warning, info
+  title       String
+  description String   @db.Text
+  impact      String?  // Estimated improvement description
+
+  metric       String?  // Related metric (LCP, CLS, etc)
+  currentValue Float?
+  targetValue  Float?
+
+  dismissed Boolean @default(false)
+  resolved  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, resolved])
+  @@index([projectId, severity])
+}
+
+model PerformanceTrend {
+  id          String   @id @default(cuid())
+  projectId   String
+  path        String?
+
+  metric      String   // LCP, FCP, CLS, TTFB, etc
+  period      String   // hourly, daily, weekly
+  periodStart DateTime
+
+  p50         Float    // 50th percentile
+  p75         Float    // 75th percentile
+  p90         Float    // 90th percentile
+  p99         Float    // 99th percentile
+  sampleCount Int
+
+  // Comparison to previous period
+  previousP75   Float?
+  changePercent Float?
+
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, path, metric, period, periodStart])
+  @@index([projectId, metric, periodStart])
+}
+
+// ============ AI FEATURES ============
+
+model AIAnalysis {
+  id           String    @id @default(cuid())
+  projectId    String
+  deploymentId String?
+  functionId   String?
+
+  type   String // deployment_analysis, error_pattern, performance_recommendation, code_review
+  status String @default("pending") // pending, processing, completed, failed
+
+  input  Json   // Build logs, error data, code snippets
+  output Json?  // AI analysis results
+
+  model   String? // claude-3-sonnet, gpt-4, etc
+  tokens  Int?    // Token usage for billing
+  latency Int?    // Processing time in ms
+
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([projectId, type])
+  @@index([deploymentId])
+  @@index([status])
+}
+
+model AIConversation {
+  id        String  @id @default(cuid())
+  projectId String
+  userId    String
+
+  title     String?
+  context   String? // deployment, function, build, general
+  contextId String? // Related entity ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages AIMessage[]
+
+  @@index([projectId, userId])
+}
+
+model AIMessage {
+  id             String @id @default(cuid())
+  conversationId String
+  role           String // user, assistant, system
+  content        String @db.Text
+
+  metadata Json? // Tool calls, citations, etc
+  tokens   Int?
+
+  createdAt DateTime @default(now())
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+model ErrorPattern {
+  id        String @id @default(cuid())
+  projectId String
+
+  pattern   String @db.Text // Error message pattern/regex
+  category  String // build, runtime, deployment, function
+  frequency Int    @default(1)
+
+  aiSolution   String? @db.Text // AI-generated solution
+  userSolution String? @db.Text // User-provided solution
+
+  lastOccurrence  DateTime
+  firstOccurrence DateTime
+
+  resolved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId, category])
+  @@index([pattern])
+}
+
+// ============ MANAGED DATABASES ============
+
+model ManagedDatabase {
+  id        String @id @default(cuid())
+  projectId String
+
+  name     String
+  type     String // postgresql, mysql, redis, mongodb
+  provider String // cloudify, neon, planetscale, upstash
+
+  // Connection details (encrypted)
+  host     String
+  port     Int
+  database String
+  username String
+  password String  @db.Text // Encrypted
+  sslMode  String  @default("require")
+
+  // Provisioning state
+  status       String  @default("provisioning") // provisioning, active, error, suspended
+  errorMessage String?
+
+  // Resource limits
+  plan            String @default("hobby") // hobby, pro, enterprise
+  storageLimit    Int    @default(512) // MB
+  connectionLimit Int    @default(5)
+
+  // Usage metrics
+  storageUsed       Int    @default(0)
+  connectionsActive Int    @default(0)
+  queriesTotal      BigInt @default(0)
+
+  // Metadata
+  region  String  @default("us-east-1")
+  version String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  migrations DatabaseMigration[]
+  backups    DatabaseBackup[]
+  metrics    DatabaseMetric[]
+
+  @@unique([projectId, name])
+  @@index([projectId])
+  @@index([status])
+}
+
+model DatabaseMigration {
+  id         String @id @default(cuid())
+  databaseId String
+
+  name     String
+  version  String
+  type     String // up, down, seed
+
+  content  String @db.Text // SQL or migration script
+  checksum String
+
+  status    String    @default("pending") // pending, running, applied, failed, rolled_back
+  appliedAt DateTime?
+  duration  Int? // ms
+
+  error String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  database ManagedDatabase @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+
+  @@index([databaseId, status])
+}
+
+model DatabaseBackup {
+  id         String @id @default(cuid())
+  databaseId String
+
+  type   String // manual, scheduled, before_migration
+  status String // pending, in_progress, completed, failed
+
+  size Int?    // bytes
+  path String? // MinIO path
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  expiresAt   DateTime?
+
+  error String?
+
+  database ManagedDatabase @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+
+  @@index([databaseId])
+  @@index([status])
+}
+
+model DatabaseMetric {
+  id         String @id @default(cuid())
+  databaseId String
+
+  timestamp DateTime @default(now())
+
+  // Performance metrics
+  queryCount   Int
+  avgQueryTime Float // ms
+  slowQueries  Int // > 1s
+
+  // Resource metrics
+  cpuUsage     Float? // percentage
+  memoryUsage  Float? // percentage
+  storageUsage Float? // MB
+  connections  Int
+
+  database ManagedDatabase @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+
+  @@index([databaseId, timestamp])
+}
+
+// ============ EDGE FUNCTIONS ============
+
+model EdgeFunction {
+  id        String  @id @default(cuid())
+  projectId String
+  name      String
+  slug      String
+  code      String  @db.Text // JavaScript/TypeScript code
+
+  // Runtime configuration
+  runtime String   @default("edge-runtime") // edge-runtime, deno
+  regions String[] @default(["global"])     // global, iad1, sfo1, cdg1, etc.
+  memory  Int      @default(128) // MB (max 256 for edge)
+  timeout Int      @default(30)  // seconds (max 30 for edge)
+
+  // Feature flags
+  enabled          Boolean @default(true)
+  cacheEnabled     Boolean @default(false)
+  cacheTtl         Int?    // seconds
+  geolocationEnabled Boolean @default(false)
+
+  // Routing
+  routes String[] // URL patterns: ["/api/*", "/middleware"]
+
+  // Environment
+  envVars Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invocations EdgeInvocation[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@index([enabled])
+}
+
+model EdgeInvocation {
+  id         String @id @default(cuid())
+  functionId String
+
+  status   String // success, error, timeout
+  duration Int    // ms
+  memory   Int    // MB used
+  region   String
+
+  requestPath   String?
+  requestMethod String?
+  statusCode    Int?
+
+  // Geolocation context
+  country String?
+  city    String?
+
+  error     String? @db.Text
+  createdAt DateTime @default(now())
+
+  function EdgeFunction @relation(fields: [functionId], references: [id], onDelete: Cascade)
+
+  @@index([functionId, createdAt])
+  @@index([status])
+}
+
+// ============ EDGE KV STORE ============
+
+model EdgeKV {
+  id        String @id @default(cuid())
+  projectId String
+  name      String
+  slug      String
+
+  // Limits
+  maxKeys   Int @default(10000)
+  maxValueSize Int @default(25000) // bytes (25KB default)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  entries EdgeKVEntry[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+}
+
+model EdgeKVEntry {
+  id    String @id @default(cuid())
+  kvId  String
+  key   String
+  value String @db.Text
+
+  // TTL support
+  expiresAt DateTime?
+
+  // Metadata
+  metadata Json?
+  version  Int @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kv EdgeKV @relation(fields: [kvId], references: [id], onDelete: Cascade)
+
+  @@unique([kvId, key])
+  @@index([kvId])
+  @@index([expiresAt])
+}
+
+// ============ A/B TESTING ============
+
+model ABTest {
+  id        String  @id @default(cuid())
+  projectId String
+  name      String
+  slug      String
+
+  // Configuration
+  enabled    Boolean @default(false)
+  startDate  DateTime?
+  endDate    DateTime?
+
+  // Variants with traffic allocation
+  variants Json // [{ name: "control", weight: 50, url: "/" }, { name: "variant_a", weight: 50, url: "/new-homepage" }]
+
+  // Targeting rules
+  targeting Json? // { countries: ["US"], devices: ["mobile"], percentage: 100 }
+
+  // Metrics tracking
+  primaryMetric String? // conversion, engagement, bounce_rate
+  goalUrl       String? // Conversion URL
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project      Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  participants ABTestParticipant[]
+  conversions  ABTestConversion[]
+
+  @@unique([projectId, slug])
+  @@index([projectId])
+  @@index([enabled])
+}
+
+model ABTestParticipant {
+  id     String @id @default(cuid())
+  testId String
+
+  visitorId String
+  variant   String
+
+  country String?
+  device  String?
+
+  assignedAt DateTime @default(now())
+
+  test ABTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@unique([testId, visitorId])
+  @@index([testId, variant])
+}
+
+model ABTestConversion {
+  id     String @id @default(cuid())
+  testId String
+
+  visitorId String
+  variant   String
+
+  // Conversion details
+  conversionType String  // goal_reached, custom_event
+  value          Float?  // Optional conversion value (revenue, etc.)
+  metadata       Json?
+
+  convertedAt DateTime @default(now())
+
+  test ABTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@index([testId, variant])
+  @@index([convertedAt])
+}
+
+// ============ MULTI-REGION FAILOVER ============
+
+model Region {
+  id          String  @id @default(cuid())
+  name        String  @unique // iad1, sfo1, cdg1, etc.
+  displayName String  // US East, US West, Paris, etc.
+  endpoint    String  // Internal K8s endpoint or external URL
+
+  // Region status
+  status    String  @default("healthy") // healthy, degraded, unhealthy, maintenance
+  isPrimary Boolean @default(false)
+  priority  Int     @default(100) // Lower = higher priority for failover
+
+  // Capacity
+  maxDeployments Int @default(1000)
+  activeDeployments Int @default(0)
+
+  // Location data
+  latitude  Float?
+  longitude Float?
+  country   String?
+  provider  String? // aws, gcp, cloudflare, custom
+
+  lastHealthCheck DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  healthChecks   RegionHealthCheck[]
+  failoversFrom  FailoverEvent[] @relation("FailoverFrom")
+  failoversTo    FailoverEvent[] @relation("FailoverTo")
+  replicationsSource DataReplication[] @relation("ReplicationSource")
+  replicationsTarget DataReplication[] @relation("ReplicationTarget")
+
+  @@index([status])
+  @@index([isPrimary])
+}
+
+model RegionHealthCheck {
+  id       String @id @default(cuid())
+  regionId String
+
+  status  String // healthy, degraded, unhealthy, timeout
+  latency Int    // ms
+
+  // Detailed checks
+  checks Json // { api: "ok", database: "ok", storage: "ok", redis: "ok" }
+
+  // Error details
+  error     String?
+  errorType String? // connection, timeout, ssl, dns
+
+  createdAt DateTime @default(now())
+
+  region Region @relation(fields: [regionId], references: [id], onDelete: Cascade)
+
+  @@index([regionId, createdAt])
+  @@index([status])
+}
+
+model FailoverEvent {
+  id String @id @default(cuid())
+
+  fromRegionId String
+  toRegionId   String
+
+  reason      String  // health_check_failed, manual, scheduled_maintenance
+  triggeredBy String  // system, user_id
+  status      String  @default("pending") // pending, in_progress, completed, failed, rolled_back
+
+  // Timing
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  duration    Int?      // ms
+
+  // Affected resources
+  projectsAffected Int @default(0)
+  deploymentsAffected Int @default(0)
+
+  // Details
+  metadata Json? // Additional context
+  error    String? // If failed
+
+  fromRegion Region @relation("FailoverFrom", fields: [fromRegionId], references: [id])
+  toRegion   Region @relation("FailoverTo", fields: [toRegionId], references: [id])
+
+  @@index([status])
+  @@index([fromRegionId])
+  @@index([toRegionId])
+  @@index([startedAt])
+}
+
+model DataReplication {
+  id String @id @default(cuid())
+
+  sourceRegionId String
+  targetRegionId String
+
+  dataType String // postgres, minio, redis, deployments
+  status   String @default("synced") // synced, syncing, lagging, error
+
+  // Lag metrics
+  lagSeconds Int @default(0)
+  lagBytes   BigInt @default(0)
+
+  // Sync stats
+  lastSyncAt     DateTime?
+  lastSyncBytes  BigInt @default(0)
+  lastSyncDuration Int? // ms
+
+  // Error tracking
+  consecutiveErrors Int @default(0)
+  lastError         String?
+  lastErrorAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sourceRegion Region @relation("ReplicationSource", fields: [sourceRegionId], references: [id])
+  targetRegion Region @relation("ReplicationTarget", fields: [targetRegionId], references: [id])
+
+  @@unique([sourceRegionId, targetRegionId, dataType])
+  @@index([status])
+  @@index([dataType])
+}
+
+// ============ PERFORMANCE BUDGETS ============
+
+model PerformanceBudget {
+  id        String @id @default(cuid())
+  projectId String
+
+  // Budget configuration
+  metric     String // lcp, fcp, cls, ttfb, bundle_size, etc.
+  threshold  Float  // Threshold value
+  unit       String // ms, score, kb, etc.
+  comparison String @default("lte") // lte, lt, gte, gt
+
+  // Alert configuration
+  alertEnabled Boolean @default(true)
+  alertChannel String? // email, slack, webhook
+
+  // Status
+  lastValue   Float?
+  lastChecked DateTime?
+  isViolating Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, metric])
+  @@index([projectId])
+  @@index([isViolating])
+}

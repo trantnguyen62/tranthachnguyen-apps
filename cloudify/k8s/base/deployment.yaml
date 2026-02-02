@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudify
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+    app.kubernetes.io/component: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudify
+      app.kubernetes.io/component: web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cloudify
+        app.kubernetes.io/component: web
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/api/metrics"
+    spec:
+      serviceAccountName: cloudify
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: cloudify
+          image: cloudify:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: cloudify-config
+            - secretRef:
+                name: cloudify-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health/ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: docker-socket
+              mountPath: /var/run/docker.sock
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cloudify-data
+        - name: docker-socket
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: cloudify
+                topologyKey: kubernetes.io/hostname

@@ -1,0 +1,178 @@
+# MinIO Object Storage for Cloudify
+# Provides S3-compatible storage for:
+# - Build artifacts
+# - Blob storage API
+# - Function code storage
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+  namespace: cloudify-system
+  labels:
+    app: minio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  # storageClassName: local-path  # K3s default
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-credentials
+  namespace: cloudify-system
+type: Opaque
+stringData:
+  root-user: cloudify
+  root-password: cloudify-minio-secret-key-change-in-production
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: cloudify-system
+  labels:
+    app: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  strategy:
+    type: Recreate  # Required for PVC
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:latest
+          args:
+            - server
+            - /data
+            - --console-address
+            - ":9001"
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: root-user
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: root-password
+          ports:
+            - name: api
+              containerPort: 9000
+            - name: console
+              containerPort: 9001
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: cloudify-system
+  labels:
+    app: minio
+spec:
+  type: ClusterIP
+  ports:
+    - name: api
+      port: 9000
+      targetPort: 9000
+    - name: console
+      port: 9001
+      targetPort: 9001
+  selector:
+    app: minio
+
+---
+# NodePort service for external access (MinIO Console)
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-console-external
+  namespace: cloudify-system
+spec:
+  type: NodePort
+  ports:
+    - name: console
+      port: 9001
+      targetPort: 9001
+      nodePort: 30901
+  selector:
+    app: minio
+
+---
+# Job to create default buckets on startup
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-setup
+  namespace: cloudify-system
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mc
+          image: minio/mc:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              sleep 10  # Wait for MinIO to be ready
+              mc alias set minio http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+              mc mb --ignore-existing minio/cloudify-builds
+              mc mb --ignore-existing minio/cloudify-blobs
+              mc mb --ignore-existing minio/cloudify-functions
+              mc anonymous set download minio/cloudify-builds  # Public read for deployed sites
+              echo "Buckets created successfully"
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: root-user
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: root-password

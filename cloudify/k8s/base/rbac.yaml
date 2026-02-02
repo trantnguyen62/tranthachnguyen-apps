@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloudify
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cloudify
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cloudify
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cloudify
+subjects:
+  - kind: ServiceAccount
+    name: cloudify
+    namespace: cloudify
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: cloudify
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudify
+      app.kubernetes.io/component: web

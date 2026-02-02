@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloudify-data
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+    app.kubernetes.io/component: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: cloudify
+  labels:
+    app.kubernetes.io/name: cloudify
+    app.kubernetes.io/component: cache
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi

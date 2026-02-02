@@ -1,0 +1,271 @@
+# Production Docker Compose Configuration
+# Usage: docker compose -f docker-compose.production.yml up -d
+#
+# IMPORTANT: Before deploying, copy .env.example to .env and fill in all secrets
+# Never commit .env to version control
+
+services:
+  cloudify:
+    image: registry.tranthachnguyen.com/cloudify:${APP_VERSION:-latest}
+    container_name: cloudify-app
+    restart: always
+    ports:
+      - "127.0.0.1:3000:3000"  # Only expose to localhost (use reverse proxy)
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_URL=${AUTH_URL}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+      - REDIS_URL=redis://redis:6379
+      - REPOS_DIR=/data/repos
+      - BUILDS_DIR=/data/builds
+      - SSL_CERTS_DIR=/data/certs
+      # Notifications
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+      # Monitoring
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      - DATADOG_API_KEY=${DATADOG_API_KEY}
+      - DATADOG_APP_KEY=${DATADOG_APP_KEY}
+      # Cloudflare & SSL
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - ACME_EMAIL=${ACME_EMAIL}
+      - LETSENCRYPT_ENV=${LETSENCRYPT_ENV:-production}
+      # MinIO
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_USE_SSL=false
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - cloudify_repos:/data/repos
+      - cloudify_builds:/data/builds
+      - cloudify_certs:/data/certs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=256m
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: cloudify-db
+    restart: always
+    command: >
+      postgres
+      -c unix_socket_directories=
+      -c max_connections=100
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+    environment:
+      - POSTGRES_USER=cloudify
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=cloudify
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h localhost -U cloudify -d cloudify"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  redis:
+    image: redis:7-alpine
+    container_name: cloudify-redis
+    restart: always
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --tcp-backlog 511
+      --timeout 0
+      --tcp-keepalive 300
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 768M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  minio:
+    image: minio/minio:latest
+    container_name: cloudify-minio
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+      - MINIO_BROWSER_REDIRECT_URL=${MINIO_CONSOLE_URL:-https://minio-console.tranthachnguyen.com}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  # Traefik reverse proxy
+  traefik:
+    image: traefik:v3.0
+    container_name: cloudify-traefik
+    restart: always
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--accesslog=true"
+      - "--accesslog.filepath=/var/log/traefik/access.log"
+      - "--metrics.prometheus=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certs:/letsencrypt
+      - traefik_logs:/var/log/traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN:-tranthachnguyen.com}`)"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_AUTH}"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    security_opt:
+      - no-new-privileges:true
+
+  # Cloudify app with Traefik labels
+  cloudify-proxy:
+    extends:
+      service: cloudify
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cloudify.rule=Host(`cloudify.${DOMAIN:-tranthachnguyen.com}`)"
+      - "traefik.http.routers.cloudify.tls.certresolver=letsencrypt"
+      - "traefik.http.services.cloudify.loadbalancer.server.port=3000"
+      - "traefik.http.routers.cloudify.middlewares=security-headers"
+      - "traefik.http.middlewares.security-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.security-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.security-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.security-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.security-headers.headers.browserXssFilter=true"
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+  cloudify_repos:
+    driver: local
+  cloudify_builds:
+    driver: local
+  cloudify_certs:
+    driver: local
+  traefik_certs:
+    driver: local
+  traefik_logs:
+    driver: local
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

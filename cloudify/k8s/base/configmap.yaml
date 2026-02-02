@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudify-config
+  namespace: cloudify
+data:
+  NODE_ENV: "production"
+  NEXT_TELEMETRY_DISABLED: "1"
+  AUTH_URL: "https://cloudify.tranthachnguyen.com"
+  NEXT_PUBLIC_APP_URL: "https://cloudify.tranthachnguyen.com"
+  DEPLOYMENT_BASE_URL: "tranthachnguyen.com"
+  LETSENCRYPT_ENV: "production"
+  CERTIFICATE_EXPIRY_THRESHOLD: "30"
+  USE_ACME_CLIENT: "true"
+  REPOS_DIR: "/data/repos"
+  BUILDS_DIR: "/data/builds"
+  SSL_CERTS_DIR: "/data/certs"
+  CERTBOT_WEBROOT: "/data/certbot"

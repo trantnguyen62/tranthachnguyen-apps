@@ -1,0 +1,68 @@
+# Cloudify K3s Namespaces
+# Apply with: kubectl apply -f namespaces.yaml
+
+---
+# Core system components (MinIO, Redis, Registry)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cloudify-system
+  labels:
+    app.kubernetes.io/part-of: cloudify
+    app.kubernetes.io/component: system
+
+---
+# Build jobs namespace (isolated build execution)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cloudify-builds
+  labels:
+    app.kubernetes.io/part-of: cloudify
+    app.kubernetes.io/component: builds
+  annotations:
+    # Resource quotas for build jobs
+    scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator": "Exists"}]'
+
+---
+# Deployed sites namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cloudify-sites
+  labels:
+    app.kubernetes.io/part-of: cloudify
+    app.kubernetes.io/component: sites
+
+---
+# Resource quota for builds namespace (prevent runaway builds)
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: build-quota
+  namespace: cloudify-builds
+spec:
+  hard:
+    requests.cpu: "8"
+    requests.memory: 16Gi
+    limits.cpu: "16"
+    limits.memory: 32Gi
+    pods: "20"
+    jobs.batch: "10"
+
+---
+# Limit range for build pods
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: build-limits
+  namespace: cloudify-builds
+spec:
+  limits:
+    - default:
+        cpu: "2"
+        memory: 2Gi
+      defaultRequest:
+        cpu: "500m"
+        memory: 512Mi
+      type: Container
