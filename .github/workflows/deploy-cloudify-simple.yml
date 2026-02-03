@@ -72,25 +72,23 @@ jobs:
               echo \"Docker version:\"
               docker --version
 
-              # Install standalone docker-compose binary if not available
-              if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null 2>&1; then
-                echo \"Installing docker-compose standalone...\"
-                COMPOSE_VERSION=v2.24.5
-                curl -SL https://github.com/docker/compose/releases/download/\${COMPOSE_VERSION}/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-                chmod +x /usr/local/bin/docker-compose
-              fi
+              # Force install standalone docker-compose binary
+              echo \"Installing docker-compose standalone...\"
+              COMPOSE_VERSION=v2.24.5
+              curl -SL https://github.com/docker/compose/releases/download/\${COMPOSE_VERSION}/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+              chmod +x /usr/local/bin/docker-compose
 
-              # Use docker-compose (standalone binary)
+              # Use the new binary explicitly
               echo \"Building and restarting container...\"
-              docker-compose down || true
-              docker-compose build --no-cache
-              docker-compose up -d
+              /usr/local/bin/docker-compose down || true
+              /usr/local/bin/docker-compose build --no-cache
+              /usr/local/bin/docker-compose up -d
 
               echo \"Waiting for health check...\"
               sleep 15
 
               echo \"Container status:\"
-              docker-compose ps
+              /usr/local/bin/docker-compose ps
 
               echo \"=== Deployment complete ===\"
             '
