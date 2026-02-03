@@ -27,6 +27,7 @@ jobs:
           PROXMOX_HOST: ${{ secrets.CLOUDFLARE_TUNNEL_HOST }}
           PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
           PROXMOX_PASSWORD: ${{ secrets.PROXMOX_PASSWORD }}
+          GITHUB_OAUTH_SECRET: ${{ secrets.CLOUDIFY_GITHUB_OAUTH_SECRET }}
         run: |
           # Install sshpass for password auth
           sudo apt-get update && sudo apt-get install -y sshpass
@@ -41,45 +42,48 @@ jobs:
             StrictHostKeyChecking no
           EOF
 
-          # Deploy to LXC 203
-          sshpass -p "$PROXMOX_PASSWORD" ssh proxmox "
-            set -e
-            echo '=== Deploying Cloudify to LXC 203 ==='
+          # First, write the secret to LXC container
+          sshpass -p "$PROXMOX_PASSWORD" ssh proxmox "pct exec 203 -- bash -c 'echo \"GITHUB_CLIENT_SECRET=$GITHUB_OAUTH_SECRET\" > /opt/cloudify/.env.secrets'"
 
-            pct exec 203 -- bash -c '
+          # Deploy to LXC 203
+          sshpass -p "$PROXMOX_PASSWORD" ssh proxmox '
+            set -e
+            echo "=== Deploying Cloudify to LXC 203 ==="
+
+            pct exec 203 -- bash -c '\''
               set -e
 
               # Use a temp directory to clone/update the full repo
               REPO_DIR=/opt/tranthachnguyen-apps
 
-              if [ -d \"\$REPO_DIR/.git\" ]; then
-                echo \"Updating existing repository...\"
-                cd \$REPO_DIR
+              if [ -d "$REPO_DIR/.git" ]; then
+                echo "Updating existing repository..."
+                cd $REPO_DIR
                 git fetch origin main
                 git reset --hard origin/main
               else
-                echo \"Cloning repository for the first time...\"
-                rm -rf \$REPO_DIR
-                git clone https://github.com/trantnguyen62/tranthachnguyen-apps.git \$REPO_DIR
+                echo "Cloning repository for the first time..."
+                rm -rf $REPO_DIR
+                git clone https://github.com/trantnguyen62/tranthachnguyen-apps.git $REPO_DIR
               fi
 
               # Sync cloudify folder to /opt/cloudify
-              echo \"Syncing cloudify folder...\"
-              rsync -av --delete \$REPO_DIR/cloudify/ /opt/cloudify/
+              echo "Syncing cloudify folder..."
+              rsync -av --delete $REPO_DIR/cloudify/ /opt/cloudify/
 
               cd /opt/cloudify
 
-              echo \"Docker version:\"
+              echo "Docker version:"
               docker --version
 
               # Force install standalone docker-compose binary
-              echo \"Installing docker-compose standalone...\"
+              echo "Installing docker-compose standalone..."
               COMPOSE_VERSION=v2.24.5
-              wget -q https://github.com/docker/compose/releases/download/\${COMPOSE_VERSION}/docker-compose-linux-x86_64 -O /usr/local/bin/docker-compose
+              wget -q https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-x86_64 -O /usr/local/bin/docker-compose
               chmod +x /usr/local/bin/docker-compose
 
               # Use the new binary explicitly
-              echo \"Building and restarting container...\"
+              echo "Building and restarting container..."
               /usr/local/bin/docker-compose down --remove-orphans || true
               # Force remove all cloudify containers
               docker rm -f cloudify cloudify-redis cloudify-db cloudify-minio cloudify-minio-init cloudify-app 2>/dev/null || true
@@ -88,12 +92,12 @@ jobs:
               /usr/local/bin/docker-compose build --no-cache
               /usr/local/bin/docker-compose up -d
 
-              echo \"Waiting for health check...\"
+              echo "Waiting for health check..."
               sleep 15
 
-              echo \"Container status:\"
+              echo "Container status:"
               /usr/local/bin/docker-compose ps
 
-              echo \"=== Deployment complete ===\"
-            '
-          "
+              echo "=== Deployment complete ==="
+            '\''
+          '

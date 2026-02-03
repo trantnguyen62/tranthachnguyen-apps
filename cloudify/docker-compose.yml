@@ -8,6 +8,8 @@ services:
     privileged: true
     ports:
       - "3000:3000"
+    env_file:
+      - .env.secrets
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://cloudify:cloudify123@postgres:5432/cloudify
@@ -15,7 +17,7 @@ services:
       - AUTH_SECRET=${AUTH_SECRET:-cloudify-auth-secret-change-in-production-min-32}
       - AUTH_URL=https://cloudify.tranthachnguyen.com
       - GITHUB_CLIENT_ID=Ov23lij7qBtBsl1gDUdL
-      - GITHUB_CLIENT_SECRET=31e8782b351b1d1c9b6ba211a474985365a42ac3
+      # GITHUB_CLIENT_SECRET loaded from .env.secrets (not in repo)
       # Google OAuth - get from https://console.cloud.google.com/apis/credentials
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
