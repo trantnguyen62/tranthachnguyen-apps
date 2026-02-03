@@ -15,7 +15,7 @@ services:
       - AUTH_SECRET=${AUTH_SECRET:-cloudify-auth-secret-change-in-production-min-32}
       - AUTH_URL=https://cloudify.tranthachnguyen.com
       - GITHUB_CLIENT_ID=Ov23lij7qBtBsl1gDUdL
-      - GITHUB_CLIENT_SECRET=04dac123ef81d436381687ff221cb644b3f2f30e
+      - GITHUB_CLIENT_SECRET=31e8782b351b1d1c9b6ba211a474985365a42ac3
       # Google OAuth - get from https://console.cloud.google.com/apis/credentials
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
