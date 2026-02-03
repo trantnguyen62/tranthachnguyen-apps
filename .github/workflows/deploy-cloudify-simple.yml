@@ -69,16 +69,35 @@ jobs:
 
               cd /opt/cloudify
 
+              # Check which docker compose command is available
+              echo \"Checking Docker installation...\"
+              which docker || echo \"docker not found in PATH\"
+              docker --version || echo \"docker version failed\"
+
+              # Try different compose commands
+              if command -v docker-compose &> /dev/null; then
+                COMPOSE_CMD=\"docker-compose\"
+              elif docker compose version &> /dev/null; then
+                COMPOSE_CMD=\"docker compose\"
+              else
+                echo \"ERROR: No docker compose available\"
+                echo \"Trying to find docker...\"
+                ls -la /usr/bin/docker* || true
+                ls -la /usr/local/bin/docker* || true
+                exit 1
+              fi
+
+              echo \"Using compose command: \$COMPOSE_CMD\"
               echo \"Building and restarting container...\"
-              docker-compose down || true
-              docker-compose build --no-cache
-              docker-compose up -d
+              \$COMPOSE_CMD down || true
+              \$COMPOSE_CMD build --no-cache
+              \$COMPOSE_CMD up -d
 
               echo \"Waiting for health check...\"
               sleep 15
 
               echo \"Container status:\"
-              docker-compose ps
+              \$COMPOSE_CMD ps
 
               echo \"=== Deployment complete ===\"
             '
