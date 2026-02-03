@@ -48,11 +48,26 @@ jobs:
 
             pct exec 203 -- bash -c '
               set -e
-              cd /opt/cloudify
 
-              echo \"Pulling latest code...\"
-              git fetch origin main
-              git reset --hard origin/main
+              # Use a temp directory to clone/update the full repo
+              REPO_DIR=/opt/tranthachnguyen-apps
+
+              if [ -d \"\$REPO_DIR/.git\" ]; then
+                echo \"Updating existing repository...\"
+                cd \$REPO_DIR
+                git fetch origin main
+                git reset --hard origin/main
+              else
+                echo \"Cloning repository for the first time...\"
+                rm -rf \$REPO_DIR
+                git clone https://github.com/trantnguyen62/tranthachnguyen-apps.git \$REPO_DIR
+              fi
+
+              # Sync cloudify folder to /opt/cloudify
+              echo \"Syncing cloudify folder...\"
+              rsync -av --delete \$REPO_DIR/cloudify/ /opt/cloudify/
+
+              cd /opt/cloudify
 
               echo \"Building and restarting container...\"
               docker compose down || true
