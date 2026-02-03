@@ -80,7 +80,9 @@ jobs:
 
               # Use the new binary explicitly
               echo \"Building and restarting container...\"
-              /usr/local/bin/docker-compose down || true
+              /usr/local/bin/docker-compose down --remove-orphans || true
+              # Force remove any lingering containers
+              docker rm -f cloudify-redis cloudify-db cloudify-minio cloudify-app 2>/dev/null || true
               /usr/local/bin/docker-compose build --no-cache
               /usr/local/bin/docker-compose up -d
 
