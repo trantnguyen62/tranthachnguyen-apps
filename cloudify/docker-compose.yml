@@ -16,6 +16,9 @@ services:
       - AUTH_URL=https://cloudify.tranthachnguyen.com
       - GITHUB_CLIENT_ID=Ov23lij7qBtBsl1gDUdL
       - GITHUB_CLIENT_SECRET=04dac123ef81d436381687ff221cb644b3f2f30e
+      # Google OAuth - get from https://console.cloud.google.com/apis/credentials
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
       # Redis for KV store and caching
       - REDIS_URL=redis://redis:6379
       # MinIO for blob storage
