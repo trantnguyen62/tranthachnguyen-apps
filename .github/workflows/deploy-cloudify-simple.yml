@@ -72,16 +72,23 @@ jobs:
               echo \"Docker version:\"
               docker --version
 
+              # Install docker-compose-plugin if not available
+              if ! docker compose version > /dev/null 2>&1; then
+                echo \"Installing docker-compose-plugin...\"
+                apt-get update -qq
+                apt-get install -y -qq docker-compose-plugin || apt-get install -y -qq docker-compose
+              fi
+
               echo \"Building and restarting container...\"
-              /bin/docker compose down || true
-              /bin/docker compose build --no-cache
-              /bin/docker compose up -d
+              docker compose down 2>/dev/null || docker-compose down 2>/dev/null || true
+              docker compose build --no-cache 2>/dev/null || docker-compose build --no-cache
+              docker compose up -d 2>/dev/null || docker-compose up -d
 
               echo \"Waiting for health check...\"
               sleep 15
 
               echo \"Container status:\"
-              /bin/docker compose ps
+              docker compose ps 2>/dev/null || docker-compose ps
 
               echo \"=== Deployment complete ===\"
             '
