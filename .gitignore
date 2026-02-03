@@ -13,6 +13,9 @@ build/
 */dist/
 */build/
 
+# But keep lib/build/ directories (source code, not output)
+!*/lib/build/
+
 # Logs
 *.log
 npm-debug.log*
