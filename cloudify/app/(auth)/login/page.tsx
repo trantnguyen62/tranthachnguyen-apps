@@ -48,8 +48,11 @@ export default function LoginPage() {
   };
 
   const handleGitHubLogin = () => {
-    // Use NextAuth signIn function for GitHub OAuth
     signIn("github", { callbackUrl: "/dashboard" });
+  };
+
+  const handleGoogleLogin = () => {
+    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   return (
@@ -97,7 +100,11 @@ export default function LoginPage() {
                 <Github className="h-5 w-5" />
                 Continue with GitHub
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleGoogleLogin}
+              >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
