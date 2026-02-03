@@ -1,5 +1,8 @@
 services:
   cloudify:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: cloudify:latest
     container_name: cloudify
     privileged: true
