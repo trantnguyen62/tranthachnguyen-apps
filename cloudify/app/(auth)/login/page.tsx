@@ -7,6 +7,7 @@ import { Cloud, Github, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -47,8 +48,8 @@ export default function LoginPage() {
   };
 
   const handleGitHubLogin = () => {
-    // Redirect to NextAuth GitHub signin endpoint
-    window.location.href = "/api/auth/signin/github?callbackUrl=/dashboard";
+    // Use NextAuth signIn function for GitHub OAuth
+    signIn("github", { callbackUrl: "/dashboard" });
   };
 
   return (
