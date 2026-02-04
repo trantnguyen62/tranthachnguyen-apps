@@ -8,12 +8,16 @@ services:
     privileged: true
     ports:
       - "3000:3000"
+    env_file:
+      - .env.secrets
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://cloudify:cloudify123@postgres:5432/cloudify
       - JWT_SECRET=${JWT_SECRET:-cloudify-jwt-secret-change-in-production-min-32-chars}
       - AUTH_SECRET=${AUTH_SECRET:-cloudify-auth-secret-change-in-production-min-32}
       - AUTH_URL=https://cloudify.tranthachnguyen.com
+      # GitHub OAuth - Client ID is public, secret loaded from .env.secrets
+      - GITHUB_CLIENT_ID=Ov23lij7qBtBsl1gDUdL
       # Redis for KV store and caching
       - REDIS_URL=redis://redis:6379
       # MinIO for blob storage

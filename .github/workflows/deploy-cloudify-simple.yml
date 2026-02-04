@@ -63,11 +63,17 @@ jobs:
                 git clone https://github.com/trantnguyen62/tranthachnguyen-apps.git $REPO_DIR
               fi
 
-              # Sync cloudify folder to /opt/cloudify
+              # Sync cloudify folder to /opt/cloudify (preserve .env.secrets)
               echo "Syncing cloudify folder..."
-              rsync -av --delete $REPO_DIR/cloudify/ /opt/cloudify/
+              rsync -av --delete --exclude=".env.secrets" $REPO_DIR/cloudify/ /opt/cloudify/
 
               cd /opt/cloudify
+
+              # Ensure .env.secrets exists (empty if not set up yet)
+              if [ ! -f .env.secrets ]; then
+                echo "Creating empty .env.secrets (set up OAuth credentials on server)"
+                touch .env.secrets
+              fi
 
               echo "Docker version:"
               docker --version
