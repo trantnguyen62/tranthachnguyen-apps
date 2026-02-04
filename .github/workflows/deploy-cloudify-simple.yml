@@ -27,7 +27,6 @@ jobs:
           PROXMOX_HOST: ${{ secrets.CLOUDFLARE_TUNNEL_HOST }}
           PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
           PROXMOX_PASSWORD: ${{ secrets.PROXMOX_PASSWORD }}
-          GITHUB_OAUTH_SECRET: ${{ secrets.CLOUDIFY_GITHUB_OAUTH_SECRET }}
         run: |
           # Install sshpass for password auth
           sudo apt-get update && sudo apt-get install -y sshpass
@@ -41,14 +40,6 @@ jobs:
             ProxyCommand cloudflared access ssh --hostname %h
             StrictHostKeyChecking no
           EOF
-
-          # Write the secret to LXC container (only if secret is set)
-          if [ -n "$GITHUB_OAUTH_SECRET" ]; then
-            echo "Writing GitHub OAuth secret to server..."
-            sshpass -p "$PROXMOX_PASSWORD" ssh proxmox "pct exec 203 -- bash -c 'echo \"GITHUB_CLIENT_SECRET=$GITHUB_OAUTH_SECRET\" > /opt/cloudify/.env.secrets'"
-          else
-            echo "WARNING: CLOUDIFY_GITHUB_OAUTH_SECRET not set - using existing .env.secrets on server"
-          fi
 
           # Deploy to LXC 203
           sshpass -p "$PROXMOX_PASSWORD" ssh proxmox '
@@ -77,9 +68,6 @@ jobs:
               rsync -av --delete $REPO_DIR/cloudify/ /opt/cloudify/
 
               cd /opt/cloudify
-
-              # Ensure .env.secrets exists (required by docker-compose)
-              touch .env.secrets
 
               echo "Docker version:"
               docker --version
