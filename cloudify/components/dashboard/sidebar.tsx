@@ -235,7 +235,10 @@ export function DashboardSidebar() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-[#ee0000]"
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onSelect={(e) => {
+                e.preventDefault();
+                signOut({ callbackUrl: "/login" });
+              }}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out

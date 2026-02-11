@@ -399,6 +399,126 @@ body {
   white-space: nowrap;
   user-select: none;
 }
+
+/* Select All / None filter buttons */
+.section-label-row {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+}
+.filter-toggle-btns { display: flex; gap: 8px; }
+.filter-toggle-btn {
+  font-size: 10px; color: #64748b; cursor: pointer; background: none;
+  border: none; padding: 0; text-decoration: underline; font-family: inherit;
+}
+.filter-toggle-btn:hover { color: #94a3b8; }
+
+/* Collapsible sections */
+.section-label-row .chevron {
+  transition: transform 0.2s; display: inline-block; font-size: 8px; margin-right: 4px; color: #64748b;
+}
+.section-label-row.collapsed .chevron { transform: rotate(-90deg); }
+.section-content { overflow: hidden; max-height: 2000px; transition: max-height 0.3s ease; }
+.section-content.collapsed { max-height: 0 !important; padding: 0; }
+
+/* Search results bar */
+#searchResults {
+  display: none; margin-top: 6px; font-size: 11px; color: #94a3b8;
+  align-items: center; gap: 6px;
+}
+#searchResults.visible { display: flex; }
+.search-nav-btn {
+  width: 22px; height: 22px; background: #0f172a; border: 1px solid #475569;
+  border-radius: 4px; color: #cbd5e1; font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+  font-family: inherit; transition: background 0.15s;
+}
+.search-nav-btn:hover { background: #1e293b; border-color: #64748b; }
+#searchCount { flex: 1; }
+
+/* Keyboard shortcuts overlay */
+#shortcuts-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+  display: none; align-items: center; justify-content: center; z-index: 150;
+}
+#shortcuts-overlay.visible { display: flex; }
+.shortcuts-modal {
+  background: #1e293b; border: 1px solid #475569; border-radius: 12px;
+  padding: 24px 32px; max-width: 380px; width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.shortcuts-modal h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 16px; font-weight: 600; }
+.shortcuts-modal table { width: 100%; border-collapse: collapse; }
+.shortcuts-modal td { padding: 5px 0; font-size: 13px; color: #cbd5e1; }
+.shortcuts-modal td:first-child {
+  width: 50px;
+}
+.shortcuts-modal kbd {
+  display: inline-block; background: #0f172a; border: 1px solid #475569;
+  border-radius: 4px; padding: 2px 7px; font-size: 11px; font-family: 'SF Mono', 'Fira Code', monospace;
+  color: #e2e8f0; min-width: 22px; text-align: center;
+}
+.shortcuts-modal .hint { font-size: 11px; color: #64748b; margin-top: 14px; text-align: center; }
+
+/* Node info panel */
+#info-panel {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 300px;
+  background: #1e293b; border-left: 1px solid #334155;
+  transform: translateX(100%); transition: transform 0.25s ease;
+  z-index: 50; overflow-y: auto; display: flex; flex-direction: column;
+}
+#info-panel.visible { transform: translateX(0); }
+#info-panel::-webkit-scrollbar { width: 6px; }
+#info-panel::-webkit-scrollbar-track { background: #1e293b; }
+#info-panel::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+.info-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 16px; border-bottom: 1px solid #334155;
+}
+.info-header-content { flex: 1; min-width: 0; }
+#infoName { font-size: 15px; font-weight: 600; color: #f1f5f9; word-break: break-word; }
+#infoClose {
+  background: none; border: none; color: #64748b; font-size: 20px;
+  cursor: pointer; padding: 0 0 0 8px; line-height: 1;
+}
+#infoClose:hover { color: #e2e8f0; }
+#infoType {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; padding: 0 16px; margin-top: -8px; margin-bottom: 4px;
+}
+#infoPath {
+  font-size: 11px; color: #94a3b8; font-family: 'SF Mono', 'Fira Code', monospace;
+  padding: 0 16px 8px; word-break: break-all; border-bottom: 1px solid #334155;
+}
+.info-conns { font-size: 11px; color: #64748b; padding: 4px 16px 8px; }
+.info-section-label {
+  font-size: 10px; font-weight: 600; color: #94a3b8; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 10px 16px 6px;
+}
+.info-list { padding: 0 8px 8px; }
+.info-edge-row {
+  display: flex; align-items: center; gap: 8px; padding: 5px 8px;
+  border-radius: 4px; cursor: pointer; font-size: 12px; color: #cbd5e1;
+  transition: background 0.1s;
+}
+.info-edge-row:hover { background: #0f172a; }
+.info-edge-chip {
+  font-size: 9px; font-weight: 600; text-transform: uppercase;
+  padding: 1px 5px; border-radius: 3px; white-space: nowrap; flex-shrink: 0;
+}
+.info-edge-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Context menu */
+#context-menu {
+  position: fixed; display: none; background: #1e293b; border: 1px solid #475569;
+  border-radius: 8px; padding: 4px; z-index: 120; min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.ctx-item {
+  padding: 7px 12px; font-size: 12px; color: #cbd5e1; border-radius: 4px;
+  cursor: pointer; transition: background 0.1s; white-space: nowrap;
+}
+.ctx-item:hover { background: #334155; color: #f1f5f9; }
+.ctx-divider { height: 1px; background: #334155; margin: 4px 0; }
 </style>
 </head>
 <body>
@@ -420,7 +540,12 @@ body {
   </div>
 
   <div class="sidebar-section">
-    <input type="text" id="searchInput" placeholder="Search nodes...">
+    <input type="text" id="searchInput" placeholder="Search nodes... (/ to focus)">
+    <div id="searchResults">
+      <span id="searchCount">0 matches</span>
+      <button class="search-nav-btn" id="searchPrev" title="Previous match">&#9650;</button>
+      <button class="search-nav-btn" id="searchNext" title="Next match">&#9660;</button>
+    </div>
   </div>
 
   <div class="sidebar-section">
@@ -484,6 +609,53 @@ body {
     <svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="6" stroke-width="2"/><circle cx="44" cy="16" r="4" stroke-width="2"/><circle cx="32" cy="44" r="5" stroke-width="2"/><line x1="25" y1="23" x2="29" y2="40" stroke-width="1.5"/><line x1="39" y1="18" x2="35" y2="40" stroke-width="1.5"/><line x1="26" y1="18" x2="40" y2="16" stroke-width="1.5"/></svg>
     <p>Upload a graph JSON file to begin</p>
     <p class="hint">Drag &amp; drop or click the Upload button</p>
+  </div>
+
+  <!-- Node info panel (slides in on selection) -->
+  <div id="info-panel">
+    <div class="info-header">
+      <div class="info-header-content"><div id="infoName"></div></div>
+      <button id="infoClose">&times;</button>
+    </div>
+    <div id="infoType"></div>
+    <div id="infoPath"></div>
+    <div class="info-conns" id="infoConns"></div>
+    <div class="info-section-label">Outgoing (source &rarr;)</div>
+    <div id="infoOutgoing" class="info-list"></div>
+    <div class="info-section-label">Incoming (&rarr; target)</div>
+    <div id="infoIncoming" class="info-list"></div>
+  </div>
+
+  <!-- Right-click context menu -->
+  <div id="context-menu">
+    <div class="ctx-item" data-action="select">Select Node</div>
+    <div class="ctx-item" data-action="focus">Fly to Node</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-action="pin">Pin Position</div>
+    <div class="ctx-item" data-action="unpin">Unpin Position</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-action="show-type">Show Only This Type</div>
+    <div class="ctx-item" data-action="hide-type">Hide This Type</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-action="copy-path">Copy File Path</div>
+  </div>
+
+  <!-- Keyboard shortcuts overlay -->
+  <div id="shortcuts-overlay">
+    <div class="shortcuts-modal">
+      <h3>Keyboard Shortcuts</h3>
+      <table>
+        <tr><td><kbd>?</kbd></td><td>Toggle this help</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Clear selection &amp; search</td></tr>
+        <tr><td><kbd>/</kbd></td><td>Focus search input</td></tr>
+        <tr><td><kbd>F</kbd></td><td>Fit view (frame all nodes)</td></tr>
+        <tr><td><kbd>L</kbd></td><td>Toggle labels</td></tr>
+        <tr><td><kbd>B</kbd></td><td>Toggle bloom effect</td></tr>
+        <tr><td><kbd>R</kbd></td><td>Toggle auto-rotate</td></tr>
+        <tr><td><kbd>Space</kbd></td><td>Toggle freeze layout</td></tr>
+      </table>
+      <p class="hint">Press ? or Esc to close</p>
+    </div>
   </div>
 </div>
 
@@ -557,13 +729,19 @@ let simulation = null;
 const nodeMeshes = new Map();    // nodeId -> THREE.Mesh
 const nodeGlows = new Map();     // nodeId -> THREE.Sprite
 const nodeLabels = new Map();    // nodeId -> CSS2DObject
-const edgeLines = [];            // [{line, sourceId, targetId, type}]
+const nodePinRings = new Map();  // nodeId -> THREE.Mesh (gold ring for pinned)
+const edgeLines = [];            // [{line, cone, sourceId, targetId, type}]
+const nodeById = new Map();      // nodeId -> node object (O(1) lookup)
 let backgroundParticles = null;
-let nodeGroup, edgeGroup, glowGroup;
+let nodeGroup, edgeGroup, glowGroup, arrowGroup;
+let searchIndex = -1;            // Current search result index for navigation
 
 // Shared geometry/textures
-let sphereGeo;
+let sphereGeo, coneGeo, ringGeo;
 let glowTexture;
+
+// localStorage key
+const STORAGE_KEY = 'codeGraphViewer3D';
 
 // ============================================================================
 // DOM REFS
@@ -596,9 +774,11 @@ function initScene() {
 
   // Groups for organization
   edgeGroup = new THREE.Group();
+  arrowGroup = new THREE.Group();
   nodeGroup = new THREE.Group();
   glowGroup = new THREE.Group();
   scene.add(edgeGroup);
+  scene.add(arrowGroup);
   scene.add(glowGroup);
   scene.add(nodeGroup);
 
@@ -666,6 +846,9 @@ function initScene() {
 
   // Shared geometry
   sphereGeo = new THREE.SphereGeometry(1, 16, 12);
+  coneGeo = new THREE.ConeGeometry(0.6, 2, 6);
+  coneGeo.rotateX(Math.PI / 2); // Point along +Z by default
+  ringGeo = new THREE.RingGeometry(1.15, 1.4, 24);
 
   // Glow texture
   glowTexture = createGlowTexture();
@@ -743,7 +926,12 @@ function clearSceneObjects() {
   nodeGlows.clear();
   nodeLabels.forEach((label) => { nodeGroup.remove(label); });
   nodeLabels.clear();
-  edgeLines.forEach(({line}) => { edgeGroup.remove(line); line.geometry.dispose(); line.material.dispose(); });
+  nodePinRings.forEach((ring) => { nodeGroup.remove(ring); ring.material.dispose(); });
+  nodePinRings.clear();
+  edgeLines.forEach(({line, cone}) => {
+    edgeGroup.remove(line); line.geometry.dispose(); line.material.dispose();
+    if (cone) { arrowGroup.remove(cone); cone.material.dispose(); }
+  });
   edgeLines.length = 0;
 }
 
@@ -799,9 +987,20 @@ function buildSceneObjects() {
     labelObj.position.set(0, r + 2, 0);
     mesh.add(labelObj);
     nodeLabels.set(node.id, labelObj);
+
+    // Pin ring (hidden by default, shown when node is pinned/dragged)
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0xfacc15, transparent: true, opacity: 0.6,
+      side: THREE.DoubleSide, depthWrite: false,
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.scale.setScalar(r);
+    ring.visible = false;
+    nodeGroup.add(ring);
+    nodePinRings.set(node.id, ring);
   }
 
-  // Create edge lines
+  // Create edge lines with arrow cones
   const visNodeIds = new Set();
   nodeMeshes.forEach((_, id) => visNodeIds.add(id));
 
@@ -813,6 +1012,7 @@ function buildSceneObjects() {
 
     const color = new THREE.Color(getEdgeColor(link.type));
     const isImport = link.type === 'imports';
+    const baseOpacity = isImport ? 0.12 : 0.5;
 
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute([0,0,0, 0,0,0], 3));
@@ -820,13 +1020,22 @@ function buildSceneObjects() {
     const mat = new THREE.LineBasicMaterial({
       color: color,
       transparent: true,
-      opacity: isImport ? 0.12 : 0.5,
+      opacity: baseOpacity,
       linewidth: 1,
     });
 
     const line = new THREE.Line(geo, mat);
     edgeGroup.add(line);
-    edgeLines.push({ line, sourceId: sid, targetId: tid, type: link.type });
+
+    // Arrow cone (hidden for imports by default to reduce clutter)
+    const coneMat = new THREE.MeshBasicMaterial({
+      color: color, transparent: true, opacity: isImport ? 0 : baseOpacity,
+    });
+    const cone = new THREE.Mesh(coneGeo, coneMat);
+    cone.visible = !isImport;
+    arrowGroup.add(cone);
+
+    edgeLines.push({ line, cone, sourceId: sid, targetId: tid, type: link.type });
   }
 }
 
@@ -865,7 +1074,7 @@ function buildSimulation() {
 }
 
 function onSimulationTick() {
-  // Update node mesh positions
+  // Update node mesh positions + pin rings
   for (const node of nodes) {
     const mesh = nodeMeshes.get(node.id);
     if (mesh && node.x !== undefined) {
@@ -875,17 +1084,46 @@ function onSimulationTick() {
     if (glow && node.x !== undefined) {
       glow.position.set(node.x, node.y, node.z || 0);
     }
+    // Pin ring follows node and faces camera
+    const ring = nodePinRings.get(node.id);
+    if (ring) {
+      const isPinned = node.fx != null;
+      ring.visible = isPinned;
+      if (isPinned && node.x !== undefined) {
+        ring.position.set(node.x, node.y, node.z || 0);
+        ring.quaternion.copy(camera.quaternion); // billboard
+      }
+    }
   }
 
-  // Update edge line positions
+  // Update edge line positions + arrow cones
+  const _srcVec = new THREE.Vector3();
+  const _tgtVec = new THREE.Vector3();
+  const _dir = new THREE.Vector3();
   for (const edge of edgeLines) {
-    const src = nodes.find(n => n.id === edge.sourceId);
-    const tgt = nodes.find(n => n.id === edge.targetId);
+    const src = nodeById.get(edge.sourceId);
+    const tgt = nodeById.get(edge.targetId);
     if (src && tgt && src.x !== undefined && tgt.x !== undefined) {
+      _srcVec.set(src.x, src.y, src.z || 0);
+      _tgtVec.set(tgt.x, tgt.y, tgt.z || 0);
+
       const pos = edge.line.geometry.attributes.position;
-      pos.array[0] = src.x; pos.array[1] = src.y; pos.array[2] = src.z || 0;
-      pos.array[3] = tgt.x; pos.array[4] = tgt.y; pos.array[5] = tgt.z || 0;
+      pos.array[0] = _srcVec.x; pos.array[1] = _srcVec.y; pos.array[2] = _srcVec.z;
+      pos.array[3] = _tgtVec.x; pos.array[4] = _tgtVec.y; pos.array[5] = _tgtVec.z;
       pos.needsUpdate = true;
+
+      // Position arrow cone at 80% toward target (just outside target node)
+      if (edge.cone) {
+        _dir.copy(_tgtVec).sub(_srcVec);
+        const len = _dir.length();
+        if (len > 0.1) {
+          _dir.normalize();
+          const tgtR = getRadius(tgt) || 2;
+          const arrowPos = _tgtVec.clone().sub(_dir.clone().multiplyScalar(tgtR + 1.5));
+          edge.cone.position.copy(arrowPos);
+          edge.cone.lookAt(_tgtVec);
+        }
+      }
     }
   }
 }
@@ -914,7 +1152,7 @@ function raycastNodes(event) {
 }
 
 function showTooltipForNode(nodeId, cx, cy) {
-  const node = nodes.find(n => n.id === nodeId);
+  const node = nodeById.get(nodeId);
   if (!node) return;
   document.getElementById('ttLabel').textContent = node.label || node.id;
   const ttType = document.getElementById('ttType');
@@ -945,8 +1183,9 @@ function hideTooltip() { tooltip.style.display = 'none'; }
 // SELECTION & VISUAL STATE
 // ============================================================================
 function selectNode(nodeId) {
-  selectedNode = nodeId ? nodes.find(n => n.id === nodeId) : null;
+  selectedNode = nodeId ? nodeById.get(nodeId) || null : null;
   applyVisualState();
+  updateInfoPanel();
 }
 
 function applyVisualState() {
@@ -1002,7 +1241,7 @@ function applyVisualState() {
     }
   });
 
-  // Update edge opacities
+  // Update edge opacities + arrow cones
   for (const edge of edgeLines) {
     const isImport = edge.type === 'imports';
     let opacity = is3D
@@ -1021,6 +1260,13 @@ function applyVisualState() {
     }
 
     edge.line.material.opacity = opacity;
+
+    // Arrow cone: visible when edge is visible enough; imports show arrows only when highlighted
+    if (edge.cone) {
+      const showArrow = isImport ? opacity > 0.5 : opacity > 0.05;
+      edge.cone.visible = showArrow;
+      edge.cone.material.opacity = Math.min(opacity, 0.8);
+    }
   }
 }
 
@@ -1028,12 +1274,6 @@ function applyVisualState() {
 // MOUSE EVENT HANDLERS
 // ============================================================================
 let mouseDownPos = null;
-
-renderer?.domElement?.addEventListener('mousedown', onMouseDown);
-renderer?.domElement?.addEventListener('mousemove', onMouseMove);
-renderer?.domElement?.addEventListener('mouseup', onMouseUp);
-renderer?.domElement?.addEventListener('dblclick', onDblClick);
-renderer?.domElement?.addEventListener('mouseleave', onMouseLeave);
 
 function onMouseDown(e) {
   if (e.button !== 0) return;
@@ -1043,7 +1283,7 @@ function onMouseDown(e) {
 
   const hitId = raycastNodes(e);
   if (hitId) {
-    const node = nodes.find(n => n.id === hitId);
+    const node = nodeById.get(hitId);
     if (node) {
       draggedNode = node;
       controls.enabled = false;
@@ -1088,7 +1328,7 @@ function onMouseMove(e) {
   // Hover
   const hitId = raycastNodes(e);
   if (hitId !== (hoveredNode?.id || null)) {
-    hoveredNode = hitId ? nodes.find(n => n.id === hitId) : null;
+    hoveredNode = hitId ? nodeById.get(hitId) || null : null;
     renderer.domElement.style.cursor = hitId ? 'pointer' : 'default';
     if (hitId) {
       showTooltipForNode(hitId, e.clientX, e.clientY);
@@ -1128,7 +1368,7 @@ function onDblClick(e) {
   e.preventDefault();
   const hitId = raycastNodes(e);
   if (hitId) {
-    const node = nodes.find(n => n.id === hitId);
+    const node = nodeById.get(hitId);
     if (node) {
       node.fx = null;
       node.fy = null;
@@ -1146,18 +1386,64 @@ function onMouseLeave() {
 // ============================================================================
 // KEYBOARD SHORTCUTS
 // ============================================================================
+const shortcutsOverlay = document.getElementById('shortcuts-overlay');
+
 document.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT') return;
+  // Close context menu on any key
+  document.getElementById('context-menu').style.display = 'none';
+
+  // Allow Escape from input fields
   if (e.key === 'Escape') {
+    if (shortcutsOverlay.classList.contains('visible')) {
+      shortcutsOverlay.classList.remove('visible');
+      return;
+    }
+    if (e.target.tagName === 'INPUT') {
+      e.target.blur();
+    }
     selectNode(null);
     document.getElementById('searchInput').value = '';
     searchTerm = '';
     searchMatches.clear();
+    searchIndex = -1;
+    document.getElementById('searchResults').classList.remove('visible');
     applyVisualState();
+    return;
   }
-  if (e.key === 'f' || e.key === 'F') {
+
+  // Don't trigger shortcuts when typing in inputs
+  if (e.target.tagName === 'INPUT') return;
+
+  if (e.key === '?') {
+    shortcutsOverlay.classList.toggle('visible');
+  } else if (e.key === '/') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  } else if (e.key === 'f' || e.key === 'F') {
     fitView();
+  } else if (e.key === 'l' || e.key === 'L') {
+    const toggle = document.getElementById('toggleLabels');
+    toggle.checked = !toggle.checked;
+    toggle.dispatchEvent(new Event('change'));
+  } else if (e.key === 'b' || e.key === 'B') {
+    const toggle = document.getElementById('toggleBloom');
+    toggle.checked = !toggle.checked;
+    toggle.dispatchEvent(new Event('change'));
+  } else if (e.key === 'r') {
+    const toggle = document.getElementById('toggleAutoRotate');
+    toggle.checked = !toggle.checked;
+    toggle.dispatchEvent(new Event('change'));
+  } else if (e.key === ' ') {
+    e.preventDefault();
+    const toggle = document.getElementById('toggleFreeze');
+    toggle.checked = !toggle.checked;
+    toggle.dispatchEvent(new Event('change'));
   }
+});
+
+// Close shortcuts overlay when clicking outside modal
+shortcutsOverlay.addEventListener('click', (e) => {
+  if (e.target === shortcutsOverlay) shortcutsOverlay.classList.remove('visible');
 });
 
 // ============================================================================
@@ -1203,9 +1489,13 @@ document.getElementById('cameraReset').addEventListener('click', () => {
 // ============================================================================
 // SEARCH
 // ============================================================================
+const searchResultsEl = document.getElementById('searchResults');
+const searchCountEl = document.getElementById('searchCount');
+
 document.getElementById('searchInput').addEventListener('input', function(e) {
   searchTerm = e.target.value.toLowerCase().trim();
   searchMatches.clear();
+  searchIndex = -1;
   if (searchTerm.length > 0) {
     for (const node of nodes) {
       if ((node.label && node.label.toLowerCase().includes(searchTerm)) ||
@@ -1213,18 +1503,59 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
         searchMatches.add(node.id);
       }
     }
+    searchCountEl.textContent = searchMatches.size + ' match' + (searchMatches.size !== 1 ? 'es' : '');
+    searchResultsEl.classList.add('visible');
+  } else {
+    searchResultsEl.classList.remove('visible');
   }
   applyVisualState();
 });
+
+document.getElementById('searchPrev').addEventListener('click', () => navigateSearch(-1));
+document.getElementById('searchNext').addEventListener('click', () => navigateSearch(1));
+
+function navigateSearch(dir) {
+  if (searchMatches.size === 0) return;
+  const ids = Array.from(searchMatches);
+  searchIndex = (searchIndex + dir + ids.length) % ids.length;
+  searchCountEl.textContent = (searchIndex + 1) + ' / ' + ids.length;
+  const nodeId = ids[searchIndex];
+  selectNode(nodeId);
+  flyToNode(nodeId);
+}
+
+// ============================================================================
+// FLY TO NODE (smooth camera transition)
+// ============================================================================
+function flyToNode(nodeId) {
+  const node = nodeById.get(nodeId);
+  if (!node || node.x === undefined) return;
+  const target = new THREE.Vector3(node.x, node.y, node.z || 0);
+  const startPos = camera.position.clone();
+  const startTarget = controls.target.clone();
+  const endPos = target.clone();
+  endPos.z += 80; // Offset camera in front of node
+  const duration = 500;
+  const start = performance.now();
+
+  function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // easeInOutQuad
+    camera.position.lerpVectors(startPos, endPos, ease);
+    controls.target.lerpVectors(startTarget, target, ease);
+    controls.update();
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 
 // ============================================================================
 // TOGGLE HANDLERS
 // ============================================================================
 document.getElementById('toggleLabels').addEventListener('change', function() {
   showLabels = this.checked;
-  nodeLabels.forEach((label) => {
-    label.visible = showLabels;
-  });
+  nodeLabels.forEach((label) => { label.visible = showLabels; });
+  saveSettings();
 });
 
 document.getElementById('toggleFreeze').addEventListener('change', function() {
@@ -1233,15 +1564,18 @@ document.getElementById('toggleFreeze').addEventListener('change', function() {
     if (frozen) simulation.stop();
     else simulation.alpha(0.3).restart();
   }
+  saveSettings();
 });
 
 document.getElementById('toggleBloom').addEventListener('change', function() {
   bloomEnabled = this.checked;
-  bloomPass.enabled = bloomEnabled;
+  bloomPass.enabled = bloomEnabled && is3D;
+  saveSettings();
 });
 
 document.getElementById('toggleAutoRotate').addEventListener('change', function() {
   autoRotate = this.checked;
+  saveSettings();
 });
 
 // ============================================================================
@@ -1312,6 +1646,7 @@ function setViewMode(mode) {
     buildSimulation();
     setTimeout(fitView, 1500);
   }
+  saveSettings();
 }
 
 document.getElementById('btn3D').addEventListener('click', () => setViewMode('3d'));
@@ -1361,6 +1696,36 @@ function buildNodeTypeFilters(types) {
   list.innerHTML = '';
   section.style.display = '';
 
+  // Replace section label with row containing All/None
+  const existingLabel = section.querySelector('.section-label');
+  if (existingLabel) {
+    const row = document.createElement('div');
+    row.className = 'section-label-row';
+    row.innerHTML = '<span><span class="chevron">&#9660;</span> NODE TYPES</span><div class="filter-toggle-btns"><button class="filter-toggle-btn" data-action="all">All</button><button class="filter-toggle-btn" data-action="none">None</button></div>';
+    existingLabel.replaceWith(row);
+
+    // Collapsible
+    const content = list;
+    row.addEventListener('click', (e) => {
+      if (e.target.classList.contains('filter-toggle-btn')) return;
+      row.classList.toggle('collapsed');
+      content.classList.toggle('collapsed');
+      saveSettings();
+    });
+
+    // All/None buttons
+    row.querySelector('[data-action="all"]').addEventListener('click', () => {
+      visibleNodeTypes = new Set(Object.keys(types));
+      list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+      rebuildVisualization();
+    });
+    row.querySelector('[data-action="none"]').addEventListener('click', () => {
+      visibleNodeTypes.clear();
+      list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      rebuildVisualization();
+    });
+  }
+
   const sorted = Object.entries(types).sort((a, b) => b[1] - a[1]);
   for (const [type, count] of sorted) {
     const item = document.createElement('label');
@@ -1397,6 +1762,36 @@ function buildEdgeTypeFilters(types) {
   const list = document.getElementById('edgeTypesList');
   list.innerHTML = '';
   section.style.display = '';
+
+  // Replace section label with row containing All/None
+  const existingLabel = section.querySelector('.section-label');
+  if (existingLabel) {
+    const row = document.createElement('div');
+    row.className = 'section-label-row';
+    row.innerHTML = '<span><span class="chevron">&#9660;</span> EDGE TYPES</span><div class="filter-toggle-btns"><button class="filter-toggle-btn" data-action="all">All</button><button class="filter-toggle-btn" data-action="none">None</button></div>';
+    existingLabel.replaceWith(row);
+
+    // Collapsible
+    const content = list;
+    row.addEventListener('click', (e) => {
+      if (e.target.classList.contains('filter-toggle-btn')) return;
+      row.classList.toggle('collapsed');
+      content.classList.toggle('collapsed');
+      saveSettings();
+    });
+
+    // All/None buttons
+    row.querySelector('[data-action="all"]').addEventListener('click', () => {
+      visibleEdgeTypes = new Set(Object.keys(types));
+      list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+      rebuildVisualization();
+    });
+    row.querySelector('[data-action="none"]').addEventListener('click', () => {
+      visibleEdgeTypes.clear();
+      list.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      rebuildVisualization();
+    });
+  }
 
   const sorted = Object.entries(types).sort((a, b) => b[1] - a[1]);
   for (const [type, count] of sorted) {
@@ -1457,6 +1852,10 @@ function loadGraph(data, filename) {
   nodes = (data.nodes || []).map(d => Object.assign({}, d));
   links = (data.links || []).map(d => Object.assign({}, d));
 
+  // Build O(1) node lookup
+  nodeById.clear();
+  for (const n of nodes) nodeById.set(n.id, n);
+
   // Build indices
   linkedByIndex = {};
   edgeCounts = {};
@@ -1500,6 +1899,194 @@ function loadGraph(data, filename) {
 window.__loadGraph = loadGraph;
 
 // ============================================================================
+// NODE INFO PANEL
+// ============================================================================
+const infoPanel = document.getElementById('info-panel');
+
+function updateInfoPanel() {
+  if (!selectedNode) {
+    infoPanel.classList.remove('visible');
+    return;
+  }
+
+  const node = selectedNode;
+  document.getElementById('infoName').textContent = node.label || node.id;
+  const typeEl = document.getElementById('infoType');
+  typeEl.textContent = node.type;
+  typeEl.style.color = getNodeColor(node.type);
+  const pathEl = document.getElementById('infoPath');
+  pathEl.textContent = node.filePath || '';
+  pathEl.style.display = node.filePath ? 'block' : 'none';
+  document.getElementById('infoConns').textContent = (edgeCounts[node.id] || 0) + ' connections';
+
+  // Build outgoing edges (this node is source)
+  const outgoing = document.getElementById('infoOutgoing');
+  outgoing.innerHTML = '';
+  const outEdges = links.filter(l => {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    return sid === node.id;
+  });
+  for (const edge of outEdges) {
+    const tid = typeof edge.target === 'object' ? edge.target.id : edge.target;
+    const tgt = nodeById.get(tid);
+    if (!tgt) continue;
+    const row = document.createElement('div');
+    row.className = 'info-edge-row';
+    row.innerHTML = `<span class="info-edge-chip" style="background:${getEdgeColor(edge.type)}22;color:${getEdgeColor(edge.type)}">${edge.type.replace(/_/g, ' ')}</span><span class="info-edge-label">${tgt.label || tgt.id}</span>`;
+    row.addEventListener('click', () => { selectNode(tid); flyToNode(tid); });
+    outgoing.appendChild(row);
+  }
+
+  // Build incoming edges (this node is target)
+  const incoming = document.getElementById('infoIncoming');
+  incoming.innerHTML = '';
+  const inEdges = links.filter(l => {
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    return tid === node.id;
+  });
+  for (const edge of inEdges) {
+    const sid = typeof edge.source === 'object' ? edge.source.id : edge.source;
+    const src = nodeById.get(sid);
+    if (!src) continue;
+    const row = document.createElement('div');
+    row.className = 'info-edge-row';
+    row.innerHTML = `<span class="info-edge-chip" style="background:${getEdgeColor(edge.type)}22;color:${getEdgeColor(edge.type)}">${edge.type.replace(/_/g, ' ')}</span><span class="info-edge-label">${src.label || src.id}</span>`;
+    row.addEventListener('click', () => { selectNode(sid); flyToNode(sid); });
+    incoming.appendChild(row);
+  }
+
+  infoPanel.classList.add('visible');
+}
+
+document.getElementById('infoClose').addEventListener('click', () => selectNode(null));
+
+// ============================================================================
+// RIGHT-CLICK CONTEXT MENU
+// ============================================================================
+const contextMenu = document.getElementById('context-menu');
+let contextMenuNodeId = null;
+
+renderer.domElement.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  const hitId = raycastNodes(e);
+  if (!hitId) {
+    contextMenu.style.display = 'none';
+    return;
+  }
+  contextMenuNodeId = hitId;
+  const node = nodeById.get(hitId);
+
+  // Update pin/unpin visibility
+  const isPinned = node && node.fx != null;
+  contextMenu.querySelector('[data-action="pin"]').style.display = isPinned ? 'none' : '';
+  contextMenu.querySelector('[data-action="unpin"]').style.display = isPinned ? '' : 'none';
+
+  contextMenu.style.display = 'block';
+  let left = e.clientX;
+  let top = e.clientY;
+  if (left + 190 > window.innerWidth) left = e.clientX - 190;
+  if (top + 250 > window.innerHeight) top = e.clientY - 250;
+  contextMenu.style.left = left + 'px';
+  contextMenu.style.top = top + 'px';
+});
+
+// Close context menu on click anywhere
+document.addEventListener('click', () => { contextMenu.style.display = 'none'; });
+
+// Context menu actions
+contextMenu.addEventListener('click', (e) => {
+  const action = e.target.dataset?.action;
+  if (!action || !contextMenuNodeId) return;
+  const node = nodeById.get(contextMenuNodeId);
+
+  switch (action) {
+    case 'select':
+      selectNode(contextMenuNodeId);
+      break;
+    case 'focus':
+      selectNode(contextMenuNodeId);
+      flyToNode(contextMenuNodeId);
+      break;
+    case 'pin':
+      if (node) { node.fx = node.x; node.fy = node.y; node.fz = node.z; }
+      break;
+    case 'unpin':
+      if (node) { node.fx = null; node.fy = null; node.fz = null; if (!frozen && simulation) simulation.alpha(0.3).restart(); }
+      break;
+    case 'show-type':
+      if (node) {
+        // Uncheck all, then check only this type
+        visibleNodeTypes.clear();
+        visibleNodeTypes.add(node.type);
+        document.querySelectorAll('#nodeTypesList input[type="checkbox"]').forEach((cb, i) => {
+          const items = document.querySelectorAll('#nodeTypesList .filter-label');
+          const typeName = items[i]?.textContent.replace(/ /g, '_');
+          cb.checked = typeName === node.type;
+        });
+        rebuildVisualization();
+      }
+      break;
+    case 'hide-type':
+      if (node) {
+        visibleNodeTypes.delete(node.type);
+        document.querySelectorAll('#nodeTypesList .filter-item').forEach(item => {
+          const label = item.querySelector('.filter-label');
+          if (label && label.textContent.replace(/ /g, '_') === node.type) {
+            item.querySelector('input[type="checkbox"]').checked = false;
+          }
+        });
+        rebuildVisualization();
+      }
+      break;
+    case 'copy-path':
+      if (node?.filePath) {
+        navigator.clipboard.writeText(node.filePath).catch(() => {});
+      }
+      break;
+  }
+  contextMenu.style.display = 'none';
+});
+
+// ============================================================================
+// SETTINGS PERSISTENCE (localStorage)
+// ============================================================================
+function saveSettings() {
+  try {
+    const settings = { showLabels, frozen, bloomEnabled, autoRotate, is3D };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  } catch (e) { /* ignore */ }
+}
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+
+    if (s.showLabels !== undefined) {
+      showLabels = s.showLabels;
+      document.getElementById('toggleLabels').checked = showLabels;
+    }
+    if (s.frozen !== undefined) {
+      frozen = s.frozen;
+      document.getElementById('toggleFreeze').checked = frozen;
+    }
+    if (s.bloomEnabled !== undefined) {
+      bloomEnabled = s.bloomEnabled;
+      document.getElementById('toggleBloom').checked = bloomEnabled;
+      bloomPass.enabled = bloomEnabled;
+    }
+    if (s.autoRotate !== undefined) {
+      autoRotate = s.autoRotate;
+      document.getElementById('toggleAutoRotate').checked = autoRotate;
+    }
+    if (s.is3D !== undefined && !s.is3D) {
+      setViewMode('2d');
+    }
+  } catch (e) { /* ignore */ }
+}
+
+// ============================================================================
 // ANIMATION LOOP
 // ============================================================================
 function animate() {
@@ -1529,7 +2116,7 @@ function animate() {
   }
 
   // Render
-  if (bloomEnabled) {
+  if (bloomEnabled && is3D) {
     composer.render();
   } else {
     renderer.render(scene, camera);
@@ -1541,6 +2128,7 @@ function animate() {
 // INIT
 // ============================================================================
 initScene();
+loadSettings();
 
 // Attach mouse events after renderer is created
 renderer.domElement.addEventListener('mousedown', onMouseDown);
