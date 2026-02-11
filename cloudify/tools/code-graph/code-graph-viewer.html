@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Graph Viewer</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 260px;
+  min-width: 260px;
+  height: 100vh;
+  background: #1e293b;
+  border-right: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+
+#sidebar::-webkit-scrollbar { width: 6px; }
+#sidebar::-webkit-scrollbar-track { background: #1e293b; }
+#sidebar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+.sidebar-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.sidebar-header h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
+}
+
+.sidebar-header .subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+/* Upload button */
+#uploadBtn {
+  display: block;
+  width: 100%;
+  padding: 9px 0;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: center;
+}
+
+#uploadBtn:hover { background: #2563eb; }
+#uploadBtn:active { background: #1d4ed8; }
+
+#fileInput { display: none; }
+
+/* Search */
+#searchInput {
+  width: 100%;
+  padding: 7px 10px;
+  background: #0f172a;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#searchInput::placeholder { color: #64748b; }
+#searchInput:focus { border-color: #3b82f6; }
+
+/* Filter items */
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  background: #0f172a;
+  border: 1.5px solid #475569;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.filter-item input[type="checkbox"]:checked {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.filter-item input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 3.5px;
+  top: 1px;
+  width: 4px;
+  height: 7px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.edge-color-line {
+  width: 12px;
+  height: 3px;
+  min-width: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.filter-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #cbd5e1;
+}
+
+.filter-count {
+  font-size: 11px;
+  color: #64748b;
+  background: #0f172a;
+  padding: 1px 6px;
+  border-radius: 8px;
+  min-width: 22px;
+  text-align: center;
+}
+
+/* Toggle switches */
+.toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.toggle-label {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #475569;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  background: #e2e8f0;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: #3b82f6;
+}
+
+.toggle-switch input:checked + .toggle-slider::after {
+  transform: translateX(16px);
+}
+
+/* Stats */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.stat-label { color: #94a3b8; }
+.stat-value { color: #e2e8f0; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* Canvas area */
+#canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Tooltip */
+#tooltip {
+  position: fixed;
+  display: none;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 100;
+  max-width: 300px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+#tooltip .tt-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 4px;
+}
+
+#tooltip .tt-type {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+#tooltip .tt-path {
+  font-size: 11px;
+  color: #94a3b8;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  word-break: break-all;
+  margin-bottom: 4px;
+}
+
+#tooltip .tt-conns {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Empty state */
+#empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+}
+
+#empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  stroke: #334155;
+  fill: none;
+}
+
+#empty-state p {
+  font-size: 14px;
+}
+
+#empty-state .hint {
+  font-size: 12px;
+  color: #334155;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    z-index: 20;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  #sidebar.open { transform: translateX(0); }
+
+  #menu-toggle {
+    display: flex !important;
+  }
+}
+
+#menu-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 15;
+  width: 36px;
+  height: 36px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #e2e8f0;
+  font-size: 18px;
+}
+</style>
+</head>
+<body>
+
+<button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
+
+<aside id="sidebar">
+  <div class="sidebar-header">
+    <h1>Code Graph Viewer</h1>
+    <div class="subtitle" id="loadedFile">No file loaded</div>
+  </div>
+
+  <div class="sidebar-section">
+    <button id="uploadBtn" onclick="document.getElementById('fileInput').click()">Upload Graph JSON</button>
+    <input type="file" id="fileInput" accept=".json">
+  </div>
+
+  <div class="sidebar-section">
+    <input type="text" id="searchInput" placeholder="Search nodes...">
+  </div>
+
+  <div class="sidebar-section" id="nodeTypesSection" style="display:none">
+    <div class="section-label">Node Types</div>
+    <div id="nodeTypesList"></div>
+  </div>
+
+  <div class="sidebar-section" id="edgeTypesSection" style="display:none">
+    <div class="section-label">Edge Types</div>
+    <div id="edgeTypesList"></div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Display Options</div>
+
+    <div class="toggle-item">
+      <span class="toggle-label">Show Labels</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggleLabels">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-item">
+      <span class="toggle-label">Show Arrows</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggleArrows" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-item">
+      <span class="toggle-label">Freeze Layout</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggleFreeze">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="statsSection" style="display:none">
+    <div class="section-label">Statistics</div>
+    <div class="stat-row"><span class="stat-label">Total Nodes</span><span class="stat-value" id="statNodes">0</span></div>
+    <div class="stat-row"><span class="stat-label">Total Edges</span><span class="stat-value" id="statEdges">0</span></div>
+    <div class="stat-row"><span class="stat-label">Generated</span><span class="stat-value" id="statDate">-</span></div>
+  </div>
+</aside>
+
+<div id="canvas-container">
+  <canvas id="graphCanvas"></canvas>
+  <div id="empty-state">
+    <svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="6" stroke-width="2"/><circle cx="44" cy="16" r="4" stroke-width="2"/><circle cx="32" cy="44" r="5" stroke-width="2"/><line x1="25" y1="23" x2="29" y2="40" stroke-width="1.5"/><line x1="39" y1="18" x2="35" y2="40" stroke-width="1.5"/><line x1="26" y1="18" x2="40" y2="16" stroke-width="1.5"/></svg>
+    <p>Upload a graph JSON file to begin</p>
+    <p class="hint">Drag & drop or click the Upload button</p>
+  </div>
+</div>
+
+<div id="tooltip">
+  <div class="tt-label" id="ttLabel"></div>
+  <div class="tt-type" id="ttType"></div>
+  <div class="tt-path" id="ttPath"></div>
+  <div class="tt-conns" id="ttConns"></div>
+</div>
+
+<script>
+(function() {
+  // ---- Constants ----
+  const NODE_COLORS = {
+    endpoint: '#ef4444', collection: '#3b82f6', file: '#22c55e',
+    router: '#a855f7', script: '#f59e0b', service: '#06b6d4',
+    cache_key: '#f97316', utility: '#6b7280', webhook: '#ec4899',
+    event: '#14b8a6', external_api: '#eab308', component: '#8b5cf6',
+    hook: '#10b981'
+  };
+
+  const EDGE_COLORS = {
+    db_read: '#3b82f6', db_write: '#ef4444', endpoint_handler: '#06b6d4',
+    imports: '#4b5563', api_call: '#a855f7', cache_read: '#f97316',
+    cache_write: '#f59e0b', webhook_receive: '#ec4899',
+    webhook_send: '#f472b6', event_publish: '#14b8a6'
+  };
+
+  const DEFAULT_NODE_COLOR = '#6b7280';
+  const DEFAULT_EDGE_COLOR = '#4b5563';
+
+  // ---- State ----
+  let graphData = null;
+  let simulation = null;
+  let nodes = [];
+  let links = [];
+  let linkedByIndex = {};
+  let edgeCounts = {};
+  let transform = d3.zoomIdentity;
+  let selectedNode = null;
+  let hoveredNode = null;
+  let draggedNode = null;
+  let searchTerm = '';
+  let searchMatches = new Set();
+  let visibleNodeTypes = new Set();
+  let visibleEdgeTypes = new Set();
+  let showLabels = false;
+  let showArrows = true;
+  let frozen = false;
+
+  // ---- DOM ----
+  const canvas = document.getElementById('graphCanvas');
+  const ctx = canvas.getContext('2d');
+  const container = document.getElementById('canvas-container');
+  const tooltip = document.getElementById('tooltip');
+  const emptyState = document.getElementById('empty-state');
+
+  // ---- Canvas sizing ----
+  let W, H, dpr;
+
+  function resizeCanvas() {
+    dpr = window.devicePixelRatio || 1;
+    W = container.clientWidth;
+    H = container.clientHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // ---- Helpers ----
+  function getNodeColor(type) { return NODE_COLORS[type] || DEFAULT_NODE_COLOR; }
+  function getEdgeColor(type) { return EDGE_COLORS[type] || DEFAULT_EDGE_COLOR; }
+  function getRadius(node) { return 5 + Math.sqrt(edgeCounts[node.id] || 0) * 2; }
+
+  function isNeighbor(a, b) {
+    return linkedByIndex[a.id + '|' + b.id] || linkedByIndex[b.id + '|' + a.id];
+  }
+
+  function isNodeVisible(node) { return visibleNodeTypes.has(node.type); }
+
+  function isEdgeVisible(link) {
+    const src = typeof link.source === 'object' ? link.source : nodes.find(n => n.id === link.source);
+    const tgt = typeof link.target === 'object' ? link.target : nodes.find(n => n.id === link.target);
+    if (!src || !tgt) return false;
+    return visibleEdgeTypes.has(link.type) && visibleNodeTypes.has(src.type) && visibleNodeTypes.has(tgt.type);
+  }
+
+  function nodeAtPoint(x, y) {
+    // Reverse iterate so top-drawn nodes are hit first
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const n = nodes[i];
+      if (!isNodeVisible(n)) continue;
+      const r = getRadius(n);
+      const dx = x - n.x;
+      const dy = y - n.y;
+      if (dx * dx + dy * dy < (r + 2) * (r + 2)) return n;
+    }
+    return null;
+  }
+
+  function screenToGraph(sx, sy) {
+    return [(sx - transform.x) / transform.k, (sy - transform.y) / transform.k];
+  }
+
+  // ---- Drawing ----
+  function draw() {
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    if (!graphData) { ctx.restore(); return; }
+
+    ctx.save();
+    ctx.translate(transform.x, transform.y);
+    ctx.scale(transform.k, transform.k);
+
+    const hasSelection = selectedNode !== null;
+    const hasSearch = searchTerm.length > 0;
+
+    // Draw edges
+    for (let i = 0; i < links.length; i++) {
+      const link = links[i];
+      const src = link.source;
+      const tgt = link.target;
+      if (!isNodeVisible(src) || !isNodeVisible(tgt)) continue;
+      if (!visibleEdgeTypes.has(link.type)) continue;
+
+      const isImports = link.type === 'imports';
+      let alpha = isImports ? 0.15 : 0.6;
+
+      if (hasSelection) {
+        const connectedToSelected = (src === selectedNode || tgt === selectedNode);
+        alpha = connectedToSelected ? 1.0 : 0.04;
+      } else if (hasSearch && searchMatches.size > 0) {
+        const srcMatch = searchMatches.has(src.id);
+        const tgtMatch = searchMatches.has(tgt.id);
+        if (!srcMatch && !tgtMatch) alpha = 0.04;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(src.x, src.y);
+      ctx.lineTo(tgt.x, tgt.y);
+      ctx.strokeStyle = getEdgeColor(link.type);
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = 1 / transform.k;
+      ctx.stroke();
+
+      // Arrows
+      if (showArrows && alpha > 0.05) {
+        const dx = tgt.x - src.x;
+        const dy = tgt.y - src.y;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len > 0) {
+          const r = getRadius(tgt);
+          const ratio = (len - r - 2) / len;
+          const ax = src.x + dx * ratio;
+          const ay = src.y + dy * ratio;
+          const angle = Math.atan2(dy, dx);
+          const arrowSize = 5 / transform.k;
+          ctx.beginPath();
+          ctx.moveTo(ax, ay);
+          ctx.lineTo(ax - arrowSize * Math.cos(angle - 0.4), ay - arrowSize * Math.sin(angle - 0.4));
+          ctx.moveTo(ax, ay);
+          ctx.lineTo(ax - arrowSize * Math.cos(angle + 0.4), ay - arrowSize * Math.sin(angle + 0.4));
+          ctx.stroke();
+        }
+      }
+    }
+
+    ctx.globalAlpha = 1;
+
+    // Draw nodes
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      if (!isNodeVisible(node)) continue;
+      const r = getRadius(node);
+
+      let alpha = 1;
+      let strokeColor = 'rgba(255,255,255,0.7)';
+      let strokeWidth = 1.5 / transform.k;
+      let glowing = false;
+
+      if (hasSelection) {
+        if (node === selectedNode) {
+          strokeColor = '#facc15';
+          strokeWidth = 3 / transform.k;
+        } else if (isNeighbor(selectedNode, node)) {
+          alpha = 1;
+        } else {
+          alpha = 0.12;
+        }
+      }
+
+      if (hasSearch && searchMatches.size > 0) {
+        if (searchMatches.has(node.id)) {
+          glowing = true;
+          alpha = 1;
+        } else if (!hasSelection) {
+          alpha = 0.12;
+        }
+      }
+
+      ctx.globalAlpha = alpha;
+
+      if (glowing) {
+        ctx.shadowColor = getNodeColor(node.type);
+        ctx.shadowBlur = 12 / transform.k;
+      }
+
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = getNodeColor(node.type);
+      ctx.fill();
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = strokeWidth;
+      ctx.stroke();
+
+      if (glowing) {
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    ctx.globalAlpha = 1;
+
+    // Labels
+    if (showLabels && transform.k > 0.5) {
+      const fontSize = Math.max(8, Math.min(14, 10 / transform.k));
+      ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        if (!isNodeVisible(node)) continue;
+        const r = getRadius(node);
+
+        let alpha = 0.9;
+        if (hasSelection) {
+          if (node !== selectedNode && !isNeighbor(selectedNode, node)) alpha = 0.08;
+        }
+        if (hasSearch && searchMatches.size > 0 && !searchMatches.has(node.id) && !hasSelection) {
+          alpha = 0.08;
+        }
+
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillText(node.label || node.id, node.x, node.y + r + 3);
+      }
+    }
+
+    ctx.restore();
+    ctx.restore();
+  }
+
+  // ---- Zoom ----
+  const zoomBehavior = d3.zoom()
+    .scaleExtent([0.05, 8])
+    .filter(function(event) {
+      // Allow wheel, dblclick, touch; block other mouse buttons for pan if dragging a node
+      if (event.type === 'mousedown' && draggedNode) return false;
+      return true;
+    })
+    .on('zoom', function(event) {
+      transform = event.transform;
+      draw();
+    });
+
+  d3.select(canvas).call(zoomBehavior);
+
+  // ---- Mouse interactions ----
+  let mouseDownPos = null;
+  let mouseDownNode = null;
+  let isDragging = false;
+
+  canvas.addEventListener('mousedown', function(e) {
+    if (e.button !== 0) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const [gx, gy] = screenToGraph(mx, my);
+    const node = nodeAtPoint(gx, gy);
+    mouseDownPos = { x: e.clientX, y: e.clientY };
+    mouseDownNode = node;
+    isDragging = false;
+
+    if (node) {
+      draggedNode = node;
+      node.fx = node.x;
+      node.fy = node.y;
+      // Disable zoom panning while dragging a node
+      d3.select(canvas).on('.zoom', null);
+      canvas.style.cursor = 'grabbing';
+    }
+  });
+
+  canvas.addEventListener('mousemove', function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const [gx, gy] = screenToGraph(mx, my);
+
+    if (draggedNode) {
+      isDragging = true;
+      draggedNode.fx = gx;
+      draggedNode.fy = gy;
+      draggedNode.x = gx;
+      draggedNode.y = gy;
+      if (!frozen && simulation) simulation.alpha(0.1).restart();
+      draw();
+      return;
+    }
+
+    // Hover detection
+    const node = nodeAtPoint(gx, gy);
+    if (node !== hoveredNode) {
+      hoveredNode = node;
+      canvas.style.cursor = node ? 'pointer' : 'default';
+      if (node) {
+        showTooltip(node, e.clientX, e.clientY);
+      } else {
+        hideTooltip();
+      }
+      draw();
+    } else if (node) {
+      positionTooltip(e.clientX, e.clientY);
+    }
+  });
+
+  canvas.addEventListener('mouseup', function(e) {
+    if (draggedNode) {
+      if (!isDragging) {
+        // It was a click, not a drag
+        selectNode(draggedNode);
+      }
+      draggedNode = null;
+      canvas.style.cursor = 'default';
+      // Re-enable zoom
+      d3.select(canvas).call(zoomBehavior);
+      return;
+    }
+
+    // Click on background
+    if (!isDragging && mouseDownNode === null) {
+      selectNode(null);
+    }
+
+    mouseDownPos = null;
+    mouseDownNode = null;
+    isDragging = false;
+  });
+
+  canvas.addEventListener('dblclick', function(e) {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const [gx, gy] = screenToGraph(mx, my);
+    const node = nodeAtPoint(gx, gy);
+    if (node) {
+      node.fx = null;
+      node.fy = null;
+      if (!frozen && simulation) simulation.alpha(0.3).restart();
+    }
+  });
+
+  canvas.addEventListener('mouseleave', function() {
+    hoveredNode = null;
+    hideTooltip();
+  });
+
+  // ---- Tooltip ----
+  function showTooltip(node, cx, cy) {
+    document.getElementById('ttLabel').textContent = node.label || node.id;
+    const ttType = document.getElementById('ttType');
+    ttType.textContent = node.type;
+    ttType.style.color = getNodeColor(node.type);
+    document.getElementById('ttPath').textContent = node.filePath || '';
+    document.getElementById('ttPath').style.display = node.filePath ? 'block' : 'none';
+    document.getElementById('ttConns').textContent = (edgeCounts[node.id] || 0) + ' connections';
+    tooltip.style.display = 'block';
+    positionTooltip(cx, cy);
+  }
+
+  function positionTooltip(cx, cy) {
+    const tw = tooltip.offsetWidth;
+    const th = tooltip.offsetHeight;
+    let left = cx + 14;
+    let top = cy + 14;
+    if (left + tw > window.innerWidth - 8) left = cx - tw - 14;
+    if (top + th > window.innerHeight - 8) top = cy - th - 14;
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+  }
+
+  function hideTooltip() {
+    tooltip.style.display = 'none';
+  }
+
+  // ---- Selection ----
+  function selectNode(node) {
+    selectedNode = node;
+    draw();
+  }
+
+  // ---- Search ----
+  document.getElementById('searchInput').addEventListener('input', function(e) {
+    searchTerm = e.target.value.toLowerCase().trim();
+    searchMatches.clear();
+    if (searchTerm.length > 0) {
+      for (const node of nodes) {
+        if ((node.label && node.label.toLowerCase().includes(searchTerm)) ||
+            node.id.toLowerCase().includes(searchTerm)) {
+          searchMatches.add(node.id);
+        }
+      }
+    }
+    draw();
+  });
+
+  // ---- Toggle handlers ----
+  document.getElementById('toggleLabels').addEventListener('change', function() {
+    showLabels = this.checked;
+    draw();
+  });
+
+  document.getElementById('toggleArrows').addEventListener('change', function() {
+    showArrows = this.checked;
+    draw();
+  });
+
+  document.getElementById('toggleFreeze').addEventListener('change', function() {
+    frozen = this.checked;
+    if (simulation) {
+      if (frozen) { simulation.stop(); }
+      else { simulation.alpha(0.3).restart(); }
+    }
+  });
+
+  // ---- File upload ----
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const data = JSON.parse(ev.target.result);
+        loadGraph(data, file.name);
+      } catch (err) {
+        alert('Invalid JSON file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // Drag and drop
+  container.addEventListener('dragover', function(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+  container.addEventListener('drop', function(e) {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const data = JSON.parse(ev.target.result);
+        loadGraph(data, file.name);
+      } catch (err) {
+        alert('Invalid JSON file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // ---- Load graph ----
+  function loadGraph(data, filename) {
+    graphData = data;
+    emptyState.style.display = 'none';
+    document.getElementById('loadedFile').textContent = 'Loaded: ' + filename;
+
+    // Reset state
+    selectedNode = null;
+    hoveredNode = null;
+    draggedNode = null;
+    searchTerm = '';
+    searchMatches.clear();
+    document.getElementById('searchInput').value = '';
+
+    // Parse nodes and links
+    nodes = (data.nodes || []).map(d => Object.assign({}, d));
+    links = (data.links || []).map(d => Object.assign({}, d));
+
+    // Build linked-by index and edge counts
+    linkedByIndex = {};
+    edgeCounts = {};
+    for (const link of links) {
+      const sid = typeof link.source === 'object' ? link.source.id : link.source;
+      const tid = typeof link.target === 'object' ? link.target.id : link.target;
+      linkedByIndex[sid + '|' + tid] = true;
+      linkedByIndex[tid + '|' + sid] = true;
+      edgeCounts[sid] = (edgeCounts[sid] || 0) + 1;
+      edgeCounts[tid] = (edgeCounts[tid] || 0) + 1;
+    }
+
+    // Collect types
+    const nodeTypes = {};
+    for (const n of nodes) {
+      nodeTypes[n.type] = (nodeTypes[n.type] || 0) + 1;
+    }
+    const edgeTypes = {};
+    for (const l of links) {
+      edgeTypes[l.type] = (edgeTypes[l.type] || 0) + 1;
+    }
+
+    visibleNodeTypes = new Set(Object.keys(nodeTypes));
+    visibleEdgeTypes = new Set(Object.keys(edgeTypes));
+
+    buildNodeTypeFilters(nodeTypes);
+    buildEdgeTypeFilters(edgeTypes);
+
+    // Stats
+    document.getElementById('statsSection').style.display = '';
+    document.getElementById('statNodes').textContent = nodes.length;
+    document.getElementById('statEdges').textContent = links.length;
+    const generated = data.metadata && data.metadata.generated ? data.metadata.generated : '-';
+    document.getElementById('statDate').textContent = generated;
+
+    // Build simulation
+    buildSimulation();
+  }
+
+  function buildSimulation() {
+    if (simulation) simulation.stop();
+
+    const w = W;
+    const h = H;
+
+    // Filter visible
+    const visNodes = nodes.filter(n => isNodeVisible(n));
+    const visNodeIds = new Set(visNodes.map(n => n.id));
+    const visLinks = links.filter(l => {
+      const sid = typeof l.source === 'object' ? l.source.id : l.source;
+      const tid = typeof l.target === 'object' ? l.target.id : l.target;
+      return visNodeIds.has(sid) && visNodeIds.has(tid) && visibleEdgeTypes.has(l.type);
+    });
+
+    simulation = d3.forceSimulation(visNodes)
+      .force('charge', d3.forceManyBody().strength(-300).distanceMax(150))
+      .force('link', d3.forceLink(visLinks).id(d => d.id).distance(80).strength(0.5))
+      .force('center', d3.forceCenter(w / 2, h / 2))
+      .force('collide', d3.forceCollide(d => getRadius(d) + 3))
+      .force('x', d3.forceX(w / 2).strength(0.05))
+      .force('y', d3.forceY(h / 2).strength(0.05))
+      .alphaDecay(0.02)
+      .velocityDecay(0.4)
+      .on('tick', draw);
+
+    if (frozen) simulation.stop();
+  }
+
+  // ---- Build sidebar filters ----
+  function buildNodeTypeFilters(types) {
+    const section = document.getElementById('nodeTypesSection');
+    const list = document.getElementById('nodeTypesList');
+    list.innerHTML = '';
+    section.style.display = '';
+
+    const sorted = Object.entries(types).sort((a, b) => b[1] - a[1]);
+
+    for (const [type, count] of sorted) {
+      const item = document.createElement('label');
+      item.className = 'filter-item';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = true;
+      cb.addEventListener('change', function() {
+        if (this.checked) visibleNodeTypes.add(type);
+        else visibleNodeTypes.delete(type);
+        buildSimulation();
+      });
+
+      const dot = document.createElement('span');
+      dot.className = 'color-dot';
+      dot.style.background = getNodeColor(type);
+
+      const lbl = document.createElement('span');
+      lbl.className = 'filter-label';
+      lbl.textContent = type.replace(/_/g, ' ');
+
+      const cnt = document.createElement('span');
+      cnt.className = 'filter-count';
+      cnt.textContent = count;
+
+      item.append(cb, dot, lbl, cnt);
+      list.appendChild(item);
+    }
+  }
+
+  function buildEdgeTypeFilters(types) {
+    const section = document.getElementById('edgeTypesSection');
+    const list = document.getElementById('edgeTypesList');
+    list.innerHTML = '';
+    section.style.display = '';
+
+    const sorted = Object.entries(types).sort((a, b) => b[1] - a[1]);
+
+    for (const [type, count] of sorted) {
+      const item = document.createElement('label');
+      item.className = 'filter-item';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = true;
+      cb.addEventListener('change', function() {
+        if (this.checked) visibleEdgeTypes.add(type);
+        else visibleEdgeTypes.delete(type);
+        draw();
+      });
+
+      const line = document.createElement('span');
+      line.className = 'edge-color-line';
+      line.style.background = getEdgeColor(type);
+
+      const lbl = document.createElement('span');
+      lbl.className = 'filter-label';
+      lbl.textContent = type.replace(/_/g, ' ');
+
+      const cnt = document.createElement('span');
+      cnt.className = 'filter-count';
+      cnt.textContent = count;
+
+      item.append(cb, line, lbl, cnt);
+      list.appendChild(item);
+    }
+  }
+})();
+</script>
+</body>
+</html>

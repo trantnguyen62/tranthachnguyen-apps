@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Graph Viewer 3D</title>
+
+<!-- Import Map for Three.js ES modules -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+  }
+}
+</script>
+
+<!-- d3 (provides d3-timer, d3-dispatch, d3-quadtree needed by d3-force-3d) -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<!-- d3-force-3d (UMD global, extends d3 with 3D force simulation) -->
+<script src="https://cdn.jsdelivr.net/npm/d3-force-3d@3.0.5/dist/d3-force-3d.min.js"></script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+}
+
+/* ============ Sidebar ============ */
+#sidebar {
+  width: 260px;
+  min-width: 260px;
+  height: 100vh;
+  background: #1e293b;
+  border-right: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+
+#sidebar::-webkit-scrollbar { width: 6px; }
+#sidebar::-webkit-scrollbar-track { background: #1e293b; }
+#sidebar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+#sidebar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+.sidebar-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-header h1 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.01em;
+}
+
+.badge-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.sidebar-header .subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+/* Upload */
+#uploadBtn {
+  display: block;
+  width: 100%;
+  padding: 9px 0;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: center;
+}
+#uploadBtn:hover { background: #2563eb; }
+#uploadBtn:active { background: #1d4ed8; }
+#fileInput { display: none; }
+
+/* Search */
+#searchInput {
+  width: 100%;
+  padding: 7px 10px;
+  background: #0f172a;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+#searchInput::placeholder { color: #64748b; }
+#searchInput:focus { border-color: #3b82f6; }
+
+/* Filter items */
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  background: #0f172a;
+  border: 1.5px solid #475569;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.filter-item input[type="checkbox"]:checked {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.filter-item input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 3.5px;
+  top: 1px;
+  width: 4px;
+  height: 7px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  min-width: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.edge-color-line {
+  width: 12px;
+  height: 3px;
+  min-width: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.filter-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #cbd5e1;
+}
+
+.filter-count {
+  font-size: 11px;
+  color: #64748b;
+  background: #0f172a;
+  padding: 1px 6px;
+  border-radius: 8px;
+  min-width: 22px;
+  text-align: center;
+}
+
+/* Toggles */
+.toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+.toggle-label { font-size: 13px; color: #cbd5e1; }
+
+.toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  cursor: pointer;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #475569;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  background: #e2e8f0;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: #3b82f6; }
+.toggle-switch input:checked + .toggle-slider::after { transform: translateX(16px); }
+
+/* View mode toggle */
+.view-mode-toggle {
+  display: flex;
+  background: #0f172a;
+  border-radius: 6px;
+  padding: 3px;
+  gap: 3px;
+}
+.view-mode-btn {
+  flex: 1;
+  padding: 6px 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.view-mode-btn:hover { color: #cbd5e1; }
+.view-mode-btn.active { background: #3b82f6; color: #fff; }
+
+/* Camera buttons */
+.camera-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.camera-btn {
+  padding: 6px 0;
+  background: #0f172a;
+  border: 1px solid #475569;
+  border-radius: 5px;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: center;
+}
+.camera-btn:hover {
+  background: #1e293b;
+  border-color: #64748b;
+  color: #f1f5f9;
+}
+
+/* Stats */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 13px;
+}
+.stat-label { color: #94a3b8; }
+.stat-value { color: #e2e8f0; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* Canvas area */
+#canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Tooltip */
+#tooltip {
+  position: fixed;
+  display: none;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 100;
+  max-width: 300px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+#tooltip .tt-label { font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
+#tooltip .tt-type { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+#tooltip .tt-path { font-size: 11px; color: #94a3b8; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; word-break: break-all; margin-bottom: 4px; }
+#tooltip .tt-conns { font-size: 11px; color: #64748b; }
+
+/* Empty state */
+#empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  z-index: 5;
+}
+#empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; stroke: #334155; fill: none; }
+#empty-state p { font-size: 14px; }
+#empty-state .hint { font-size: 12px; color: #334155; margin-top: 4px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  #sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    z-index: 20;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  #sidebar.open { transform: translateX(0); }
+  #menu-toggle { display: flex !important; }
+}
+
+#menu-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 15;
+  width: 36px;
+  height: 36px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #e2e8f0;
+  font-size: 18px;
+}
+
+/* Node label sprites (CSS2D) */
+.node-label {
+  color: #f1f5f9;
+  font-size: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 1px 4px;
+  border-radius: 3px;
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+}
+</style>
+</head>
+<body>
+
+<button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
+
+<aside id="sidebar">
+  <div class="sidebar-header">
+    <div class="header-title-row">
+      <h1>Code Graph Viewer</h1>
+      <span class="badge-3d">3D</span>
+    </div>
+    <div class="subtitle" id="loadedFile">No file loaded</div>
+  </div>
+
+  <div class="sidebar-section">
+    <button id="uploadBtn" onclick="document.getElementById('fileInput').click()">Upload Graph JSON</button>
+    <input type="file" id="fileInput" accept=".json">
+  </div>
+
+  <div class="sidebar-section">
+    <input type="text" id="searchInput" placeholder="Search nodes...">
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">View Mode</div>
+    <div class="view-mode-toggle">
+      <button class="view-mode-btn active" id="btn3D">3D</button>
+      <button class="view-mode-btn" id="btn2D">2D</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="nodeTypesSection" style="display:none">
+    <div class="section-label">Node Types</div>
+    <div id="nodeTypesList"></div>
+  </div>
+
+  <div class="sidebar-section" id="edgeTypesSection" style="display:none">
+    <div class="section-label">Edge Types</div>
+    <div id="edgeTypesList"></div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Display Options</div>
+    <div class="toggle-item">
+      <span class="toggle-label">Show Labels</span>
+      <label class="toggle-switch"><input type="checkbox" id="toggleLabels"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-item">
+      <span class="toggle-label">Freeze Layout</span>
+      <label class="toggle-switch"><input type="checkbox" id="toggleFreeze"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-item">
+      <span class="toggle-label">Bloom Effect</span>
+      <label class="toggle-switch"><input type="checkbox" id="toggleBloom" checked><span class="toggle-slider"></span></label>
+    </div>
+    <div class="toggle-item">
+      <span class="toggle-label">Auto-Rotate</span>
+      <label class="toggle-switch"><input type="checkbox" id="toggleAutoRotate"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Camera</div>
+    <div class="camera-buttons">
+      <button class="camera-btn" id="cameraFitView">Fit View</button>
+      <button class="camera-btn" id="cameraTopView">Top</button>
+      <button class="camera-btn" id="cameraFrontView">Front</button>
+      <button class="camera-btn" id="cameraReset">Reset</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="statsSection" style="display:none">
+    <div class="section-label">Statistics</div>
+    <div class="stat-row"><span class="stat-label">Total Nodes</span><span class="stat-value" id="statNodes">0</span></div>
+    <div class="stat-row"><span class="stat-label">Total Edges</span><span class="stat-value" id="statEdges">0</span></div>
+    <div class="stat-row"><span class="stat-label">Generated</span><span class="stat-value" id="statDate">-</span></div>
+  </div>
+</aside>
+
+<div id="canvas-container">
+  <div id="empty-state">
+    <svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="6" stroke-width="2"/><circle cx="44" cy="16" r="4" stroke-width="2"/><circle cx="32" cy="44" r="5" stroke-width="2"/><line x1="25" y1="23" x2="29" y2="40" stroke-width="1.5"/><line x1="39" y1="18" x2="35" y2="40" stroke-width="1.5"/><line x1="26" y1="18" x2="40" y2="16" stroke-width="1.5"/></svg>
+    <p>Upload a graph JSON file to begin</p>
+    <p class="hint">Drag &amp; drop or click the Upload button</p>
+  </div>
+</div>
+
+<div id="tooltip">
+  <div class="tt-label" id="ttLabel"></div>
+  <div class="tt-type" id="ttType"></div>
+  <div class="tt-path" id="ttPath"></div>
+  <div class="tt-conns" id="ttConns"></div>
+</div>
+
+<script type="module">
+// ============================================================================
+// IMPORTS
+// ============================================================================
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+const NODE_COLORS = {
+  endpoint: '#ef4444', collection: '#3b82f6', file: '#22c55e',
+  router: '#a855f7', script: '#f59e0b', service: '#06b6d4',
+  cache_key: '#f97316', utility: '#6b7280', webhook: '#ec4899',
+  event: '#14b8a6', external_api: '#eab308', component: '#8b5cf6',
+  hook: '#10b981'
+};
+
+const EDGE_COLORS = {
+  db_read: '#3b82f6', db_write: '#ef4444', endpoint_handler: '#06b6d4',
+  imports: '#4b5563', api_call: '#a855f7', cache_read: '#f97316',
+  cache_write: '#f59e0b', webhook_receive: '#ec4899',
+  webhook_send: '#f472b6', event_publish: '#14b8a6'
+};
+
+const DEFAULT_NODE_COLOR = '#6b7280';
+const DEFAULT_EDGE_COLOR = '#4b5563';
+const BG_COLOR = 0x0f172a;
+
+// ============================================================================
+// STATE
+// ============================================================================
+let graphData = null;
+let nodes = [];
+let links = [];
+let linkedByIndex = {};
+let edgeCounts = {};
+let selectedNode = null;
+let hoveredNode = null;
+let draggedNode = null;
+let isDragging = false;
+let searchTerm = '';
+let searchMatches = new Set();
+let visibleNodeTypes = new Set();
+let visibleEdgeTypes = new Set();
+let showLabels = false;
+let frozen = false;
+let bloomEnabled = true;
+let autoRotate = false;
+let is3D = true;
+let lastInteraction = 0;
+
+// Three.js objects
+let scene, camera, renderer, controls, composer, bloomPass;
+let css2dRenderer;
+let simulation = null;
+const nodeMeshes = new Map();    // nodeId -> THREE.Mesh
+const nodeGlows = new Map();     // nodeId -> THREE.Sprite
+const nodeLabels = new Map();    // nodeId -> CSS2DObject
+const edgeLines = [];            // [{line, sourceId, targetId, type}]
+let backgroundParticles = null;
+let nodeGroup, edgeGroup, glowGroup;
+
+// Shared geometry/textures
+let sphereGeo;
+let glowTexture;
+
+// ============================================================================
+// DOM REFS
+// ============================================================================
+const container = document.getElementById('canvas-container');
+const tooltip = document.getElementById('tooltip');
+const emptyState = document.getElementById('empty-state');
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+function getNodeColor(type) { return NODE_COLORS[type] || DEFAULT_NODE_COLOR; }
+function getEdgeColor(type) { return EDGE_COLORS[type] || DEFAULT_EDGE_COLOR; }
+function getRadius(node) { return Math.min(6, 1.5 + Math.sqrt(edgeCounts[node.id] || 0) * 0.5); }
+
+function isNeighbor(a, b) {
+  return linkedByIndex[a.id + '|' + b.id] || linkedByIndex[b.id + '|' + a.id];
+}
+
+function isNodeVisible(node) { return visibleNodeTypes.has(node.type); }
+
+// ============================================================================
+// THREE.JS SCENE SETUP
+// ============================================================================
+function initScene() {
+  // Scene
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(BG_COLOR);
+  scene.fog = new THREE.FogExp2(BG_COLOR, 0.0015);
+
+  // Groups for organization
+  edgeGroup = new THREE.Group();
+  nodeGroup = new THREE.Group();
+  glowGroup = new THREE.Group();
+  scene.add(edgeGroup);
+  scene.add(glowGroup);
+  scene.add(nodeGroup);
+
+  // Camera
+  camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 5000);
+  camera.position.set(0, 0, 300);
+
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  container.appendChild(renderer.domElement);
+
+  // CSS2D Renderer for labels
+  css2dRenderer = new CSS2DRenderer();
+  css2dRenderer.setSize(container.clientWidth, container.clientHeight);
+  css2dRenderer.domElement.style.position = 'absolute';
+  css2dRenderer.domElement.style.top = '0';
+  css2dRenderer.domElement.style.left = '0';
+  css2dRenderer.domElement.style.pointerEvents = 'none';
+  container.appendChild(css2dRenderer.domElement);
+
+  // Lights
+  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambient);
+
+  const point1 = new THREE.PointLight(0xffffff, 1.0, 1000);
+  point1.position.set(200, 200, 200);
+  scene.add(point1);
+
+  const point2 = new THREE.PointLight(0x6366f1, 0.5, 800);
+  point2.position.set(-200, -100, -200);
+  scene.add(point2);
+
+  // OrbitControls
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.rotateSpeed = 0.8;
+  controls.zoomSpeed = 1.2;
+  controls.minDistance = 10;
+  controls.maxDistance = 2000;
+  controls.addEventListener('start', () => { lastInteraction = performance.now(); });
+
+  // Post-processing (bloom)
+  const dpr = renderer.getPixelRatio();
+  const rtWidth = container.clientWidth * dpr;
+  const rtHeight = container.clientHeight * dpr;
+  const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight, {
+    type: THREE.HalfFloatType,
+  });
+  composer = new EffectComposer(renderer, renderTarget);
+  const renderPass = new RenderPass(scene, camera);
+  composer.addPass(renderPass);
+
+  bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(rtWidth, rtHeight),
+    0.2,   // strength (subtle glow)
+    0.3,   // radius
+    0.92   // threshold (only bright emissives bloom)
+  );
+  composer.addPass(bloomPass);
+
+  // Shared geometry
+  sphereGeo = new THREE.SphereGeometry(1, 16, 12);
+
+  // Glow texture
+  glowTexture = createGlowTexture();
+
+  // Background particles
+  createBackgroundParticles();
+
+  // Resize handler
+  window.addEventListener('resize', onResize);
+}
+
+function onResize() {
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+  const dpr = renderer.getPixelRatio();
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+  css2dRenderer.setSize(w, h);
+  composer.setSize(w * dpr, h * dpr);
+  bloomPass.resolution.set(w * dpr, h * dpr);
+}
+
+// ============================================================================
+// GLOW TEXTURE (generated via Canvas)
+// ============================================================================
+function createGlowTexture() {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  gradient.addColorStop(0, 'rgba(255,255,255,0.6)');
+  gradient.addColorStop(0.3, 'rgba(255,255,255,0.2)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+// ============================================================================
+// BACKGROUND PARTICLES
+// ============================================================================
+function createBackgroundParticles() {
+  const count = 300;
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 1200;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 1200;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 1200;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({
+    color: 0x334155,
+    size: 1.5,
+    transparent: true,
+    opacity: 0.4,
+    sizeAttenuation: true,
+  });
+  backgroundParticles = new THREE.Points(geo, mat);
+  scene.add(backgroundParticles);
+}
+
+// ============================================================================
+// BUILD SCENE OBJECTS FROM GRAPH DATA
+// ============================================================================
+function clearSceneObjects() {
+  nodeMeshes.forEach((mesh) => { nodeGroup.remove(mesh); mesh.geometry !== sphereGeo && mesh.geometry.dispose(); mesh.material.dispose(); });
+  nodeMeshes.clear();
+  nodeGlows.forEach((sprite) => { glowGroup.remove(sprite); sprite.material.dispose(); });
+  nodeGlows.clear();
+  nodeLabels.forEach((label) => { nodeGroup.remove(label); });
+  nodeLabels.clear();
+  edgeLines.forEach(({line}) => { edgeGroup.remove(line); line.geometry.dispose(); line.material.dispose(); });
+  edgeLines.length = 0;
+}
+
+function buildSceneObjects() {
+  clearSceneObjects();
+
+  // Create node meshes
+  for (const node of nodes) {
+    if (!isNodeVisible(node)) continue;
+
+    const r = getRadius(node);
+    const color = new THREE.Color(getNodeColor(node.type));
+
+    // Sphere mesh
+    const mat = new THREE.MeshStandardMaterial({
+      color: color,
+      emissive: color,
+      emissiveIntensity: 0.3,
+      metalness: 0.1,
+      roughness: 0.6,
+      transparent: true,
+      opacity: 1.0,
+    });
+
+    const mesh = new THREE.Mesh(sphereGeo, mat);
+    mesh.scale.setScalar(r);
+    mesh.userData.nodeId = node.id;
+    mesh.userData.nodeType = node.type;
+    mesh.userData.radius = r;
+    nodeGroup.add(mesh);
+    nodeMeshes.set(node.id, mesh);
+
+    // Glow sprite
+    const spriteMat = new THREE.SpriteMaterial({
+      map: glowTexture,
+      color: color,
+      transparent: true,
+      opacity: 0.25,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.setScalar(r * 2.5);
+    glowGroup.add(sprite);
+    nodeGlows.set(node.id, sprite);
+
+    // Label (CSS2D)
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'node-label';
+    labelDiv.textContent = node.label || node.id;
+    const labelObj = new CSS2DObject(labelDiv);
+    labelObj.visible = showLabels;
+    labelObj.position.set(0, r + 2, 0);
+    mesh.add(labelObj);
+    nodeLabels.set(node.id, labelObj);
+  }
+
+  // Create edge lines
+  const visNodeIds = new Set();
+  nodeMeshes.forEach((_, id) => visNodeIds.add(id));
+
+  for (const link of links) {
+    const sid = typeof link.source === 'object' ? link.source.id : link.source;
+    const tid = typeof link.target === 'object' ? link.target.id : link.target;
+    if (!visNodeIds.has(sid) || !visNodeIds.has(tid)) continue;
+    if (!visibleEdgeTypes.has(link.type)) continue;
+
+    const color = new THREE.Color(getEdgeColor(link.type));
+    const isImport = link.type === 'imports';
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute([0,0,0, 0,0,0], 3));
+
+    const mat = new THREE.LineBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: isImport ? 0.12 : 0.5,
+      linewidth: 1,
+    });
+
+    const line = new THREE.Line(geo, mat);
+    edgeGroup.add(line);
+    edgeLines.push({ line, sourceId: sid, targetId: tid, type: link.type });
+  }
+}
+
+// ============================================================================
+// FORCE SIMULATION (d3-force-3d)
+// ============================================================================
+function buildSimulation() {
+  if (simulation) simulation.stop();
+
+  const d3f = window.d3;
+  const visNodes = nodes.filter(n => isNodeVisible(n));
+  const visNodeIds = new Set(visNodes.map(n => n.id));
+  const visLinks = links.filter(l => {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    return visNodeIds.has(sid) && visNodeIds.has(tid) && visibleEdgeTypes.has(l.type);
+  });
+
+  const dims = is3D ? 3 : 2;
+
+  // Reset z positions when switching to 2D
+  if (!is3D) {
+    for (const n of visNodes) { n.z = 0; n.fz = undefined; }
+  }
+
+  simulation = d3f.forceSimulation(visNodes, dims)
+    .force('charge', d3f.forceManyBody().strength(is3D ? -80 : -120).distanceMax(400))
+    .force('link', d3f.forceLink(visLinks).id(d => d.id).distance(is3D ? 30 : 50).strength(0.3))
+    .force('center', d3f.forceCenter(0, 0, is3D ? 0 : undefined).strength(0.03))
+    .force('collide', d3f.forceCollide(d => getRadius(d) + 1))
+    .alphaDecay(0.02)
+    .velocityDecay(0.4)
+    .on('tick', onSimulationTick);
+
+  if (frozen) simulation.stop();
+}
+
+function onSimulationTick() {
+  // Update node mesh positions
+  for (const node of nodes) {
+    const mesh = nodeMeshes.get(node.id);
+    if (mesh && node.x !== undefined) {
+      mesh.position.set(node.x, node.y, node.z || 0);
+    }
+    const glow = nodeGlows.get(node.id);
+    if (glow && node.x !== undefined) {
+      glow.position.set(node.x, node.y, node.z || 0);
+    }
+  }
+
+  // Update edge line positions
+  for (const edge of edgeLines) {
+    const src = nodes.find(n => n.id === edge.sourceId);
+    const tgt = nodes.find(n => n.id === edge.targetId);
+    if (src && tgt && src.x !== undefined && tgt.x !== undefined) {
+      const pos = edge.line.geometry.attributes.position;
+      pos.array[0] = src.x; pos.array[1] = src.y; pos.array[2] = src.z || 0;
+      pos.array[3] = tgt.x; pos.array[4] = tgt.y; pos.array[5] = tgt.z || 0;
+      pos.needsUpdate = true;
+    }
+  }
+}
+
+// ============================================================================
+// RAYCASTING / INTERACTIONS
+// ============================================================================
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const dragPlane = new THREE.Plane();
+const dragIntersection = new THREE.Vector3();
+
+function raycastNodes(event) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+
+  const meshArray = [];
+  nodeMeshes.forEach((mesh) => { if (mesh.visible) meshArray.push(mesh); });
+  const intersects = raycaster.intersectObjects(meshArray, false);
+  if (intersects.length > 0) {
+    return intersects[0].object.userData.nodeId;
+  }
+  return null;
+}
+
+function showTooltipForNode(nodeId, cx, cy) {
+  const node = nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  document.getElementById('ttLabel').textContent = node.label || node.id;
+  const ttType = document.getElementById('ttType');
+  ttType.textContent = node.type;
+  ttType.style.color = getNodeColor(node.type);
+  const ttPath = document.getElementById('ttPath');
+  ttPath.textContent = node.filePath || '';
+  ttPath.style.display = node.filePath ? 'block' : 'none';
+  document.getElementById('ttConns').textContent = (edgeCounts[node.id] || 0) + ' connections';
+  tooltip.style.display = 'block';
+  positionTooltip(cx, cy);
+}
+
+function positionTooltip(cx, cy) {
+  const tw = tooltip.offsetWidth;
+  const th = tooltip.offsetHeight;
+  let left = cx + 14;
+  let top = cy + 14;
+  if (left + tw > window.innerWidth - 8) left = cx - tw - 14;
+  if (top + th > window.innerHeight - 8) top = cy - th - 14;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+function hideTooltip() { tooltip.style.display = 'none'; }
+
+// ============================================================================
+// SELECTION & VISUAL STATE
+// ============================================================================
+function selectNode(nodeId) {
+  selectedNode = nodeId ? nodes.find(n => n.id === nodeId) : null;
+  applyVisualState();
+}
+
+function applyVisualState() {
+  const hasSelection = selectedNode !== null;
+  const hasSearch = searchTerm.length > 0 && searchMatches.size > 0;
+
+  const baseEmissive = is3D ? 0.3 : 0.5;
+
+  nodeMeshes.forEach((mesh, nodeId) => {
+    let opacity = 1.0;
+    let emissiveIntensity = baseEmissive;
+
+    if (hasSelection) {
+      if (nodeId === selectedNode.id) {
+        opacity = 1.0;
+        emissiveIntensity = 0.8;
+        mesh.material.emissive.set(0xfacc15);
+      } else if (isNeighbor(selectedNode, { id: nodeId })) {
+        opacity = 1.0;
+      } else {
+        opacity = 0.12;
+        emissiveIntensity = 0.05;
+      }
+    }
+
+    if (hasSearch) {
+      if (searchMatches.has(nodeId)) {
+        opacity = 1.0;
+        emissiveIntensity = 0.6;
+      } else if (!hasSelection) {
+        opacity = 0.12;
+        emissiveIntensity = 0.05;
+      }
+    }
+
+    if (!hasSelection || nodeId !== selectedNode?.id) {
+      mesh.material.emissive.set(new THREE.Color(getNodeColor(mesh.userData.nodeType)));
+    }
+
+    mesh.material.opacity = opacity;
+    mesh.material.emissiveIntensity = emissiveIntensity;
+
+    // Glow sprite
+    const glow = nodeGlows.get(nodeId);
+    if (glow) {
+      glow.material.opacity = opacity > 0.5 ? 0.25 : 0.03;
+    }
+
+    // Label
+    const label = nodeLabels.get(nodeId);
+    if (label && showLabels) {
+      label.visible = opacity > 0.5;
+    }
+  });
+
+  // Update edge opacities
+  for (const edge of edgeLines) {
+    const isImport = edge.type === 'imports';
+    let opacity = is3D
+      ? (isImport ? 0.12 : 0.5)
+      : (isImport ? 0.25 : 0.7);
+
+    if (hasSelection) {
+      const connected = edge.sourceId === selectedNode.id || edge.targetId === selectedNode.id;
+      opacity = connected ? 1.0 : 0.03;
+    }
+
+    if (hasSearch && !hasSelection) {
+      const srcMatch = searchMatches.has(edge.sourceId);
+      const tgtMatch = searchMatches.has(edge.targetId);
+      if (!srcMatch && !tgtMatch) opacity = 0.03;
+    }
+
+    edge.line.material.opacity = opacity;
+  }
+}
+
+// ============================================================================
+// MOUSE EVENT HANDLERS
+// ============================================================================
+let mouseDownPos = null;
+
+renderer?.domElement?.addEventListener('mousedown', onMouseDown);
+renderer?.domElement?.addEventListener('mousemove', onMouseMove);
+renderer?.domElement?.addEventListener('mouseup', onMouseUp);
+renderer?.domElement?.addEventListener('dblclick', onDblClick);
+renderer?.domElement?.addEventListener('mouseleave', onMouseLeave);
+
+function onMouseDown(e) {
+  if (e.button !== 0) return;
+  mouseDownPos = { x: e.clientX, y: e.clientY };
+  isDragging = false;
+  lastInteraction = performance.now();
+
+  const hitId = raycastNodes(e);
+  if (hitId) {
+    const node = nodes.find(n => n.id === hitId);
+    if (node) {
+      draggedNode = node;
+      controls.enabled = false;
+
+      // Create drag plane perpendicular to camera
+      const camDir = new THREE.Vector3();
+      camera.getWorldDirection(camDir);
+      const nodePos = new THREE.Vector3(node.x, node.y, node.z || 0);
+      dragPlane.setFromNormalAndCoplanarPoint(camDir, nodePos);
+
+      node.fx = node.x;
+      node.fy = node.y;
+      node.fz = node.z;
+      renderer.domElement.style.cursor = 'grabbing';
+    }
+  }
+}
+
+function onMouseMove(e) {
+  lastInteraction = performance.now();
+
+  if (draggedNode) {
+    isDragging = true;
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+
+    if (raycaster.ray.intersectPlane(dragPlane, dragIntersection)) {
+      draggedNode.fx = dragIntersection.x;
+      draggedNode.fy = dragIntersection.y;
+      draggedNode.fz = dragIntersection.z;
+      draggedNode.x = dragIntersection.x;
+      draggedNode.y = dragIntersection.y;
+      draggedNode.z = dragIntersection.z;
+      if (!frozen && simulation) simulation.alpha(0.1).restart();
+      onSimulationTick();
+    }
+    return;
+  }
+
+  // Hover
+  const hitId = raycastNodes(e);
+  if (hitId !== (hoveredNode?.id || null)) {
+    hoveredNode = hitId ? nodes.find(n => n.id === hitId) : null;
+    renderer.domElement.style.cursor = hitId ? 'pointer' : 'default';
+    if (hitId) {
+      showTooltipForNode(hitId, e.clientX, e.clientY);
+    } else {
+      hideTooltip();
+    }
+  } else if (hitId) {
+    positionTooltip(e.clientX, e.clientY);
+  }
+}
+
+function onMouseUp(e) {
+  if (draggedNode) {
+    if (!isDragging) {
+      selectNode(draggedNode.id);
+    }
+    draggedNode = null;
+    controls.enabled = true;
+    renderer.domElement.style.cursor = 'default';
+    return;
+  }
+
+  if (!isDragging && !mouseDownPos) return;
+  if (mouseDownPos) {
+    const dx = e.clientX - mouseDownPos.x;
+    const dy = e.clientY - mouseDownPos.y;
+    if (Math.abs(dx) < 3 && Math.abs(dy) < 3) {
+      const hitId = raycastNodes(e);
+      if (!hitId) selectNode(null);
+    }
+  }
+  mouseDownPos = null;
+  isDragging = false;
+}
+
+function onDblClick(e) {
+  e.preventDefault();
+  const hitId = raycastNodes(e);
+  if (hitId) {
+    const node = nodes.find(n => n.id === hitId);
+    if (node) {
+      node.fx = null;
+      node.fy = null;
+      node.fz = null;
+      if (!frozen && simulation) simulation.alpha(0.3).restart();
+    }
+  }
+}
+
+function onMouseLeave() {
+  hoveredNode = null;
+  hideTooltip();
+}
+
+// ============================================================================
+// KEYBOARD SHORTCUTS
+// ============================================================================
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'Escape') {
+    selectNode(null);
+    document.getElementById('searchInput').value = '';
+    searchTerm = '';
+    searchMatches.clear();
+    applyVisualState();
+  }
+  if (e.key === 'f' || e.key === 'F') {
+    fitView();
+  }
+});
+
+// ============================================================================
+// CAMERA CONTROLS
+// ============================================================================
+function fitView() {
+  if (nodes.length === 0) return;
+  const box = new THREE.Box3();
+  nodeMeshes.forEach((mesh) => { if (mesh.visible) box.expandByObject(mesh); });
+  const center = new THREE.Vector3();
+  box.getCenter(center);
+  const size = box.getSize(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const dist = maxDim / (2 * Math.tan(camera.fov * Math.PI / 360));
+  camera.position.copy(center);
+  camera.position.z += dist * 1.5;
+  controls.target.copy(center);
+  controls.update();
+}
+
+function setCameraPosition(x, y, z) {
+  const center = new THREE.Vector3();
+  if (nodes.length > 0) {
+    const box = new THREE.Box3();
+    nodeMeshes.forEach((mesh) => { if (mesh.visible) box.expandByObject(mesh); });
+    box.getCenter(center);
+  }
+  const maxDim = 200;
+  camera.position.set(center.x + x * maxDim, center.y + y * maxDim, center.z + z * maxDim);
+  controls.target.copy(center);
+  controls.update();
+}
+
+document.getElementById('cameraFitView').addEventListener('click', fitView);
+document.getElementById('cameraTopView').addEventListener('click', () => setCameraPosition(0, 2, 0));
+document.getElementById('cameraFrontView').addEventListener('click', () => setCameraPosition(0, 0, 2));
+document.getElementById('cameraReset').addEventListener('click', () => {
+  camera.position.set(0, 0, 300);
+  controls.target.set(0, 0, 0);
+  controls.update();
+});
+
+// ============================================================================
+// SEARCH
+// ============================================================================
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  searchTerm = e.target.value.toLowerCase().trim();
+  searchMatches.clear();
+  if (searchTerm.length > 0) {
+    for (const node of nodes) {
+      if ((node.label && node.label.toLowerCase().includes(searchTerm)) ||
+          node.id.toLowerCase().includes(searchTerm)) {
+        searchMatches.add(node.id);
+      }
+    }
+  }
+  applyVisualState();
+});
+
+// ============================================================================
+// TOGGLE HANDLERS
+// ============================================================================
+document.getElementById('toggleLabels').addEventListener('change', function() {
+  showLabels = this.checked;
+  nodeLabels.forEach((label) => {
+    label.visible = showLabels;
+  });
+});
+
+document.getElementById('toggleFreeze').addEventListener('change', function() {
+  frozen = this.checked;
+  if (simulation) {
+    if (frozen) simulation.stop();
+    else simulation.alpha(0.3).restart();
+  }
+});
+
+document.getElementById('toggleBloom').addEventListener('change', function() {
+  bloomEnabled = this.checked;
+  bloomPass.enabled = bloomEnabled;
+});
+
+document.getElementById('toggleAutoRotate').addEventListener('change', function() {
+  autoRotate = this.checked;
+});
+
+// ============================================================================
+// VIEW MODE (2D / 3D)
+// ============================================================================
+function setViewMode(mode) {
+  is3D = mode === '3d';
+
+  // Update buttons
+  document.getElementById('btn3D').classList.toggle('active', is3D);
+  document.getElementById('btn2D').classList.toggle('active', !is3D);
+
+  // Update badge
+  const badge = document.querySelector('.badge-3d');
+  if (badge) badge.textContent = is3D ? '3D' : '2D';
+
+  if (is3D) {
+    // Restore 3D settings
+    controls.enableRotate = true;
+    controls.autoRotate = false;
+    scene.fog = new THREE.FogExp2(BG_COLOR, 0.0015);
+    bloomPass.enabled = bloomEnabled;
+    // Show glow sprites
+    nodeGlows.forEach(g => { g.visible = true; });
+    // Show background particles
+    if (backgroundParticles) backgroundParticles.visible = true;
+  } else {
+    // 2D: flat, crisp, no depth effects
+    controls.enableRotate = false;
+    controls.autoRotate = false;
+    scene.fog = null;
+    bloomPass.enabled = false;
+    // Hide glow sprites (clutter in 2D)
+    nodeGlows.forEach(g => { g.visible = false; });
+    // Hide background particles (confusing in 2D)
+    if (backgroundParticles) backgroundParticles.visible = false;
+
+    // Snap camera to front
+    const center = new THREE.Vector3();
+    if (nodes.length > 0) {
+      const box = new THREE.Box3();
+      nodeMeshes.forEach((mesh) => { if (mesh.visible) box.expandByObject(mesh); });
+      box.getCenter(center);
+    }
+    camera.position.set(center.x, center.y, 300);
+    camera.up.set(0, 1, 0);
+    controls.target.copy(center);
+    controls.update();
+  }
+
+  // Update node materials for 2D vs 3D
+  nodeMeshes.forEach((mesh) => {
+    mesh.material.emissiveIntensity = is3D ? 0.3 : 0.5;
+  });
+
+  // Update edge opacities for 2D clarity
+  for (const edge of edgeLines) {
+    const isImport = edge.type === 'imports';
+    if (is3D) {
+      edge.line.material.opacity = isImport ? 0.12 : 0.5;
+    } else {
+      edge.line.material.opacity = isImport ? 0.25 : 0.7;
+    }
+  }
+
+  // Rebuild simulation with correct dimensionality
+  if (graphData) {
+    buildSimulation();
+    setTimeout(fitView, 1500);
+  }
+}
+
+document.getElementById('btn3D').addEventListener('click', () => setViewMode('3d'));
+document.getElementById('btn2D').addEventListener('click', () => setViewMode('2d'));
+
+// ============================================================================
+// FILE UPLOAD / DRAG & DROP
+// ============================================================================
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      loadGraph(data, file.name);
+    } catch (err) {
+      alert('Invalid JSON file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+container.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+container.addEventListener('drop', (e) => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      loadGraph(data, file.name);
+    } catch (err) {
+      alert('Invalid JSON file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+// ============================================================================
+// SIDEBAR FILTER BUILDERS
+// ============================================================================
+function buildNodeTypeFilters(types) {
+  const section = document.getElementById('nodeTypesSection');
+  const list = document.getElementById('nodeTypesList');
+  list.innerHTML = '';
+  section.style.display = '';
+
+  const sorted = Object.entries(types).sort((a, b) => b[1] - a[1]);
+  for (const [type, count] of sorted) {
+    const item = document.createElement('label');
+    item.className = 'filter-item';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = true;
+    cb.addEventListener('change', function() {
+      if (this.checked) visibleNodeTypes.add(type);
+      else visibleNodeTypes.delete(type);
+      rebuildVisualization();
+    });
+
+    const dot = document.createElement('span');
+    dot.className = 'color-dot';
+    dot.style.background = getNodeColor(type);
+
+    const lbl = document.createElement('span');
+    lbl.className = 'filter-label';
+    lbl.textContent = type.replace(/_/g, ' ');
+
+    const cnt = document.createElement('span');
+    cnt.className = 'filter-count';
+    cnt.textContent = count;
+
+    item.append(cb, dot, lbl, cnt);
+    list.appendChild(item);
+  }
+}
+
+function buildEdgeTypeFilters(types) {
+  const section = document.getElementById('edgeTypesSection');
+  const list = document.getElementById('edgeTypesList');
+  list.innerHTML = '';
+  section.style.display = '';
+
+  const sorted = Object.entries(types).sort((a, b) => b[1] - a[1]);
+  for (const [type, count] of sorted) {
+    const item = document.createElement('label');
+    item.className = 'filter-item';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = true;
+    cb.addEventListener('change', function() {
+      if (this.checked) visibleEdgeTypes.add(type);
+      else visibleEdgeTypes.delete(type);
+      rebuildVisualization();
+    });
+
+    const line = document.createElement('span');
+    line.className = 'edge-color-line';
+    line.style.background = getEdgeColor(type);
+
+    const lbl = document.createElement('span');
+    lbl.className = 'filter-label';
+    lbl.textContent = type.replace(/_/g, ' ');
+
+    const cnt = document.createElement('span');
+    cnt.className = 'filter-count';
+    cnt.textContent = count;
+
+    item.append(cb, line, lbl, cnt);
+    list.appendChild(item);
+  }
+}
+
+// ============================================================================
+// REBUILD AFTER FILTER CHANGE
+// ============================================================================
+function rebuildVisualization() {
+  buildSceneObjects();
+  buildSimulation();
+}
+
+// ============================================================================
+// LOAD GRAPH
+// ============================================================================
+function loadGraph(data, filename) {
+  graphData = data;
+  emptyState.style.display = 'none';
+  document.getElementById('loadedFile').textContent = 'Loaded: ' + filename;
+
+  // Reset state
+  selectedNode = null;
+  hoveredNode = null;
+  draggedNode = null;
+  searchTerm = '';
+  searchMatches.clear();
+  document.getElementById('searchInput').value = '';
+
+  // Parse nodes and links
+  nodes = (data.nodes || []).map(d => Object.assign({}, d));
+  links = (data.links || []).map(d => Object.assign({}, d));
+
+  // Build indices
+  linkedByIndex = {};
+  edgeCounts = {};
+  for (const link of links) {
+    const sid = typeof link.source === 'object' ? link.source.id : link.source;
+    const tid = typeof link.target === 'object' ? link.target.id : link.target;
+    linkedByIndex[sid + '|' + tid] = true;
+    linkedByIndex[tid + '|' + sid] = true;
+    edgeCounts[sid] = (edgeCounts[sid] || 0) + 1;
+    edgeCounts[tid] = (edgeCounts[tid] || 0) + 1;
+  }
+
+  // Collect types
+  const nodeTypes = {};
+  for (const n of nodes) nodeTypes[n.type] = (nodeTypes[n.type] || 0) + 1;
+  const edgeTypes = {};
+  for (const l of links) edgeTypes[l.type] = (edgeTypes[l.type] || 0) + 1;
+
+  visibleNodeTypes = new Set(Object.keys(nodeTypes));
+  visibleEdgeTypes = new Set(Object.keys(edgeTypes));
+
+  buildNodeTypeFilters(nodeTypes);
+  buildEdgeTypeFilters(edgeTypes);
+
+  // Stats
+  document.getElementById('statsSection').style.display = '';
+  document.getElementById('statNodes').textContent = nodes.length;
+  document.getElementById('statEdges').textContent = links.length;
+  const generated = data.metadata?.generated || '-';
+  document.getElementById('statDate').textContent = generated;
+
+  // Build 3D
+  buildSceneObjects();
+  buildSimulation();
+
+  // Fit view after initial layout settles
+  setTimeout(fitView, 2000);
+}
+
+// Expose loadGraph globally for live-reload SSE script
+window.__loadGraph = loadGraph;
+
+// ============================================================================
+// ANIMATION LOOP
+// ============================================================================
+function animate() {
+  requestAnimationFrame(animate);
+
+  if (!graphData) {
+    renderer.render(scene, camera);
+    css2dRenderer.render(scene, camera);
+    return;
+  }
+
+  // Auto-rotate
+  if (autoRotate && performance.now() - lastInteraction > 5000) {
+    const t = performance.now() * 0.0001;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.5;
+  } else {
+    controls.autoRotate = false;
+  }
+
+  controls.update();
+
+  // Subtle particle rotation
+  if (backgroundParticles) {
+    backgroundParticles.rotation.y += 0.0001;
+    backgroundParticles.rotation.x += 0.00005;
+  }
+
+  // Render
+  if (bloomEnabled) {
+    composer.render();
+  } else {
+    renderer.render(scene, camera);
+  }
+  css2dRenderer.render(scene, camera);
+}
+
+// ============================================================================
+// INIT
+// ============================================================================
+initScene();
+
+// Attach mouse events after renderer is created
+renderer.domElement.addEventListener('mousedown', onMouseDown);
+renderer.domElement.addEventListener('mousemove', onMouseMove);
+renderer.domElement.addEventListener('mouseup', onMouseUp);
+renderer.domElement.addEventListener('dblclick', onDblClick);
+renderer.domElement.addEventListener('mouseleave', onMouseLeave);
+
+animate();
+</script>
+</body>
+</html>
