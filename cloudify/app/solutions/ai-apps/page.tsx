@@ -52,8 +52,8 @@ export default function AiAppsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -63,17 +63,17 @@ export default function AiAppsPage() {
                 <Brain className="h-4 w-4" />
                 <span className="text-sm font-medium">AI Applications</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Build AI apps
                 <br />
                 <span className="text-pink-600 dark:text-pink-400">that scale</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Deploy AI-powered applications with streaming, edge inference, and
                 multi-provider support. Build the next generation of intelligent apps.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     Start Building
                     <ArrowRight className="h-4 w-4" />
@@ -89,17 +89,17 @@ export default function AiAppsPage() {
 
         {/* Features */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Built for AI workloads
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Everything you need to deploy production AI applications.
               </p>
             </motion.div>
@@ -112,15 +112,15 @@ export default function AiAppsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
                   <div className="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-pink-600 dark:text-pink-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -130,18 +130,18 @@ export default function AiAppsPage() {
         </section>
 
         {/* Code Example */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Ship AI features fast
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Build streaming chat interfaces, content generators, and intelligent
                   features with just a few lines of code.
                 </p>
@@ -153,7 +153,7 @@ export default function AiAppsPage() {
                     "Built-in rate limiting",
                     "Response caching",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                    <li key={item} className="flex items-center gap-3 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </li>
@@ -193,14 +193,14 @@ export async function POST(req: Request) {
 
         {/* Use Cases */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Build any AI experience
               </h2>
             </motion.div>
@@ -213,15 +213,15 @@ export async function POST(req: Request) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-center"
+                  className="p-8 rounded-lg bg-card border border-border text-center"
                 >
-                  <div className="w-16 h-16 mx-auto rounded-2xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 mx-auto rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-6">
                     <useCase.icon className="h-8 w-8 text-pink-600 dark:text-pink-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {useCase.name}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {useCase.desc}
                   </p>
                 </motion.div>
@@ -232,7 +232,7 @@ export async function POST(req: Request) {
 
         {/* CTA */}
         <section className="py-20 bg-pink-600 dark:bg-pink-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Start building with AI today
             </h2>

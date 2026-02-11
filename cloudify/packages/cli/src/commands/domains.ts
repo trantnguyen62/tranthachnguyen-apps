@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 import ora from "ora";
-import { requireAuth, apiRequest, getCurrentProject } from "../config";
+import { requireAuth, apiRequest, getCurrentProject } from "../config.js";
 
 interface Domain {
   id: string;
@@ -133,6 +133,11 @@ export async function domainsRemove(domain: string): Promise<void> {
     process.exit(1);
   }
 }
+
+// Aliases for index.ts imports
+export const listDomains = domainsList;
+export const addDomain = domainsAdd;
+export const removeDomain = domainsRemove;
 
 export async function domainsVerify(domain: string): Promise<void> {
   requireAuth();

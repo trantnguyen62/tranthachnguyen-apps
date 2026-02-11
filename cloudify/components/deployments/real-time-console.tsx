@@ -129,7 +129,7 @@ export function RealTimeConsole({
               className={cn(
                 "px-2 py-0.5 text-xs rounded",
                 status.status === "BUILDING" && "bg-yellow-500/20 text-yellow-400",
-                status.status === "DEPLOYING" && "bg-blue-500/20 text-blue-400",
+                status.status === "DEPLOYING" && "bg-secondary text-[#0070f3]",
                 status.status === "READY" && "bg-green-500/20 text-green-400",
                 status.status === "ERROR" && "bg-red-500/20 text-red-400"
               )}
@@ -254,7 +254,7 @@ function getLevelBgClass(level: string): string {
       return "bg-gray-500/20 text-gray-400";
     case "info":
     default:
-      return "bg-blue-500/20 text-blue-400";
+      return "bg-secondary text-[#0070f3]";
   }
 }
 
@@ -286,7 +286,7 @@ function getLevelBadgeClass(level: string): string {
       return "text-gray-600";
     case "info":
     default:
-      return "text-blue-500";
+      return "text-[#0070f3]";
   }
 }
 

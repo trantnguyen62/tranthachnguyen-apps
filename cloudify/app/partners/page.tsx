@@ -23,7 +23,7 @@ const partnerTypes = [
     name: "Technology Partners",
     description: "Integrate your product with Cloudify and reach millions of developers",
     icon: Code2,
-    color: "from-blue-500 to-cyan-500",
+    color: "from-gray-600 to-gray-400",
     benefits: [
       "Integration support and documentation",
       "Co-marketing opportunities",
@@ -82,7 +82,7 @@ export default function PartnersPage() {
       <main className="flex-1 pt-16">
         {/* Hero */}
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -91,10 +91,10 @@ export default function PartnersPage() {
               <Badge className="mb-4" variant="secondary">
                 Partner Program
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Grow Together with Cloudify
               </h1>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Join our partner ecosystem and unlock new opportunities for your business.
                 Whether you're a technology vendor, agency, or enterprise, we have a program for you.
               </p>
@@ -109,7 +109,7 @@ export default function PartnersPage() {
 
         {/* Partner Benefits Overview */}
         <section className="py-12 -mt-8">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {partnerBenefits.map((benefit, index) => (
                 <motion.div
@@ -120,13 +120,13 @@ export default function PartnersPage() {
                 >
                   <Card className="h-full">
                     <CardContent className="p-6 text-center">
-                      <div className="w-12 h-12 mx-auto rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-                        <benefit.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                      <div className="w-12 h-12 mx-auto rounded-xl bg-secondary flex items-center justify-center mb-4">
+                        <benefit.icon className="h-6 w-6 text-foreground" />
                       </div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="font-semibold text-foreground">
                         {benefit.title}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      <p className="text-sm text-muted-foreground mt-2">
                         {benefit.description}
                       </p>
                     </CardContent>
@@ -139,8 +139,8 @@ export default function PartnersPage() {
 
         {/* Partner Types */}
         <section className="py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
               Partner Programs
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -151,7 +151,7 @@ export default function PartnersPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden"
+                  className="rounded-lg border border-border bg-card overflow-hidden"
                 >
                   <div className={`h-2 bg-gradient-to-r ${type.color}`} />
                   <div className="p-6">
@@ -160,17 +160,17 @@ export default function PartnersPage() {
                     >
                       <type.icon className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-xl font-semibold text-foreground">
                       {type.name}
                     </h3>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">
+                    <p className="mt-2 text-muted-foreground">
                       {type.description}
                     </p>
                     <ul className="mt-6 space-y-3">
                       {type.benefits.map((benefit) => (
                         <li key={benefit} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                          <span className="text-sm text-muted-foreground">
                             {benefit}
                           </span>
                         </li>
@@ -192,16 +192,16 @@ export default function PartnersPage() {
         </section>
 
         {/* CTA */}
-        <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-white">
+        <section className="py-20 bg-foreground">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-background">
               Ready to Partner with Us?
             </h2>
-            <p className="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
+            <p className="mt-4 text-xl text-background/70 max-w-2xl mx-auto">
               Fill out the form and our partnerships team will get in touch within 48 hours.
             </p>
             <div className="mt-8">
-              <Button size="lg" variant="secondary" asChild>
+              <Button size="lg" variant="secondary" className="bg-background text-foreground" asChild>
                 <Link href="/contact">Apply Now</Link>
               </Button>
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -12,18 +12,18 @@ import {
   Globe,
   Clock,
   CheckCircle2,
-  XCircle,
-  Loader2,
   MoreHorizontal,
   ExternalLink,
   Settings,
   Trash2,
   Copy,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,123 +32,189 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { getStatusConfig } from "@/lib/utils/status-config";
+import { formatTimeAgo } from "@/lib/utils/format-time";
 
-const projects = [
-  {
-    id: "proj-1",
-    name: "my-portfolio",
-    description: "Personal portfolio website built with Next.js",
-    framework: "Next.js",
-    domain: "my-portfolio.cloudify.app",
-    customDomain: "johndoe.com",
-    gitRepo: "github.com/johndoe/portfolio",
-    branch: "main",
-    lastDeployment: "2 minutes ago",
-    status: "ready",
-    deployments: 48,
-  },
-  {
-    id: "proj-2",
-    name: "ecommerce-store",
-    description: "Full-stack e-commerce platform",
-    framework: "React",
-    domain: "ecommerce-store.cloudify.app",
-    gitRepo: "github.com/johndoe/ecommerce",
-    branch: "main",
-    lastDeployment: "5 minutes ago",
-    status: "building",
-    deployments: 124,
-  },
-  {
-    id: "proj-3",
-    name: "blog-app",
-    description: "Personal blog with MDX support",
-    framework: "Astro",
-    domain: "blog-app.cloudify.app",
-    customDomain: "blog.johndoe.com",
-    gitRepo: "github.com/johndoe/blog",
-    branch: "main",
-    lastDeployment: "1 hour ago",
-    status: "ready",
-    deployments: 67,
-  },
-  {
-    id: "proj-4",
-    name: "api-service",
-    description: "REST API backend service",
-    framework: "Node.js",
-    domain: "api-service.cloudify.app",
-    gitRepo: "github.com/johndoe/api",
-    branch: "develop",
-    lastDeployment: "2 hours ago",
-    status: "error",
-    deployments: 89,
-  },
-  {
-    id: "proj-5",
-    name: "mobile-app-landing",
-    description: "Landing page for mobile app",
-    framework: "Vue",
-    domain: "mobile-app-landing.cloudify.app",
-    gitRepo: "github.com/johndoe/mobile-landing",
-    branch: "main",
-    lastDeployment: "3 hours ago",
-    status: "ready",
-    deployments: 23,
-  },
-  {
-    id: "proj-6",
-    name: "documentation-site",
-    description: "Product documentation website",
-    framework: "Docusaurus",
-    domain: "documentation-site.cloudify.app",
-    customDomain: "docs.acme.com",
-    gitRepo: "github.com/acme/docs",
-    branch: "main",
-    lastDeployment: "1 day ago",
-    status: "ready",
-    deployments: 156,
-  },
-];
+interface Project {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  framework: string;
+  repoUrl?: string;
+  deployments: Array<{
+    id: string;
+    status: string;
+    createdAt: string;
+    branch?: string;
+  }>;
+  _count: {
+    deployments: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 
 const frameworkIcons: Record<string, string> = {
+  nextjs: "▲",
   "Next.js": "▲",
+  react: "⚛️",
   React: "⚛️",
+  vue: "💚",
   Vue: "💚",
+  astro: "🚀",
   Astro: "🚀",
+  nodejs: "🟢",
   "Node.js": "🟢",
+  docusaurus: "🦖",
   Docusaurus: "🦖",
+  svelte: "🔥",
+  Svelte: "🔥",
+  gatsby: "💜",
+  Gatsby: "💜",
+  nuxt: "💚",
+  Nuxt: "💚",
+  remix: "💿",
+  Remix: "💿",
 };
 
-const statusConfig = {
-  ready: {
-    icon: CheckCircle2,
-    color: "text-green-600 dark:text-green-400",
-    bg: "bg-green-100 dark:bg-green-900/30",
-    label: "Ready",
-  },
-  building: {
-    icon: Loader2,
-    color: "text-yellow-600 dark:text-yellow-400",
-    bg: "bg-yellow-100 dark:bg-yellow-900/30",
-    label: "Building",
-  },
-  error: {
-    icon: XCircle,
-    color: "text-red-600 dark:text-red-400",
-    bg: "bg-red-100 dark:bg-red-900/30",
-    label: "Error",
-  },
-};
+function LoadingSkeleton() {
+  return (
+    <div className="p-8">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <Skeleton className="h-9 w-32 mb-2" />
+          <Skeleton className="h-5 w-64" />
+        </div>
+        <Skeleton className="h-10 w-28" />
+      </div>
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <Skeleton className="h-10 w-80" />
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-10" />
+          <Skeleton className="h-10 w-10" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <Card key={i}>
+            <CardContent className="p-6">
+              <Skeleton className="h-12 w-12 rounded-lg mb-4" />
+              <Skeleton className="h-5 w-32 mb-2" />
+              <Skeleton className="h-4 w-full mb-4" />
+              <Skeleton className="h-4 w-48 mb-4" />
+              <div className="flex justify-between pt-4 border-t">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
+  const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  async function fetchProjects() {
+    try {
+      const response = await fetch("/api/projects");
+      if (!response.ok) {
+        throw new Error("Failed to fetch projects");
+      }
+      const data = await response.json();
+      // Support both paginated and legacy array responses
+      setProjects(Array.isArray(data) ? data : data.projects || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteProject(projectId: string, projectName: string) {
+    if (!confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`)) return;
+    try {
+      const res = await fetch(`/api/projects?id=${projectId}`, { method: "DELETE" });
+      if (res.ok) {
+        setProjects((prev) => prev.filter((p) => p.id !== projectId));
+        setActionMessage({ type: "success", text: `Project "${projectName}" deleted` });
+      } else {
+        const data = await res.json();
+        setActionMessage({ type: "error", text: data.error || "Failed to delete project" });
+      }
+    } catch {
+      setActionMessage({ type: "error", text: "Network error" });
+    }
+    setTimeout(() => setActionMessage(null), 4000);
+  }
+
+  async function handleCloneProject(projectId: string, projectName: string) {
+    try {
+      setActionMessage({ type: "success", text: `Cloning "${projectName}"...` });
+      const res = await fetch("/api/projects/clone", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId }),
+      });
+      if (res.ok) {
+        const cloned = await res.json();
+        setProjects((prev) => [cloned, ...prev]);
+        setActionMessage({ type: "success", text: `Project cloned as "${cloned.name}"` });
+      } else {
+        const data = await res.json();
+        setActionMessage({ type: "error", text: data.error || "Failed to clone project" });
+      }
+    } catch {
+      setActionMessage({ type: "error", text: "Network error" });
+    }
+    setTimeout(() => setActionMessage(null), 4000);
+  }
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <Card className="border-red-200 dark:border-red-900">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+              <AlertCircle className="h-6 w-6" />
+              <div>
+                <h3 className="font-semibold">Failed to load projects</h3>
+                <p className="text-sm text-red-500">{error}</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => window.location.reload()}
+            >
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const filteredProjects = projects.filter(
     (project) =>
       project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (project.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
   );
 
   return (
@@ -159,7 +225,7 @@ export default function ProjectsPage() {
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white"
+            className="text-3xl font-bold text-foreground"
           >
             Projects
           </motion.h1>
@@ -167,7 +233,7 @@ export default function ProjectsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-2 text-gray-600 dark:text-gray-400"
+            className="mt-2 text-muted-foreground"
           >
             Manage your deployed projects and applications.
           </motion.p>
@@ -177,7 +243,7 @@ export default function ProjectsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Button variant="primary" asChild>
+          <Button variant="default" asChild>
             <Link href="/new">
               <Plus className="h-4 w-4" />
               Add New
@@ -194,7 +260,7 @@ export default function ProjectsPage() {
         className="flex items-center justify-between gap-4 mb-6"
       >
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search projects..."
             value={searchQuery}
@@ -220,206 +286,246 @@ export default function ProjectsPage() {
         </div>
       </motion.div>
 
-      {/* Projects Grid/List */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className={cn(
-          viewMode === "grid"
-            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            : "space-y-4"
-        )}
-      >
-        {filteredProjects.map((project, index) => {
-          const status = statusConfig[project.status as keyof typeof statusConfig];
-          const StatusIcon = status.icon;
+      {/* Action Message */}
+      {actionMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn(
+            "mb-4 flex items-center gap-2 rounded-lg px-4 py-3 text-sm",
+            actionMessage.type === "success"
+              ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+              : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+          )}
+        >
+          {actionMessage.type === "success" ? (
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+          ) : (
+            <AlertCircle className="h-4 w-4 shrink-0" />
+          )}
+          {actionMessage.text}
+        </motion.div>
+      )}
 
-          if (viewMode === "list") {
-            return (
-              <Card key={project.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 text-2xl">
-                        {frameworkIcons[project.framework] || "📦"}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={`/projects/${project.name}`}
-                            className="font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
-                          >
-                            {project.name}
-                          </Link>
-                          <Badge variant={project.status === "ready" ? "success" : project.status === "error" ? "error" : "warning"}>
-                            {status.label}
-                          </Badge>
+      {/* Projects Grid/List */}
+      {filteredProjects.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className={cn(
+            viewMode === "grid"
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              : "space-y-4"
+          )}
+        >
+          {filteredProjects.map((project, index) => {
+            const lastDeployment = project.deployments[0];
+            const projectStatus = lastDeployment?.status?.toLowerCase() || "ready";
+            const status = getStatusConfig(projectStatus);
+            const StatusIcon = status.icon;
+            const domain = `${project.slug}.cloudify.tranthachnguyen.com`;
+            const branch = lastDeployment?.branch || "main";
+            const lastDeploymentTime = lastDeployment
+              ? formatTimeAgo(lastDeployment.createdAt)
+              : "No deployments";
+
+            if (viewMode === "list") {
+              return (
+                <Card key={project.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-2xl">
+                          {frameworkIcons[project.framework] || "📦"}
                         </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {project.description}
-                        </p>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/projects/${project.slug}`}
+                              className="font-semibold text-foreground hover:text-[#0070f3] dark:hover:text-[#0070f3]"
+                            >
+                              {project.name}
+                            </Link>
+                            <Badge variant={projectStatus === "ready" ? "success" : projectStatus === "error" || projectStatus === "failed" ? "error" : "warning"}>
+                              {status.label}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {project.description || `${project.framework} project`}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-6">
+                        <div className="text-right">
+                          <div className="text-sm text-foreground">
+                            {domain}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {project._count.deployments} deployments
+                          </div>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                Visit
+                              </a>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/projects/${project.slug}/settings`}>
+                                <Settings className="h-4 w-4 mr-2" />
+                                Settings
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleCloneProject(project.id, project.name)}
+                            >
+                              <Copy className="h-4 w-4 mr-2" />
+                              Clone
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-red-600 dark:text-red-400"
+                              onClick={() => handleDeleteProject(project.id, project.name)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
-                        <div className="text-sm text-gray-900 dark:text-white">
-                          {project.customDomain || project.domain}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {project.deployments} deployments
-                        </div>
+                  </CardContent>
+                </Card>
+              );
+            }
+
+            return (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * index }}
+              >
+                <Card className="hover:shadow-lg transition-shadow group">
+                  <CardContent className="p-6">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-2xl">
+                        {frameworkIcons[project.framework] || "📦"}
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
+                          <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
-                            <a href={`https://${project.domain}`} target="_blank" rel="noopener noreferrer">
+                            <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="h-4 w-4 mr-2" />
                               Visit
                             </a>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
-                            <Link href={`/projects/${project.name}/settings`}>
+                            <Link href={`/projects/${project.slug}/settings`}>
                               <Settings className="h-4 w-4 mr-2" />
                               Settings
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleCloneProject(project.id, project.name)}
+                          >
                             <Copy className="h-4 w-4 mr-2" />
                             Clone
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600 dark:text-red-400">
+                          <DropdownMenuItem
+                            className="text-red-600 dark:text-red-400"
+                            onClick={() => handleDeleteProject(project.id, project.name)}
+                          >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          }
 
-          return (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index }}
-            >
-              <Card className="hover:shadow-lg transition-shadow group">
-                <CardContent className="p-6">
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 text-2xl">
-                      {frameworkIcons[project.framework] || "📦"}
+                    {/* Project info */}
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Link
+                          href={`/projects/${project.slug}`}
+                          className="font-semibold text-foreground hover:text-[#0070f3] dark:hover:text-[#0070f3]"
+                        >
+                          {project.name}
+                        </Link>
+                        <div className={`p-1 rounded-full ${status.bg}`}>
+                          <StatusIcon
+                            className={`h-3 w-3 ${status.color} ${
+                              projectStatus === "building" ? "animate-spin" : ""
+                            }`}
+                          />
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {project.description || `${project.framework} project`}
+                      </p>
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem asChild>
-                          <a href={`https://${project.domain}`} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Visit
-                          </a>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link href={`/projects/${project.name}/settings`}>
-                            <Settings className="h-4 w-4 mr-2" />
-                            Settings
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Copy className="h-4 w-4 mr-2" />
-                          Clone
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600 dark:text-red-400">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
 
-                  {/* Project info */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Link
-                        href={`/projects/${project.name}`}
-                        className="font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                    {/* Domain */}
+                    <div className="flex items-center gap-2 mb-4">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <a
+                        href={`https://${domain}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-[#0070f3] hover:underline"
                       >
-                        {project.name}
-                      </Link>
-                      <div className={`p-1 rounded-full ${status.bg}`}>
-                        <StatusIcon
-                          className={`h-3 w-3 ${status.color} ${
-                            project.status === "building" ? "animate-spin" : ""
-                          }`}
-                        />
+                        {domain}
+                      </a>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <GitBranch className="h-4 w-4" />
+                        {branch}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        {lastDeploymentTime}
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-                      {project.description}
-                    </p>
-                  </div>
-
-                  {/* Domain */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <Globe className="h-4 w-4 text-gray-400" />
-                    <a
-                      href={`https://${project.customDomain || project.domain}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:underline dark:text-blue-400"
-                    >
-                      {project.customDomain || project.domain}
-                    </a>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-800">
-                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                      <GitBranch className="h-4 w-4" />
-                      {project.branch}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                      <Clock className="h-4 w-4" />
-                      {project.lastDeployment}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      )}
 
       {/* Empty state */}
       {filteredProjects.length === 0 && (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📦</div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             No projects found
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
+          <p className="text-muted-foreground mb-6">
             {searchQuery
               ? "Try adjusting your search query"
               : "Get started by importing your first project"}
           </p>
           {!searchQuery && (
-            <Button variant="primary" asChild>
+            <Button variant="default" asChild>
               <Link href="/new">
                 <Plus className="h-4 w-4" />
                 Import Project

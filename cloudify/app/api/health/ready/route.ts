@@ -19,10 +19,11 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error) {
+    console.error("[Ready] Database check failed:", error);
     return NextResponse.json(
       {
         status: "not_ready",
-        error: error instanceof Error ? error.message : "Database unavailable",
+        error: "Database unavailable",
         timestamp: new Date().toISOString(),
       },
       { status: 503 }

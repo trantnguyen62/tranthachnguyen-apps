@@ -11,11 +11,36 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const periodParam = searchParams.get("period") || getCurrentPeriod();
+    let periodParam = searchParams.get("period") || "current";
     const projectId = searchParams.get("projectId");
 
-    // Parse period (format: YYYY-MM)
-    const [year, month] = periodParam.split("-").map(Number);
+    // Handle special period values
+    if (periodParam === "current") {
+      periodParam = getCurrentPeriod();
+    } else if (periodParam === "last") {
+      periodParam = getLastPeriod();
+    }
+
+    // Parse and validate period (format: YYYY-MM)
+    const periodMatch = periodParam.match(/^(\d{4})-(\d{2})$/);
+    if (!periodMatch) {
+      return NextResponse.json(
+        { error: "Invalid period format. Expected YYYY-MM, 'current', or 'last'" },
+        { status: 400 }
+      );
+    }
+
+    const year = parseInt(periodMatch[1], 10);
+    const month = parseInt(periodMatch[2], 10);
+
+    // Validate month range
+    if (month < 1 || month > 12) {
+      return NextResponse.json(
+        { error: "Invalid month. Must be between 01 and 12" },
+        { status: 400 }
+      );
+    }
+
     const periodStart = new Date(year, month - 1, 1);
     const periodEnd = new Date(year, month, 0, 23, 59, 59, 999);
 
@@ -109,6 +134,12 @@ export async function GET(request: NextRequest) {
 function getCurrentPeriod(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function getLastPeriod(): string {
+  const now = new Date();
+  const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  return `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, "0")}`;
 }
 
 // Helper to record usage (called from other parts of the app)

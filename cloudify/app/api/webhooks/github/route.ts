@@ -383,12 +383,12 @@ export async function POST(request: NextRequest) {
     // Verify signature - REQUIRED for all webhook requests
     const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
 
-    // Webhook secret must be configured
+    // Webhook secret must be configured - this is a server config issue, not a client error
     if (!webhookSecret) {
       console.error("GITHUB_WEBHOOK_SECRET is not configured");
       return NextResponse.json(
-        { error: "Webhook not configured" },
-        { status: 400 }
+        { error: "Webhook service unavailable" },
+        { status: 503 }
       );
     }
 

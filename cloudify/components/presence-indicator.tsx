@@ -31,7 +31,7 @@ export function PresenceIndicator({
     <TooltipProvider>
       <div className="flex items-center gap-2">
         {showCount && (
-          <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+          <span className="text-sm text-muted-foreground flex items-center gap-1">
             <Users className="h-3.5 w-3.5" />
             {viewers.length}
           </span>
@@ -89,7 +89,7 @@ export function PresenceIndicatorCompact({ projectId }: { projectId: string }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full cursor-default">
+          <div className="flex items-center gap-1 text-sm text-muted-foreground bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full cursor-default">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -143,7 +143,7 @@ function getColorFromName(name: string): string {
     "#14b8a6", // teal
     "#06b6d4", // cyan
     "#0ea5e9", // sky
-    "#3b82f6", // blue
+    "#0070f3", // blue
   ];
 
   let hash = 0;

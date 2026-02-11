@@ -159,10 +159,29 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       }
     }
 
+    // Get member info for audit log before deletion
+    const memberInfo = await prisma.teamMember.findFirst({
+      where: { teamId: id, userId },
+      include: { user: { select: { name: true, email: true } } },
+    });
+
     // Remove member
     await prisma.teamMember.deleteMany({
       where: { teamId: id, userId },
     });
+
+    // Log activity
+    if (memberInfo) {
+      prisma.activity.create({
+        data: {
+          userId: session.user.id,
+          type: "team",
+          action: "member_removed",
+          description: `Removed ${memberInfo.user.name || memberInfo.user.email} from team`,
+          metadata: { teamId: id, removedUserId: userId },
+        },
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

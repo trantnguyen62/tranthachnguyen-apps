@@ -985,6 +985,7 @@ describe("Flow 5: Team Collaboration", () => {
 
     // ========== Step 2: Generate Invite Token ==========
     const inviteToken = signToken({
+      userId: project.ownerId || "system",
       projectId: project.id,
       inviteeId: newMemberId,
       role: "member",

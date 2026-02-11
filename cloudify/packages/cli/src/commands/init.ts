@@ -8,7 +8,7 @@ import path from "path";
 import chalk from "chalk";
 import ora from "ora";
 import inquirer from "inquirer";
-import { requireAuth, apiRequest, setCurrentProject } from "../config";
+import { requireAuth, apiRequest, setCurrentProject } from "../config.js";
 
 interface InitOptions {
   yes?: boolean;

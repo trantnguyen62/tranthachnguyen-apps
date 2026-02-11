@@ -47,6 +47,8 @@ export const mockPrisma = {
     findUnique: vi.fn(),
     findMany: vi.fn(),
     delete: vi.fn(),
+    upsert: vi.fn(),
+    deleteMany: vi.fn(),
   },
   blobStore: {
     create: vi.fn(),
@@ -62,6 +64,8 @@ export const mockPrisma = {
     findMany: vi.fn(),
     upsert: vi.fn(),
     delete: vi.fn(),
+    deleteMany: vi.fn(),
+    updateMany: vi.fn(),
   },
   kVStore: {
     create: vi.fn(),

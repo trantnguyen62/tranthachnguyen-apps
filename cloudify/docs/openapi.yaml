@@ -1,0 +1,1245 @@
+openapi: 3.0.3
+info:
+  title: Cloudify API
+  description: |
+    Cloudify is a self-hosted deployment platform for modern web applications.
+    This API provides programmatic access to manage projects, deployments, domains,
+    environment variables, serverless functions, and more.
+
+    ## Authentication
+    All API requests require authentication using a Bearer token.
+    Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-api-token>
+    ```
+
+    ## Rate Limiting
+    API requests are rate limited to 1000 requests per minute per API key.
+
+    ## Errors
+    The API uses standard HTTP response codes to indicate success or failure.
+    - 2xx: Success
+    - 4xx: Client error (bad request, unauthorized, not found)
+    - 5xx: Server error
+  version: 1.0.0
+  contact:
+    name: Cloudify Support
+    email: support@cloudify.dev
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://cloudify.tranthachnguyen.com/api
+    description: Production server
+  - url: http://localhost:3000/api
+    description: Development server
+
+tags:
+  - name: Projects
+    description: Project management endpoints
+  - name: Deployments
+    description: Deployment management endpoints
+  - name: Domains
+    description: Custom domain management
+  - name: Environment Variables
+    description: Environment variable management
+  - name: Functions
+    description: Serverless function management
+  - name: Analytics
+    description: Analytics and metrics
+  - name: AI
+    description: AI-powered analysis and insights
+  - name: Audit Logs
+    description: Audit log management
+  - name: Teams
+    description: Team management
+  - name: Webhooks
+    description: Webhook endpoints
+
+paths:
+  # ==================== Projects ====================
+  /projects:
+    get:
+      tags: [Projects]
+      summary: List all projects
+      description: Returns a list of all projects accessible to the authenticated user.
+      operationId: listProjects
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by project name
+      responses:
+        '200':
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  projects:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Projects]
+      summary: Create a new project
+      operationId: createProject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, repoUrl]
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                repoUrl:
+                  type: string
+                  format: uri
+                repoBranch:
+                  type: string
+                  default: main
+                framework:
+                  type: string
+                  enum: [nextjs, react, vue, nuxt, svelte, astro, static]
+                buildCommand:
+                  type: string
+                outputDirectory:
+                  type: string
+                installCommand:
+                  type: string
+      responses:
+        '201':
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /projects/{projectId}:
+    get:
+      tags: [Projects]
+      summary: Get project details
+      operationId: getProject
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Projects]
+      summary: Update project
+      operationId: updateProject
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+      responses:
+        '200':
+          description: Project updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Projects]
+      summary: Delete project
+      operationId: deleteProject
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '204':
+          description: Project deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ==================== Deployments ====================
+  /deployments:
+    get:
+      tags: [Deployments]
+      summary: List deployments
+      operationId: listDeployments
+      parameters:
+        - name: projectId
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [QUEUED, BUILDING, DEPLOYING, READY, ERROR, CANCELLED]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of deployments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deployments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Deployment'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags: [Deployments]
+      summary: Create a new deployment
+      operationId: createDeployment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [projectId]
+              properties:
+                projectId:
+                  type: string
+                branch:
+                  type: string
+                commitSha:
+                  type: string
+                isPreview:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Deployment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+
+  /deployments/{deploymentId}:
+    get:
+      tags: [Deployments]
+      summary: Get deployment details
+      operationId: getDeployment
+      parameters:
+        - $ref: '#/components/parameters/DeploymentId'
+      responses:
+        '200':
+          description: Deployment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+
+  /deployments/{deploymentId}/logs:
+    get:
+      tags: [Deployments]
+      summary: Get deployment build logs
+      operationId: getDeploymentLogs
+      parameters:
+        - $ref: '#/components/parameters/DeploymentId'
+      responses:
+        '200':
+          description: Build logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                        level:
+                          type: string
+                          enum: [info, warn, error]
+                        message:
+                          type: string
+
+  /deployments/{deploymentId}/rollback:
+    post:
+      tags: [Deployments]
+      summary: Rollback to this deployment
+      operationId: rollbackDeployment
+      parameters:
+        - $ref: '#/components/parameters/DeploymentId'
+      responses:
+        '200':
+          description: Rollback initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+
+  # ==================== Domains ====================
+  /projects/{projectId}/domains:
+    get:
+      tags: [Domains]
+      summary: List project domains
+      operationId: listDomains
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of domains
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  domains:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Domain'
+
+    post:
+      tags: [Domains]
+      summary: Add a custom domain
+      operationId: addDomain
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [domain]
+              properties:
+                domain:
+                  type: string
+                  format: hostname
+      responses:
+        '201':
+          description: Domain added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+
+  /projects/{projectId}/domains/{domainId}:
+    delete:
+      tags: [Domains]
+      summary: Remove a domain
+      operationId: removeDomain
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Domain removed
+
+  /projects/{projectId}/domains/{domainId}/verify:
+    post:
+      tags: [Domains]
+      summary: Verify domain ownership
+      operationId: verifyDomain
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Verification status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified:
+                    type: boolean
+                  dnsRecords:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                        name:
+                          type: string
+                        value:
+                          type: string
+
+  # ==================== Environment Variables ====================
+  /projects/{projectId}/env:
+    get:
+      tags: [Environment Variables]
+      summary: List environment variables
+      operationId: listEnvVars
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: environment
+          in: query
+          schema:
+            type: string
+            enum: [production, preview, development]
+      responses:
+        '200':
+          description: List of environment variables
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  variables:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EnvVariable'
+
+    post:
+      tags: [Environment Variables]
+      summary: Create environment variable
+      operationId: createEnvVar
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [key, value]
+              properties:
+                key:
+                  type: string
+                value:
+                  type: string
+                environment:
+                  type: string
+                  enum: [production, preview, development]
+                  default: production
+                isSecret:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Variable created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvVariable'
+
+  /projects/{projectId}/env/{envId}:
+    put:
+      tags: [Environment Variables]
+      summary: Update environment variable
+      operationId: updateEnvVar
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: envId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                environment:
+                  type: string
+                  enum: [production, preview, development]
+      responses:
+        '200':
+          description: Variable updated
+
+    delete:
+      tags: [Environment Variables]
+      summary: Delete environment variable
+      operationId: deleteEnvVar
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: envId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Variable deleted
+
+  # ==================== AI Endpoints ====================
+  /ai/analyze:
+    post:
+      tags: [AI]
+      summary: Analyze a deployment
+      description: Uses AI to analyze deployment logs and provide insights
+      operationId: analyzeDeployment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deploymentId]
+              properties:
+                deploymentId:
+                  type: string
+                analysisType:
+                  type: string
+                  enum: [general, error, performance]
+                  default: general
+      responses:
+        '200':
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIAnalysis'
+
+  /ai/conversations:
+    get:
+      tags: [AI]
+      summary: List AI conversations
+      operationId: listConversations
+      parameters:
+        - name: projectId
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AIConversation'
+
+    post:
+      tags: [AI]
+      summary: Start a new AI conversation
+      operationId: createConversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                projectId:
+                  type: string
+                title:
+                  type: string
+                context:
+                  type: string
+                  enum: [deployment, error, performance, general]
+      responses:
+        '201':
+          description: Conversation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIConversation'
+
+  /ai/conversations/{conversationId}:
+    get:
+      tags: [AI]
+      summary: Get conversation with messages
+      operationId: getConversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/AIConversation'
+                  - type: object
+                    properties:
+                      messages:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AIMessage'
+
+    delete:
+      tags: [AI]
+      summary: Delete conversation
+      operationId: deleteConversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Conversation deleted
+
+  /ai/conversations/{conversationId}/messages:
+    post:
+      tags: [AI]
+      summary: Send message to conversation
+      description: Sends a message and receives AI response (supports streaming)
+      operationId: sendMessage
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                stream:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIMessage'
+            text/event-stream:
+              schema:
+                type: string
+                description: Server-sent events for streaming responses
+
+  /ai/review:
+    post:
+      tags: [AI]
+      summary: AI code review
+      description: Performs AI-powered code review on deployment changes
+      operationId: codeReview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deploymentId]
+              properties:
+                deploymentId:
+                  type: string
+                scope:
+                  type: string
+                  enum: [full, security, performance]
+                  default: full
+      responses:
+        '200':
+          description: Code review result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodeReview'
+
+  /ai/performance:
+    post:
+      tags: [AI]
+      summary: Performance recommendations
+      description: Get AI-powered performance recommendations for a project
+      operationId: performanceRecommendations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [projectId]
+              properties:
+                projectId:
+                  type: string
+      responses:
+        '200':
+          description: Performance recommendations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recommendations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PerformanceRecommendation'
+
+  # ==================== Audit Logs ====================
+  /audit-logs:
+    get:
+      tags: [Audit Logs]
+      summary: List audit logs
+      operationId: listAuditLogs
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: projectId
+          in: query
+          schema:
+            type: string
+        - name: teamId
+          in: query
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of audit logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuditLog'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /audit-logs/export:
+    post:
+      tags: [Audit Logs]
+      summary: Export audit logs
+      operationId: exportAuditLogs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  enum: [json, csv]
+                  default: json
+                filters:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    action:
+                      type: string
+                    startDate:
+                      type: string
+                      format: date-time
+                    endDate:
+                      type: string
+                      format: date-time
+      responses:
+        '200':
+          description: Exported file
+          content:
+            application/json:
+              schema:
+                type: string
+            text/csv:
+              schema:
+                type: string
+
+  # ==================== Webhooks ====================
+  /webhooks/github:
+    post:
+      tags: [Webhooks]
+      summary: GitHub webhook endpoint
+      operationId: githubWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+
+  /webhooks/gitlab:
+    post:
+      tags: [Webhooks]
+      summary: GitLab webhook endpoint
+      operationId: gitlabWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+
+  /webhooks/bitbucket:
+    post:
+      tags: [Webhooks]
+      summary: Bitbucket webhook endpoint
+      operationId: bitbucketWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Project ID
+
+    DeploymentId:
+      name: deploymentId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Deployment ID
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+        hasMore:
+          type: boolean
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        repoUrl:
+          type: string
+        repoBranch:
+          type: string
+        framework:
+          type: string
+        buildCommand:
+          type: string
+        outputDirectory:
+          type: string
+        installCommand:
+          type: string
+        status:
+          type: string
+          enum: [active, paused, deleted]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        repoBranch:
+          type: string
+        buildCommand:
+          type: string
+        outputDirectory:
+          type: string
+        installCommand:
+          type: string
+
+    Deployment:
+      type: object
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        status:
+          type: string
+          enum: [QUEUED, BUILDING, DEPLOYING, READY, ERROR, CANCELLED]
+        branch:
+          type: string
+        commitSha:
+          type: string
+        commitMessage:
+          type: string
+        url:
+          type: string
+        isPreview:
+          type: boolean
+        duration:
+          type: integer
+          description: Build duration in milliseconds
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+
+    Domain:
+      type: object
+      properties:
+        id:
+          type: string
+        domain:
+          type: string
+        verified:
+          type: boolean
+        sslStatus:
+          type: string
+          enum: [pending, active, expired]
+        createdAt:
+          type: string
+          format: date-time
+
+    EnvVariable:
+      type: object
+      properties:
+        id:
+          type: string
+        key:
+          type: string
+        value:
+          type: string
+          description: Masked for secrets
+        environment:
+          type: string
+          enum: [production, preview, development]
+        isSecret:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AIAnalysis:
+      type: object
+      properties:
+        id:
+          type: string
+        deploymentId:
+          type: string
+        type:
+          type: string
+        summary:
+          type: string
+        insights:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+              severity:
+                type: string
+                enum: [low, medium, high]
+              message:
+                type: string
+              suggestion:
+                type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    AIConversation:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        projectId:
+          type: string
+        title:
+          type: string
+        context:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AIMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        conversationId:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CodeReview:
+      type: object
+      properties:
+        id:
+          type: string
+        deploymentId:
+          type: string
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [security, performance, quality, style]
+              severity:
+                type: string
+                enum: [low, medium, high, critical]
+              file:
+                type: string
+              line:
+                type: integer
+              message:
+                type: string
+              suggestion:
+                type: string
+        summary:
+          type: string
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        createdAt:
+          type: string
+          format: date-time
+
+    PerformanceRecommendation:
+      type: object
+      properties:
+        category:
+          type: string
+          enum: [lcp, fid, cls, ttfb, bundle]
+        severity:
+          type: string
+          enum: [low, medium, high]
+        issue:
+          type: string
+        suggestion:
+          type: string
+        codeExample:
+          type: string
+        impact:
+          type: string
+
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        action:
+          type: string
+        description:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+        project:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            slug:
+              type: string
+        team:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            slug:
+              type: string
+        ipAddress:
+          type: string
+          nullable: true
+        userAgent:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+
+security:
+  - bearerAuth: []

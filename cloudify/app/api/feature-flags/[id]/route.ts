@@ -75,10 +75,28 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       conditions?: object;
     } = {};
 
-    if (name !== undefined) updateData.name = name;
-    if (description !== undefined) updateData.description = description;
-    if (enabled !== undefined) updateData.enabled = enabled;
+    if (name !== undefined) {
+      if (typeof name !== "string" || name.length < 1 || name.length > 100) {
+        return NextResponse.json({ error: "Name must be a string (1-100 chars)" }, { status: 400 });
+      }
+      updateData.name = name;
+    }
+    if (description !== undefined) {
+      if (typeof description !== "string") {
+        return NextResponse.json({ error: "Description must be a string" }, { status: 400 });
+      }
+      updateData.description = description;
+    }
+    if (enabled !== undefined) {
+      if (typeof enabled !== "boolean") {
+        return NextResponse.json({ error: "Enabled must be a boolean" }, { status: 400 });
+      }
+      updateData.enabled = enabled;
+    }
     if (percentage !== undefined) {
+      if (typeof percentage !== "number" || isNaN(percentage)) {
+        return NextResponse.json({ error: "Percentage must be a number" }, { status: 400 });
+      }
       updateData.percentage = Math.min(100, Math.max(0, percentage));
     }
     if (conditions !== undefined) updateData.conditions = conditions;

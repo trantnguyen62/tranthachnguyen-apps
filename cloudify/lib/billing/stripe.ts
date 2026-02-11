@@ -5,12 +5,16 @@
 
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
+import { sendPaymentFailedNotification } from "@/lib/notifications/service";
+import { loggers } from "@/lib/logging/logger";
+
+const log = loggers.billing;
 
 // Initialize Stripe client
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey && process.env.NODE_ENV === "production") {
-  console.warn("STRIPE_SECRET_KEY is not set");
+  log.warn("STRIPE_SECRET_KEY is not set");
 }
 
 export const stripe = stripeSecretKey
@@ -315,7 +319,7 @@ export async function reportUsage(
     });
     return true;
   } catch (error) {
-    console.error("Failed to report usage:", error);
+    log.error("Failed to report usage", error);
     return false;
   }
 }
@@ -342,7 +346,7 @@ export async function getUsageRecords(
     );
     return summaries.data;
   } catch (error) {
-    console.error("Failed to get usage records:", error);
+    log.error("Failed to get usage records", error);
     return [];
   }
 }
@@ -360,14 +364,14 @@ export function constructWebhookEvent(
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    console.error("STRIPE_WEBHOOK_SECRET is not set");
+    log.error("STRIPE_WEBHOOK_SECRET is not set");
     return null;
   }
 
   try {
     return stripe.webhooks.constructEvent(payload, signature, webhookSecret);
   } catch (error) {
-    console.error("Webhook signature verification failed:", error);
+    log.error("Webhook signature verification failed", error);
     return null;
   }
 }
@@ -523,5 +527,11 @@ export async function handleInvoicePaymentFailed(
     },
   });
 
-  // TODO: Send notification to user about failed payment
+  // Send notification to user about failed payment
+  await sendPaymentFailedNotification({
+    userId: user.id,
+    amount: invoice.amount_due,
+    currency: invoice.currency,
+    invoiceId: invoice.id,
+  });
 }

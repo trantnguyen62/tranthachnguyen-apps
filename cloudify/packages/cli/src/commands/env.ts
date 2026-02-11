@@ -8,7 +8,7 @@ import path from "path";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import ora from "ora";
-import { requireAuth, apiRequest, getCurrentProject } from "../config";
+import { requireAuth, apiRequest, getCurrentProject } from "../config.js";
 
 interface EnvVariable {
   id: string;
@@ -204,6 +204,99 @@ export async function envPull(filename?: string): Promise<void> {
     spinner.succeed(`Wrote ${response.variables.length} variables to ${chalk.cyan(outputFile)}`);
   } catch (error) {
     spinner.fail("Failed to pull environment variables");
+    console.error(chalk.red((error as Error).message));
+    process.exit(1);
+  }
+}
+
+export async function envPush(options: { environment?: string }): Promise<void> {
+  requireAuth();
+
+  const projectId = getProjectId();
+  const cwd = process.cwd();
+  const target = options.environment || "development";
+
+  // Look for .env files
+  const envFiles = [".env.local", ".env", `.env.${target}`];
+  let envFile: string | null = null;
+
+  for (const file of envFiles) {
+    const filePath = path.join(cwd, file);
+    if (fs.existsSync(filePath)) {
+      envFile = filePath;
+      break;
+    }
+  }
+
+  if (!envFile) {
+    console.log(chalk.yellow("No .env file found."));
+    console.log(chalk.gray("Create a .env.local or .env file with your variables."));
+    return;
+  }
+
+  const spinner = ora(`Pushing environment variables from ${path.basename(envFile)}...`).start();
+
+  try {
+    // Parse .env file
+    const content = fs.readFileSync(envFile, "utf-8");
+    const lines = content.split("\n").filter((line) => {
+      const trimmed = line.trim();
+      return trimmed && !trimmed.startsWith("#");
+    });
+
+    const variables: Array<{ key: string; value: string }> = [];
+    for (const line of lines) {
+      const eqIndex = line.indexOf("=");
+      if (eqIndex > 0) {
+        const key = line.substring(0, eqIndex).trim();
+        let value = line.substring(eqIndex + 1).trim();
+        // Remove quotes if present
+        if ((value.startsWith('"') && value.endsWith('"')) ||
+            (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
+        }
+        variables.push({ key, value });
+      }
+    }
+
+    if (variables.length === 0) {
+      spinner.warn("No variables found in .env file");
+      return;
+    }
+
+    // Push each variable
+    let successCount = 0;
+    for (const { key, value } of variables) {
+      try {
+        await apiRequest(`/projects/${projectId}/env`, {
+          method: "POST",
+          body: JSON.stringify({
+            key,
+            value,
+            target: [target],
+          }),
+        });
+        successCount++;
+      } catch {
+        // Variable might already exist, try updating
+        try {
+          await apiRequest(`/projects/${projectId}/env/${key}`, {
+            method: "PUT",
+            body: JSON.stringify({
+              value,
+              target: [target],
+            }),
+          });
+          successCount++;
+        } catch (updateError) {
+          console.log(chalk.yellow(`\nFailed to set ${key}: ${(updateError as Error).message}`));
+        }
+      }
+    }
+
+    spinner.succeed(`Pushed ${chalk.cyan(successCount)}/${variables.length} variables to ${chalk.cyan(target)}`);
+  } catch (error) {
+    spinner.fail("Failed to push environment variables");
     console.error(chalk.red((error as Error).message));
     process.exit(1);
   }

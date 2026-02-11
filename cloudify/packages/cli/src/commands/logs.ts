@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 import ora from "ora";
-import { requireAuth, apiRequest, getCurrentProject, getConfig } from "../config";
+import { requireAuth, apiRequest, getCurrentProject, getApiUrl, getToken } from "../config.js";
 
 interface LogEntry {
   timestamp: string;
@@ -138,16 +138,15 @@ async function streamLogs(
   deploymentId?: string,
   filter?: string
 ): Promise<void> {
-  const config = getConfig();
-  const apiUrl = config.get("apiUrl") || "https://cloudify.tranthachnguyen.com/api";
-  const token = config.get("token");
+  const apiUrl = getApiUrl();
+  const token = getToken();
 
   const query = new URLSearchParams();
   if (deploymentId) {
     query.set("deploymentId", deploymentId);
   }
 
-  const url = `${apiUrl}/projects/${projectId}/logs/stream?${query.toString()}`;
+  const url = `${apiUrl}/api/projects/${projectId}/logs/stream?${query.toString()}`;
 
   console.log(chalk.cyan("Streaming logs... (Ctrl+C to stop)"));
   console.log("");

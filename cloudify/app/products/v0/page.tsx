@@ -54,8 +54,8 @@ export default function V0Page() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-purple-50 to-white dark:from-purple-950/30 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -66,19 +66,19 @@ export default function V0Page() {
                 <span className="text-sm font-medium">v0 by Cloudify</span>
                 <Badge variant="secondary" className="ml-2">New</Badge>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Turn ideas into
                 <br />
                 <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   production code
                 </span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 v0 is an AI-powered app builder. Describe your UI in plain English and get
                 production-ready React components in seconds.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     <Play className="h-4 w-4" />
                     Try v0 Free
@@ -94,25 +94,25 @@ export default function V0Page() {
 
         {/* Demo Section */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 overflow-hidden"
+              className="rounded-lg border border-border bg-background overflow-hidden"
             >
-              <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center gap-2">
+              <div className="p-4 border-b border-border flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
                 <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="ml-4 text-sm text-gray-500">v0.cloudify.app</span>
+                <span className="ml-4 text-sm text-muted-foreground">v0.cloudify.app</span>
               </div>
               <div className="p-8 flex flex-col items-center justify-center min-h-[400px] text-center">
                 <Wand2 className="h-16 w-16 text-purple-500 mb-6" />
-                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-2xl font-semibold text-foreground mb-2">
                   What would you like to build?
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
+                <p className="text-muted-foreground mb-8 max-w-md">
                   Type a description of the UI component you want to create
                 </p>
                 <div className="w-full max-w-2xl">
@@ -120,7 +120,7 @@ export default function V0Page() {
                     {examples.map((example, index) => (
                       <button
                         key={index}
-                        className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:border-purple-500 hover:text-purple-600 transition-colors"
+                        className="px-4 py-2 rounded-lg bg-card border border-border text-sm text-muted-foreground hover:border-purple-500 hover:text-purple-600 transition-colors"
                       >
                         {example}
                       </button>
@@ -133,18 +133,18 @@ export default function V0Page() {
         </section>
 
         {/* Features */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-background">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 From prompt to production
               </h2>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
                 v0 understands your intent and generates clean, accessible, well-structured code.
               </p>
             </motion.div>
@@ -157,15 +157,15 @@ export default function V0Page() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -176,14 +176,14 @@ export default function V0Page() {
 
         {/* How it Works */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 How it works
               </h2>
             </motion.div>
@@ -205,10 +205,10 @@ export default function V0Page() {
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl font-bold text-white">{item.step}</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {item.description}
                   </p>
                 </motion.div>
@@ -219,7 +219,7 @@ export default function V0Page() {
 
         {/* CTA */}
         <section className="py-20 bg-gradient-to-r from-purple-600 to-pink-600">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-white">
               Ready to build faster?
             </h2>

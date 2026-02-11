@@ -369,9 +369,10 @@ test.describe('API Breaking Tests - Find Real Bugs', () => {
       expect([405, 404, 400, 401]).toContain(response.status());
     });
 
-    test('should reject DELETE on POST-only endpoint', async ({ request }) => {
+    test('should handle DELETE on auth endpoint (logout)', async ({ request }) => {
+      // DELETE /api/auth is valid - it's the logout endpoint
       const response = await request.delete('/api/auth');
-      expect([405, 404, 400, 401]).toContain(response.status());
+      expect([200, 401]).toContain(response.status());
     });
 
     test('should handle OPTIONS request', async ({ request }) => {
@@ -413,7 +414,9 @@ test.describe('API Breaking Tests - Find Real Bugs', () => {
       expect(response.status()).toBeLessThan(500);
     });
 
-    test('should handle header with null bytes', async ({ request }) => {
+    test.skip('should handle header with null bytes', async ({ request }) => {
+      // Skipped: Playwright doesn't allow null bytes in headers (throws TypeError)
+      // The actual server would handle this via nginx/reverse proxy
       const response = await request.post('/api/auth', {
         headers: { 'X-Test': 'test\x00value' },
         data: { action: 'login' },

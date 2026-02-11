@@ -57,7 +57,7 @@ const productCategories = [
         description: "Git-based deployments with automatic previews and rollbacks",
         icon: GitBranch,
         href: "/products/deployments",
-        color: "from-blue-500 to-cyan-500",
+        color: "from-gray-600 to-gray-400",
       },
       {
         name: "Edge Network",
@@ -103,8 +103,8 @@ export default function ProductsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -113,10 +113,10 @@ export default function ProductsPage() {
               <Badge className="mb-4" variant="secondary">
                 Platform
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Build with the Best Tools
               </h1>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Everything you need to build, deploy, and scale your applications.
                 From AI to infrastructure, we've got you covered.
               </p>
@@ -128,19 +128,19 @@ export default function ProductsPage() {
         {productCategories.map((category, categoryIndex) => (
           <section
             key={category.name}
-            className={`py-16 ${categoryIndex % 2 === 1 ? "bg-gray-50 dark:bg-gray-900" : ""}`}
+            className={`py-16 ${categoryIndex % 2 === 1 ? "bg-background" : ""}`}
           >
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 className="mb-10"
               >
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold text-foreground">
                   {category.name}
                 </h2>
-                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                <p className="mt-2 text-muted-foreground">
                   {category.description}
                 </p>
               </motion.div>
@@ -156,7 +156,7 @@ export default function ProductsPage() {
                   >
                     <Link
                       href={product.href}
-                      className="group block h-full p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 hover:shadow-xl transition-all hover:border-blue-500 dark:hover:border-blue-500"
+                      className="group block h-full p-6 rounded-lg border border-border bg-card hover:shadow-xl transition-all hover:border-foreground/20"
                     >
                       <div className="flex items-start justify-between">
                         <div
@@ -168,13 +168,13 @@ export default function ProductsPage() {
                           <Badge variant="secondary">{product.badge}</Badge>
                         )}
                       </div>
-                      <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <h3 className="mt-4 text-xl font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                         {product.name}
                       </h3>
-                      <p className="mt-2 text-gray-600 dark:text-gray-400">
+                      <p className="mt-2 text-muted-foreground">
                         {product.description}
                       </p>
-                      <div className="mt-4 flex items-center text-blue-600 dark:text-blue-400 font-medium">
+                      <div className="mt-4 flex items-center text-foreground font-medium">
                         Learn more
                         <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </div>
@@ -187,19 +187,19 @@ export default function ProductsPage() {
         ))}
 
         {/* CTA */}
-        <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-white">
+        <section className="py-20 bg-foreground">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-background">
               Ready to Get Started?
             </h2>
-            <p className="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
+            <p className="mt-4 text-xl text-background/70 max-w-2xl mx-auto">
               Deploy your first project in minutes with our intuitive platform.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" asChild>
+              <Button size="lg" variant="secondary" className="bg-background text-foreground" asChild>
                 <Link href="/new">Start Deploying</Link>
               </Button>
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10" asChild>
+              <Button size="lg" variant="outline" className="border-background/30 text-background hover:bg-background/10" asChild>
                 <Link href="/pricing">View Pricing</Link>
               </Button>
             </div>

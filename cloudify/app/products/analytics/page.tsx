@@ -64,8 +64,8 @@ export default function AnalyticsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -75,17 +75,17 @@ export default function AnalyticsPage() {
                 <BarChart3 className="h-4 w-4" />
                 <span className="text-sm font-medium">Analytics</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Insights that
                 <br />
                 <span className="text-orange-600 dark:text-orange-400">drive growth</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Real-time analytics for your web applications. Understand your users,
                 improve performance, and grow your business.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     Enable Analytics
                     <ArrowRight className="h-4 w-4" />
@@ -101,33 +101,33 @@ export default function AnalyticsPage() {
 
         {/* Dashboard Preview */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden"
+              className="rounded-lg bg-card border border-border overflow-hidden"
             >
               {/* Dashboard Header */}
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <div className="px-6 py-4 border-b border-border flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Dashboard</h3>
+                  <h3 className="font-semibold text-foreground">Dashboard</h3>
                   <span className="px-2 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs">
                     Live
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="h-4 w-4" />
                   Last 7 days
                 </div>
               </div>
 
               {/* Metrics */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-200 dark:bg-gray-700">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-secondary">
                 {metrics.map((metric) => (
-                  <div key={metric.label} className="bg-white dark:bg-gray-800 p-6">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{metric.label}</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                  <div key={metric.label} className="bg-card p-6">
+                    <p className="text-sm text-muted-foreground">{metric.label}</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">
                       {metric.value}
                     </p>
                     <p className={`text-sm mt-1 ${
@@ -158,18 +158,18 @@ export default function AnalyticsPage() {
         </section>
 
         {/* Features Grid */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Everything you need to understand your users
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Powerful analytics without the complexity of traditional tools.
               </p>
             </motion.div>
@@ -182,15 +182,15 @@ export default function AnalyticsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
                   <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -201,17 +201,17 @@ export default function AnalyticsPage() {
 
         {/* Privacy Section */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Privacy-first analytics
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Get the insights you need without compromising your users&apos; privacy.
                   No cookies, no tracking across sites, fully GDPR compliant.
                 </p>
@@ -223,7 +223,7 @@ export default function AnalyticsPage() {
                     "No third-party data sharing",
                     "Open and transparent methodology",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                    <li key={item} className="flex items-center gap-3 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </li>
@@ -235,16 +235,16 @@ export default function AnalyticsPage() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border border-orange-200 dark:border-orange-800"
+                className="p-8 rounded-lg bg-gradient-to-br from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 border border-orange-200 dark:border-orange-800"
               >
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900/30 mb-4">
                     <Globe className="h-8 w-8 text-orange-600 dark:text-orange-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
                     No Cookie Banner Needed
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     Since we don&apos;t use cookies for tracking, you don&apos;t need to show
                     a cookie consent banner for Cloudify Analytics.
                   </p>
@@ -255,18 +255,18 @@ export default function AnalyticsPage() {
         </section>
 
         {/* Pricing Preview */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Simple, transparent pricing
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Analytics included in all plans. Scale as you grow.
               </p>
             </motion.div>
@@ -283,13 +283,13 @@ export default function AnalyticsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-center"
+                  className="p-6 rounded-lg bg-card border border-border text-center"
                 >
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{tier.plan}</h3>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+                  <h3 className="font-semibold text-foreground">{tier.plan}</h3>
+                  <p className="text-3xl font-bold text-foreground mt-2">
                     {tier.events}
                   </p>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">events/month</p>
+                  <p className="text-muted-foreground text-sm">events/month</p>
                   <p className="mt-4 text-orange-600 dark:text-orange-400 font-medium">
                     {tier.price}
                   </p>
@@ -301,7 +301,7 @@ export default function AnalyticsPage() {
 
         {/* CTA */}
         <section className="py-20 bg-orange-600 dark:bg-orange-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Start understanding your users
             </h2>

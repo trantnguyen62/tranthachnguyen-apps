@@ -94,7 +94,7 @@ export default function GuidesPage() {
       <main className="flex-1 pt-16">
         {/* Hero */}
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -104,10 +104,10 @@ export default function GuidesPage() {
                 <BookOpen className="h-3 w-3 mr-1" />
                 Guides
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Learn How to Build with Cloudify
               </h1>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Step-by-step tutorials and best practices to help you get the most out of
                 our platform.
               </p>
@@ -119,9 +119,9 @@ export default function GuidesPage() {
         {guideCategories.map((category, categoryIndex) => (
           <section
             key={category.name}
-            className={`py-16 ${categoryIndex % 2 === 1 ? "bg-gray-50 dark:bg-gray-900" : ""}`}
+            className={`py-16 ${categoryIndex % 2 === 1 ? "bg-background" : ""}`}
           >
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -133,7 +133,7 @@ export default function GuidesPage() {
                 >
                   <category.icon className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold text-foreground">
                   {category.name}
                 </h2>
               </motion.div>
@@ -149,17 +149,17 @@ export default function GuidesPage() {
                   >
                     <Link
                       href={guide.href}
-                      className="group flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 hover:border-blue-500 dark:hover:border-blue-500 transition-all hover:shadow-md"
+                      className="group flex items-center justify-between p-4 rounded-xl border border-border bg-card hover:border-blue-500 dark:hover:border-blue-500 transition-all hover:shadow-md"
                     >
-                      <span className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <span className="font-medium text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                         {guide.title}
                       </span>
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center text-sm text-gray-500">
+                        <span className="flex items-center text-sm text-muted-foreground">
                           <Clock className="h-4 w-4 mr-1" />
                           {guide.time}
                         </span>
-                        <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-[#0070f3] group-hover:translate-x-1 transition-all" />
                       </div>
                     </Link>
                   </motion.div>
@@ -171,11 +171,11 @@ export default function GuidesPage() {
 
         {/* CTA */}
         <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold text-white">
               Can't Find What You're Looking For?
             </h2>
-            <p className="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
+            <p className="mt-4 text-xl text-background/70 max-w-2xl mx-auto">
               Check our documentation or reach out to our support team.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">

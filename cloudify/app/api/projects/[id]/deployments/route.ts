@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth/next-auth";
+import { triggerBuild } from "@/lib/build/worker";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -92,8 +93,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    // TODO: Trigger build worker here
-    // For now, we'll simulate the build process
+    // Trigger build worker to start the deployment
+    await triggerBuild(deployment.id);
 
     return NextResponse.json(deployment, { status: 201 });
   } catch (error) {

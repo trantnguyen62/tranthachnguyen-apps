@@ -1,10 +1,34 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const SESSION_COOKIE_NAME = "cloudify_session";
+// NextAuth v5 uses these cookie names
+const NEXTAUTH_SESSION_COOKIES = [
+  "__Secure-authjs.session-token",  // Production (HTTPS)
+  "authjs.session-token",           // Development (HTTP)
+  "__Host-authjs.csrf-token",       // CSRF token (indicates auth activity)
+];
 
 // Routes that require authentication
-const protectedRoutes = ["/dashboard"];
+const protectedRoutes = [
+  "/dashboard",
+  "/projects",
+  "/deployments",
+  "/domains",
+  "/analytics",
+  "/settings",
+  "/team",
+  "/tokens",
+  "/storage",
+  "/functions",
+  "/logs",
+  "/activity",
+  "/usage",
+  "/feature-flags",
+  "/edge-config",
+  "/ai-insights",
+  "/integrations",
+  "/admin",
+];
 
 // Routes that should redirect to dashboard if already authenticated
 const authRoutes = ["/login", "/signup"];
@@ -62,7 +86,10 @@ function applySecurityHeaders(response: NextResponse, isProduction: boolean): Ne
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
+  // Check for any NextAuth session cookie
+  const hasSessionCookie = NEXTAUTH_SESSION_COOKIES.some(
+    (name) => request.cookies.get(name)?.value
+  );
   const isProduction = process.env.NODE_ENV === "production";
 
   // Check if the current route is protected
@@ -74,7 +101,7 @@ export function middleware(request: NextRequest) {
   const isAuthRoute = authRoutes.some((route) => pathname === route);
 
   // If trying to access protected route without session, redirect to login
-  if (isProtectedRoute && !sessionCookie) {
+  if (isProtectedRoute && !hasSessionCookie) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     const response = NextResponse.redirect(loginUrl);
@@ -82,7 +109,7 @@ export function middleware(request: NextRequest) {
   }
 
   // If trying to access auth routes with session, redirect to dashboard
-  if (isAuthRoute && sessionCookie) {
+  if (isAuthRoute && hasSessionCookie) {
     const response = NextResponse.redirect(new URL("/dashboard", request.url));
     return applySecurityHeaders(response, isProduction);
   }

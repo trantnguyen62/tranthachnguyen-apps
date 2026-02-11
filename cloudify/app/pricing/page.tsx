@@ -138,35 +138,36 @@ export default function PricingPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <section className="py-20 bg-background">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white"
+              transition={{ duration: 0.3 }}
+              className="text-4xl sm:text-5xl font-bold text-foreground"
             >
               Simple, transparent pricing
             </motion.h1>
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto"
+              transition={{ delay: 0.1, duration: 0.3 }}
+              className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto"
             >
               Start for free, scale as you grow. No hidden fees, no surprises.
             </motion.p>
 
             {/* Billing toggle */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
               className="mt-8 flex items-center justify-center gap-4"
             >
               <span
                 className={cn(
                   "text-sm font-medium",
-                  !isYearly ? "text-gray-900 dark:text-white" : "text-gray-500"
+                  !isYearly ? "text-foreground" : "text-muted-foreground"
                 )}
               >
                 Monthly
@@ -175,7 +176,7 @@ export default function PricingPage() {
               <span
                 className={cn(
                   "text-sm font-medium",
-                  isYearly ? "text-gray-900 dark:text-white" : "text-gray-500"
+                  isYearly ? "text-foreground" : "text-muted-foreground"
                 )}
               >
                 Yearly{" "}
@@ -189,19 +190,19 @@ export default function PricingPage() {
 
         {/* Pricing Cards */}
         <section className="py-12 -mt-8">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {plans.map((plan, index) => (
                 <motion.div
                   key={plan.name}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * index }}
+                  transition={{ delay: 0.1 * index, duration: 0.3 }}
                   className="relative"
                 >
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-600 px-4 py-1 text-sm font-medium text-white">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-foreground px-4 py-1 text-sm font-medium text-background">
                         <Zap className="h-4 w-4" />
                         Most Popular
                       </span>
@@ -211,7 +212,7 @@ export default function PricingPage() {
                     className={cn(
                       "h-full flex flex-col",
                       plan.popular
-                        ? "border-blue-500 shadow-xl shadow-blue-500/10"
+                        ? "border-foreground shadow-none"
                         : ""
                     )}
                   >
@@ -221,14 +222,14 @@ export default function PricingPage() {
                           <Users className="h-5 w-5 text-gray-400" />
                         )}
                         {plan.name === "Pro" && (
-                          <Zap className="h-5 w-5 text-blue-500" />
+                          <Zap className="h-5 w-5 text-[#0070f3]" />
                         )}
                         {plan.name === "Enterprise" && (
                           <Building2 className="h-5 w-5 text-purple-500" />
                         )}
                         <CardTitle>{plan.name}</CardTitle>
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-muted-foreground">
                         {plan.description}
                       </p>
                     </CardHeader>
@@ -237,15 +238,15 @@ export default function PricingPage() {
                       <div className="mb-6">
                         {plan.monthlyPrice !== null ? (
                           <div className="flex items-baseline">
-                            <span className="text-4xl font-bold text-gray-900 dark:text-white">
+                            <span className="text-4xl font-bold text-foreground">
                               ${isYearly ? plan.yearlyPrice : plan.monthlyPrice}
                             </span>
-                            <span className="ml-2 text-gray-500">
+                            <span className="ml-2 text-muted-foreground">
                               /{isYearly ? "year" : "month"}
                             </span>
                           </div>
                         ) : (
-                          <div className="text-4xl font-bold text-gray-900 dark:text-white">
+                          <div className="text-4xl font-bold text-foreground">
                             Custom
                           </div>
                         )}
@@ -261,19 +262,19 @@ export default function PricingPage() {
                             {feature.included ? (
                               <Check className="h-5 w-5 text-green-500 shrink-0" />
                             ) : (
-                              <X className="h-5 w-5 text-gray-300 dark:text-gray-700 shrink-0" />
+                              <X className="h-5 w-5 text-muted-foreground shrink-0" />
                             )}
                             <span
                               className={cn(
                                 "text-sm",
                                 feature.included
-                                  ? "text-gray-700 dark:text-gray-300"
-                                  : "text-gray-400 dark:text-gray-600"
+                                  ? "text-foreground"
+                                  : "text-muted-foreground"
                               )}
                             >
                               {feature.name}
                               {feature.limit && (
-                                <span className="text-gray-500 dark:text-gray-400">
+                                <span className="text-muted-foreground">
                                   {" "}
                                   ({feature.limit})
                                 </span>
@@ -287,7 +288,7 @@ export default function PricingPage() {
                       <div className="mt-8">
                         <Button
                           className="w-full"
-                          variant={plan.popular ? "primary" : "outline"}
+                          variant={plan.popular ? "default" : "outline"}
                           asChild
                         >
                           <Link href={plan.ctaLink}>
@@ -305,13 +306,14 @@ export default function PricingPage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900">
+        <section className="py-20 bg-background">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <motion.h2
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12"
+              transition={{ duration: 0.3 }}
+              className="text-3xl font-bold text-center text-foreground mb-12"
             >
               Frequently Asked Questions
             </motion.h2>
@@ -319,17 +321,17 @@ export default function PricingPage() {
               {faqs.map((faq, index) => (
                 <motion.div
                   key={faq.question}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.1 * index }}
-                  className="p-6 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  transition={{ delay: 0.1 * index, duration: 0.3 }}
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <HelpCircle className="h-5 w-5 text-blue-500" />
+                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                    <HelpCircle className="h-5 w-5 text-[#0070f3]" />
                     {faq.question}
                   </h3>
-                  <p className="mt-2 text-gray-600 dark:text-gray-400">
+                  <p className="mt-2 text-muted-foreground">
                     {faq.answer}
                   </p>
                 </motion.div>

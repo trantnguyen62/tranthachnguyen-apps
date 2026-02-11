@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth/next-auth";
-import { verifyDomainDns, getRequiredDnsRecords } from "@/lib/domains/dns";
+import { verifyDomainDnsWithCloudflare, getRequiredDnsRecords } from "@/lib/domains/dns";
 import { triggerSslProvisioning } from "@/lib/domains/ssl";
 import { updateNginxConfig } from "@/lib/domains/nginx";
 
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Domain not found" }, { status: 404 });
     }
 
-    // Perform DNS verification
-    const result = await verifyDomainDns(domain.domain, domain.verificationToken);
+    // Perform DNS verification (uses Cloudflare API when available, falls back to DNS lookup)
+    const result = await verifyDomainDnsWithCloudflare(domain.domain, domain.verificationToken);
 
     // Update domain status based on verification result
     if (result.verified && !domain.verified) {

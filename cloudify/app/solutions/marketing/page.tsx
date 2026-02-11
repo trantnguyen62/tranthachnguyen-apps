@@ -56,8 +56,8 @@ export default function MarketingPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -67,17 +67,17 @@ export default function MarketingPage() {
                 <Megaphone className="h-4 w-4" />
                 <span className="text-sm font-medium">Marketing Sites</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Ship campaigns
                 <br />
                 <span className="text-violet-600 dark:text-violet-400">at the speed of marketing</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Deploy landing pages, microsites, and marketing content instantly.
                 Move as fast as your campaigns demand.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     Start Deploying
                     <ArrowRight className="h-4 w-4" />
@@ -93,17 +93,17 @@ export default function MarketingPage() {
 
         {/* Features */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Built for marketing teams
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Deploy, preview, and iterate without waiting for engineering.
               </p>
             </motion.div>
@@ -116,15 +116,15 @@ export default function MarketingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
                   <div className="w-12 h-12 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-violet-600 dark:text-violet-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -134,18 +134,18 @@ export default function MarketingPage() {
         </section>
 
         {/* Workflow */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   From design to deployed in minutes
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Streamline your workflow with instant previews, branch deployments,
                   and automated publishing.
                 </p>
@@ -161,8 +161,8 @@ export default function MarketingPage() {
                         {item.step}
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900 dark:text-white">{item.title}</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{item.desc}</p>
+                        <h4 className="font-semibold text-foreground">{item.title}</h4>
+                        <p className="text-sm text-muted-foreground">{item.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -173,35 +173,35 @@ export default function MarketingPage() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden"
+                className="rounded-lg bg-card border border-border overflow-hidden"
               >
-                <div className="px-4 py-3 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
+                <div className="px-4 py-3 bg-secondary dark:bg-secondary border-b border-border flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500" />
                   <div className="w-3 h-3 rounded-full bg-yellow-500" />
                   <div className="w-3 h-3 rounded-full bg-green-500" />
-                  <span className="text-xs text-gray-500 ml-2">Preview Deployment</span>
+                  <span className="text-xs text-muted-foreground ml-2">Preview Deployment</span>
                 </div>
                 <div className="p-6">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
+                      <span className="text-sm text-muted-foreground">Status</span>
                       <span className="px-2 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium">
                         Ready
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">URL</span>
+                      <span className="text-sm text-muted-foreground">URL</span>
                       <code className="text-xs text-violet-600 dark:text-violet-400">
                         campaign-abc123.cloudify.app
                       </code>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Branch</span>
-                      <span className="text-sm text-gray-900 dark:text-white">feature/new-hero</span>
+                      <span className="text-sm text-muted-foreground">Branch</span>
+                      <span className="text-sm text-foreground">feature/new-hero</span>
                     </div>
                   </div>
-                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <Button variant="primary" size="sm" className="w-full">
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <Button variant="default" size="sm" className="w-full">
                       Promote to Production
                     </Button>
                   </div>
@@ -213,14 +213,14 @@ export default function MarketingPage() {
 
         {/* Use Cases */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Perfect for every marketing need
               </h2>
             </motion.div>
@@ -233,10 +233,10 @@ export default function MarketingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
+                  className="p-4 rounded-xl bg-background border border-border"
                 >
-                  <h4 className="font-semibold text-gray-900 dark:text-white">{useCase.name}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{useCase.desc}</p>
+                  <h4 className="font-semibold text-foreground">{useCase.name}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">{useCase.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -245,7 +245,7 @@ export default function MarketingPage() {
 
         {/* CTA */}
         <section className="py-20 bg-violet-600 dark:bg-violet-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Launch your next campaign today
             </h2>

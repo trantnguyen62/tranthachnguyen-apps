@@ -896,3 +896,659 @@ export async function projectSubdomainExists(
 export function getProjectUrl(projectSlug: string): string {
   return `https://${projectSlug}.${BASE_DOMAIN}`;
 }
+
+// ============ CDN Cache Management ============
+
+const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
+
+/**
+ * Purge cache for specific URLs
+ */
+export async function purgeCache(
+  urls: string[],
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<{ id: string }>(
+      `/zones/${zoneId}/purge_cache`,
+      "POST",
+      { files: urls }
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Purged cache for ${urls.length} URLs`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Purge all cache for a zone
+ */
+export async function purgeAllCache(
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<{ id: string }>(
+      `/zones/${zoneId}/purge_cache`,
+      "POST",
+      { purge_everything: true }
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Purged all cache for zone ${zoneId}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Purge cache by prefix (useful for project deployments)
+ */
+export async function purgeCacheByPrefix(
+  prefixes: string[],
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<{ id: string }>(
+      `/zones/${zoneId}/purge_cache`,
+      "POST",
+      { prefixes }
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Purged cache for ${prefixes.length} prefixes`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Purge cache for a deployed project
+ */
+export async function purgeProjectCache(
+  projectSlug: string
+): Promise<{ success: boolean; error?: string }> {
+  const projectUrl = getProjectUrl(projectSlug);
+  return purgeCacheByPrefix([projectUrl]);
+}
+
+// ============ Cloudflare Workers ============
+
+interface WorkerScript {
+  id: string;
+  name: string;
+  created_on: string;
+  modified_on: string;
+}
+
+interface WorkerRoute {
+  id: string;
+  pattern: string;
+  script: string;
+}
+
+/**
+ * Deploy a Worker script
+ */
+export async function deployWorker(
+  scriptName: string,
+  code: string,
+  options?: {
+    bindings?: Array<{
+      type: "plain_text" | "secret_text" | "kv_namespace" | "r2_bucket";
+      name: string;
+      text?: string;
+      namespace_id?: string;
+      bucket_name?: string;
+    }>;
+  }
+): Promise<{ success: boolean; worker?: WorkerScript; error?: string }> {
+  if (!isCloudflareConfigured() || !CLOUDFLARE_ACCOUNT_ID) {
+    return { success: false, error: "Cloudflare Workers not configured" };
+  }
+
+  try {
+    // Create FormData for script upload
+    const formData = new FormData();
+
+    // Add the worker script
+    const scriptBlob = new Blob([code], { type: "application/javascript" });
+    formData.append("script", scriptBlob, "worker.js");
+
+    // Add metadata with bindings
+    const metadata: { main_module: string; bindings?: unknown[] } = {
+      main_module: "worker.js",
+    };
+
+    if (options?.bindings) {
+      metadata.bindings = options.bindings;
+    }
+
+    formData.append(
+      "metadata",
+      new Blob([JSON.stringify(metadata)], { type: "application/json" })
+    );
+
+    // Upload the worker
+    const headers: Record<string, string> = {};
+    if (CLOUDFLARE_API_TOKEN) {
+      headers["Authorization"] = `Bearer ${CLOUDFLARE_API_TOKEN}`;
+    } else if (CLOUDFLARE_EMAIL && CLOUDFLARE_API_KEY) {
+      headers["X-Auth-Email"] = CLOUDFLARE_EMAIL;
+      headers["X-Auth-Key"] = CLOUDFLARE_API_KEY;
+    }
+
+    const response = await fetch(
+      `${CF_API_URL}/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${scriptName}`,
+      {
+        method: "PUT",
+        headers,
+        body: formData,
+      }
+    );
+
+    const data = (await response.json()) as CloudflareResponse<WorkerScript>;
+
+    if (!data.success) {
+      return {
+        success: false,
+        error: data.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Deployed worker: ${scriptName}`);
+    return { success: true, worker: data.result };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Delete a Worker script
+ */
+export async function deleteWorker(
+  scriptName: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!isCloudflareConfigured() || !CLOUDFLARE_ACCOUNT_ID) {
+    return { success: false, error: "Cloudflare Workers not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<null>(
+      `/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${scriptName}`,
+      "DELETE"
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Deleted worker: ${scriptName}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Add a route for a Worker
+ */
+export async function addWorkerRoute(
+  pattern: string,
+  scriptName: string,
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; route?: WorkerRoute; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<WorkerRoute>(
+      `/zones/${zoneId}/workers/routes`,
+      "POST",
+      { pattern, script: scriptName }
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Added worker route: ${pattern} -> ${scriptName}`);
+    return { success: true, route: response.result };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * List Worker routes for a zone
+ */
+export async function listWorkerRoutes(
+  options?: { zoneId?: string }
+): Promise<WorkerRoute[]> {
+  if (!isCloudflareConfigured()) {
+    return [];
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return [];
+  }
+
+  try {
+    const response = await cloudflareRequest<WorkerRoute[]>(
+      `/zones/${zoneId}/workers/routes`,
+      "GET"
+    );
+
+    if (!response.success) {
+      return [];
+    }
+
+    return response.result;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Delete a Worker route
+ */
+export async function deleteWorkerRoute(
+  routeId: string,
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<{ id: string }>(
+      `/zones/${zoneId}/workers/routes/${routeId}`,
+      "DELETE"
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+// ============ WAF / Firewall Rules ============
+
+interface FirewallRule {
+  id: string;
+  paused: boolean;
+  description: string;
+  action: "block" | "challenge" | "js_challenge" | "managed_challenge" | "allow" | "log" | "bypass";
+  priority: number;
+  filter: {
+    id: string;
+    expression: string;
+  };
+}
+
+/**
+ * Create a firewall rule
+ */
+export async function createFirewallRule(
+  rule: {
+    description: string;
+    action: FirewallRule["action"];
+    expression: string;
+    priority?: number;
+    paused?: boolean;
+  },
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; rule?: FirewallRule; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<FirewallRule[]>(
+      `/zones/${zoneId}/firewall/rules`,
+      "POST",
+      [
+        {
+          description: rule.description,
+          action: rule.action,
+          filter: {
+            expression: rule.expression,
+          },
+          priority: rule.priority || 1,
+          paused: rule.paused || false,
+        },
+      ]
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Created firewall rule: ${rule.description}`);
+    return { success: true, rule: response.result[0] };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * List firewall rules for a zone
+ */
+export async function listFirewallRules(
+  options?: { zoneId?: string }
+): Promise<FirewallRule[]> {
+  if (!isCloudflareConfigured()) {
+    return [];
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return [];
+  }
+
+  try {
+    const response = await cloudflareRequest<FirewallRule[]>(
+      `/zones/${zoneId}/firewall/rules`,
+      "GET"
+    );
+
+    if (!response.success) {
+      return [];
+    }
+
+    return response.result;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Delete a firewall rule
+ */
+export async function deleteFirewallRule(
+  ruleId: string,
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<{ id: string }>(
+      `/zones/${zoneId}/firewall/rules/${ruleId}`,
+      "DELETE"
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Deleted firewall rule: ${ruleId}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Create rate limiting rule
+ */
+export async function createRateLimitRule(
+  rule: {
+    description: string;
+    expression: string;
+    requestsPerPeriod: number;
+    period: number; // seconds
+    action: "block" | "challenge" | "managed_challenge" | "log";
+    timeout?: number; // seconds to block
+  },
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<{ id: string }>(
+      `/zones/${zoneId}/rate_limits`,
+      "POST",
+      {
+        description: rule.description,
+        match: {
+          request: {
+            url_pattern: "*",
+          },
+          response: {
+            origin_traffic: true,
+          },
+        },
+        threshold: rule.requestsPerPeriod,
+        period: rule.period,
+        action: {
+          mode: rule.action,
+          timeout: rule.timeout || 60,
+        },
+        disabled: false,
+      }
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Created rate limit rule: ${rule.description}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Enable "Under Attack" mode for DDoS protection
+ */
+export async function setSecurityLevel(
+  level: "off" | "essentially_off" | "low" | "medium" | "high" | "under_attack",
+  options?: { zoneId?: string }
+): Promise<{ success: boolean; error?: string }> {
+  if (!isCloudflareConfigured()) {
+    return { success: false, error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { success: false, error: "Zone ID not configured" };
+  }
+
+  try {
+    const response = await cloudflareRequest<{ value: string }>(
+      `/zones/${zoneId}/settings/security_level`,
+      "PATCH",
+      { value: level }
+    );
+
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.errors.map((e) => e.message).join(", "),
+      };
+    }
+
+    console.log(`[Cloudflare] Set security level to: ${level}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Get current security settings
+ */
+export async function getSecuritySettings(
+  options?: { zoneId?: string }
+): Promise<{
+  securityLevel?: string;
+  wafEnabled?: boolean;
+  browserIntegrityCheck?: boolean;
+  challengeTTL?: number;
+  error?: string;
+}> {
+  if (!isCloudflareConfigured()) {
+    return { error: "Cloudflare not configured" };
+  }
+
+  const zoneId = options?.zoneId || CLOUDFLARE_ZONE_ID;
+  if (!zoneId) {
+    return { error: "Zone ID not configured" };
+  }
+
+  try {
+    const [securityLevel, waf, browserCheck, challengeTTL] = await Promise.all([
+      cloudflareRequest<{ value: string }>(`/zones/${zoneId}/settings/security_level`, "GET"),
+      cloudflareRequest<{ value: string }>(`/zones/${zoneId}/settings/waf`, "GET"),
+      cloudflareRequest<{ value: string }>(`/zones/${zoneId}/settings/browser_check`, "GET"),
+      cloudflareRequest<{ value: number }>(`/zones/${zoneId}/settings/challenge_ttl`, "GET"),
+    ]);
+
+    return {
+      securityLevel: securityLevel.result?.value,
+      wafEnabled: waf.result?.value === "on",
+      browserIntegrityCheck: browserCheck.result?.value === "on",
+      challengeTTL: challengeTTL.result?.value,
+    };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}

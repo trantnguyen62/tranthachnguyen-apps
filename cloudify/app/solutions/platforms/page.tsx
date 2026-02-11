@@ -55,8 +55,8 @@ export default function PlatformsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -66,17 +66,17 @@ export default function PlatformsPage() {
                 <Layers className="h-4 w-4" />
                 <span className="text-sm font-medium">Platforms</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Build platforms
                 <br />
                 <span className="text-cyan-600 dark:text-cyan-400">your customers love</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Create multi-tenant SaaS products, developer platforms, and white-label
                 solutions that scale with your business.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     Start Building
                     <ArrowRight className="h-4 w-4" />
@@ -92,17 +92,17 @@ export default function PlatformsPage() {
 
         {/* Features */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Platform infrastructure at scale
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Everything you need to build and operate a platform business.
               </p>
             </motion.div>
@@ -115,15 +115,15 @@ export default function PlatformsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
                   <div className="w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -133,18 +133,18 @@ export default function PlatformsPage() {
         </section>
 
         {/* Multi-tenancy */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Built for multi-tenancy
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Serve thousands of customers from a single codebase with complete
                   isolation and customization.
                 </p>
@@ -156,7 +156,7 @@ export default function PlatformsPage() {
                     "Usage-based billing integration",
                     "White-label branding options",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                    <li key={item} className="flex items-center gap-3 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </li>
@@ -203,14 +203,14 @@ const data = await db.items.findMany({
 
         {/* Use Cases */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Build any type of platform
               </h2>
             </motion.div>
@@ -223,10 +223,10 @@ const data = await db.items.findMany({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-4 rounded-xl bg-card border border-border"
                 >
-                  <h4 className="font-semibold text-gray-900 dark:text-white">{useCase.name}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{useCase.desc}</p>
+                  <h4 className="font-semibold text-foreground">{useCase.name}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">{useCase.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -234,8 +234,8 @@ const data = await db.items.findMany({
         </section>
 
         {/* Enterprise */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -243,10 +243,10 @@ const data = await db.items.findMany({
               className="text-center"
             >
               <Building2 className="h-12 w-12 text-cyan-600 dark:text-cyan-400 mx-auto mb-6" />
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
                 Enterprise-ready from day one
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12">
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-12">
                 Meet the security and compliance requirements of your largest customers.
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
@@ -258,7 +258,7 @@ const data = await db.items.findMany({
                 ].map((item) => (
                   <div key={item.label} className="text-center">
                     <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    <span className="text-sm font-medium text-foreground">
                       {item.label}
                     </span>
                   </div>
@@ -270,7 +270,7 @@ const data = await db.items.findMany({
 
         {/* CTA */}
         <section className="py-20 bg-cyan-600 dark:bg-cyan-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Launch your platform today
             </h2>

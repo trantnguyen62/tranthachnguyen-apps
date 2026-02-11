@@ -29,7 +29,7 @@ export default function UsagePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -38,10 +38,10 @@ export default function UsagePage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           Failed to load usage data
         </h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button variant="outline" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
@@ -74,14 +74,14 @@ export default function UsagePage() {
   ];
 
   return (
-    <div className="space-y-8 p-8">
+    <div className="space-y-6 p-8">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             Usage & Billing
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-muted-foreground">
             Monitor your resource usage and manage billing
           </p>
         </div>
@@ -94,7 +94,7 @@ export default function UsagePage() {
             <Download className="h-4 w-4" />
             Export Report
           </Button>
-          <Button variant="primary" asChild>
+          <Button variant="default" asChild>
             <a href="/settings?tab=billing">
               <CreditCard className="h-4 w-4" />
               Manage Billing
@@ -104,20 +104,20 @@ export default function UsagePage() {
       </div>
 
       {/* Current Plan */}
-      <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl text-white">
+      <div className="p-6 bg-foreground rounded-lg text-background">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <p className="text-blue-100 text-sm">Current Plan</p>
+            <p className="text-background/70 text-sm">Current Plan</p>
             <h2 className="text-3xl font-bold mt-1">Pro Plan</h2>
-            <p className="text-blue-100 mt-2">
+            <p className="text-background/70 mt-2">
               $20/month · Billing period: {data?.period || "Current month"}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="secondary" className="bg-white/20 hover:bg-white/30 border-0 text-white">
+            <Button variant="secondary" className="bg-background/20 hover:bg-background/30 border-0 text-background">
               View Plan Details
             </Button>
-            <Button className="bg-white text-blue-600 hover:bg-blue-50">
+            <Button className="bg-background text-foreground hover:bg-background/90">
               Upgrade Plan
             </Button>
           </div>
@@ -137,11 +137,11 @@ export default function UsagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="p-5 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+              className="p-5 bg-card rounded-xl border border-border"
             >
               <div className="flex items-center justify-between mb-3">
-                <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
-                  <metric.icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <div className="p-2 rounded-lg bg-secondary">
+                  <metric.icon className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div
                   className={cn(
@@ -162,14 +162,14 @@ export default function UsagePage() {
                 </div>
               </div>
 
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              <h3 className="text-sm font-medium text-muted-foreground">
                 {metric.name}
               </h3>
 
               <div className="mt-2">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-foreground">
                   {formatUsage(metric.key)}
-                  <span className="text-sm font-normal text-gray-500 ml-1">
+                  <span className="text-sm font-normal text-muted-foreground ml-1">
                     / {formatLimit(metric.key)}
                   </span>
                 </p>
@@ -199,14 +199,14 @@ export default function UsagePage() {
         </TabsList>
 
         <TabsContent value="breakdown" className="mt-6">
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+          <div className="bg-card rounded-xl border border-border">
+            <div className="p-6 border-b border-border">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900 dark:text-white">
+                <h3 className="font-semibold text-foreground">
                   Usage by Project
                 </h3>
                 <select
-                  className="text-sm border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 bg-transparent"
+                  className="text-sm border border-border rounded-lg px-3 py-1.5 bg-transparent"
                   value={period}
                   onChange={(e) => setPeriod(e.target.value)}
                 >
@@ -221,24 +221,24 @@ export default function UsagePage() {
                 data.records.slice(0, 10).map((record) => (
                   <div
                     key={record.id}
-                    className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                    className="p-6 hover:bg-secondary/50 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white font-bold">
+                        <div className="h-10 w-10 rounded-lg bg-foreground flex items-center justify-center text-white font-bold">
                           {(record.project?.name || "U")[0].toUpperCase()}
                         </div>
                         <div>
-                          <h4 className="font-medium text-gray-900 dark:text-white">
+                          <h4 className="font-medium text-foreground">
                             {record.project?.name || "Unknown Project"}
                           </h4>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-muted-foreground">
                             {record.type.replace("_", " ")} - {record.amount} {record.unit}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {new Date(record.recordedAt).toLocaleDateString()}
                         </p>
                       </div>
@@ -246,7 +246,7 @@ export default function UsagePage() {
                   </div>
                 ))
               ) : (
-                <div className="p-12 text-center text-gray-500">
+                <div className="p-12 text-center text-muted-foreground">
                   No usage records found for this period.
                 </div>
               )}
@@ -255,25 +255,25 @@ export default function UsagePage() {
         </TabsContent>
 
         <TabsContent value="invoices" className="mt-6">
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="font-semibold text-gray-900 dark:text-white">
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <div className="p-6 border-b border-border">
+              <h3 className="font-semibold text-foreground">
                 Billing History
               </h3>
             </div>
 
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-muted-foreground">
               No invoices yet. Your first invoice will appear here after the billing period ends.
             </div>
           </div>
         </TabsContent>
 
         <TabsContent value="spending" className="mt-6">
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h3 className="font-semibold text-foreground mb-4">
               Spending Alerts
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
+            <p className="text-muted-foreground mb-6">
               Get notified when your usage approaches certain thresholds.
             </p>
 
@@ -289,10 +289,10 @@ export default function UsagePage() {
                   className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
                 >
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className="font-medium text-foreground">
                       {alert.threshold}% usage alert
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       Notify when usage reaches {alert.threshold}% of limit
                     </p>
                   </div>
@@ -302,13 +302,13 @@ export default function UsagePage() {
                       defaultChecked={alert.enabled}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-muted-foreground/30 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-muted-foreground/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-background after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-background after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-foreground"></div>
                   </label>
                 </div>
               ))}
             </div>
 
-            <Button variant="primary" className="mt-6">
+            <Button variant="default" className="mt-6">
               Save Alert Settings
             </Button>
           </div>

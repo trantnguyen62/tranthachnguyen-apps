@@ -6,6 +6,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { redisHealthCheck } from "@/lib/storage/redis-client";
+import { promises as fs } from "fs";
+import { exec } from "child_process";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 interface HealthStatus {
   status: "healthy" | "degraded" | "unhealthy";
@@ -15,6 +20,7 @@ interface HealthStatus {
   checks: {
     database: CheckResult;
     redis: CheckResult;
+    buildPipeline: CheckResult;
   };
 }
 
@@ -37,6 +43,7 @@ export async function GET() {
   const checks: HealthStatus["checks"] = {
     database: { status: "fail" },
     redis: { status: "fail" },
+    buildPipeline: { status: "fail" },
   };
 
   // Check database
@@ -48,9 +55,10 @@ export async function GET() {
       latency: Date.now() - dbStart,
     };
   } catch (error) {
+    console.error("[Health] Database check failed:", error);
     checks.database = {
       status: "fail",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: "Database check failed",
     };
   }
 
@@ -63,9 +71,62 @@ export async function GET() {
       latency: Date.now() - redisStart,
     };
   } catch (error) {
+    console.error("[Health] Redis check failed:", error);
     checks.redis = {
       status: "fail",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: "Redis check failed",
+    };
+  }
+
+  // Check Build Pipeline
+  const buildStart = Date.now();
+  try {
+    let pipelineErrors = 0;
+
+    // Check /data/builds is writable
+    const buildsDir = process.env.BUILDS_DIR || "/data/builds";
+    const reposDir = process.env.REPOS_DIR || "/data/repos";
+
+    try {
+      await fs.access(buildsDir, fs.constants.W_OK);
+    } catch {
+      pipelineErrors++;
+    }
+
+    try {
+      await fs.access(reposDir, fs.constants.W_OK);
+    } catch {
+      pipelineErrors++;
+    }
+
+    // Check git is available
+    try {
+      await execAsync("git --version");
+    } catch {
+      pipelineErrors++;
+    }
+
+    // Check node is available
+    try {
+      const { stdout } = await execAsync("node --version");
+      const nodeVersion = stdout.trim();
+      if (!nodeVersion.startsWith("v")) {
+        pipelineErrors++;
+      }
+    } catch {
+      pipelineErrors++;
+    }
+
+    checks.buildPipeline = {
+      status: pipelineErrors === 0 ? "pass" : "fail",
+      latency: Date.now() - buildStart,
+      ...(pipelineErrors > 0 && { error: "Build pipeline check failed" }),
+    };
+  } catch (error) {
+    console.error("[Health] Build pipeline check failed:", error);
+    checks.buildPipeline = {
+      status: "fail",
+      error: "Build pipeline check failed",
     };
   }
 

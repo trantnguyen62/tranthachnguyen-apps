@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useDeploymentStream } from "@/hooks/use-deployment-stream";
 
 interface LogEntry {
   timestamp: string;
@@ -52,30 +53,95 @@ const mockBuildLogs: LogEntry[] = [
   { timestamp: "00:00:30", level: "success", message: "Ready! Deployment complete", step: "Complete" },
 ];
 
+function mapStreamLevel(type: string): LogEntry["level"] {
+  switch (type) {
+    case "command": return "info";
+    case "warning": return "warn";
+    default: return type as LogEntry["level"];
+  }
+}
+
 export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [autoScroll, setAutoScroll] = useState(true);
+  const [usedFallback, setUsedFallback] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
-  // Simulate streaming logs
+  // Try real-time stream via useDeploymentStream
+  const stream = useDeploymentStream(deploymentId, {
+    onLog: (log) => {
+      setLogs((prev) => [
+        ...prev,
+        {
+          timestamp: log.timestamp,
+          level: mapStreamLevel(log.type),
+          message: log.message,
+        },
+      ]);
+    },
+    onError: () => {
+      // Stream failed — fall back to REST API or mock
+      if (!usedFallback) {
+        setUsedFallback(true);
+      }
+    },
+  });
+
+  // Fallback: fetch logs from REST API, or use mock simulation
   useEffect(() => {
-    if (status === "building") {
-      let currentIndex = 0;
-      const interval = setInterval(() => {
-        if (currentIndex < mockBuildLogs.length) {
-          setLogs((prev) => [...prev, mockBuildLogs[currentIndex]]);
-          currentIndex++;
-        } else {
-          clearInterval(interval);
-        }
-      }, 500);
-      return () => clearInterval(interval);
-    } else {
-      setLogs(mockBuildLogs);
+    // If the stream is connected and providing logs, skip fallback
+    if (stream.isConnected) return;
+
+    // If we haven't detected a stream failure yet, give it a moment
+    if (!usedFallback && logs.length === 0) {
+      const timeout = setTimeout(() => setUsedFallback(true), 2000);
+      return () => clearTimeout(timeout);
     }
-  }, [status]);
+
+    if (!usedFallback) return;
+
+    // Try REST API first
+    async function fetchLogs() {
+      try {
+        const res = await fetch(`/api/deployments/${deploymentId}/logs`);
+        if (res.ok) {
+          const data = await res.json();
+          const fetched: LogEntry[] = (data.logs || data).map((l: { timestamp?: string; level?: string; type?: string; message: string; step?: string }) => ({
+            timestamp: l.timestamp || "",
+            level: mapStreamLevel(l.level || l.type || "info"),
+            message: l.message,
+            step: l.step,
+          }));
+          if (fetched.length > 0) {
+            setLogs(fetched);
+            return;
+          }
+        }
+      } catch {
+        // REST failed too
+      }
+
+      // Final fallback: mock simulation
+      if (status === "building") {
+        let currentIndex = 0;
+        const interval = setInterval(() => {
+          if (currentIndex < mockBuildLogs.length) {
+            setLogs((prev) => [...prev, mockBuildLogs[currentIndex]]);
+            currentIndex++;
+          } else {
+            clearInterval(interval);
+          }
+        }, 500);
+        return () => clearInterval(interval);
+      } else {
+        setLogs(mockBuildLogs);
+      }
+    }
+
+    fetchLogs();
+  }, [deploymentId, status, stream.isConnected, usedFallback, logs.length]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -89,7 +155,7 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
   );
 
   const levelColors = {
-    info: "text-gray-400",
+    info: "text-muted-foreground",
     warn: "text-yellow-500",
     error: "text-red-500",
     success: "text-green-500",
@@ -111,12 +177,12 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
+    <div className="rounded-lg border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between p-4 bg-background border-b border-border">
         <div className="flex items-center gap-3">
-          <Terminal className="h-5 w-5 text-gray-500" />
-          <span className="font-medium text-gray-900 dark:text-white">Build Logs</span>
+          <Terminal className="h-5 w-5 text-muted-foreground" />
+          <span className="font-medium text-foreground">Build Logs</span>
           <Badge
             variant={
               status === "ready" ? "success" : status === "error" ? "error" : "warning"
@@ -159,14 +225,14 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
             className="overflow-hidden"
           >
             {/* Search */}
-            <div className="p-2 border-b border-gray-200 dark:border-gray-800">
+            <div className="p-2 border-b border-border">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search logs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-8 text-sm bg-transparent border-gray-200 dark:border-gray-700"
+                  className="pl-9 h-8 text-sm bg-transparent border-border"
                 />
               </div>
             </div>
@@ -190,7 +256,7 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between p-2 bg-gray-900 border-t border-gray-800 text-xs text-gray-500">
+            <div className="flex items-center justify-between p-2 bg-gray-900 border-t border-gray-800 text-xs text-muted-foreground">
               <span>{logs.length} lines</span>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input

@@ -55,8 +55,8 @@ export default function AIPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -66,17 +66,17 @@ export default function AIPage() {
                 <Sparkles className="h-4 w-4" />
                 <span className="text-sm font-medium">AI SDK</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Build AI apps,
                 <br />
                 <span className="text-pink-600 dark:text-pink-400">faster</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 The AI toolkit for TypeScript. Build conversational AI, content generation,
                 and intelligent features with any model provider.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     Start Building
                     <ArrowRight className="h-4 w-4" />
@@ -92,17 +92,17 @@ export default function AIPage() {
 
         {/* Code Example */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Ship AI features in minutes
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Build streaming chat interfaces, content generators, and AI-powered features
                   with just a few lines of code.
                 </p>
@@ -113,7 +113,7 @@ export default function AIPage() {
                     "Function calling and tool use",
                     "Built-in rate limiting and caching",
                   ].map((item) => (
-                    <div key={item} className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                    <div key={item} className="flex items-center gap-3 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </div>
@@ -165,18 +165,18 @@ function Chat() {
         </section>
 
         {/* Features Grid */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Everything you need for AI development
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 A complete toolkit for building AI-powered applications.
               </p>
             </motion.div>
@@ -189,15 +189,15 @@ function Chat() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
                   <div className="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-pink-600 dark:text-pink-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -208,17 +208,17 @@ function Chat() {
 
         {/* Providers */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Works with every major AI provider
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Use your favorite models. Switch providers without changing your code.
               </p>
             </motion.div>
@@ -231,16 +231,16 @@ function Chat() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
+                  className="p-6 rounded-lg bg-background border border-border"
                 >
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="font-semibold text-foreground mb-2">
                     {provider.name}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {provider.models.map((model) => (
                       <span
                         key={model}
-                        className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs"
+                        className="px-2 py-1 rounded bg-secondary dark:bg-card text-muted-foreground text-xs"
                       >
                         {model}
                       </span>
@@ -253,15 +253,15 @@ function Chat() {
         </section>
 
         {/* Use Cases */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Build any AI experience
               </h2>
             </motion.div>
@@ -290,15 +290,15 @@ function Chat() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-center"
+                  className="p-6 rounded-lg bg-card border border-border text-center"
                 >
                   <div className="w-12 h-12 mx-auto rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
                     <useCase.icon className="h-6 w-6 text-pink-600 dark:text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     {useCase.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {useCase.desc}
                   </p>
                 </motion.div>
@@ -309,7 +309,7 @@ function Chat() {
 
         {/* CTA */}
         <section className="py-20 bg-pink-600 dark:bg-pink-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Start building with AI today
             </h2>

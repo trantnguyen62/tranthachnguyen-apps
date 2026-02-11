@@ -40,26 +40,26 @@ export default function RedirectsDocsPage() {
       <h2>Redirect Types</h2>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
-        <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+        <div className="p-4 rounded-lg bg-background border border-border">
           <div className="flex items-center gap-2 mb-2">
-            <code className="text-blue-600 dark:text-blue-400 font-semibold">permanent: true</code>
+            <code className="text-foreground font-semibold">permanent: true</code>
             <span className="text-xs px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
               308
             </span>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Permanent redirect. Browsers and search engines cache this redirect.
             Use for content that has permanently moved.
           </p>
         </div>
-        <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+        <div className="p-4 rounded-lg bg-background border border-border">
           <div className="flex items-center gap-2 mb-2">
-            <code className="text-blue-600 dark:text-blue-400 font-semibold">permanent: false</code>
+            <code className="text-foreground font-semibold">permanent: false</code>
             <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400">
               307
             </span>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Temporary redirect. Not cached by browsers.
             Use for A/B testing or temporary redirects.
           </p>
@@ -300,11 +300,11 @@ export default function RedirectsDocsPage() {
         <li>Dynamic routes</li>
       </ol>
 
-      <div className="not-prose p-6 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 my-8">
-        <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">
+      <div className="not-prose p-6 rounded-xl border border-border bg-secondary my-8">
+        <h3 className="font-semibold text-foreground text-lg mb-2">
           Performance Tip
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-muted-foreground">
           Redirects are processed at the edge, ensuring minimal latency. However,
           too many redirects can impact performance. Consider consolidating redirect
           rules when possible.
@@ -323,7 +323,7 @@ x-cloudify-redirect: true`}</code>
       </pre>
 
       <div className="not-prose mt-12">
-        <Button variant="primary" asChild>
+        <Button variant="default" asChild>
           <Link href="/docs/rewrites">
             Learn About Rewrites
             <ArrowRight className="h-4 w-4" />

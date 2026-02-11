@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError, checkProjectAccess, meetsMinimumRole } from "@/lib/auth/api-auth";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -17,18 +17,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
 
-    const project = await prisma.project.findUnique({
-      where: { id },
-      select: { userId: true },
-    });
-
-    if (!project) {
+    // Check ownership or team membership (minimum role: admin for env secrets)
+    const access = await checkProjectAccess(user.id, id);
+    if (!access.hasAccess) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
-
-    // Verify ownership - prevent IDOR
-    if (project.userId !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!access.isOwner && (!access.teamRole || !meetsMinimumRole(access.teamRole, "admin"))) {
+      return NextResponse.json(
+        { error: "Insufficient role - viewing env vars requires admin role or higher" },
+        { status: 403 }
+      );
     }
 
     const envVariables = await prisma.envVariable.findMany({
@@ -64,18 +62,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
 
-    const project = await prisma.project.findUnique({
-      where: { id },
-      select: { userId: true },
-    });
-
-    if (!project) {
+    // Check ownership or team membership (minimum role: admin for env secrets)
+    const writeAccess = await checkProjectAccess(user.id, id);
+    if (!writeAccess.hasAccess) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
-
-    // Verify ownership - prevent IDOR
-    if (project.userId !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (!writeAccess.isOwner && (!writeAccess.teamRole || !meetsMinimumRole(writeAccess.teamRole, "admin"))) {
+      return NextResponse.json(
+        { error: "Insufficient role - editing env vars requires admin role or higher" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();
@@ -99,6 +95,65 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     console.error("Failed to create environment variable:", error);
     return NextResponse.json(
       { error: "Failed to create environment variable" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/projects/[id]/env - Delete an environment variable
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  try {
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) {
+      return authResult;
+    }
+    const { user } = authResult;
+
+    const { id } = await params;
+
+    // Check ownership or team membership (minimum role: admin for env secrets)
+    const deleteAccess = await checkProjectAccess(user.id, id);
+    if (!deleteAccess.hasAccess) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+    if (!deleteAccess.isOwner && (!deleteAccess.teamRole || !meetsMinimumRole(deleteAccess.teamRole, "admin"))) {
+      return NextResponse.json(
+        { error: "Insufficient role - deleting env vars requires admin role or higher" },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+    const { envId, key, target } = body;
+
+    // Delete by ID if provided, otherwise by key+target
+    if (envId) {
+      const envVar = await prisma.envVariable.findFirst({
+        where: { id: envId, projectId: id },
+      });
+      if (!envVar) {
+        return NextResponse.json({ error: "Environment variable not found" }, { status: 404 });
+      }
+      await prisma.envVariable.delete({ where: { id: envId } });
+    } else if (key && target) {
+      const deleted = await prisma.envVariable.deleteMany({
+        where: { projectId: id, key, target },
+      });
+      if (deleted.count === 0) {
+        return NextResponse.json({ error: "Environment variable not found" }, { status: 404 });
+      }
+    } else {
+      return NextResponse.json(
+        { error: "Either envId or both key and target are required" },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete environment variable:", error);
+    return NextResponse.json(
+      { error: "Failed to delete environment variable" },
       { status: 500 }
     );
   }

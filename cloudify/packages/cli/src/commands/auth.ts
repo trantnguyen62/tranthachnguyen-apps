@@ -7,7 +7,7 @@
 import chalk from "chalk";
 import ora from "ora";
 import inquirer from "inquirer";
-import { setToken, clearToken, setUser, getUser, apiRequest, isLoggedIn } from "../config";
+import { setToken, clearToken, setUser, getUser, apiRequest, isLoggedIn } from "../config.js";
 
 interface LoginResponse {
   token: string;

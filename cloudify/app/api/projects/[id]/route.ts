@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError, checkProjectAccess, meetsMinimumRole } from "@/lib/auth/api-auth";
 import { deleteSite } from "@/lib/build/site-deployer";
 import { sanitizeSlug } from "@/lib/security/validation";
 
@@ -19,11 +19,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
 
-    const project = await prisma.project.findFirst({
-      where: {
-        id,
-        userId: user.id,
-      },
+    // Check ownership or team membership (any team member can view)
+    const access = await checkProjectAccess(user.id, id);
+    if (!access.hasAccess) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    const project = await prisma.project.findUnique({
+      where: { id },
       include: {
         deployments: {
           take: 10,
@@ -78,13 +81,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const body = await request.json();
 
-    // Verify ownership
-    const existing = await prisma.project.findFirst({
-      where: { id, userId: user.id },
-    });
-
-    if (!existing) {
+    // Check ownership or team membership (minimum role: admin to update settings)
+    const patchAccess = await checkProjectAccess(user.id, id);
+    if (!patchAccess.hasAccess) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+    if (!patchAccess.isOwner && (!patchAccess.teamRole || !meetsMinimumRole(patchAccess.teamRole, "admin"))) {
+      return NextResponse.json(
+        { error: "Insufficient role - updating project requires admin role or higher" },
+        { status: 403 }
+      );
     }
 
     const { name, repoUrl, repoBranch, framework, buildCmd, outputDir, installCmd, rootDir, nodeVersion } = body;
@@ -146,9 +152,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
 
-    // Verify ownership and get project details
-    const existing = await prisma.project.findFirst({
-      where: { id, userId: user.id },
+    // Only project owner can delete (not team members)
+    const deleteAccess = await checkProjectAccess(user.id, id);
+    if (!deleteAccess.hasAccess || !deleteAccess.isOwner) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    const existing = await prisma.project.findUnique({
+      where: { id },
     });
 
     if (!existing) {

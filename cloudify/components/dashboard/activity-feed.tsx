@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -94,8 +95,8 @@ const mockActivities: Activity[] = [
 const typeConfig = {
   deployment: {
     icon: GitBranch,
-    color: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-100 dark:bg-blue-900/30",
+    color: "text-foreground",
+    bg: "bg-secondary",
   },
   domain: {
     icon: Globe,
@@ -109,8 +110,8 @@ const typeConfig = {
   },
   settings: {
     icon: Settings,
-    color: "text-gray-600 dark:text-gray-400",
-    bg: "bg-gray-100 dark:bg-gray-800",
+    color: "text-muted-foreground",
+    bg: "bg-secondary",
   },
   security: {
     icon: Shield,
@@ -138,22 +139,47 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({
-  activities = mockActivities,
+  activities: activitiesProp,
   maxItems = 10,
   showHeader = true,
 }: ActivityFeedProps) {
+  const [fetchedActivities, setFetchedActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(!activitiesProp);
+
+  useEffect(() => {
+    if (activitiesProp) return;
+
+    async function fetchActivities() {
+      try {
+        const res = await fetch("/api/activity");
+        if (res.ok) {
+          const data = await res.json();
+          setFetchedActivities(data.activities || data);
+        } else {
+          setFetchedActivities([]);
+        }
+      } catch {
+        setFetchedActivities([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchActivities();
+  }, [activitiesProp]);
+
+  const activities = activitiesProp || fetchedActivities;
   const displayedActivities = activities.slice(0, maxItems);
 
   return (
     <div className="space-y-4">
       {showHeader && (
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 dark:text-white">
+          <h3 className="font-semibold text-foreground">
             Recent Activity
           </h3>
           <Link
             href="/activity"
-            className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+            className="text-sm text-[#0070f3] hover:text-[#0070f3]"
           >
             View all
           </Link>
@@ -161,7 +187,21 @@ export function ActivityFeed({
       )}
 
       <div className="space-y-4">
-        {displayedActivities.map((activity, index) => {
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex items-start gap-4 animate-pulse">
+              <div className="p-2 rounded-lg bg-secondary h-8 w-8 shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-secondary rounded w-1/3" />
+                <div className="h-3 bg-secondary rounded w-2/3" />
+                <div className="h-3 bg-secondary rounded w-1/4" />
+              </div>
+            </div>
+          ))
+        ) : displayedActivities.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+        ) : null}
+        {!isLoading && displayedActivities.map((activity, index) => {
           const config = typeConfig[activity.type];
           const TypeIcon = config.icon;
           const StatusIcon = activity.status
@@ -184,7 +224,7 @@ export function ActivityFeed({
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <span className="font-medium text-foreground">
                     {activity.action}
                   </span>
                   {StatusIcon && (
@@ -199,12 +239,12 @@ export function ActivityFeed({
                 {activity.link ? (
                   <Link
                     href={activity.link}
-                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                    className="text-sm text-muted-foreground hover:text-[#0070f3] dark:hover:text-[#0070f3]"
                   >
                     {activity.description}
                   </Link>
                 ) : (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     {activity.description}
                   </p>
                 )}
@@ -215,7 +255,7 @@ export function ActivityFeed({
                       {activity.user.initials}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-muted-foreground">
                     {activity.user.name} · {activity.timestamp}
                   </span>
                 </div>

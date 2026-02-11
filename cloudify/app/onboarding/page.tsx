@@ -77,19 +77,16 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
       {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-[20rem] left-1/2 -translate-x-1/2">
-          <div className="h-[40rem] w-[40rem] rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-3xl" />
-        </div>
       </div>
 
       <div className="relative mx-auto max-w-2xl px-4 py-16">
         {/* Logo */}
         <div className="text-center mb-12">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 shadow-lg shadow-blue-500/25">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-foreground ">
               <Cloud className="h-7 w-7 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">
+            <span className="text-2xl font-bold text-foreground">
               Cloudify
             </span>
           </Link>
@@ -103,9 +100,9 @@ export default function OnboardingPage() {
               className={cn(
                 "h-2 rounded-full transition-all duration-300",
                 index === currentStep
-                  ? "w-8 bg-blue-600"
+                  ? "w-8 bg-foreground"
                   : index < currentStep
-                  ? "w-2 bg-blue-600"
+                  ? "w-2 bg-foreground"
                   : "w-2 bg-gray-300 dark:bg-gray-700"
               )}
             />
@@ -121,18 +118,18 @@ export default function OnboardingPage() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <Card className="border-gray-200 dark:border-gray-800 shadow-xl">
+            <Card className="border-border shadow-xl">
               <CardContent className="p-8">
                 {/* Step 0: Welcome */}
                 {currentStep === 0 && (
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-100 dark:bg-blue-900/30 mb-6">
-                      <Sparkles className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-secondary mb-6">
+                      <Sparkles className="h-10 w-10 text-foreground" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 className="text-2xl font-bold text-foreground mb-2">
                       {steps[currentStep].title}
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8">
+                    <p className="text-muted-foreground mb-8">
                       {steps[currentStep].description}
                     </p>
                     <div className="space-y-4 text-left">
@@ -141,7 +138,7 @@ export default function OnboardingPage() {
                           <Zap className="h-5 w-5 text-green-600 dark:text-green-400" />
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-900 dark:text-white">
+                          <h3 className="font-medium text-foreground">
                             Deploy in seconds
                           </h3>
                           <p className="text-sm text-gray-500">
@@ -154,7 +151,7 @@ export default function OnboardingPage() {
                           <Globe className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-900 dark:text-white">
+                          <h3 className="font-medium text-foreground">
                             Global edge network
                           </h3>
                           <p className="text-sm text-gray-500">
@@ -163,11 +160,11 @@ export default function OnboardingPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                          <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
+                          <Users className="h-5 w-5 text-foreground" />
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-900 dark:text-white">
+                          <h3 className="font-medium text-foreground">
                             Collaborate with your team
                           </h3>
                           <p className="text-sm text-gray-500">
@@ -177,7 +174,7 @@ export default function OnboardingPage() {
                       </div>
                     </div>
                     <Button
-                      variant="primary"
+                      variant="default"
                       size="lg"
                       className="mt-8 w-full"
                       onClick={nextStep}
@@ -191,10 +188,10 @@ export default function OnboardingPage() {
                 {/* Step 1: Connect Git */}
                 {currentStep === 1 && (
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                    <h2 className="text-2xl font-bold text-foreground mb-2 text-center">
                       {steps[currentStep].title}
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8 text-center">
+                    <p className="text-muted-foreground mb-8 text-center">
                       {steps[currentStep].description}
                     </p>
                     <div className="space-y-3">
@@ -206,7 +203,7 @@ export default function OnboardingPage() {
                             "w-full flex items-center justify-between p-4 rounded-lg border transition-colors",
                             connectedProvider === provider.name
                               ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                              : "border-gray-200 dark:border-gray-800 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                              : "border-border hover:border-foreground/20 hover:bg-secondary"
                           )}
                         >
                           <div className="flex items-center gap-3">
@@ -233,10 +230,10 @@ export default function OnboardingPage() {
                 {/* Step 2: Team setup */}
                 {currentStep === 2 && (
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                    <h2 className="text-2xl font-bold text-foreground mb-2 text-center">
                       {steps[currentStep].title}
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8 text-center">
+                    <p className="text-muted-foreground mb-8 text-center">
                       {steps[currentStep].description}
                     </p>
                     <div className="space-y-6">
@@ -270,7 +267,7 @@ export default function OnboardingPage() {
                         Back
                       </Button>
                       <Button
-                        variant="primary"
+                        variant="default"
                         className="flex-1"
                         onClick={nextStep}
                       >
@@ -287,15 +284,15 @@ export default function OnboardingPage() {
                     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
                       <Rocket className="h-10 w-10 text-green-600 dark:text-green-400" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    <h2 className="text-2xl font-bold text-foreground mb-2">
                       {steps[currentStep].title}
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-8">
+                    <p className="text-muted-foreground mb-8">
                       {steps[currentStep].description}
                     </p>
                     <div className="space-y-4">
                       <Button
-                        variant="primary"
+                        variant="default"
                         size="lg"
                         className="w-full"
                         asChild

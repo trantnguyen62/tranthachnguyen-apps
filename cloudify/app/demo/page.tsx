@@ -64,17 +64,17 @@ export default function DemoPage() {
       <main className="flex-1 pt-16">
         {/* Hero */}
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               {/* Left - Content */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
               >
-                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                   See Cloudify in Action
                 </h1>
-                <p className="mt-6 text-xl text-gray-600 dark:text-gray-400">
+                <p className="mt-6 text-xl text-muted-foreground">
                   Get a personalized demo of how Cloudify can help your team deploy
                   faster, scale effortlessly, and build with confidence.
                 </p>
@@ -83,14 +83,14 @@ export default function DemoPage() {
                 <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {benefits.map((benefit) => (
                     <div key={benefit.title} className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                        <benefit.icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                        <benefit.icon className="h-5 w-5 text-foreground" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900 dark:text-white">
+                        <h3 className="font-medium text-foreground">
                           {benefit.title}
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                           {benefit.description}
                         </p>
                       </div>
@@ -109,10 +109,10 @@ export default function DemoPage() {
                     {submitted ? (
                       <div className="text-center py-8">
                         <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                        <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                        <h3 className="text-2xl font-semibold text-foreground mb-2">
                           Demo Request Received!
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <p className="text-muted-foreground">
                           Our team will reach out within 24 hours to schedule your
                           personalized demo.
                         </p>
@@ -120,8 +120,8 @@ export default function DemoPage() {
                     ) : (
                       <>
                         <div className="flex items-center gap-2 mb-6">
-                          <Play className="h-5 w-5 text-blue-600" />
-                          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                          <Play className="h-5 w-5 text-[#0070f3]" />
+                          <h2 className="text-xl font-semibold text-foreground">
                             Request a Demo
                           </h2>
                         </div>
@@ -129,7 +129,7 @@ export default function DemoPage() {
                         <form onSubmit={handleSubmit} className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 First Name *
                               </label>
                               <Input
@@ -142,7 +142,7 @@ export default function DemoPage() {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              <label className="block text-sm font-medium text-foreground mb-1">
                                 Last Name *
                               </label>
                               <Input
@@ -157,7 +157,7 @@ export default function DemoPage() {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label className="block text-sm font-medium text-foreground mb-1">
                               Work Email *
                             </label>
                             <Input
@@ -172,7 +172,7 @@ export default function DemoPage() {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label className="block text-sm font-medium text-foreground mb-1">
                               Company *
                             </label>
                             <Input
@@ -186,7 +186,7 @@ export default function DemoPage() {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label className="block text-sm font-medium text-foreground mb-1">
                               Job Title *
                             </label>
                             <Input
@@ -200,7 +200,7 @@ export default function DemoPage() {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label className="block text-sm font-medium text-foreground mb-1">
                               Team Size *
                             </label>
                             <select
@@ -209,7 +209,7 @@ export default function DemoPage() {
                               onChange={(e) =>
                                 setFormState({ ...formState, teamSize: e.target.value })
                               }
-                              className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-blue-500"
+                              className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground focus:border-blue-500 focus:ring-blue-500"
                             >
                               <option value="">Select team size</option>
                               {teamSizes.map((size) => (
@@ -221,7 +221,7 @@ export default function DemoPage() {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label className="block text-sm font-medium text-foreground mb-1">
                               What would you like to learn about?
                             </label>
                             <textarea
@@ -231,17 +231,17 @@ export default function DemoPage() {
                                 setFormState({ ...formState, useCase: e.target.value })
                               }
                               placeholder="Tell us about your use case..."
-                              className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                              className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500"
                             />
                           </div>
 
-                          <Button type="submit" variant="primary" size="lg" className="w-full">
+                          <Button type="submit" variant="default" size="lg" className="w-full">
                             Request Demo
                           </Button>
 
-                          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                          <p className="text-xs text-muted-foreground text-center">
                             By submitting, you agree to our{" "}
-                            <a href="/privacy" className="text-blue-600 hover:underline">
+                            <a href="/privacy" className="text-[#0070f3] hover:underline">
                               Privacy Policy
                             </a>
                           </p>

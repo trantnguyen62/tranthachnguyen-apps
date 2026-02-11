@@ -137,7 +137,7 @@ const statusConfig = {
 const incidentStatusConfig = {
   investigating: { color: "bg-red-500", label: "Investigating" },
   identified: { color: "bg-yellow-500", label: "Identified" },
-  monitoring: { color: "bg-blue-500", label: "Monitoring" },
+  monitoring: { color: "bg-[#0070f3]", label: "Monitoring" },
   resolved: { color: "bg-green-500", label: "Resolved" },
 };
 
@@ -154,7 +154,7 @@ export default function StatusPage() {
   const OverallIcon = overallConfig.icon;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
+    <div className="min-h-screen flex flex-col bg-card">
       <Header />
 
       <main className="flex-1">
@@ -182,12 +182,12 @@ export default function StatusPage() {
             <div className="flex items-center gap-4">
               <OverallIcon className={cn("h-10 w-10", overallConfig.color)} />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-3xl font-bold text-foreground">
                   {overallStatus === "operational"
                     ? "All Systems Operational"
                     : "System Issues Detected"}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-muted-foreground mt-1">
                   Last updated: {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} UTC
                 </p>
               </div>
@@ -196,7 +196,7 @@ export default function StatusPage() {
 
           {/* Services */}
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-xl font-bold text-foreground mb-6">
               Services
             </h2>
             <div className="space-y-3">
@@ -210,17 +210,17 @@ export default function StatusPage() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+                    className="flex items-center justify-between p-4 bg-card rounded-xl border border-border"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
-                        <service.icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                      <div className="p-2 rounded-lg bg-secondary">
+                        <service.icon className="h-5 w-5 text-muted-foreground" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900 dark:text-white">
+                        <h3 className="font-medium text-foreground">
                           {service.name}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                           {service.description}
                         </p>
                       </div>
@@ -239,10 +239,10 @@ export default function StatusPage() {
 
           {/* Uptime */}
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-xl font-bold text-foreground mb-6">
               90-Day Uptime
             </h2>
-            <div className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+            <div className="p-6 bg-card rounded-xl border border-border">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-3xl font-bold text-green-600 dark:text-green-400">
                   99.99%
@@ -263,7 +263,7 @@ export default function StatusPage() {
                   />
                 ))}
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Each bar represents one day. Green = 100% uptime.
               </p>
             </div>
@@ -271,13 +271,13 @@ export default function StatusPage() {
 
           {/* Recent incidents */}
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-xl font-bold text-foreground mb-6">
               Recent Incidents
             </h2>
             {incidents.length === 0 ? (
-              <div className="p-8 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 text-center">
+              <div className="p-8 bg-card rounded-xl border border-border text-center">
                 <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-3" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <p className="text-muted-foreground">
                   No incidents in the past 30 days
                 </p>
               </div>
@@ -286,7 +286,7 @@ export default function StatusPage() {
                 {incidents.map((incident) => (
                   <div
                     key={incident.id}
-                    className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+                    className="p-6 bg-card rounded-xl border border-border"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div>
@@ -303,7 +303,7 @@ export default function StatusPage() {
                             {incident.severity}
                           </Badge>
                         </div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                        <h3 className="font-semibold text-foreground">
                           {incident.title}
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">
@@ -311,13 +311,13 @@ export default function StatusPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="space-y-3 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                    <div className="space-y-3 border-l-2 border-border pl-4">
                       {incident.updates.map((update, i) => (
                         <div key={i}>
                           <p className="text-xs text-gray-500 mb-1">
                             {update.time}
                           </p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300">
+                          <p className="text-sm text-foreground">
                             {update.message}
                           </p>
                         </div>
@@ -330,14 +330,14 @@ export default function StatusPage() {
           </section>
 
           {/* Subscribe */}
-          <section className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+          <section className="p-6 bg-secondary rounded-xl border border-blue-100 dark:border-blue-800">
             <div className="flex items-start gap-4">
-              <Bell className="h-6 w-6 text-blue-600 dark:text-blue-400 shrink-0" />
+              <Bell className="h-6 w-6 text-foreground shrink-0" />
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                <h3 className="font-semibold text-foreground mb-1">
                   Get Status Updates
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   Subscribe to receive notifications when incidents occur or are resolved.
                 </p>
                 <div className="flex gap-2">
@@ -348,7 +348,7 @@ export default function StatusPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="max-w-xs"
                   />
-                  <Button variant="primary">Subscribe</Button>
+                  <Button variant="default">Subscribe</Button>
                 </div>
               </div>
             </div>

@@ -3,9 +3,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
   Users,
   Eye,
   Globe,
@@ -29,6 +26,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useProjects } from "@/hooks/use-projects";
+import { TrafficChart } from "@/components/dashboard/traffic-chart";
 
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<"24h" | "7d" | "30d">("7d");
@@ -53,7 +51,7 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -62,10 +60,10 @@ export default function AnalyticsPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           Failed to load analytics
         </h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button variant="outline" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
@@ -105,7 +103,7 @@ export default function AnalyticsPage() {
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white"
+            className="text-3xl font-bold text-foreground"
           >
             Analytics
           </motion.h1>
@@ -113,7 +111,7 @@ export default function AnalyticsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-2 text-gray-600 dark:text-gray-400"
+            className="mt-2 text-muted-foreground"
           >
             Monitor your project performance and user engagement.
           </motion.p>
@@ -183,12 +181,12 @@ export default function AnalyticsPage() {
           <Card key={stat.name}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <stat.icon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <stat.icon className="h-8 w-8 text-foreground" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">
+              <div className="text-3xl font-bold text-foreground">
                 {stat.value}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-muted-foreground">
                 {stat.name}
               </div>
             </CardContent>
@@ -207,7 +205,7 @@ export default function AnalyticsPage() {
         {/* Traffic Tab */}
         <TabsContent value="traffic">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Chart placeholder */}
+            {/* Traffic Chart */}
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -216,19 +214,11 @@ export default function AnalyticsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-[300px] flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg">
-                  <div className="text-center">
-                    <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                      {data?.summary?.pageviews
-                        ? `${formatNumber(data.summary.pageviews)} page views`
-                        : "No traffic data available"}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      for the selected period
-                    </p>
-                  </div>
-                </div>
+                <TrafficChart
+                  data={data?.timeseries || []}
+                  height={300}
+                  color="#0070f3"
+                />
               </CardContent>
             </Card>
 
@@ -249,10 +239,10 @@ export default function AnalyticsPage() {
                       return (
                         <div key={page.path}>
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-mono text-sm text-gray-900 dark:text-white truncate max-w-[60%]">
+                            <span className="font-mono text-sm text-foreground truncate max-w-[60%]">
                               {page.path}
                             </span>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <span className="text-sm text-muted-foreground">
                               {formatNumber(page.views)} views
                             </span>
                           </div>
@@ -262,7 +252,7 @@ export default function AnalyticsPage() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     No page data available
                   </div>
                 )}
@@ -286,10 +276,10 @@ export default function AnalyticsPage() {
                       return (
                         <div key={referrer.source}>
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm text-gray-900 dark:text-white">
+                            <span className="text-sm text-foreground">
                               {referrer.source}
                             </span>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <span className="text-sm text-muted-foreground">
                               {formatNumber(referrer.visits)} visits
                             </span>
                           </div>
@@ -299,7 +289,7 @@ export default function AnalyticsPage() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     No referrer data available
                   </div>
                 )}
@@ -310,36 +300,126 @@ export default function AnalyticsPage() {
 
         {/* Performance Tab */}
         <TabsContent value="performance">
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Metrics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {data?.devices && data.devices.length > 0 ? (
-                  data.devices.map((device) => (
+          <div className="space-y-6">
+            {/* Core Web Vitals */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Core Web Vitals</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[
+                    { name: "LCP", label: "Largest Contentful Paint", target: "2.5s", targetMs: 2500 },
+                    { name: "FID", label: "First Input Delay", target: "100ms", targetMs: 100 },
+                    { name: "CLS", label: "Cumulative Layout Shift", target: "0.1", targetMs: 0.1 },
+                    { name: "FCP", label: "First Contentful Paint", target: "1.8s", targetMs: 1800 },
+                    { name: "TTFB", label: "Time to First Byte", target: "800ms", targetMs: 800 },
+                    { name: "INP", label: "Interaction to Next Paint", target: "200ms", targetMs: 200 },
+                  ].map((vital) => (
                     <div
-                      key={device.type}
-                      className="p-4 rounded-lg border border-gray-200 dark:border-gray-800"
+                      key={vital.name}
+                      className="p-4 rounded-lg border border-border"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-gray-900 dark:text-white capitalize">
-                          {device.type}
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-semibold text-foreground">
+                          {vital.name}
                         </span>
-                        <span className="text-gray-500">
-                          {formatNumber(device.count)} users
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-muted-foreground dark:bg-gray-800 dark:text-muted-foreground">
+                          Awaiting data
                         </span>
                       </div>
+                      <div className="text-2xl font-bold text-gray-300 dark:text-gray-600">
+                        --
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {vital.label} (target: {vital.target})
+                      </div>
                     </div>
-                  ))
+                  ))}
+                </div>
+                <div className="mt-4 p-4 bg-secondary rounded-lg border border-border">
+                  <p className="text-sm text-foreground font-medium">
+                    Add the Cloudify analytics script to your project to track Web Vitals
+                  </p>
+                  <code className="block mt-2 text-xs font-mono text-foreground bg-secondary p-2 rounded">
+                    {`<Script src="https://cloudify.tranthachnguyen.com/api/analytics/script/{projectId}" />`}
+                  </code>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Device Breakdown */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Device Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {data?.devices && data.devices.length > 0 ? (
+                  <div className="space-y-3">
+                    {(() => {
+                      const totalDevices = data.devices.reduce((sum, d) => sum + d.count, 0);
+                      return data.devices.map((device) => {
+                        const pct = totalDevices > 0 ? (device.count / totalDevices) * 100 : 0;
+                        return (
+                          <div key={device.type} className="p-4 rounded-lg border border-border">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-semibold text-foreground capitalize">
+                                {device.type}
+                              </span>
+                              <span className="text-muted-foreground">
+                                {formatNumber(device.count)} ({pct.toFixed(1)}%)
+                              </span>
+                            </div>
+                            <Progress value={pct} />
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
                 ) : (
-                  <div className="col-span-2 text-center py-8 text-gray-500">
-                    No device data available
+                  <div className="text-center py-8 text-muted-foreground">
+                    No device data available yet. Data appears when your projects receive traffic.
                   </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Browser Breakdown */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Browser Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {data?.browsers && data.browsers.length > 0 ? (
+                  <div className="space-y-3">
+                    {(() => {
+                      const totalBrowsers = data.browsers.reduce((sum, b) => sum + b.count, 0);
+                      return data.browsers.map((browser) => {
+                        const pct = totalBrowsers > 0 ? (browser.count / totalBrowsers) * 100 : 0;
+                        return (
+                          <div key={browser.browser}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm text-foreground">
+                                {browser.browser}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                {formatNumber(browser.count)} ({pct.toFixed(1)}%)
+                              </span>
+                            </div>
+                            <Progress value={pct} />
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No browser data available
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Geography Tab */}
@@ -360,10 +440,10 @@ export default function AnalyticsPage() {
                     return (
                       <div key={country.country}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-900 dark:text-white">
+                          <span className="text-sm text-foreground">
                             {country.country}
                           </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                          <span className="text-sm text-muted-foreground">
                             {formatNumber(country.visits)} visitors
                           </span>
                         </div>
@@ -373,7 +453,7 @@ export default function AnalyticsPage() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   No geographic data available
                 </div>
               )}

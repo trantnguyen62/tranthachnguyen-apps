@@ -131,17 +131,29 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const team = await prisma.team.findUnique({ where: { id } });
 
-    await prisma.team.delete({ where: { id } });
+    // Explicitly delete dependent records that may not have cascade,
+    // then delete the team in a transaction
+    await prisma.$transaction([
+      prisma.teamInvitation.deleteMany({ where: { teamId: id } }),
+      prisma.teamProject.deleteMany({ where: { teamId: id } }),
+      prisma.teamMember.deleteMany({ where: { teamId: id } }),
+      // Set null on activities referencing this team
+      prisma.activity.updateMany({
+        where: { teamId: id },
+        data: { teamId: null },
+      }),
+      prisma.team.delete({ where: { id } }),
+    ]);
 
-    // Log activity
-    await prisma.activity.create({
+    // Log activity (non-blocking)
+    prisma.activity.create({
       data: {
         userId: session.user.id,
         type: "team",
         action: "deleted",
         description: `Deleted team "${team?.name}"`,
       },
-    });
+    }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (error) {

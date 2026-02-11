@@ -81,7 +81,7 @@ describe("GitHub Webhook Integration", () => {
   beforeAll(async () => {
     // Set environment variable for webhook secret
     process.env.GITHUB_WEBHOOK_SECRET = webhookSecret;
-    process.env.NODE_ENV = "test";
+    (process.env as any).NODE_ENV = "test";
 
     isDatabaseAvailable = await checkDatabaseConnection();
     if (!isDatabaseAvailable) {

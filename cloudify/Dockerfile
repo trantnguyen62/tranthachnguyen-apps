@@ -1,6 +1,8 @@
-# Build stage - Use Debian for better Prisma compatibility
-FROM node:20-slim AS builder
+# Build stage - Use full Debian for better compatibility
+FROM node:20 AS builder
 
+# Run as root to avoid permission issues
+USER root
 WORKDIR /app
 
 # Install build dependencies
@@ -15,11 +17,8 @@ COPY package*.json ./
 # Copy Prisma schema first (needed for prisma generate)
 COPY prisma ./prisma
 
-# Install dependencies
-RUN npm ci --ignore-scripts
-
-# Generate Prisma client for Debian
-RUN npx prisma generate
+# Install dependencies and generate Prisma client
+RUN npm ci
 
 # Copy source files
 COPY . .
@@ -39,12 +38,13 @@ LABEL org.opencontainers.image.source="https://github.com/tranthachnguyen/cloudi
 
 WORKDIR /app
 
-# Install runtime dependencies and security updates
+# Install runtime dependencies, build tools, and security updates
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssl \
     ca-certificates \
     curl \
     dumb-init \
+    git \
     && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*

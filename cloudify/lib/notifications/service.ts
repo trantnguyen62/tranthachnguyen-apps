@@ -389,6 +389,86 @@ export async function sendSecurityAlertNotification(
 }
 
 /**
+ * Send payment failed notification
+ */
+export async function sendPaymentFailedNotification(
+  data: {
+    userId: string;
+    amount?: number;
+    currency?: string;
+    invoiceId?: string;
+    retryDate?: string;
+  }
+): Promise<NotificationSendResult> {
+  const amountStr = data.amount && data.currency
+    ? ` of ${(data.amount / 100).toFixed(2)} ${data.currency.toUpperCase()}`
+    : "";
+
+  return sendNotification({
+    userId: data.userId,
+    type: "payment_failed",
+    title: "Payment failed",
+    message: `Your payment${amountStr} was unsuccessful. Please update your payment method to continue using Cloudify.`,
+    metadata: {
+      amount: data.amount,
+      currency: data.currency,
+      invoiceId: data.invoiceId,
+      retryDate: data.retryDate,
+    },
+  });
+}
+
+/**
+ * Send upcoming invoice notification
+ */
+export async function sendUpcomingInvoiceNotification(
+  data: {
+    userId: string;
+    amount: number;
+    currency: string;
+    dueDate: string;
+    planName?: string;
+  }
+): Promise<NotificationSendResult> {
+  const amountStr = `${(data.amount / 100).toFixed(2)} ${data.currency.toUpperCase()}`;
+
+  return sendNotification({
+    userId: data.userId,
+    type: "invoice_upcoming",
+    title: "Upcoming invoice",
+    message: `Your ${data.planName || "Cloudify"} subscription invoice for ${amountStr} will be charged on ${data.dueDate}.`,
+    metadata: {
+      amount: data.amount,
+      currency: data.currency,
+      dueDate: data.dueDate,
+      planName: data.planName,
+    },
+  });
+}
+
+/**
+ * Send subscription cancelled notification
+ */
+export async function sendSubscriptionCancelledNotification(
+  data: {
+    userId: string;
+    planName: string;
+    endDate: string;
+  }
+): Promise<NotificationSendResult> {
+  return sendNotification({
+    userId: data.userId,
+    type: "subscription_cancelled",
+    title: "Subscription cancelled",
+    message: `Your ${data.planName} subscription has been cancelled. You'll continue to have access until ${data.endDate}.`,
+    metadata: {
+      planName: data.planName,
+      endDate: data.endDate,
+    },
+  });
+}
+
+/**
  * Mark a notification as read
  */
 export async function markNotificationAsRead(notificationId: string): Promise<void> {

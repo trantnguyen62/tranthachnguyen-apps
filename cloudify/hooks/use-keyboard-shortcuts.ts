@@ -98,8 +98,7 @@ export function useNavigationShortcuts() {
       shift: true,
       description: "Show Keyboard Shortcuts",
       action: () => {
-        // This could open a shortcuts modal
-        console.log("Show shortcuts help");
+        // TODO: Open a shortcuts help modal
       },
     },
   ];

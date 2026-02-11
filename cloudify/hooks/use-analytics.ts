@@ -33,9 +33,15 @@ interface BrowserStats {
   count: number;
 }
 
+interface TimeseriesPoint {
+  label: string;
+  value: number;
+}
+
 interface AnalyticsData {
   range: string;
   summary: AnalyticsSummary;
+  timeseries: TimeseriesPoint[];
   topPages: TopPage[];
   referrers: Referrer[];
   devices: DeviceStats[];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bell,
@@ -119,12 +119,32 @@ const statusColors = {
   success: "text-green-500",
   error: "text-red-500",
   warning: "text-yellow-500",
-  info: "text-blue-500",
+  info: "text-[#0070f3]",
 };
 
 export function NotificationCenter() {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    async function fetchNotifications() {
+      try {
+        const res = await fetch("/api/notifications");
+        if (res.ok) {
+          const data = await res.json();
+          setNotifications(data.notifications || data);
+        } else {
+          setNotifications([]);
+        }
+      } catch {
+        setNotifications([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchNotifications();
+  }, []);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -160,8 +180,8 @@ export function NotificationCenter() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-96 p-0">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800">
-          <h3 className="font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <h3 className="font-semibold text-foreground">
             Notifications
           </h3>
           <div className="flex items-center gap-2">
@@ -181,7 +201,7 @@ export function NotificationCenter() {
                 variant="ghost"
                 size="sm"
                 onClick={clearAll}
-                className="text-xs text-gray-500"
+                className="text-xs text-muted-foreground"
               >
                 <Trash2 className="h-3 w-3 mr-1" />
                 Clear
@@ -192,10 +212,17 @@ export function NotificationCenter() {
 
         {/* Notifications list */}
         <div className="max-h-[400px] overflow-y-auto">
-          {notifications.length === 0 ? (
+          {isLoading ? (
             <div className="py-12 text-center">
-              <Bell className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Bell className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3 animate-pulse" />
+              <p className="text-sm text-muted-foreground">
+                Loading notifications...
+              </p>
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="py-12 text-center">
+              <Bell className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">
                 No notifications yet
               </p>
             </div>
@@ -212,15 +239,15 @@ export function NotificationCenter() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     className={cn(
-                      "relative px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors",
-                      !notification.read && "bg-blue-50/50 dark:bg-blue-900/10"
+                      "relative px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors",
+                      !notification.read && "bg-secondary/50"
                     )}
                     onClick={() => markAsRead(notification.id)}
                   >
                     <div className="flex items-start gap-3">
                       <div className="relative shrink-0">
-                        <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
-                          <TypeIcon className="h-4 w-4 text-gray-500" />
+                        <div className="p-2 rounded-lg bg-secondary">
+                          <TypeIcon className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <StatusIcon
                           className={cn(
@@ -235,8 +262,8 @@ export function NotificationCenter() {
                             className={cn(
                               "text-sm",
                               !notification.read
-                                ? "font-semibold text-gray-900 dark:text-white"
-                                : "font-medium text-gray-700 dark:text-gray-300"
+                                ? "font-semibold text-foreground"
+                                : "font-medium text-foreground"
                             )}
                           >
                             {notification.title}
@@ -246,22 +273,22 @@ export function NotificationCenter() {
                               e.stopPropagation();
                               deleteNotification(notification.id);
                             }}
-                            className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="p-1 rounded hover:bg-secondary opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            <X className="h-3 w-3 text-gray-400" />
+                            <X className="h-3 w-3 text-muted-foreground" />
                           </button>
                         </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                        <p className="text-sm text-muted-foreground truncate">
                           {notification.message}
                         </p>
                         <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-muted-foreground">
                             {notification.timestamp}
                           </span>
                           {notification.link && (
                             <a
                               href={notification.link}
-                              className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                              className="text-xs text-foreground hover:underline flex items-center gap-1"
                               onClick={(e) => e.stopPropagation()}
                             >
                               View <ExternalLink className="h-3 w-3" />
@@ -270,7 +297,7 @@ export function NotificationCenter() {
                         </div>
                       </div>
                       {!notification.read && (
-                        <div className="absolute left-1 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-blue-500" />
+                        <div className="absolute left-1 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-foreground" />
                       )}
                     </div>
                   </motion.div>
@@ -282,9 +309,9 @@ export function NotificationCenter() {
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-800">
+          <div className="px-4 py-3 border-t border-border">
             <Button variant="ghost" className="w-full text-sm" asChild>
-              <a href="/notifications">View all notifications</a>
+              <a href="/activity">View all notifications</a>
             </Button>
           </div>
         )}

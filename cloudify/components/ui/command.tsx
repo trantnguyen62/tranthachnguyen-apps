@@ -70,7 +70,7 @@ export function CommandPalette({ open, onOpenChange, groups }: CommandPalettePro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl p-0 overflow-hidden">
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center gap-3 px-4 border-b border-border">
           <Search className="h-5 w-5 text-gray-400" />
           <input
             ref={inputRef}
@@ -78,7 +78,7 @@ export function CommandPalette({ open, onOpenChange, groups }: CommandPalettePro
             placeholder="Search commands..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 h-14 bg-transparent border-0 focus:outline-none text-gray-900 dark:text-white placeholder:text-gray-400"
+            className="flex-1 h-14 bg-transparent border-0 focus:outline-none text-foreground placeholder:text-gray-400"
           />
           <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 bg-gray-100 dark:bg-gray-800 rounded">
             <CommandIcon className="h-3 w-3" />K
@@ -94,14 +94,14 @@ export function CommandPalette({ open, onOpenChange, groups }: CommandPalettePro
           ) : (
             filteredGroups.map((group) => (
               <div key={group.heading} className="mb-4">
-                <div className="px-2 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400">
+                <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
                   {group.heading}
                 </div>
                 {group.items.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => handleSelect(item)}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary transition-colors text-left"
                   >
                     {item.icon && (
                       <div className="flex-shrink-0 text-gray-500">
@@ -109,11 +109,11 @@ export function CommandPalette({ open, onOpenChange, groups }: CommandPalettePro
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 dark:text-white">
+                      <div className="font-medium text-foreground">
                         {item.title}
                       </div>
                       {item.description && (
-                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                        <div className="text-sm text-muted-foreground truncate">
                           {item.description}
                         </div>
                       )}

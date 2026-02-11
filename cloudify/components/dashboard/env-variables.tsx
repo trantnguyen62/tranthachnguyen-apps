@@ -131,16 +131,16 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-foreground">
             Environment Variables
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Configure environment variables for your deployments
           </p>
         </div>
         <div className="flex items-center gap-2">
           {hasChanges && (
-            <Button variant="primary" onClick={handleSave}>
+            <Button variant="default" onClick={handleSave}>
               <Save className="h-4 w-4" />
               Save Changes
             </Button>
@@ -153,11 +153,11 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
       </div>
 
       {/* Info box */}
-      <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 flex items-start gap-3">
-        <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-        <div className="text-sm text-blue-700 dark:text-blue-300">
+      <div className="p-4 rounded-lg bg-secondary border border-border flex items-start gap-3">
+        <Info className="h-5 w-5 text-foreground shrink-0 mt-0.5" />
+        <div className="text-sm text-foreground">
           <p className="font-medium">Environment Variable Tips</p>
-          <ul className="mt-1 list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400">
+          <ul className="mt-1 list-disc list-inside space-y-1 text-foreground">
             <li>Variables starting with NEXT_PUBLIC_ are exposed to the browser</li>
             <li>Sensitive values are encrypted at rest</li>
             <li>Changes require a new deployment to take effect</li>
@@ -172,11 +172,11 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="p-4 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+            className="p-4 rounded-lg border border-border bg-secondary"
           >
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                <label className="text-sm font-medium text-foreground mb-1 block">
                   Key
                 </label>
                 <Input
@@ -187,7 +187,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                <label className="text-sm font-medium text-foreground mb-1 block">
                   Value
                 </label>
                 <Input
@@ -202,7 +202,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
               <Button variant="ghost" onClick={() => setIsAdding(false)}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={addVariable}>
+              <Button variant="default" onClick={addVariable}>
                 Add Variable
               </Button>
             </div>
@@ -213,9 +213,9 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
       {/* Variables list */}
       <div className="space-y-3">
         {variables.length === 0 ? (
-          <div className="text-center py-12 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-            <Key className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">
+          <div className="text-center py-12 border border-dashed border-border rounded-lg">
+            <Key className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">
               No environment variables configured
             </p>
             <Button
@@ -232,12 +232,12 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
             <motion.div
               key={variable.id}
               layout
-              className="p-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950"
+              className="p-4 rounded-lg border border-border bg-card"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="font-mono font-medium text-gray-900 dark:text-white">
+                    <span className="font-mono font-medium text-foreground">
                       {variable.key}
                     </span>
                     {variable.encrypted && (
@@ -256,7 +256,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 font-mono text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 rounded px-3 py-2 overflow-hidden">
+                    <div className="flex-1 font-mono text-sm text-muted-foreground bg-background rounded px-3 py-2 overflow-hidden">
                       {showValues[variable.id] ? (
                         variable.value
                       ) : (
@@ -296,8 +296,8 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
               </div>
 
               {/* Target environments */}
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 block">
+              <div className="mt-4 pt-4 border-t border-border">
+                <span className="text-xs font-medium text-muted-foreground mb-2 block">
                   Apply to environments:
                 </span>
                 <div className="flex items-center gap-4">
@@ -310,7 +310,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                         checked={variable.target.includes(target)}
                         onCheckedChange={() => toggleTarget(variable.id, target)}
                       />
-                      <span className="text-sm capitalize text-gray-700 dark:text-gray-300">
+                      <span className="text-sm capitalize text-foreground">
                         {target}
                       </span>
                     </label>

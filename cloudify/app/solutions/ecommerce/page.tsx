@@ -63,8 +63,8 @@ export default function EcommercePage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -74,17 +74,17 @@ export default function EcommercePage() {
                 <ShoppingCart className="h-4 w-4" />
                 <span className="text-sm font-medium">E-commerce</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Sell more with
                 <br />
                 <span className="text-emerald-600 dark:text-emerald-400">faster stores</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Build high-converting online stores that load instantly.
                 Every millisecond matters when it comes to sales.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     Start Building
                     <ArrowRight className="h-4 w-4" />
@@ -100,7 +100,7 @@ export default function EcommercePage() {
 
         {/* Metrics */}
         <section className="py-16 bg-emerald-600 dark:bg-emerald-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {metrics.map((metric, index) => (
                 <motion.div
@@ -121,17 +121,17 @@ export default function EcommercePage() {
 
         {/* Features */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Built for commerce performance
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Everything you need to run a world-class online store.
               </p>
             </motion.div>
@@ -144,15 +144,15 @@ export default function EcommercePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
                   <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -162,18 +162,18 @@ export default function EcommercePage() {
         </section>
 
         {/* Platforms */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Works with your commerce platform
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Deploy headless commerce solutions with any backend.
               </p>
             </motion.div>
@@ -186,10 +186,10 @@ export default function EcommercePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-4 rounded-xl bg-card border border-border"
                 >
-                  <h4 className="font-semibold text-gray-900 dark:text-white">{platform.name}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{platform.desc}</p>
+                  <h4 className="font-semibold text-foreground">{platform.name}</h4>
+                  <p className="text-sm text-muted-foreground mt-1">{platform.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -198,17 +198,17 @@ export default function EcommercePage() {
 
         {/* Performance Section */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Speed = Revenue
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Studies show that every 100ms of latency costs e-commerce sites 1% in
                   conversions. With Cloudify, your store loads in milliseconds.
                 </p>
@@ -220,7 +220,7 @@ export default function EcommercePage() {
                     "Automatic image optimization",
                     "Smart caching strategies",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                    <li key={item} className="flex items-center gap-3 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </li>
@@ -232,38 +232,38 @@ export default function EcommercePage() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border border-emerald-200 dark:border-emerald-800"
+                className="p-8 rounded-lg bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border border-emerald-200 dark:border-emerald-800"
               >
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Page Load</span>
+                    <span className="text-muted-foreground">Page Load</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
                         <div className="w-1/4 h-full bg-emerald-500 rounded-full" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">0.8s</span>
+                      <span className="text-sm font-medium text-foreground">0.8s</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">First Input Delay</span>
+                    <span className="text-muted-foreground">First Input Delay</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
                         <div className="w-1/5 h-full bg-emerald-500 rounded-full" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">12ms</span>
+                      <span className="text-sm font-medium text-foreground">12ms</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Layout Shift</span>
+                    <span className="text-muted-foreground">Layout Shift</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
                         <div className="w-1/6 h-full bg-emerald-500 rounded-full" />
                       </div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">0.02</span>
+                      <span className="text-sm font-medium text-foreground">0.02</span>
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-6 text-center">
+                <p className="text-sm text-muted-foreground mt-6 text-center">
                   Core Web Vitals - All passing
                 </p>
               </motion.div>
@@ -273,7 +273,7 @@ export default function EcommercePage() {
 
         {/* CTA */}
         <section className="py-20 bg-emerald-600 dark:bg-emerald-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Start selling faster today
             </h2>

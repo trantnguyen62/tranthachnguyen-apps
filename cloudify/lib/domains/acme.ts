@@ -10,12 +10,17 @@
  */
 
 import crypto from "crypto";
+import { execFileSync } from "child_process";
+import { writeFileSync, readFileSync, unlinkSync, mkdirSync } from "fs";
+import os from "os";
+import path from "path";
 import {
   setupAcmeChallengeRecord,
   removeAcmeChallengeRecord,
   isCloudflareConfigured,
 } from "@/lib/integrations/cloudflare";
 import { prisma } from "@/lib/prisma";
+import { isValidDomain, validateDomains } from "@/lib/domains/validate";
 
 // ACME Directory URLs
 const ACME_DIRECTORY = {
@@ -427,14 +432,17 @@ async function respondToHttp01Challenge(
   token: string,
   keyAuthorization: string
 ): Promise<void> {
-  const { execSync } = await import("child_process");
+  // Create webroot directory (safe - no shell involved)
+  const challengeDir = path.join(CERTBOT_WEBROOT, ".well-known", "acme-challenge");
+  mkdirSync(challengeDir, { recursive: true });
 
-  // Create webroot directory
-  execSync(`mkdir -p ${CERTBOT_WEBROOT}/.well-known/acme-challenge`);
+  // Validate token to prevent path traversal (ACME tokens are base64url)
+  if (!/^[a-zA-Z0-9_-]+$/.test(token)) {
+    throw new Error("Invalid ACME challenge token");
+  }
 
   // Write challenge file
-  const challengePath = `${CERTBOT_WEBROOT}/.well-known/acme-challenge/${token}`;
-  const { writeFileSync } = await import("fs");
+  const challengePath = path.join(challengeDir, token);
   writeFileSync(challengePath, keyAuthorization);
 
   console.log(`[ACME] HTTP-01 challenge file created at ${challengePath}`);
@@ -522,28 +530,29 @@ async function pollAuthorizationStatus(
  * Generate CSR (Certificate Signing Request)
  */
 function generateCsr(domains: string[]): { csr: string; privateKey: string } {
+  // Validate all domains before using them in OpenSSL config (prevents injection)
+  const validation = validateDomains(domains);
+  if (!validation.valid) {
+    throw new Error(`Invalid domain names: ${validation.invalid.join(", ")}`);
+  }
+
   // Generate RSA key for the certificate
-  const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+  const { privateKey } = crypto.generateKeyPairSync("rsa", {
     modulusLength: 2048,
   });
 
-  // For CSR generation, we'll use openssl via exec since Node.js doesn't have
-  // built-in CSR generation. In production, consider using a library like node-forge.
-  const { execSync } = require("child_process");
-  const { writeFileSync, readFileSync, unlinkSync } = require("fs");
-  const os = require("os");
-  const path = require("path");
-
   const tempDir = os.tmpdir();
-  const keyPath = path.join(tempDir, `cloudify-key-${Date.now()}.pem`);
-  const csrPath = path.join(tempDir, `cloudify-csr-${Date.now()}.pem`);
-  const configPath = path.join(tempDir, `cloudify-csr-${Date.now()}.cnf`);
+  const timestamp = Date.now();
+  const keyPath = path.join(tempDir, `cloudify-key-${timestamp}.pem`);
+  const csrPath = path.join(tempDir, `cloudify-csr-${timestamp}.pem`);
+  const configPath = path.join(tempDir, `cloudify-csr-${timestamp}.cnf`);
 
   try {
     // Write private key
     writeFileSync(keyPath, privateKey.export({ type: "pkcs8", format: "pem" }));
 
     // Create OpenSSL config for SAN (Subject Alternative Names)
+    // Domains are pre-validated above — safe for config file
     const primaryDomain = domains[0];
     const sanList = domains.map((d, i) => `DNS.${i + 1} = ${d}`).join("\n");
 
@@ -565,11 +574,13 @@ ${sanList}
 
     writeFileSync(configPath, opensslConfig);
 
-    // Generate CSR
-    execSync(
-      `openssl req -new -key ${keyPath} -out ${csrPath} -config ${configPath}`,
-      { stdio: "pipe" }
-    );
+    // Generate CSR using execFileSync (safe — no shell interpolation)
+    execFileSync("openssl", [
+      "req", "-new",
+      "-key", keyPath,
+      "-out", csrPath,
+      "-config", configPath,
+    ], { stdio: "pipe" });
 
     const csrPem = readFileSync(csrPath, "utf-8");
 
@@ -664,6 +675,15 @@ export async function requestCertificate(
   challengeType: ChallengeType = "http-01"
 ): Promise<CertificateResult> {
   try {
+    // Validate all domains before processing
+    const validation = validateDomains(domains);
+    if (!validation.valid) {
+      return {
+        success: false,
+        error: `Invalid domain names: ${validation.invalid.join(", ")}`,
+      };
+    }
+
     console.log(`[ACME] Requesting certificate for: ${domains.join(", ")}`);
     console.log(`[ACME] Using ${ACME_ENV} environment with ${challengeType} challenge`);
 
@@ -752,18 +772,14 @@ export async function requestCertificate(
  */
 function parseCertificateExpiry(certPem: string): Date | undefined {
   try {
-    const { execSync } = require("child_process");
-    const { writeFileSync, unlinkSync } = require("fs");
-    const os = require("os");
-    const path = require("path");
-
     const tempPath = path.join(os.tmpdir(), `cert-${Date.now()}.pem`);
     writeFileSync(tempPath, certPem);
 
     try {
-      const output = execSync(`openssl x509 -in ${tempPath} -enddate -noout`, {
-        encoding: "utf-8",
-      });
+      // Use execFileSync (safe — no shell interpolation)
+      const output = execFileSync("openssl", [
+        "x509", "-in", tempPath, "-enddate", "-noout",
+      ], { encoding: "utf-8" });
 
       // Parse: notAfter=Jan 15 12:00:00 2024 GMT
       const match = output.match(/notAfter=(.+)/);

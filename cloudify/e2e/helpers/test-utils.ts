@@ -95,8 +95,13 @@ export async function loginViaUI(
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
   await page.click('button[type="submit"]');
-  // Wait for redirect or error
-  await page.waitForTimeout(2000);
+  // Wait for navigation to dashboard or error message
+  await Promise.race([
+    page.waitForURL('/dashboard', { timeout: 10000 }),
+    page.waitForSelector('[data-testid="login-error"], .error-message, [role="alert"]', { timeout: 10000 }),
+  ]).catch(() => {
+    // If neither happens, the page state will be checked by the test
+  });
 }
 
 // UI helper to signup via the web interface
@@ -111,7 +116,13 @@ export async function signupViaUI(
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
   await page.click('button[type="submit"]');
-  await page.waitForTimeout(2000);
+  // Wait for navigation to dashboard or error message
+  await Promise.race([
+    page.waitForURL('/dashboard', { timeout: 10000 }),
+    page.waitForSelector('[data-testid="signup-error"], .error-message, [role="alert"]', { timeout: 10000 }),
+  ]).catch(() => {
+    // If neither happens, the page state will be checked by the test
+  });
 }
 
 // Cleanup helper - delete all projects created during test

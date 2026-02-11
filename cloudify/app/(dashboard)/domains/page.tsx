@@ -171,7 +171,7 @@ export default function DomainsPage() {
   if (loading) {
     return (
       <div className="p-8 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -181,10 +181,10 @@ export default function DomainsPage() {
       <div className="p-8">
         <div className="text-center py-12">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             Failed to load domains
           </h3>
-          <p className="text-gray-500 dark:text-gray-400">{error}</p>
+          <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
     );
@@ -198,7 +198,7 @@ export default function DomainsPage() {
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white"
+            className="text-3xl font-bold text-foreground"
           >
             Domains
           </motion.h1>
@@ -206,7 +206,7 @@ export default function DomainsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-2 text-gray-600 dark:text-gray-400"
+            className="mt-2 text-muted-foreground"
           >
             Manage custom domains for your projects.
           </motion.p>
@@ -218,7 +218,7 @@ export default function DomainsPage() {
         >
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="primary">
+              <Button variant="default">
                 <Plus className="h-4 w-4" />
                 Add Domain
               </Button>
@@ -263,7 +263,7 @@ export default function DomainsPage() {
                   Cancel
                 </Button>
                 <Button
-                  variant="primary"
+                  variant="default"
                   onClick={handleAddDomain}
                   disabled={isAddingDomain || !newDomain || !selectedProject}
                 >
@@ -318,7 +318,7 @@ export default function DomainsPage() {
                               href={`https://${domain.domain}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                              className="font-semibold text-foreground hover:text-[#0070f3] dark:hover:text-[#0070f3]"
                             >
                               {domain.domain}
                             </a>
@@ -334,7 +334,7 @@ export default function DomainsPage() {
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                          <p className="text-sm text-muted-foreground">
                             Connected to {domain.project.name} • Added{" "}
                             {formatDate(domain.createdAt)}
                           </p>
@@ -407,20 +407,20 @@ export default function DomainsPage() {
 
                     {/* DNS Records to configure */}
                     {!domain.verified && (
-                      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      <div className="bg-background rounded-lg p-4">
+                        <h4 className="text-sm font-medium text-foreground mb-3">
                           Configure these DNS records to verify your domain:
                         </h4>
                         <div className="space-y-2">
                           {/* TXT Record for verification */}
-                          <div className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between p-2 bg-card rounded border border-border">
                             <div className="flex items-center gap-4">
                               <Badge variant="secondary">TXT</Badge>
-                              <span className="font-mono text-sm text-gray-600 dark:text-gray-400">
+                              <span className="font-mono text-sm text-muted-foreground">
                                 _cloudify-verify.{domain.domain}
                               </span>
-                              <span className="text-gray-400">→</span>
-                              <span className="font-mono text-sm text-gray-900 dark:text-white truncate max-w-[200px]">
+                              <span className="text-muted-foreground">→</span>
+                              <span className="font-mono text-sm text-foreground truncate max-w-[200px]">
                                 {domain.verificationToken}
                               </span>
                             </div>
@@ -435,18 +435,18 @@ export default function DomainsPage() {
                           </div>
 
                           {/* CNAME Record */}
-                          <div className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between p-2 bg-card rounded border border-border">
                             <div className="flex items-center gap-4">
                               <Badge variant="secondary">
                                 {domain.domain.split(".").length === 2 ? "A" : "CNAME"}
                               </Badge>
-                              <span className="font-mono text-sm text-gray-600 dark:text-gray-400">
+                              <span className="font-mono text-sm text-muted-foreground">
                                 {domain.domain.split(".").length === 2
                                   ? "@"
                                   : domain.domain.split(".")[0]}
                               </span>
-                              <span className="text-gray-400">→</span>
-                              <span className="font-mono text-sm text-gray-900 dark:text-white">
+                              <span className="text-muted-foreground">→</span>
+                              <span className="font-mono text-sm text-foreground">
                                 {domain.domain.split(".").length === 2
                                   ? "76.76.21.21"
                                   : "cname.cloudify.tranthachnguyen.com"}
@@ -493,9 +493,9 @@ export default function DomainsPage() {
 
                     {/* SSL Status for verified domains */}
                     {domain.verified && domain.sslStatus !== "active" && (
-                      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 flex items-center gap-3">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
-                        <span className="text-sm text-blue-600 dark:text-blue-400">
+                      <div className="bg-secondary rounded-lg p-4 flex items-center gap-3">
+                        <Loader2 className="h-5 w-5 animate-spin text-foreground" />
+                        <span className="text-sm text-foreground">
                           {sslStatusLabels[domain.sslStatus] || "Processing SSL certificate..."}
                         </span>
                       </div>
@@ -509,13 +509,13 @@ export default function DomainsPage() {
       ) : (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🌐</div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             No domains configured
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
+          <p className="text-muted-foreground mb-6">
             Add a custom domain to make your project available on your own URL.
           </p>
-          <Button variant="primary" onClick={() => setDialogOpen(true)}>
+          <Button variant="default" onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             Add Domain
           </Button>

@@ -9,10 +9,10 @@ export default function PrivacyPage() {
       <Header />
       <main className="flex-1 pt-16">
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
+          <h1 className="text-4xl font-bold text-foreground mb-8">
             Privacy Policy
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">
+          <p className="text-muted-foreground mb-8">
             Last updated: January 30, 2024
           </p>
 

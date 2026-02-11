@@ -61,28 +61,28 @@ export default function WebAppsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-4xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-foreground mb-6">
                 <Layout className="h-4 w-4" />
                 <span className="text-sm font-medium">Web Applications</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Build and deploy
                 <br />
-                <span className="text-blue-600 dark:text-blue-400">modern web apps</span>
+                <span className="text-foreground">modern web apps</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 From simple static sites to complex full-stack applications.
                 Deploy anything with zero configuration.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     Start Building
                     <ArrowRight className="h-4 w-4" />
@@ -97,9 +97,9 @@ export default function WebAppsPage() {
         </section>
 
         {/* Frameworks */}
-        <section className="py-16 border-b border-gray-200 dark:border-gray-800">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-8">
+        <section className="py-16 border-b border-border">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+            <p className="text-center text-sm text-muted-foreground mb-8">
               WORKS WITH YOUR FAVORITE FRAMEWORKS
             </p>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-6">
@@ -112,10 +112,10 @@ export default function WebAppsPage() {
                   transition={{ delay: index * 0.1 }}
                   className="text-center"
                 >
-                  <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <div className="text-lg font-semibold text-foreground">
                     {fw.name}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs text-muted-foreground">
                     {fw.category}
                   </div>
                 </motion.div>
@@ -126,17 +126,17 @@ export default function WebAppsPage() {
 
         {/* Features Grid */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Everything you need to ship
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 A complete platform for building and deploying web applications.
               </p>
             </motion.div>
@@ -149,15 +149,15 @@ export default function WebAppsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4">
+                    <feature.icon className="h-6 w-6 text-foreground" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -167,18 +167,18 @@ export default function WebAppsPage() {
         </section>
 
         {/* Full Stack */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Full-stack by design
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Build complete applications with frontend, backend, and data layer.
               </p>
             </motion.div>
@@ -191,17 +191,17 @@ export default function WebAppsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-                    <stack.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4">
+                    <stack.icon className="h-6 w-6 text-foreground" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">
                     {stack.title}
                   </h3>
                   <ul className="space-y-2">
                     {stack.items.map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm">
+                      <li key={item} className="flex items-center gap-2 text-muted-foreground text-sm">
                         <Check className="h-4 w-4 text-green-500 shrink-0" />
                         {item}
                       </li>
@@ -215,17 +215,17 @@ export default function WebAppsPage() {
 
         {/* Code Example */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Deploy in seconds
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Connect your Git repository and deploy. Every push creates a new
                   deployment with a unique URL.
                 </p>
@@ -237,7 +237,7 @@ export default function WebAppsPage() {
                     "Custom domains with free SSL",
                     "Environment variables per branch",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                    <li key={item} className="flex items-center gap-3 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </li>
@@ -274,12 +274,12 @@ Deployed in 23 seconds`}</code>
         </section>
 
         {/* CTA */}
-        <section className="py-20 bg-blue-600 dark:bg-blue-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <section className="py-20 bg-foreground">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Start building today
             </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-background/70 mb-8 max-w-2xl mx-auto">
               Deploy your first web application in minutes. No credit card required.
             </p>
             <Button variant="secondary" size="lg" asChild>

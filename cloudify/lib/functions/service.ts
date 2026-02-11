@@ -15,6 +15,10 @@ import {
   uploadFunctionCode,
   downloadFunctionCode,
 } from "@/lib/build/artifact-manager";
+import { captureFunctionError } from "@/lib/integrations/sentry";
+import { loggers } from "@/lib/logging/logger";
+
+const log = loggers.functions;
 
 export interface DeployFunctionParams {
   functionId: string;
@@ -82,7 +86,7 @@ export async function deployFunction(params: DeployFunctionParams): Promise<{
 
     return { success: true, version };
   } catch (error) {
-    console.error("Deploy function error:", error);
+    log.error("Deploy function failed", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Deploy failed",
@@ -164,7 +168,7 @@ export async function invokeFunction(params: InvokeFunctionParams): Promise<{
       invocationId: invocation.id,
     };
   } catch (error) {
-    console.error("Invoke function error:", error);
+    log.error("Function invocation failed", error, { functionId });
 
     // Record failed invocation
     try {
@@ -181,6 +185,16 @@ export async function invokeFunction(params: InvokeFunctionParams): Promise<{
       });
     } catch {
       // Ignore recording error
+    }
+
+    // Report to Sentry (non-blocking)
+    if (error instanceof Error) {
+      captureFunctionError(error, {
+        functionId,
+        functionName: functionId,
+        projectId: "",
+        duration: Date.now() - startTime,
+      }).catch(() => {});
     }
 
     return {
@@ -344,7 +358,7 @@ export async function deleteFunction(functionId: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.error("Delete function error:", error);
+    log.error("Delete function failed", error, { functionId });
     return false;
   }
 }

@@ -11,6 +11,11 @@ interface Activity {
   description: string;
   metadata: Record<string, unknown> | null;
   createdAt: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
   project: {
     id: string;
     name: string;

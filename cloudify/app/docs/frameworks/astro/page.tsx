@@ -8,14 +8,14 @@ export default function AstroDocsPage() {
   return (
     <article className="prose prose-gray dark:prose-invert max-w-none">
       <div className="not-prose flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FF5D01] to-[#FF8A4C] flex items-center justify-center">
+        <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-[#FF5D01] to-[#FF8A4C] flex items-center justify-center">
           <svg className="h-10 w-10 text-white" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8.358 20.162c-1.186-1.07-1.532-3.316-1.038-4.944.856 1.026 2.043 1.352 3.272 1.535 1.897.283 3.76.177 5.522-.678.202-.098.388-.229.608-.36.166.473.209.95.151 1.437-.14 1.185-.738 2.1-1.688 2.794-.38.277-.782.525-1.175.787-1.205.804-1.531 1.747-1.078 3.119l.044.148a3.158 3.158 0 0 1-1.407-1.188 3.31 3.31 0 0 1-.544-1.815c-.004-.32-.004-.642-.048-.958-.106-.769-.472-1.113-1.161-1.133-.707-.02-1.267.411-1.415 1.09-.012.053-.028.104-.043.182zm-5.961-4.445s3.24-1.575 6.49-1.575l2.451-7.565c.092-.366.36-.614.662-.614.303 0 .57.248.662.614l2.45 7.565c3.85 0 6.491 1.575 6.491 1.575L16.088.727C15.93.285 15.663 0 15.303 0H8.697c-.36 0-.615.285-.784.727l-5.516 14.99z"/>
           </svg>
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white m-0">Astro on Cloudify</h1>
-          <p className="text-gray-600 dark:text-gray-400 m-0 mt-1">Ship less JavaScript with Astro&apos;s island architecture</p>
+          <h1 className="text-3xl font-bold text-foreground m-0">Astro on Cloudify</h1>
+          <p className="text-muted-foreground m-0 mt-1">Ship less JavaScript with Astro&apos;s island architecture</p>
         </div>
       </div>
 
@@ -28,10 +28,10 @@ export default function AstroDocsPage() {
         <div className="flex items-start gap-4">
           <Zap className="h-8 w-8 text-orange-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">
+            <h3 className="font-semibold text-foreground text-lg mb-2">
               Zero JavaScript by Default
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               Astro ships zero JavaScript by default, only hydrating interactive components.
               Perfect for content-heavy sites that need to be fast.
             </p>
@@ -52,9 +52,9 @@ export default function AstroDocsPage() {
           "View Transitions",
           "Multiple UI Frameworks",
         ].map((feature) => (
-          <div key={feature} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-900">
+          <div key={feature} className="flex items-center gap-3 p-3 rounded-lg bg-background">
             <Check className="h-5 w-5 text-green-500 shrink-0" />
-            <span className="text-gray-900 dark:text-white">{feature}</span>
+            <span className="text-foreground">{feature}</span>
           </div>
         ))}
       </div>
@@ -250,7 +250,7 @@ import hero from '../images/hero.jpg';
       </pre>
 
       <div className="not-prose mt-12">
-        <Button variant="primary" asChild>
+        <Button variant="default" asChild>
           <Link href="/new">
             Deploy Your Astro Site
             <ArrowRight className="h-4 w-4" />

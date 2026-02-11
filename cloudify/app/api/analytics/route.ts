@@ -94,13 +94,54 @@ export async function GET(request: NextRequest) {
       _count: { browser: true },
     });
 
+    // Get time-series data for the traffic chart
+    const allEvents = await prisma.analyticsEvent.findMany({
+      where: { ...where, type: "pageview" },
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    // Build time-series buckets
+    const timeseries: { label: string; value: number }[] = [];
+    if (range === "24h") {
+      for (let i = 23; i >= 0; i--) {
+        const hour = new Date(now.getTime() - i * 60 * 60 * 1000);
+        const hourStart = new Date(hour);
+        hourStart.setMinutes(0, 0, 0);
+        const hourEnd = new Date(hourStart.getTime() + 60 * 60 * 1000);
+        const count = allEvents.filter(
+          (e) => e.createdAt >= hourStart && e.createdAt < hourEnd
+        ).length;
+        timeseries.push({
+          label: hourStart.toLocaleTimeString("en-US", { hour: "numeric" }),
+          value: count,
+        });
+      }
+    } else {
+      const days = range === "7d" ? 7 : 30;
+      for (let i = days - 1; i >= 0; i--) {
+        const day = new Date(now);
+        day.setDate(day.getDate() - i);
+        day.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(day.getTime() + 24 * 60 * 60 * 1000);
+        const count = allEvents.filter(
+          (e) => e.createdAt >= day && e.createdAt < dayEnd
+        ).length;
+        timeseries.push({
+          label: day.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+          value: count,
+        });
+      }
+    }
+
     return NextResponse.json({
       range,
       summary: {
         pageviews,
         uniqueVisitors: uniqueVisitors.length,
-        avgSessionDuration: 0, // Would need session tracking
+        avgSessionDuration: 0,
       },
+      timeseries,
       topPages: topPages.map((p) => ({ path: p.path, views: p._count.path })),
       referrers: referrers.map((r) => ({
         source: r.referrer,

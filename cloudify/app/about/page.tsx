@@ -78,17 +78,17 @@ export default function AboutPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-3xl mx-auto"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Building the future of the web
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400">
+              <p className="mt-6 text-xl text-muted-foreground">
                 Cloudify is on a mission to make the web faster, more accessible, and easier
                 to build. We&apos;re creating tools that empower developers to ship their best work.
               </p>
@@ -103,10 +103,10 @@ export default function AboutPage() {
             >
               {stats.map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-4xl font-bold text-gray-900 dark:text-white">
+                  <div className="text-4xl font-bold text-foreground">
                     {stat.value}
                   </div>
-                  <div className="mt-2 text-gray-600 dark:text-gray-400">{stat.label}</div>
+                  <div className="mt-2 text-muted-foreground">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -121,7 +121,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+              <h2 className="text-3xl font-bold text-foreground mb-8">
                 Our Story
               </h2>
               <div className="prose prose-lg dark:prose-invert">
@@ -147,18 +147,18 @@ export default function AboutPage() {
         </section>
 
         {/* Values */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-background">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl font-bold text-foreground">
                 Our Values
               </h2>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-xl text-muted-foreground">
                 The principles that guide everything we do
               </p>
             </motion.div>
@@ -171,13 +171,13 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-8 rounded-lg bg-card border border-border"
                 >
-                  <value.icon className="h-10 w-10 text-blue-500 mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  <value.icon className="h-10 w-10 text-[#0070f3] mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground">
                     {value.title}
                   </h3>
-                  <p className="mt-2 text-gray-600 dark:text-gray-400">
+                  <p className="mt-2 text-muted-foreground">
                     {value.description}
                   </p>
                 </motion.div>
@@ -188,17 +188,17 @@ export default function AboutPage() {
 
         {/* Leadership */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl font-bold text-foreground">
                 Leadership
               </h2>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-xl text-muted-foreground">
                 Meet the team building Cloudify
               </p>
             </motion.div>
@@ -218,10 +218,10 @@ export default function AboutPage() {
                   >
                     {person.image}
                   </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                  <h3 className="font-semibold text-foreground">
                     {person.name}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">{person.role}</p>
+                  <p className="text-muted-foreground">{person.role}</p>
                 </motion.div>
               ))}
             </div>
@@ -229,18 +229,18 @@ export default function AboutPage() {
         </section>
 
         {/* Offices */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-background">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl font-bold text-foreground">
                 Our Offices
               </h2>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-xl text-muted-foreground">
                 We&apos;re a global team with offices around the world
               </p>
             </motion.div>
@@ -249,14 +249,14 @@ export default function AboutPage() {
               {offices.map((office) => (
                 <div
                   key={office.city}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border"
                 >
-                  <MapPin className="h-4 w-4 text-blue-500" />
-                  <span className="text-gray-900 dark:text-white font-medium">
+                  <MapPin className="h-4 w-4 text-[#0070f3]" />
+                  <span className="text-foreground font-medium">
                     {office.city}
                   </span>
                   {office.type === "HQ" && (
-                    <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-secondary text-foreground px-2 py-0.5 rounded-full">
                       HQ
                     </span>
                   )}
@@ -269,13 +269,13 @@ export default function AboutPage() {
         {/* CTA */}
         <section className="py-20">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
               Join our team
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+            <p className="text-xl text-muted-foreground mb-8">
               We&apos;re always looking for talented people to help us build the future of the web.
             </p>
-            <Button variant="primary" size="lg" asChild>
+            <Button variant="default" size="lg" asChild>
               <Link href="/careers">
                 View Open Positions
                 <ArrowRight className="h-5 w-5" />

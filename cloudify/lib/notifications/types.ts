@@ -15,7 +15,10 @@ export type NotificationType =
   | "security_alert"
   | "build_failed"
   | "ssl_expiring"
-  | "function_error";
+  | "function_error"
+  | "payment_failed"
+  | "invoice_upcoming"
+  | "subscription_cancelled";
 
 // Channels through which notifications can be sent
 export type NotificationChannel = "email" | "slack" | "discord" | "webhook";
@@ -207,9 +210,9 @@ export const NOTIFICATION_COLORS = {
     slack: "warning",
   },
   info: {
-    hex: "#3b82f6",
+    hex: "#0070f3",
     discord: 0x3b82f6,
-    slack: "#3b82f6",
+    slack: "#0070f3",
   },
 } as const;
 
@@ -227,9 +230,12 @@ export function getNotificationColor(type: NotificationType): NotificationColor 
     case "build_failed":
     case "function_error":
     case "security_alert":
+    case "payment_failed":
+    case "subscription_cancelled":
       return NOTIFICATION_COLORS.error;
     case "usage_warning":
     case "ssl_expiring":
+    case "invoice_upcoming":
       return NOTIFICATION_COLORS.warning;
     default:
       return NOTIFICATION_COLORS.info;

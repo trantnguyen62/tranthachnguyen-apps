@@ -117,12 +117,12 @@ export default function CLIDocsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Back link */}
         <Link
           href="/docs"
-          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-8"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-gray-200 mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Documentation
@@ -133,7 +133,7 @@ export default function CLIDocsPage() {
           <aside className="hidden lg:block">
             <div className="sticky top-8 space-y-6">
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                <h3 className="font-semibold text-foreground mb-3">
                   Quick Links
                 </h3>
                 <nav className="space-y-1">
@@ -141,7 +141,7 @@ export default function CLIDocsPage() {
                     <a
                       key={link.label}
                       href={link.href}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 rounded-lg"
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary dark:text-muted-foreground dark:hover:text-white dark:hover:bg-gray-800 rounded-lg"
                     >
                       <link.icon className="h-4 w-4" />
                       {link.label}
@@ -161,10 +161,10 @@ export default function CLIDocsPage() {
                   <Terminal className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <h1 className="text-3xl font-bold text-foreground">
                     CLI Reference
                   </h1>
-                  <p className="text-gray-500 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     Command line tools for Cloudify
                   </p>
                 </div>
@@ -173,10 +173,10 @@ export default function CLIDocsPage() {
 
             {/* Installation */}
             <section id="installation">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
                 Installation
               </h2>
-              <div className="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+              <div className="p-6 bg-card rounded-xl border border-border">
                 <Tabs defaultValue="npm">
                   <TabsList>
                     <TabsTrigger value="npm">npm</TabsTrigger>
@@ -196,7 +196,7 @@ export default function CLIDocsPage() {
                         {copied === "npm" ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
-                          <Copy className="h-4 w-4 text-gray-400" />
+                          <Copy className="h-4 w-4 text-muted-foreground" />
                         )}
                       </Button>
                     </div>
@@ -214,7 +214,7 @@ export default function CLIDocsPage() {
                         {copied === "yarn" ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
-                          <Copy className="h-4 w-4 text-gray-400" />
+                          <Copy className="h-4 w-4 text-muted-foreground" />
                         )}
                       </Button>
                     </div>
@@ -232,7 +232,7 @@ export default function CLIDocsPage() {
                         {copied === "pnpm" ? (
                           <Check className="h-4 w-4 text-green-500" />
                         ) : (
-                          <Copy className="h-4 w-4 text-gray-400" />
+                          <Copy className="h-4 w-4 text-muted-foreground" />
                         )}
                       </Button>
                     </div>
@@ -243,11 +243,11 @@ export default function CLIDocsPage() {
 
             {/* Authentication */}
             <section id="auth">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
                 Authentication
               </h2>
-              <div className="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <div className="p-6 bg-card rounded-xl border border-border">
+                <p className="text-muted-foreground mb-4">
                   Login to your Cloudify account to deploy projects:
                 </p>
                 <div className="flex items-center gap-2 p-3 bg-gray-950 rounded-lg">
@@ -262,11 +262,11 @@ export default function CLIDocsPage() {
                     {copied === "login" ? (
                       <Check className="h-4 w-4 text-green-500" />
                     ) : (
-                      <Copy className="h-4 w-4 text-gray-400" />
+                      <Copy className="h-4 w-4 text-muted-foreground" />
                     )}
                   </Button>
                 </div>
-                <p className="text-sm text-gray-500 mt-3">
+                <p className="text-sm text-muted-foreground mt-3">
                   This will open a browser window for authentication.
                 </p>
               </div>
@@ -274,7 +274,7 @@ export default function CLIDocsPage() {
 
             {/* Commands */}
             <section id="commands">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
                 Commands
               </h2>
               <div className="space-y-4">
@@ -284,11 +284,11 @@ export default function CLIDocsPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
+                    className="p-6 bg-card rounded-xl border border-border"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <code className="text-lg font-bold text-blue-600 dark:text-blue-400 font-mono">
+                        <code className="text-lg font-bold text-foreground font-mono">
                           {cmd.command}
                         </code>
                       </div>
@@ -305,19 +305,19 @@ export default function CLIDocsPage() {
                       </Button>
                     </div>
 
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    <p className="text-muted-foreground mb-4">
                       {cmd.description}
                     </p>
 
-                    <div className="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg mb-4">
-                      <code className="text-sm text-gray-700 dark:text-gray-300 font-mono">
+                    <div className="p-3 bg-gray-100 dark:bg-secondary rounded-lg mb-4">
+                      <code className="text-sm text-foreground font-mono">
                         {cmd.usage}
                       </code>
                     </div>
 
                     {cmd.options && (
                       <div className="mb-4">
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                        <h4 className="text-sm font-semibold text-foreground mb-2">
                           Options
                         </h4>
                         <div className="space-y-1">
@@ -326,7 +326,7 @@ export default function CLIDocsPage() {
                               <code className="text-purple-600 dark:text-purple-400 font-mono shrink-0">
                                 {opt.flag}
                               </code>
-                              <span className="text-gray-600 dark:text-gray-400">
+                              <span className="text-muted-foreground">
                                 {opt.description}
                               </span>
                             </div>
@@ -337,7 +337,7 @@ export default function CLIDocsPage() {
 
                     {cmd.example && (
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                        <h4 className="text-sm font-semibold text-foreground mb-2">
                           Example
                         </h4>
                         <div className="p-3 bg-gray-950 rounded-lg">
@@ -353,17 +353,17 @@ export default function CLIDocsPage() {
             </section>
 
             {/* Need help */}
-            <section className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+            <section className="p-6 bg-secondary rounded-xl border border-blue-100 dark:border-blue-800">
               <div className="flex items-start gap-4">
-                <Zap className="h-6 w-6 text-blue-600 dark:text-blue-400 shrink-0" />
+                <Zap className="h-6 w-6 text-foreground shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                  <h3 className="font-semibold text-foreground mb-1">
                     Need help?
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    Run <code className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">cloudify --help</code> for a list of all commands, or visit our documentation for detailed guides.
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Run <code className="font-mono bg-card px-1.5 py-0.5 rounded">cloudify --help</code> for a list of all commands, or visit our documentation for detailed guides.
                   </p>
-                  <Button variant="primary" size="sm" asChild>
+                  <Button variant="default" size="sm" asChild>
                     <Link href="/docs">
                       View Full Documentation
                       <ChevronRight className="h-4 w-4" />

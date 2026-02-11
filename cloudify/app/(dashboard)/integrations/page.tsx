@@ -169,7 +169,7 @@ export default function IntegrationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -178,10 +178,10 @@ export default function IntegrationsPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           Failed to load integrations
         </h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button variant="outline" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
@@ -191,14 +191,14 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <div className="space-y-8 p-8">
+    <div className="space-y-6 p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             Integrations
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-muted-foreground">
             Connect third-party services to enhance your workflow
           </p>
         </div>
@@ -209,7 +209,7 @@ export default function IntegrationsPage() {
           </Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="primary">
+              <Button variant="default">
                 <Plus className="h-4 w-4" />
                 Connect Integration
               </Button>
@@ -276,7 +276,7 @@ export default function IntegrationsPage() {
                 <Button variant="outline" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button variant="primary" onClick={handleConnect} disabled={isConnecting}>
+                <Button variant="default" onClick={handleConnect} disabled={isConnecting}>
                   {isConnecting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -302,12 +302,12 @@ export default function IntegrationsPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+            className="p-4 bg-card rounded-xl border border-border"
           >
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-foreground">
               {stat.value}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground">
               {stat.label}
             </p>
           </div>
@@ -317,7 +317,7 @@ export default function IntegrationsPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search integrations..."
             value={searchQuery}
@@ -329,7 +329,7 @@ export default function IntegrationsPage() {
           {categories.map((category) => (
             <Button
               key={category.id}
-              variant={selectedCategory === category.id ? "primary" : "outline"}
+              variant={selectedCategory === category.id ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(category.id)}
               className="whitespace-nowrap"
@@ -343,7 +343,7 @@ export default function IntegrationsPage() {
       {/* Connected Integrations */}
       {filteredIntegrations.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-lg font-semibold text-foreground">
             Connected Integrations
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -355,19 +355,19 @@ export default function IntegrationsPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="p-5 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+                  className="p-5 bg-card rounded-xl border border-border"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
-                        <Icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                      <div className="p-2 rounded-lg bg-secondary">
+                        <Icon className="h-5 w-5 text-muted-foreground" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <h3 className="font-semibold text-foreground flex items-center gap-2">
                           {integration.name}
                           {integration.enabled && <Check className="h-4 w-4 text-green-500" />}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {integration.project?.name || "Unknown project"}
                         </p>
                       </div>
@@ -376,7 +376,7 @@ export default function IntegrationsPage() {
                       {integration.enabled ? "Active" : "Paused"}
                     </Badge>
                   </div>
-                  <p className="text-sm text-gray-500 mb-3">
+                  <p className="text-sm text-muted-foreground mb-3">
                     Last sync: {formatDate(integration.lastSyncAt)}
                   </p>
                   <div className="flex items-center gap-2">
@@ -409,7 +409,7 @@ export default function IntegrationsPage() {
 
       {/* Available Integrations */}
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h2 className="text-lg font-semibold text-foreground">
           Available Integrations
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -423,15 +423,15 @@ export default function IntegrationsPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="p-5 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                className="p-5 bg-card rounded-xl border border-border hover:border-foreground/20 transition-colors"
               >
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
-                    <Icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <div className="p-2 rounded-lg bg-secondary">
+                    <Icon className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="font-semibold text-foreground">
                         {info.name}
                       </h3>
                       {isConnected && (
@@ -440,14 +440,14 @@ export default function IntegrationsPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {info.description}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <Button
-                    variant="primary"
+                    variant="default"
                     size="sm"
                     onClick={() => {
                       setNewIntegration({ ...newIntegration, type });
@@ -469,12 +469,12 @@ export default function IntegrationsPage() {
       </div>
 
       {filteredIntegrations.length === 0 && availableTypesArray.length === 0 && (
-        <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+        <div className="text-center py-12 bg-card rounded-xl border border-border">
           <Zap className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             No integrations found
           </h3>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-muted-foreground">
             No integrations match your search criteria.
           </p>
         </div>

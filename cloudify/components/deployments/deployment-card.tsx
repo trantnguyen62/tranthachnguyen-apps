@@ -29,7 +29,7 @@ export function DeploymentCard({ deployment, projectSlug }: DeploymentCardProps)
       case "DEPLOYING":
         return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
       case "QUEUED":
-        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+        return "bg-secondary text-[#0070f3] border-blue-500/20";
       case "CANCELLED":
         return "bg-gray-500/10 text-gray-400 border-gray-500/20";
       default:
@@ -90,7 +90,7 @@ export function DeploymentCard({ deployment, projectSlug }: DeploymentCardProps)
             href={deployment.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-300"
+            className="text-[#0070f3] hover:text-[#0070f3]"
           >
             {deployment.url.replace("https://", "")}
           </a>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -14,12 +14,11 @@ import {
   RefreshCw,
   Clock,
   CheckCircle2,
-  Loader2,
-  XCircle,
   Copy,
   RotateCcw,
   Trash2,
   Eye,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,96 +31,143 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BuildLogs } from "@/components/dashboard/build-logs";
 import { EnvVariables } from "@/components/dashboard/env-variables";
+import { getStatusConfig } from "@/lib/utils/status-config";
 
-// Mock project data
-const projectData = {
-  name: "my-portfolio",
-  description: "Personal portfolio website built with Next.js",
-  framework: "Next.js",
-  domain: "my-portfolio.cloudify.app",
-  customDomain: "johndoe.com",
-  gitRepo: "github.com/johndoe/portfolio",
-  branch: "main",
-  status: "ready" as "ready" | "building" | "error",
-  createdAt: "2024-01-15",
-  lastDeployment: {
-    id: "dep-123",
-    status: "ready" as const,
-    time: "2 minutes ago",
-    duration: "45s",
-    commit: "a1b2c3d",
-    commitMessage: "feat: add contact form with validation",
-  },
-};
+interface Deployment {
+  id: string;
+  status: string;
+  branch: string;
+  commit: string;
+  commitMessage: string;
+  time: string;
+  duration: string | null;
+  isProduction: boolean;
+  url: string;
+}
 
-const deployments = [
-  {
-    id: "dep-1",
-    status: "ready",
-    time: "2 minutes ago",
-    duration: "45s",
-    commit: "a1b2c3d",
-    commitMessage: "feat: add contact form",
-    branch: "main",
-    isProduction: true,
-  },
-  {
-    id: "dep-2",
-    status: "ready",
-    time: "1 hour ago",
-    duration: "38s",
-    commit: "e4f5g6h",
-    commitMessage: "style: improve responsive design",
-    branch: "main",
-    isProduction: false,
-  },
-  {
-    id: "dep-3",
-    status: "ready",
-    time: "3 hours ago",
-    duration: "52s",
-    commit: "i7j8k9l",
-    commitMessage: "docs: update README",
-    branch: "main",
-    isProduction: false,
-  },
-];
+interface Domain {
+  id: string;
+  domain: string;
+  isPrimary: boolean;
+  verified: boolean;
+}
 
-const statusConfig = {
-  ready: {
-    icon: CheckCircle2,
-    color: "text-green-600 dark:text-green-400",
-    bg: "bg-green-100 dark:bg-green-900/30",
-    label: "Ready",
-  },
-  building: {
-    icon: Loader2,
-    color: "text-yellow-600 dark:text-yellow-400",
-    bg: "bg-yellow-100 dark:bg-yellow-900/30",
-    label: "Building",
-  },
-  error: {
-    icon: XCircle,
-    color: "text-red-600 dark:text-red-400",
-    bg: "bg-red-100 dark:bg-red-900/30",
-    label: "Error",
-  },
-};
+interface Project {
+  id: string;
+  name: string;
+  slug: string;
+  framework: string | null;
+  repoUrl: string | null;
+  repoBranch: string | null;
+  createdAt: string;
+  deployments: Deployment[];
+  lastDeployment: Deployment | null;
+  domains: Domain[];
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="p-8">
+      <div className="flex items-center gap-4 mb-4">
+        <Skeleton className="h-10 w-10 rounded" />
+        <div className="flex-1">
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-72" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <CardContent className="p-4">
+              <Skeleton className="h-12 w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <Skeleton className="h-10 w-96 mb-4" />
+      <Card>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-20 w-full" />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 export default function ProjectDetailPage() {
   const params = useParams();
-  const projectName = params.name as string;
-  const [selectedDeployment, setSelectedDeployment] = useState(deployments[0]);
+  const projectSlug = params.name as string;
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedDeployment, setSelectedDeployment] = useState<Deployment | null>(null);
 
-  const project = { ...projectData, name: projectName };
-  const status = statusConfig[project.status];
-  const StatusIcon = status.icon;
+  useEffect(() => {
+    async function fetchProject() {
+      try {
+        const response = await fetch(`/api/projects/by-slug/${projectSlug}`);
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("Project not found");
+          }
+          throw new Error("Failed to fetch project");
+        }
+        const data = await response.json();
+        setProject(data);
+        if (data.deployments?.length > 0) {
+          setSelectedDeployment(data.deployments[0]);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  const copyDomain = () => {
-    navigator.clipboard.writeText(project.customDomain || project.domain);
+    fetchProject();
+  }, [projectSlug]);
+
+  const copyDomain = (domain: string) => {
+    navigator.clipboard.writeText(domain);
   };
+
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
+
+  if (error || !project) {
+    return (
+      <div className="p-8">
+        <Card className="border-red-200 dark:border-red-900">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+              <AlertCircle className="h-6 w-6" />
+              <div>
+                <h3 className="font-semibold">Failed to load project</h3>
+                <p className="text-sm text-red-500">{error || "Project not found"}</p>
+              </div>
+            </div>
+            <Button variant="outline" className="mt-4" asChild>
+              <Link href="/projects">Back to Projects</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const projectStatus = project.lastDeployment?.status || "ready";
+  const status = getStatusConfig(projectStatus);
+  const StatusIcon = status.icon;
+  const primaryDomain = project.domains?.find((d) => d.isPrimary)?.domain || `${project.slug}.cloudify.tranthachnguyen.com`;
+  const gitRepo = project.repoUrl || "";
 
   return (
     <div className="p-8">
@@ -138,12 +184,12 @@ export default function ProjectDetailPage() {
               <motion.h1
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-3xl font-bold text-gray-900 dark:text-white"
+                className="text-3xl font-bold text-foreground"
               >
                 {project.name}
               </motion.h1>
-              <Badge variant={project.status === "ready" ? "success" : "warning"}>
-                <StatusIcon className={`h-3 w-3 mr-1 ${project.status === "building" ? "animate-spin" : ""}`} />
+              <Badge variant={projectStatus === "ready" ? "success" : "warning"}>
+                <StatusIcon className={`h-3 w-3 mr-1 ${projectStatus === "building" ? "animate-spin" : ""}`} />
                 {status.label}
               </Badge>
             </div>
@@ -151,15 +197,15 @@ export default function ProjectDetailPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="mt-1 text-gray-600 dark:text-gray-400"
+              className="mt-1 text-muted-foreground"
             >
-              {project.description}
+              {project.framework || "Next.js"} project
             </motion.p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" asChild>
               <a
-                href={`https://${project.customDomain || project.domain}`}
+                href={`https://${primaryDomain}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -179,7 +225,7 @@ export default function ProjectDetailPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href={`/projects/${project.name}/settings`}>
+                  <Link href={`/projects/${project.slug}/settings`}>
                     <Settings className="h-4 w-4 mr-2" />
                     Settings
                   </Link>
@@ -210,20 +256,20 @@ export default function ProjectDetailPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Globe className="h-5 w-5 text-blue-600" />
+                  <Globe className="h-5 w-5 text-[#0070f3]" />
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Domain</p>
+                    <p className="text-sm text-muted-foreground">Domain</p>
                     <a
-                      href={`https://${project.customDomain || project.domain}`}
+                      href={`https://${primaryDomain}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-medium text-gray-900 dark:text-white hover:text-blue-600"
+                      className="font-medium text-foreground hover:text-[#0070f3]"
                     >
-                      {project.customDomain || project.domain}
+                      {primaryDomain}
                     </a>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={copyDomain}>
+                <Button variant="ghost" size="icon" onClick={() => copyDomain(primaryDomain)}>
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -236,15 +282,19 @@ export default function ProjectDetailPage() {
               <div className="flex items-center gap-3">
                 <GitBranch className="h-5 w-5 text-gray-600" />
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Repository</p>
-                  <a
-                    href={`https://${project.gitRepo}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-gray-900 dark:text-white hover:text-blue-600"
-                  >
-                    {project.gitRepo}
-                  </a>
+                  <p className="text-sm text-muted-foreground">Repository</p>
+                  {gitRepo ? (
+                    <a
+                      href={gitRepo.startsWith("http") ? gitRepo : `https://${gitRepo}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-foreground hover:text-[#0070f3]"
+                    >
+                      {gitRepo.replace(/^https?:\/\//, "")}
+                    </a>
+                  ) : (
+                    <p className="font-medium text-muted-foreground">Not connected</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -256,9 +306,9 @@ export default function ProjectDetailPage() {
               <div className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-green-600" />
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Last Deployment</p>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {project.lastDeployment.time}
+                  <p className="text-sm text-muted-foreground">Last Deployment</p>
+                  <p className="font-medium text-foreground">
+                    {project.lastDeployment?.time || "No deployments"}
                   </p>
                 </div>
               </div>
@@ -284,87 +334,105 @@ export default function ProjectDetailPage() {
               <CardTitle>Deployment History</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {deployments.map((deployment) => {
-                  const depStatus = statusConfig[deployment.status as keyof typeof statusConfig];
-                  const DepStatusIcon = depStatus.icon;
-                  return (
-                    <div
-                      key={deployment.id}
-                      onClick={() => setSelectedDeployment(deployment)}
-                      className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
-                        selectedDeployment.id === deployment.id
-                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                          : "border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`p-2 rounded-lg ${depStatus.bg}`}>
-                          <DepStatusIcon className={`h-4 w-4 ${depStatus.color}`} />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-900 dark:text-white">
-                              {deployment.commitMessage}
-                            </span>
-                            {deployment.isProduction && (
-                              <Badge variant="default" className="text-xs">Production</Badge>
-                            )}
+              {project.deployments.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <GitBranch className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>No deployments yet</p>
+                  <p className="text-sm">Push to your repository to trigger a deployment</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {project.deployments.map((deployment) => {
+                    const depStatus = getStatusConfig(deployment.status);
+                    const DepStatusIcon = depStatus.icon;
+                    return (
+                      <div
+                        key={deployment.id}
+                        onClick={() => setSelectedDeployment(deployment)}
+                        className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
+                          selectedDeployment?.id === deployment.id
+                            ? "border-foreground bg-secondary"
+                            : "border-border hover:bg-secondary/50"
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`p-2 rounded-lg ${depStatus.bg}`}>
+                            <DepStatusIcon className={`h-4 w-4 ${depStatus.color} ${deployment.status === "building" ? "animate-spin" : ""}`} />
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                            <span className="font-mono">{deployment.commit}</span>
-                            <span>{deployment.branch}</span>
-                            <span>{deployment.time}</span>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-foreground">
+                                {deployment.commitMessage}
+                              </span>
+                              {deployment.isProduction && (
+                                <Badge variant="default" className="text-xs">Production</Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span className="font-mono">{deployment.commit}</span>
+                              <span>{deployment.branch}</span>
+                              <span>{deployment.time}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">{deployment.duration}</span>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Eye className="h-4 w-4 mr-2" />
-                              View Logs
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <RotateCcw className="h-4 w-4 mr-2" />
-                              Redeploy
-                            </DropdownMenuItem>
-                            {!deployment.isProduction && (
-                              <DropdownMenuItem>
-                                <CheckCircle2 className="h-4 w-4 mr-2" />
-                                Promote to Production
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">{deployment.duration}</span>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/deployments/${deployment.id}`}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View Logs
+                                </Link>
                               </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              <DropdownMenuItem>
+                                <RotateCcw className="h-4 w-4 mr-2" />
+                                Redeploy
+                              </DropdownMenuItem>
+                              {!deployment.isProduction && (
+                                <DropdownMenuItem>
+                                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                                  Promote to Production
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Build Logs Tab */}
         <TabsContent value="logs">
-          <BuildLogs
-            deploymentId={selectedDeployment.id}
-            status={selectedDeployment.status as "building" | "ready" | "error"}
-          />
+          {selectedDeployment ? (
+            <BuildLogs
+              deploymentId={selectedDeployment.id}
+              status={selectedDeployment.status as "building" | "ready" | "error"}
+            />
+          ) : (
+            <Card>
+              <CardContent className="p-6 text-center text-muted-foreground">
+                No deployment selected
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         {/* Environment Tab */}
         <TabsContent value="environment">
           <Card>
             <CardContent className="p-6">
-              <EnvVariables projectId={project.name} />
+              <EnvVariables projectId={project.id} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -377,18 +445,42 @@ export default function ProjectDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-800">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {project.customDomain || project.domain}
-                      </p>
-                      <p className="text-sm text-gray-500">Primary domain</p>
+                {project.domains && project.domains.length > 0 ? (
+                  project.domains.map((domain) => (
+                    <div
+                      key={domain.id}
+                      className="flex items-center justify-between p-4 rounded-lg border border-border"
+                    >
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 className={`h-5 w-5 ${domain.verified ? "text-green-600" : "text-muted-foreground"}`} />
+                        <div>
+                          <p className="font-medium text-foreground">
+                            {domain.domain}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {domain.isPrimary ? "Primary domain" : "Custom domain"}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant={domain.verified ? "success" : "warning"}>
+                        {domain.verified ? "Active" : "Pending"}
+                      </Badge>
                     </div>
+                  ))
+                ) : (
+                  <div className="flex items-center justify-between p-4 rounded-lg border border-border">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                      <div>
+                        <p className="font-medium text-foreground">
+                          {primaryDomain}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Default domain</p>
+                      </div>
+                    </div>
+                    <Badge variant="success">Active</Badge>
                   </div>
-                  <Badge variant="success">Active</Badge>
-                </div>
+                )}
                 <Button variant="outline">
                   <Globe className="h-4 w-4" />
                   Add Domain
@@ -405,7 +497,7 @@ export default function ProjectDetailPage() {
               <CardTitle>Analytics Overview</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-muted-foreground">
                 <p>Analytics data would be displayed here</p>
                 <Button variant="outline" className="mt-4" asChild>
                   <Link href="/analytics">View Full Analytics</Link>

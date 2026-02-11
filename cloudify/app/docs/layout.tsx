@@ -133,8 +133,8 @@ export default function DocsLayout({
               className={cn(
                 "flex w-full items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
                 hasActiveItem
-                  ? "text-blue-600 dark:text-blue-400"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "text-foreground"
+                  : "text-foreground hover:bg-secondary"
               )}
             >
               <div className="flex items-center gap-2">
@@ -157,8 +157,8 @@ export default function DocsLayout({
                     className={cn(
                       "block px-3 py-1.5 text-sm rounded-lg transition-colors",
                       pathname === item.href
-                        ? "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 font-medium"
-                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+                        ? "bg-secondary text-foreground font-medium"
+                        : "text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-secondary"
                     )}
                   >
                     {item.title}
@@ -176,7 +176,7 @@ export default function DocsLayout({
     <div className="flex min-h-screen flex-col">
       <Header />
       <div className="flex-1 pt-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
           <div className="flex gap-8 py-8">
             {/* Mobile menu button */}
             <div className="lg:hidden fixed bottom-4 right-4 z-50">
@@ -195,7 +195,7 @@ export default function DocsLayout({
 
             {/* Mobile sidebar */}
             {mobileMenuOpen && (
-              <div className="lg:hidden fixed inset-0 z-40 bg-white dark:bg-gray-950 pt-20 px-4 overflow-y-auto">
+              <div className="lg:hidden fixed inset-0 z-40 bg-card pt-20 px-4 overflow-y-auto">
                 <Sidebar />
               </div>
             )}

@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       };
       level?: string;
       message?: { contains: string; mode: "insensitive" };
-      id?: { lt: string };
+      timestamp?: { lt: Date };
     } = {
       deployment: {
         project: {
@@ -48,8 +48,13 @@ export async function GET(request: NextRequest) {
       where.message = { contains: search, mode: "insensitive" };
     }
 
+    // Use timestamp-based cursor for reliable pagination
+    // Cursor format: ISO date string
     if (cursor) {
-      where.id = { lt: cursor };
+      const cursorDate = new Date(cursor);
+      if (!isNaN(cursorDate.getTime())) {
+        where.timestamp = { lt: cursorDate };
+      }
     }
 
     const logs = await prisma.deploymentLog.findMany({
@@ -76,7 +81,10 @@ export async function GET(request: NextRequest) {
 
     const hasMore = logs.length > limit;
     const items = hasMore ? logs.slice(0, -1) : logs;
-    const nextCursor = hasMore ? items[items.length - 1].id : null;
+    // Use ISO timestamp as cursor for reliable sorting
+    const nextCursor = hasMore && items.length > 0
+      ? items[items.length - 1].timestamp.toISOString()
+      : null;
 
     // Transform logs to include source info
     const transformedLogs = items.map((log) => ({

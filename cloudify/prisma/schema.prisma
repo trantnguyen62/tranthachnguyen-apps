@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -15,6 +16,8 @@ model User {
   name          String
   passwordHash  String?
   avatar        String?
+  image         String?   // NextAuth OAuth profile image
+  emailVerified DateTime? // NextAuth email verification
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -48,6 +51,17 @@ model Session {
 
   @@index([token])
   @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
 }
 
 model Account {
@@ -283,18 +297,25 @@ model Activity {
   id          String   @id @default(cuid())
   userId      String
   projectId   String?
+  teamId      String?
   type        String   // deployment, domain, env_var, project, team, etc.
   action      String   // created, updated, deleted, deployed, verified, etc.
   description String
   metadata    Json?    // Additional context
+  ipAddress   String?  // Client IP address for audit
+  userAgent   String?  // Client user agent for audit
   createdAt   DateTime @default(now())
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  team    Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([projectId])
+  @@index([teamId])
   @@index([createdAt])
+  @@index([type])
+  @@index([action])
 }
 
 // ============ TEAMS & ORGANIZATIONS ============
@@ -311,6 +332,7 @@ model Team {
   members      TeamMember[]
   teamProjects TeamProject[]
   invitations  TeamInvitation[]
+  activities   Activity[]
 }
 
 model TeamMember {

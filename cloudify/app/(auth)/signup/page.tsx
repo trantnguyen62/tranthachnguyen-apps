@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
+import { signIn } from "next-auth/react";
 
 const features = [
   "Unlimited deployments",
@@ -48,6 +49,19 @@ export default function SignupPage() {
         return;
       }
 
+      // Sign in via NextAuth to get proper session cookie
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        // Account was created but auto-login failed - redirect to login
+        window.location.href = "/login";
+        return;
+      }
+
       // Redirect to dashboard after successful signup
       window.location.href = "/dashboard";
     } catch {
@@ -57,33 +71,26 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900 px-4 py-12">
-      {/* Background effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-[20rem] left-1/2 -translate-x-1/2">
-          <div className="h-[40rem] w-[40rem] rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-3xl" />
-        </div>
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.3 }}
         className="relative w-full max-w-md"
       >
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 shadow-lg shadow-blue-500/25">
-              <Cloud className="h-6 w-6 text-white" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground">
+              <Cloud className="h-4 w-4 text-background" />
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">
+            <span className="text-sm font-semibold text-foreground">
               Cloudify
             </span>
           </Link>
         </div>
 
-        <Card className="border-gray-200 dark:border-gray-800 shadow-xl">
+        <Card className="border-border">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Create your account</CardTitle>
             <CardDescription>
@@ -96,10 +103,10 @@ export default function SignupPage() {
               {features.map((feature) => (
                 <div
                   key={feature}
-                  className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                  className="flex items-center gap-2 text-sm text-muted-foreground"
                 >
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                    <Check className="h-3 w-3 text-green-600 dark:text-green-400" />
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-secondary">
+                    <Check className="h-3 w-3 text-foreground" />
                   </div>
                   {feature}
                 </div>
@@ -112,10 +119,10 @@ export default function SignupPage() {
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200 dark:border-gray-800" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-4 text-gray-500 dark:bg-gray-950 dark:text-gray-400">
+                <span className="bg-card px-4 text-gray-500 dark:text-gray-400">
                   or sign up with email
                 </span>
               </div>
@@ -123,7 +130,7 @@ export default function SignupPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm dark:bg-red-900/20 dark:text-red-400">
+                <div className="p-3 rounded-lg bg-[#ee0000]/10 text-[#ee0000] text-sm">
                   {error}
                 </div>
               )}
@@ -131,12 +138,12 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="name"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="text-sm font-medium text-foreground"
                 >
                   Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="name"
                     type="text"
@@ -152,12 +159,12 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="email"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="text-sm font-medium text-foreground"
                 >
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
@@ -173,12 +180,12 @@ export default function SignupPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="password"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                  className="text-sm font-medium text-foreground"
                 >
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
@@ -190,14 +197,14 @@ export default function SignupPage() {
                     required
                   />
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-muted-foreground">
                   Must be at least 8 characters
                 </p>
               </div>
 
               <Button
                 type="submit"
-                variant="primary"
+                variant="default"
                 className="w-full"
                 disabled={isLoading}
               >
@@ -216,11 +223,11 @@ export default function SignupPage() {
             </form>
 
             {/* Sign in link */}
-            <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-6 text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
+                className="font-medium text-[#0070f3] hover:text-[#0070f3]"
               >
                 Sign in
               </Link>
@@ -229,13 +236,13 @@ export default function SignupPage() {
         </Card>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
+        <p className="mt-8 text-center text-xs text-muted-foreground">
           By creating an account, you agree to our{" "}
-          <Link href="/terms" className="underline hover:text-gray-700 dark:hover:text-gray-300">
+          <Link href="/terms" className="underline hover:text-foreground">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="underline hover:text-gray-700 dark:hover:text-gray-300">
+          <Link href="/privacy" className="underline hover:text-foreground">
             Privacy Policy
           </Link>
           .

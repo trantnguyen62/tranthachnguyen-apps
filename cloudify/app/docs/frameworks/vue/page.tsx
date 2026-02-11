@@ -8,14 +8,14 @@ export default function VueDocsPage() {
   return (
     <article className="prose prose-gray dark:prose-invert max-w-none">
       <div className="not-prose flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 rounded-2xl bg-[#42b883] flex items-center justify-center">
+        <div className="w-16 h-16 rounded-lg bg-[#42b883] flex items-center justify-center">
           <svg className="h-10 w-10 text-white" viewBox="0 0 24 24" fill="currentColor">
             <path d="M24,1.61H14.06L12,5.16,9.94,1.61H0L12,22.39ZM12,14.08,5.16,2.23H9.59L12,6.41l2.41-4.18h4.43Z"/>
           </svg>
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white m-0">Vue on Cloudify</h1>
-          <p className="text-gray-600 dark:text-gray-400 m-0 mt-1">Deploy Vue.js applications with optimal performance</p>
+          <h1 className="text-3xl font-bold text-foreground m-0">Vue on Cloudify</h1>
+          <p className="text-muted-foreground m-0 mt-1">Deploy Vue.js applications with optimal performance</p>
         </div>
       </div>
 
@@ -33,11 +33,11 @@ export default function VueDocsPage() {
           { name: "Vue CLI", desc: "Classic Vue CLI projects" },
           { name: "Vue 2", desc: "Legacy Vue 2 support" },
         ].map((item) => (
-          <div key={item.name} className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+          <div key={item.name} className="flex items-center gap-3 p-4 rounded-lg bg-background border border-border">
             <Check className="h-5 w-5 text-green-500 shrink-0" />
             <div>
-              <span className="font-medium text-gray-900 dark:text-white">{item.name}</span>
-              <p className="text-sm text-gray-500">{item.desc}</p>
+              <span className="font-medium text-foreground">{item.name}</span>
+              <p className="text-sm text-muted-foreground">{item.desc}</p>
             </div>
           </div>
         ))}
@@ -224,7 +224,7 @@ const { data } = await useFetch('/api/hello')`}</code>
       </ul>
 
       <div className="not-prose mt-12">
-        <Button variant="primary" asChild>
+        <Button variant="default" asChild>
           <Link href="/new">
             Deploy Your Vue App
             <ArrowRight className="h-4 w-4" />

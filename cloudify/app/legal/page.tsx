@@ -66,7 +66,7 @@ export default function LegalPage() {
       <main className="flex-1 pt-16">
         {/* Hero */}
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -75,10 +75,10 @@ export default function LegalPage() {
               <Badge className="mb-4" variant="secondary">
                 Legal
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Legal Documents
               </h1>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Important policies and agreements governing your use of Cloudify services.
               </p>
             </motion.div>
@@ -98,17 +98,17 @@ export default function LegalPage() {
                 >
                   <Link
                     href={doc.href}
-                    className="group flex items-center justify-between p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 hover:shadow-lg transition-all hover:border-blue-500 dark:hover:border-blue-500"
+                    className="group flex items-center justify-between p-6 rounded-lg border border-border bg-card hover:shadow-lg transition-all hover:border-blue-500 dark:hover:border-blue-500"
                   >
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
-                        <doc.icon className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                        <doc.icon className="h-6 w-6 text-muted-foreground" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                           {doc.name}
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {doc.description}
                         </p>
                         <p className="text-xs text-gray-500 mt-2">
@@ -116,7 +116,7 @@ export default function LegalPage() {
                         </p>
                       </div>
                     </div>
-                    <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all shrink-0" />
+                    <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-[#0070f3] group-hover:translate-x-1 transition-all shrink-0" />
                   </Link>
                 </motion.div>
               ))}
@@ -125,16 +125,16 @@ export default function LegalPage() {
         </section>
 
         {/* Contact Section */}
-        <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <section className="py-16 bg-background">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-foreground">
               Have Questions?
             </h2>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
+            <p className="mt-4 text-muted-foreground">
               For legal inquiries, please contact us at{" "}
               <a
                 href="mailto:legal@cloudify.app"
-                className="text-blue-600 hover:underline"
+                className="text-[#0070f3] hover:underline"
               >
                 legal@cloudify.app
               </a>

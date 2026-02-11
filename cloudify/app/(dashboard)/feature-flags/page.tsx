@@ -50,7 +50,7 @@ import { useProjects } from "@/hooks/use-projects";
 type FlagType = "boolean" | "percentage" | "user-segment";
 
 const typeConfig = {
-  boolean: { icon: Flag, label: "Boolean", color: "text-blue-500" },
+  boolean: { icon: Flag, label: "Boolean", color: "text-[#0070f3]" },
   percentage: { icon: Percent, label: "Percentage", color: "text-green-500" },
   "user-segment": { icon: Users, label: "User Segment", color: "text-purple-500" },
 };
@@ -153,7 +153,7 @@ export default function FeatureFlagsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -162,10 +162,10 @@ export default function FeatureFlagsPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           Failed to load feature flags
         </h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button variant="outline" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
@@ -175,14 +175,14 @@ export default function FeatureFlagsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             Feature Flags
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-muted-foreground">
             Control feature rollouts with real-time flags
           </p>
         </div>
@@ -191,7 +191,7 @@ export default function FeatureFlagsPage() {
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
-          <Button variant="primary" onClick={() => setCreateDialogOpen(true)}>
+          <Button variant="default" onClick={() => setCreateDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             Create Flag
           </Button>
@@ -208,19 +208,19 @@ export default function FeatureFlagsPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+            className="p-4 bg-card rounded-xl border border-border"
           >
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="text-2xl font-bold text-foreground">
               {stat.value}
             </p>
-            <p className="text-sm text-gray-500">{stat.label}</p>
+            <p className="text-sm text-muted-foreground">{stat.label}</p>
           </div>
         ))}
       </div>
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search flags..."
           value={searchQuery}
@@ -232,9 +232,9 @@ export default function FeatureFlagsPage() {
       {/* Flags list */}
       <div className="space-y-3">
         {filteredFlags.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+          <div className="text-center py-12 bg-card rounded-xl border border-border">
             <Flag className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-            <p className="text-gray-500">No feature flags found</p>
+            <p className="text-muted-foreground">No feature flags found</p>
           </div>
         ) : (
           filteredFlags.map((flag, index) => {
@@ -248,16 +248,16 @@ export default function FeatureFlagsPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="p-5 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+                className="p-5 bg-card rounded-xl border border-border"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className={cn("p-2 rounded-lg", flag.enabled ? "bg-green-100 dark:bg-green-900/30" : "bg-gray-100 dark:bg-gray-800")}>
-                      <Flag className={cn("h-5 w-5", flag.enabled ? "text-green-600 dark:text-green-400" : "text-gray-400")} />
+                    <div className={cn("p-2 rounded-lg", flag.enabled ? "bg-green-100 dark:bg-green-900/30" : "bg-secondary")}>
+                      <Flag className={cn("h-5 w-5", flag.enabled ? "text-green-600 dark:text-green-400" : "text-muted-foreground")} />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                        <h3 className="font-semibold text-foreground">
                           {flag.name}
                         </h3>
                         <Badge variant="secondary">
@@ -267,10 +267,10 @@ export default function FeatureFlagsPage() {
                           {flag.key}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {flag.description || "No description"}
                       </p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <TypeIcon className={cn("h-3 w-3", typeInfo.color)} />
                           {typeInfo.label}
@@ -392,8 +392,8 @@ export default function FeatureFlagsPage() {
                       className={cn(
                         "p-3 rounded-lg border text-left transition-colors",
                         newFlag.type === type
-                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                          : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                          ? "border-foreground bg-secondary"
+                          : "border-border hover:bg-secondary"
                       )}
                     >
                       <Icon className={cn("h-5 w-5 mb-1", config.color)} />
@@ -425,7 +425,7 @@ export default function FeatureFlagsPage() {
               Cancel
             </Button>
             <Button
-              variant="primary"
+              variant="default"
               onClick={handleCreateFlag}
               disabled={!newFlag.key || !newFlag.name || !newFlag.projectId || isCreating}
             >

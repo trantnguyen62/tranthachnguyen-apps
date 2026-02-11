@@ -17,26 +17,26 @@ export default function ImportingPage() {
       <h2>Import Methods</h2>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-          <Github className="h-8 w-8 text-gray-900 dark:text-white mb-4" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">From Git</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+        <div className="p-6 rounded-xl border border-border bg-background">
+          <Github className="h-8 w-8 text-foreground mb-4" />
+          <h3 className="font-semibold text-foreground">From Git</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Connect GitHub, GitLab, or Bitbucket and import any repository.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-          <FolderGit2 className="h-8 w-8 text-blue-500 mb-4" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">From Template</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+        <div className="p-6 rounded-xl border border-border bg-background">
+          <FolderGit2 className="h-8 w-8 text-[#0070f3] mb-4" />
+          <h3 className="font-semibold text-foreground">From Template</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Start with a pre-built template and customize from there.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+        <div className="p-6 rounded-xl border border-border bg-background">
           <Upload className="h-8 w-8 text-green-500 mb-4" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">From CLI</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <h3 className="font-semibold text-foreground">From CLI</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Deploy directly from your local machine using the Cloudify CLI.
           </p>
         </div>

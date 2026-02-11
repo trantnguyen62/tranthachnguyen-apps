@@ -77,45 +77,46 @@ const features = [
 ];
 
 const colorClasses = {
-  blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-  green: "bg-green-500/10 text-green-600 dark:text-green-400",
-  purple: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
-  orange: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-  red: "bg-red-500/10 text-red-600 dark:text-red-400",
-  cyan: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400",
-  indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
-  pink: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
+  blue: "bg-secondary text-foreground",
+  green: "bg-secondary text-foreground",
+  purple: "bg-secondary text-foreground",
+  orange: "bg-secondary text-foreground",
+  red: "bg-secondary text-foreground",
+  cyan: "bg-secondary text-foreground",
+  indigo: "bg-secondary text-foreground",
+  pink: "bg-secondary text-foreground",
 };
 
 export function Features() {
   return (
-    <section className="relative py-24 bg-white dark:bg-gray-950">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative py-24 bg-card">
+      <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center">
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-sm font-semibold text-blue-600 dark:text-blue-400"
+            transition={{ duration: 0.3 }}
+            className="text-sm font-semibold text-muted-foreground"
           >
             EVERYTHING YOU NEED
           </motion.p>
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="mt-2 text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl"
+            transition={{ delay: 0.1, duration: 0.3 }}
+            className="mt-2 text-4xl font-bold tracking-tight text-foreground sm:text-5xl"
           >
             Deploy once, deliver everywhere
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-400"
+            transition={{ delay: 0.2, duration: 0.3 }}
+            className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground"
           >
             A complete platform for building and deploying modern web applications
             with all the features you need out of the box.
@@ -127,47 +128,52 @@ export function Features() {
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group relative rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:border-gray-300 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700"
+              transition={{ delay: index * 0.1, duration: 0.3 }}
+              className="group relative rounded-lg border border-border bg-card p-6 transition-all duration-300 hover:border-foreground/20"
             >
               <div
                 className={cn(
-                  "inline-flex h-12 w-12 items-center justify-center rounded-xl",
+                  "inline-flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110",
                   colorClasses[feature.color as keyof typeof colorClasses]
                 )}
               >
                 <feature.icon className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="mt-4 text-lg font-semibold text-foreground">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
+              <p className="mt-2 text-muted-foreground">
                 {feature.description}
               </p>
+              <div className="mt-4 flex items-center text-sm font-medium text-foreground opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                Learn more
+                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </div>
             </motion.div>
           ))}
         </div>
 
         {/* Large feature highlight */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-24 relative overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-8 lg:p-12 dark:border-gray-800 dark:from-gray-900 dark:to-gray-950"
+          transition={{ duration: 0.3 }}
+          className="mt-24 relative overflow-hidden rounded-lg border border-border bg-secondary/50 p-8 lg:p-12"
         >
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-3 py-1 text-sm font-medium text-blue-600 dark:text-blue-400">
+              <div className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm font-medium text-foreground">
                 <Zap className="h-4 w-4" />
                 Fluid Compute
               </div>
-              <h3 className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+              <h3 className="mt-4 text-3xl font-bold text-foreground">
                 Auto-scaling that just works
               </h3>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Our serverless infrastructure automatically scales your applications
                 based on demand. Pay only for what you use, scale to millions of users
                 without any configuration.
@@ -195,13 +201,13 @@ export function Features() {
                         />
                       </svg>
                     </div>
-                    <span className="text-gray-700 dark:text-gray-300">{item}</span>
+                    <span className="text-foreground">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div className="relative">
-              <div className="aspect-square rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-8">
+              <div className="aspect-square rounded-lg bg-foreground p-8">
                 <div className="h-full w-full rounded-xl bg-gray-900/90 backdrop-blur p-6">
                   <div className="flex items-center gap-2 text-gray-400">
                     <Terminal className="h-4 w-4" />
@@ -211,7 +217,7 @@ export function Features() {
                     <div className="text-green-400">✓ Build completed</div>
                     <div className="text-green-400">✓ Functions deployed</div>
                     <div className="text-green-400">✓ Edge network updated</div>
-                    <div className="text-blue-400">→ Live at cloudify.app</div>
+                    <div className="text-[#0070f3]">→ Live at cloudify.app</div>
                   </div>
                 </div>
               </div>

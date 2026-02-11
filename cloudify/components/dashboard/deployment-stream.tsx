@@ -57,9 +57,9 @@ export function DeploymentStream({
       case "success":
         return "text-green-400";
       case "command":
-        return "text-blue-400";
+        return "text-[#0070f3]";
       default:
-        return "text-gray-400";
+        return "text-muted-foreground";
     }
   };
 
@@ -74,10 +74,10 @@ export function DeploymentStream({
             ) : status?.status === "error" ? (
               <XCircle className="h-6 w-6 text-red-500" />
             ) : (
-              <Loader2 className="h-6 w-6 text-blue-500 animate-spin" />
+              <Loader2 className="h-6 w-6 text-foreground animate-spin" />
             )}
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">
+              <h3 className="font-semibold text-foreground">
                 {status?.status === "ready"
                   ? "Deployment Complete"
                   : status?.status === "error"
@@ -85,7 +85,7 @@ export function DeploymentStream({
                   : currentStep?.message || "Starting deployment..."}
               </h3>
               {status?.duration && (
-                <p className="text-sm text-gray-500 flex items-center gap-1">
+                <p className="text-sm text-muted-foreground flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   Completed in {status.duration}
                 </p>
@@ -93,7 +93,7 @@ export function DeploymentStream({
             </div>
           </div>
           {isConnected && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
@@ -122,8 +122,8 @@ export function DeploymentStream({
                     isComplete
                       ? "text-green-600 dark:text-green-400"
                       : isCurrent
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-400"
+                      ? "text-foreground"
+                      : "text-muted-foreground"
                   )}
                 >
                   {isComplete ? (
@@ -192,13 +192,13 @@ export function DeploymentStream({
       </AnimatePresence>
 
       {/* Build logs */}
-      <div className="rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div className="rounded-lg border border-border overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-2 bg-secondary border-b border-border">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
             <Terminal className="h-4 w-4" />
             Build Logs
           </div>
-          <span className="text-xs text-gray-500">{logs.length} lines</span>
+          <span className="text-xs text-muted-foreground">{logs.length} lines</span>
         </div>
         <div className="h-64 overflow-y-auto bg-gray-950 p-4 font-mono text-sm">
           <AnimatePresence mode="popLayout">

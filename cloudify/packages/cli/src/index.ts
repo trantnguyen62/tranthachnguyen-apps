@@ -1,161 +1,36 @@
 #!/usr/bin/env node
 /**
  * Cloudify CLI
- *
- * Deploy your projects from the command line.
- *
- * Usage:
- *   cloudify                 Deploy current directory
- *   cloudify init            Initialize a new project
- *   cloudify dev             Start local development server
- *   cloudify env             Manage environment variables
- *   cloudify domains         Manage custom domains
- *   cloudify logs            View deployment logs
- *   cloudify rollback        Rollback to previous deployment
- *   cloudify login           Authenticate with Cloudify
- *   cloudify logout          Log out of Cloudify
+ * Deploy and manage your projects from the command line
  */
 
 import { Command } from "commander";
 import chalk from "chalk";
-import { version } from "../package.json";
-import { deploy } from "./commands/deploy";
-import { init } from "./commands/init";
-import { dev } from "./commands/dev";
-import { envList, envAdd, envRemove, envPull } from "./commands/env";
-import { domainsList, domainsAdd, domainsRemove, domainsVerify } from "./commands/domains";
-import { logs, buildLogs } from "./commands/logs";
-import { rollback, listDeployments } from "./commands/rollback";
-import { login, logout, whoami } from "./commands/auth";
+import { login } from "./commands/login.js";
+import { deploy } from "./commands/deploy.js";
+import { init } from "./commands/init.js";
+import { envPull, envPush, envList } from "./commands/env.js";
+import { logs } from "./commands/logs.js";
+import { list } from "./commands/list.js";
+import { link, unlink } from "./commands/link.js";
+import { whoami } from "./commands/whoami.js";
+import { logout } from "./commands/logout.js";
+import { dev } from "./commands/dev.js";
+import { rollback } from "./commands/rollback.js";
+import { addDomain, removeDomain, listDomains, domainsVerify } from "./commands/domains.js";
 
 const program = new Command();
 
-// ASCII art logo
-const logo = `
-   _____ _                 _ _  __
-  / ____| |               | (_)/ _|
- | |    | | ___  _   _  __| |_| |_ _   _
- | |    | |/ _ \\| | | |/ _\` | |  _| | | |
- | |____| | (_) | |_| | (_| | | | | |_| |
-  \\_____|_|\\___/ \\__,_|\\__,_|_|_|  \\__, |
-                                    __/ |
-                                   |___/
-`;
-
 program
   .name("cloudify")
-  .description(chalk.cyan(logo) + "\nDeploy your projects to the cloud")
-  .version(version);
+  .description("Cloudify CLI - Deploy and manage your projects")
+  .version("1.0.0");
 
-// Deploy command (default)
-program
-  .command("deploy", { isDefault: true })
-  .description("Deploy the current project")
-  .option("-p, --prod", "Deploy to production")
-  .option("--no-wait", "Don't wait for deployment to complete")
-  .option("-y, --yes", "Skip confirmation prompts")
-  .action(deploy);
-
-// Init command
-program
-  .command("init")
-  .description("Initialize a new Cloudify project")
-  .option("-y, --yes", "Use default settings")
-  .action(init);
-
-// Dev command
-program
-  .command("dev")
-  .description("Start local development server")
-  .option("-p, --port <port>", "Port to run on", "3000")
-  .action(dev);
-
-// Environment variables
-const envCmd = program
-  .command("env")
-  .description("Manage environment variables");
-
-envCmd
-  .command("ls")
-  .description("List all environment variables")
-  .option("-e, --environment <env>", "Filter by environment")
-  .action(envList);
-
-envCmd
-  .command("add [key] [value]")
-  .description("Add an environment variable")
-  .option("-e, --environment <env>", "Target environment(s), comma-separated")
-  .action(envAdd);
-
-envCmd
-  .command("rm <key>")
-  .description("Remove an environment variable")
-  .option("-e, --environment <env>", "Target environment")
-  .action(envRemove);
-
-envCmd
-  .command("pull [filename]")
-  .description("Pull environment variables to .env.local")
-  .action(envPull);
-
-// Domains
-const domainsCmd = program
-  .command("domains")
-  .description("Manage custom domains");
-
-domainsCmd
-  .command("ls")
-  .description("List all domains")
-  .action(domainsList);
-
-domainsCmd
-  .command("add <domain>")
-  .description("Add a custom domain")
-  .action(domainsAdd);
-
-domainsCmd
-  .command("rm <domain>")
-  .description("Remove a custom domain")
-  .action(domainsRemove);
-
-domainsCmd
-  .command("verify <domain>")
-  .description("Verify domain ownership")
-  .action(domainsVerify);
-
-// Logs
-program
-  .command("logs")
-  .description("View deployment logs")
-  .option("-f, --follow", "Follow log output in real-time")
-  .option("-n, --lines <n>", "Number of lines to show", "100")
-  .option("-d, --deployment <id>", "Filter by deployment ID")
-  .option("--filter <text>", "Filter logs containing text")
-  .action(logs);
-
-program
-  .command("build-logs <deployment-id>")
-  .description("View build logs for a deployment")
-  .action(buildLogs);
-
-// Deployments
-program
-  .command("list")
-  .alias("ls")
-  .description("List recent deployments")
-  .action(listDeployments);
-
-// Rollback
-program
-  .command("rollback [deployment-id]")
-  .description("Rollback to a previous deployment")
-  .option("-y, --yes", "Skip confirmation")
-  .action(rollback);
-
-// Auth commands
+// Authentication commands
 program
   .command("login")
   .description("Log in to Cloudify")
+  .option("--token <token>", "Use API token instead of browser login")
   .action(login);
 
 program
@@ -165,8 +40,129 @@ program
 
 program
   .command("whoami")
-  .description("Show current logged in user")
+  .description("Show currently logged in user")
   .action(whoami);
 
-// Parse and execute
+// Project initialization
+program
+  .command("init")
+  .description("Initialize a new Cloudify project")
+  .option("-n, --name <name>", "Project name")
+  .option("-f, --framework <framework>", "Framework (nextjs, react, static)")
+  .action(init);
+
+// Project linking
+program
+  .command("link")
+  .description("Link current directory to a Cloudify project")
+  .option("--project <project>", "Project slug to link to")
+  .action(link);
+
+program
+  .command("unlink")
+  .description("Unlink current directory from Cloudify project")
+  .action(unlink);
+
+// Deployment
+program
+  .command("deploy")
+  .description("Deploy the current project")
+  .option("-p, --prod", "Deploy to production")
+  .option("--preview", "Create a preview deployment")
+  .option("-m, --message <message>", "Deployment message")
+  .action(deploy);
+
+// Environment variables
+const envCommand = program
+  .command("env")
+  .description("Manage environment variables");
+
+envCommand
+  .command("pull")
+  .description("Pull environment variables to local .env file")
+  .option("-e, --environment <env>", "Environment (production, preview, development)", "production")
+  .action(envPull);
+
+envCommand
+  .command("push")
+  .description("Push local .env variables to Cloudify")
+  .option("-e, --environment <env>", "Environment (production, preview, development)", "production")
+  .action(envPush);
+
+envCommand
+  .command("list")
+  .description("List environment variables")
+  .option("-e, --environment <env>", "Environment (production, preview, development)", "production")
+  .action(envList);
+
+// Logs
+program
+  .command("logs")
+  .description("Stream deployment logs")
+  .option("-f, --follow", "Follow log output")
+  .option("-n, --lines <number>", "Number of lines to show", "100")
+  .action(logs);
+
+// List projects
+program
+  .command("list")
+  .alias("ls")
+  .description("List all projects")
+  .action(list);
+
+// Development server
+program
+  .command("dev")
+  .description("Start local development server with Cloudify environment")
+  .option("-p, --port <port>", "Port to run on", "3000")
+  .option("-f, --framework <framework>", "Override framework detection")
+  .option("--no-watch", "Disable .env file watching")
+  .action(dev);
+
+// Rollback
+program
+  .command("rollback")
+  .description("Rollback to a previous deployment")
+  .option("-d, --deployment <id>", "Specific deployment ID to rollback to")
+  .action(rollback);
+
+// Domains
+const domainsCommand = program
+  .command("domains")
+  .description("Manage custom domains");
+
+domainsCommand
+  .command("list")
+  .description("List domains for current project")
+  .action(listDomains);
+
+domainsCommand
+  .command("add <domain>")
+  .description("Add a custom domain")
+  .action(addDomain);
+
+domainsCommand
+  .command("remove <domain>")
+  .description("Remove a custom domain")
+  .action(removeDomain);
+
+domainsCommand
+  .command("verify <domain>")
+  .description("Verify DNS configuration for a domain")
+  .action(domainsVerify);
+
+// Parse arguments
 program.parse();
+
+// Show help if no command
+if (!process.argv.slice(2).length) {
+  console.log(chalk.cyan(`
+   ______ __                  __ _  ____
+  / ____// /____   __  __ ___/ /(_)/ __/__  __
+ / /    / // __ \\ / / / // _  // // /_ / / / /
+/ /___ / // /_/ // /_/ // /_/ // // __// /_/ /
+\\____//_/ \\____/ \\__,_/ \\__,_//_//_/   \\__, /
+                                      /____/
+  `));
+  program.help();
+}

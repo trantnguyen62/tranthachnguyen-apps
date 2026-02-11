@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     title: "Cloudify - The Cloud Platform for Developers",
     description:
       "Build, deploy, and scale modern web applications with Cloudify.",
-    url: "https://cloudify.app",
+    url: "https://cloudify.tranthachnguyen.com",
     siteName: "Cloudify",
     locale: "en_US",
     type: "website",

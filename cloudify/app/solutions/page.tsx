@@ -31,7 +31,7 @@ const solutions = [
     description: "Deploy modern web applications with automatic scaling and global distribution",
     icon: Globe,
     href: "/solutions/web-apps",
-    color: "from-blue-500 to-cyan-500",
+    color: "from-gray-600 to-gray-400",
     features: ["Next.js optimized", "Edge rendering", "ISR support", "Automatic HTTPS"],
   },
   {
@@ -74,8 +74,8 @@ export default function SolutionsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -84,10 +84,10 @@ export default function SolutionsPage() {
               <Badge className="mb-4" variant="secondary">
                 Solutions
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Solutions for Every Use Case
               </h1>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Whether you're building AI applications, e-commerce stores, or enterprise
                 platforms, Cloudify has the tools and infrastructure you need.
               </p>
@@ -97,7 +97,7 @@ export default function SolutionsPage() {
 
         {/* Solutions Grid */}
         <section className="py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {solutions.map((solution, index) => (
                 <motion.div
@@ -109,28 +109,28 @@ export default function SolutionsPage() {
                 >
                   <Link
                     href={solution.href}
-                    className="group block h-full p-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 hover:shadow-xl transition-all hover:border-blue-500 dark:hover:border-blue-500"
+                    className="group block h-full p-6 rounded-lg border border-border bg-card hover:shadow-xl transition-all hover:border-foreground/20"
                   >
                     <div
                       className={`inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${solution.color}`}
                     >
                       <solution.icon className="h-7 w-7 text-white" />
                     </div>
-                    <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h3 className="mt-4 text-xl font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                       {solution.name}
                     </h3>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">
+                    <p className="mt-2 text-muted-foreground">
                       {solution.description}
                     </p>
                     <ul className="mt-4 space-y-2">
                       {solution.features.map((feature) => (
-                        <li key={feature} className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <li key={feature} className="flex items-center text-sm text-muted-foreground">
                           <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
                           {feature}
                         </li>
                       ))}
                     </ul>
-                    <div className="mt-6 flex items-center text-blue-600 dark:text-blue-400 font-medium">
+                    <div className="mt-6 flex items-center text-foreground font-medium">
                       Learn more
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -142,19 +142,19 @@ export default function SolutionsPage() {
         </section>
 
         {/* CTA */}
-        <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-white">
+        <section className="py-20 bg-foreground">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold text-background">
               Not Sure Which Solution Fits?
             </h2>
-            <p className="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
+            <p className="mt-4 text-xl text-background/70 max-w-2xl mx-auto">
               Talk to our team to find the perfect solution for your needs.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" asChild>
+              <Button size="lg" variant="secondary" className="bg-background text-foreground" asChild>
                 <Link href="/contact">Talk to Sales</Link>
               </Button>
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10" asChild>
+              <Button size="lg" variant="outline" className="border-background/30 text-background hover:bg-background/10" asChild>
                 <Link href="/demo">Request a Demo</Link>
               </Button>
             </div>

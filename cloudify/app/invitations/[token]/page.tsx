@@ -118,10 +118,10 @@ export default function InvitationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mx-auto" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading invitation...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto" />
+          <p className="mt-4 text-muted-foreground">Loading invitation...</p>
         </div>
       </div>
     );
@@ -129,7 +129,7 @@ export default function InvitationPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="max-w-md w-full">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
@@ -153,7 +153,7 @@ export default function InvitationPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center">
@@ -180,11 +180,11 @@ export default function InvitationPage() {
         <CardContent>
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 text-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-500 dark:text-gray-400">Invited email</span>
+              <span className="text-muted-foreground">Invited email</span>
               <span className="font-medium">{invitation.email}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 dark:text-gray-400">Expires</span>
+              <span className="text-muted-foreground">Expires</span>
               <span className="font-medium">
                 {new Date(invitation.expiresAt).toLocaleDateString()}
               </span>

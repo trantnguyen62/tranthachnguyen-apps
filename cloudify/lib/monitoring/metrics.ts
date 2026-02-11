@@ -234,6 +234,56 @@ export const kvOperationsTotal = counter(
   "Total number of KV store operations"
 );
 
+// ============ Web Vitals Metrics ============
+
+// Web Vitals gauges (p75 values per project)
+export const webVitalsLCP = gauge(
+  "web_vitals_lcp_p75_ms",
+  "LCP 75th percentile in milliseconds"
+);
+
+export const webVitalsFID = gauge(
+  "web_vitals_fid_p75_ms",
+  "FID 75th percentile in milliseconds"
+);
+
+export const webVitalsCLS = gauge(
+  "web_vitals_cls_p75",
+  "CLS 75th percentile score"
+);
+
+export const webVitalsTTFB = gauge(
+  "web_vitals_ttfb_p75_ms",
+  "TTFB 75th percentile in milliseconds"
+);
+
+export const webVitalsFCP = gauge(
+  "web_vitals_fcp_p75_ms",
+  "FCP 75th percentile in milliseconds"
+);
+
+export const webVitalsINP = gauge(
+  "web_vitals_inp_p75_ms",
+  "INP 75th percentile in milliseconds"
+);
+
+// ============ Visitor Analytics Metrics ============
+
+export const analyticsActiveVisitors = gauge(
+  "analytics_active_visitors",
+  "Active visitors in last 5 minutes"
+);
+
+export const analyticsPageviewsPerMinute = gauge(
+  "analytics_pageviews_per_minute",
+  "Pageviews in last minute"
+);
+
+export const analyticsUniqueVisitorsDaily = gauge(
+  "analytics_unique_visitors_daily",
+  "Unique visitors today"
+);
+
 // ============ Export Metrics ============
 
 /**

@@ -183,16 +183,16 @@ export default function TemplatesPage() {
       <main className="flex-1 pt-16">
         {/* Hero */}
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Start with a Template
               </h1>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Deploy production-ready applications in seconds. Choose from our
                 collection of templates built by the community.
               </p>
@@ -206,7 +206,7 @@ export default function TemplatesPage() {
               className="mt-10 flex flex-col sm:flex-row gap-4 max-w-3xl mx-auto"
             >
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   placeholder="Search templates..."
                   value={searchQuery}
@@ -258,8 +258,8 @@ export default function TemplatesPage() {
         {/* Featured Templates */}
         {featuredTemplates.length > 0 && (
           <section className="py-12">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+            <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+              <h2 className="text-2xl font-bold text-foreground mb-8">
                 Featured Templates
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -269,7 +269,7 @@ export default function TemplatesPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="group relative rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-xl transition-shadow"
+                    className="group relative rounded-lg border border-border overflow-hidden hover:shadow-xl transition-shadow"
                   >
                     {/* Preview */}
                     <div
@@ -291,14 +291,14 @@ export default function TemplatesPage() {
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                          <h3 className="text-xl font-semibold text-foreground">
                             {template.name}
                           </h3>
                           <Badge variant="secondary" className="mt-1">
                             {template.framework}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Star className="h-4 w-4" />
                             {template.stars.toLocaleString()}
@@ -309,11 +309,11 @@ export default function TemplatesPage() {
                           </span>
                         </div>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      <p className="text-muted-foreground mb-4">
                         {template.description}
                       </p>
                       <div className="flex items-center gap-3">
-                        <Button variant="primary" asChild>
+                        <Button variant="default" asChild>
                           <Link href={`/new?template=${template.id}`}>
                             <Zap className="h-4 w-4" />
                             Deploy
@@ -348,9 +348,9 @@ export default function TemplatesPage() {
         )}
 
         {/* All Templates */}
-        <section className="py-12 bg-gray-50 dark:bg-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+        <section className="py-12 bg-background">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-bold text-foreground mb-8">
               All Templates
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -360,7 +360,7 @@ export default function TemplatesPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="group rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden hover:shadow-lg transition-shadow"
+                  className="group rounded-xl border border-border bg-card overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   <div
                     className={cn(
@@ -374,18 +374,18 @@ export default function TemplatesPage() {
                   </div>
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="font-semibold text-foreground">
                         {template.name}
                       </h3>
                       <Badge variant="secondary" className="text-xs">
                         {template.category}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                       {template.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Star className="h-3 w-3" />
                           {template.stars.toLocaleString()}

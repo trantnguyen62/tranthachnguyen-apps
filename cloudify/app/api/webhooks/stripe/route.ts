@@ -12,6 +12,11 @@ import {
   handleInvoicePaid,
   handleInvoicePaymentFailed,
 } from "@/lib/billing/stripe";
+import { prisma } from "@/lib/prisma";
+import { sendUpcomingInvoiceNotification } from "@/lib/notifications/service";
+import { createLogger } from "@/lib/logging/logger";
+
+const log = createLogger("stripe-webhook");
 
 /**
  * POST /api/webhooks/stripe - Handle Stripe webhook events
@@ -23,7 +28,7 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get("stripe-signature");
 
     if (!signature) {
-      console.error("No Stripe signature found");
+      log.error("No Stripe signature found");
       return NextResponse.json(
         { error: "No signature provided" },
         { status: 400 }
@@ -34,14 +39,14 @@ export async function POST(request: NextRequest) {
     const event = constructWebhookEvent(payload, signature);
 
     if (!event) {
-      console.error("Failed to verify Stripe webhook signature");
+      log.error("Failed to verify Stripe webhook signature");
       return NextResponse.json(
         { error: "Invalid signature" },
         { status: 400 }
       );
     }
 
-    console.log(`Processing Stripe event: ${event.type}`);
+    log.info("Processing Stripe event", { type: event.type });
 
     // Handle the event based on type
     switch (event.type) {
@@ -50,14 +55,14 @@ export async function POST(request: NextRequest) {
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         await handleSubscriptionEvent(subscription);
-        console.log(`Subscription ${event.type}: ${subscription.id}`);
+        log.info("Subscription event processed", { type: event.type, subscriptionId: subscription.id });
         break;
       }
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as Stripe.Subscription;
         await handleSubscriptionDeleted(subscription);
-        console.log(`Subscription deleted: ${subscription.id}`);
+        log.info("Subscription deleted", { subscriptionId: subscription.id });
         break;
       }
 
@@ -65,29 +70,47 @@ export async function POST(request: NextRequest) {
       case "invoice.paid": {
         const invoice = event.data.object as Stripe.Invoice;
         await handleInvoicePaid(invoice);
-        console.log(`Invoice paid: ${invoice.id}`);
+        log.info("Invoice paid", { invoiceId: invoice.id });
         break;
       }
 
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
         await handleInvoicePaymentFailed(invoice);
-        console.log(`Invoice payment failed: ${invoice.id}`);
+        log.error("Invoice payment failed", undefined, { invoiceId: invoice.id });
         break;
       }
 
       case "invoice.upcoming": {
-        // Informational - could trigger notification about upcoming charge
+        // Send notification about upcoming charge
         const invoice = event.data.object as Stripe.Invoice;
-        console.log(`Upcoming invoice for customer: ${invoice.customer}`);
-        // TODO: Send notification about upcoming charge
+        const customerId = typeof invoice.customer === "string"
+          ? invoice.customer
+          : invoice.customer?.id;
+
+        if (customerId) {
+          const user = await prisma.user.findFirst({
+            where: { stripeCustomerId: customerId },
+          });
+
+          if (user && invoice.amount_due && invoice.due_date) {
+            await sendUpcomingInvoiceNotification({
+              userId: user.id,
+              amount: invoice.amount_due,
+              currency: invoice.currency,
+              dueDate: new Date(invoice.due_date * 1000).toLocaleDateString(),
+              planName: user.plan || "Pro",
+            });
+            log.info("Upcoming invoice notification sent", { userId: user.id });
+          }
+        }
         break;
       }
 
       // Checkout events
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        console.log(`Checkout completed: ${session.id}`);
+        log.info("Checkout completed", { sessionId: session.id });
         // Subscription is handled by subscription.created event
         break;
       }
@@ -95,55 +118,56 @@ export async function POST(request: NextRequest) {
       // Customer events
       case "customer.created": {
         const customer = event.data.object as Stripe.Customer;
-        console.log(`Customer created: ${customer.id}`);
+        log.info("Customer created", { customerId: customer.id });
         break;
       }
 
       case "customer.updated": {
         const customer = event.data.object as Stripe.Customer;
-        console.log(`Customer updated: ${customer.id}`);
+        log.info("Customer updated", { customerId: customer.id });
         break;
       }
 
       // Payment method events
       case "payment_method.attached": {
         const paymentMethod = event.data.object as Stripe.PaymentMethod;
-        console.log(`Payment method attached: ${paymentMethod.id}`);
+        log.info("Payment method attached", { paymentMethodId: paymentMethod.id });
         break;
       }
 
       case "payment_method.detached": {
         const paymentMethod = event.data.object as Stripe.PaymentMethod;
-        console.log(`Payment method detached: ${paymentMethod.id}`);
+        log.info("Payment method detached", { paymentMethodId: paymentMethod.id });
         break;
       }
 
       // Payment intent events (for one-time payments if needed)
       case "payment_intent.succeeded": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log(`Payment succeeded: ${paymentIntent.id}`);
+        log.info("Payment succeeded", { paymentIntentId: paymentIntent.id });
         break;
       }
 
       case "payment_intent.payment_failed": {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log(`Payment failed: ${paymentIntent.id}`);
+        log.error("Payment failed", undefined, { paymentIntentId: paymentIntent.id });
         break;
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        log.warn("Unhandled event type", { type: event.type });
     }
 
     // Always return 200 to acknowledge receipt
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Webhook error:", error);
-    // Return 200 anyway to prevent Stripe from retrying
-    // Log the error for investigation
+    log.error("Stripe webhook processing error", error instanceof Error ? error : undefined);
+    // Return 500 so Stripe retries the webhook for transient failures
+    // (e.g., database connection issues). Signature verification errors
+    // are already handled above with 400 status.
     return NextResponse.json(
-      { error: "Webhook handler failed", received: true },
-      { status: 200 }
+      { error: "Webhook handler failed" },
+      { status: 500 }
     );
   }
 }

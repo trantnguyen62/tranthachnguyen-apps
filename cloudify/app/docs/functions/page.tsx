@@ -28,34 +28,34 @@ export default function FunctionsPage() {
       </ul>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+        <div className="p-6 rounded-xl border border-border bg-background">
           <Zap className="h-8 w-8 text-yellow-500 mb-4" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">Instant Scale</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <h3 className="font-semibold text-foreground">Instant Scale</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Functions scale automatically based on traffic. Handle 1 or 1 million requests.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-          <Globe className="h-8 w-8 text-blue-500 mb-4" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">Global Deployment</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+        <div className="p-6 rounded-xl border border-border bg-background">
+          <Globe className="h-8 w-8 text-[#0070f3] mb-4" />
+          <h3 className="font-semibold text-foreground">Global Deployment</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Functions run in multiple regions worldwide for low latency.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+        <div className="p-6 rounded-xl border border-border bg-background">
           <Clock className="h-8 w-8 text-green-500 mb-4" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">Pay Per Use</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <h3 className="font-semibold text-foreground">Pay Per Use</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Only pay for the compute time you use. No idle costs.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+        <div className="p-6 rounded-xl border border-border bg-background">
           <Code className="h-8 w-8 text-purple-500 mb-4" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">Multiple Runtimes</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <h3 className="font-semibold text-foreground">Multiple Runtimes</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Support for Node.js, Python, Go, Ruby, and more.
           </p>
         </div>

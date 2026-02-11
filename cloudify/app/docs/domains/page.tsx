@@ -33,7 +33,7 @@ export default function DomainsPage() {
       <div className="not-prose bg-gray-900 text-gray-100 rounded-lg p-4 my-4 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-700">
+            <tr className="border-b border-border">
               <th className="text-left py-2 pr-4">Type</th>
               <th className="text-left py-2 pr-4">Name</th>
               <th className="text-left py-2">Value</th>
@@ -58,7 +58,7 @@ export default function DomainsPage() {
       <div className="not-prose bg-gray-900 text-gray-100 rounded-lg p-4 my-4 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-700">
+            <tr className="border-b border-border">
               <th className="text-left py-2 pr-4">Type</th>
               <th className="text-left py-2 pr-4">Name</th>
               <th className="text-left py-2">Value</th>
@@ -66,7 +66,7 @@ export default function DomainsPage() {
           </thead>
           <tbody>
             <tr>
-              <td className="py-2 pr-4 text-blue-400">CNAME</td>
+              <td className="py-2 pr-4 text-[#0070f3]">CNAME</td>
               <td className="py-2 pr-4">www</td>
               <td className="py-2">cname.cloudify.app</td>
             </tr>
@@ -80,10 +80,10 @@ export default function DomainsPage() {
         <div className="flex items-start gap-4">
           <Lock className="h-6 w-6 text-green-600 dark:text-green-400 shrink-0" />
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="font-semibold text-foreground mb-2">
               Automatic HTTPS
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               Cloudify automatically provisions and renews SSL certificates for all your domains.
               No configuration required.
             </p>
@@ -143,14 +143,14 @@ export default function DomainsPage() {
         <li>Ensure the domain is not on a blocklist</li>
       </ul>
 
-      <div className="not-prose p-6 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30 my-8">
+      <div className="not-prose p-6 rounded-xl border border-border bg-secondary my-8">
         <div className="flex items-start gap-4">
-          <AlertCircle className="h-6 w-6 text-blue-600 dark:text-blue-400 shrink-0" />
+          <AlertCircle className="h-6 w-6 text-foreground shrink-0" />
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="font-semibold text-foreground mb-2">
               Need Help?
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               If you&apos;re having trouble with your domain, our support team is here to help.
               Contact us at support@cloudify.app
             </p>

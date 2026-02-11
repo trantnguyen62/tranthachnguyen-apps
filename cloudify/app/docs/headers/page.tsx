@@ -46,10 +46,10 @@ export default function HeadersDocsPage() {
         <div className="flex items-start gap-4">
           <Shield className="h-8 w-8 text-green-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-2">
+            <h3 className="font-semibold text-foreground text-lg mb-2">
               Recommended Security Headers
             </h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-muted-foreground">
               These headers help protect your application from common web vulnerabilities.
             </p>
           </div>
@@ -119,35 +119,35 @@ export default function HeadersDocsPage() {
       <div className="not-prose my-8">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-800">
-              <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Directive</th>
-              <th className="text-left py-3 px-4 font-semibold text-gray-900 dark:text-white">Description</th>
+            <tr className="border-b border-border">
+              <th className="text-left py-3 px-4 font-semibold text-foreground">Directive</th>
+              <th className="text-left py-3 px-4 font-semibold text-foreground">Description</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-gray-200 dark:border-gray-800">
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400"><code>default-src</code></td>
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400">Fallback for other directives</td>
+            <tr className="border-b border-border">
+              <td className="py-3 px-4 text-muted-foreground"><code>default-src</code></td>
+              <td className="py-3 px-4 text-muted-foreground">Fallback for other directives</td>
             </tr>
-            <tr className="border-b border-gray-200 dark:border-gray-800">
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400"><code>script-src</code></td>
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400">JavaScript sources</td>
+            <tr className="border-b border-border">
+              <td className="py-3 px-4 text-muted-foreground"><code>script-src</code></td>
+              <td className="py-3 px-4 text-muted-foreground">JavaScript sources</td>
             </tr>
-            <tr className="border-b border-gray-200 dark:border-gray-800">
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400"><code>style-src</code></td>
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400">CSS sources</td>
+            <tr className="border-b border-border">
+              <td className="py-3 px-4 text-muted-foreground"><code>style-src</code></td>
+              <td className="py-3 px-4 text-muted-foreground">CSS sources</td>
             </tr>
-            <tr className="border-b border-gray-200 dark:border-gray-800">
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400"><code>img-src</code></td>
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400">Image sources</td>
+            <tr className="border-b border-border">
+              <td className="py-3 px-4 text-muted-foreground"><code>img-src</code></td>
+              <td className="py-3 px-4 text-muted-foreground">Image sources</td>
             </tr>
-            <tr className="border-b border-gray-200 dark:border-gray-800">
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400"><code>connect-src</code></td>
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400">Fetch, XHR, WebSocket sources</td>
+            <tr className="border-b border-border">
+              <td className="py-3 px-4 text-muted-foreground"><code>connect-src</code></td>
+              <td className="py-3 px-4 text-muted-foreground">Fetch, XHR, WebSocket sources</td>
             </tr>
-            <tr className="border-b border-gray-200 dark:border-gray-800">
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400"><code>frame-ancestors</code></td>
-              <td className="py-3 px-4 text-gray-600 dark:text-gray-400">Embedding sources (iframe)</td>
+            <tr className="border-b border-border">
+              <td className="py-3 px-4 text-muted-foreground"><code>frame-ancestors</code></td>
+              <td className="py-3 px-4 text-muted-foreground">Embedding sources (iframe)</td>
             </tr>
           </tbody>
         </table>
@@ -202,9 +202,9 @@ export default function HeadersDocsPage() {
           { directive: "immutable", desc: "Content will never change" },
           { directive: "stale-while-revalidate=N", desc: "Serve stale while fetching" },
         ].map((item) => (
-          <div key={item.directive} className="p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-            <code className="text-blue-600 dark:text-blue-400 font-semibold">{item.directive}</code>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{item.desc}</p>
+          <div key={item.directive} className="p-4 rounded-lg bg-background border border-border">
+            <code className="text-foreground font-semibold">{item.directive}</code>
+            <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
           </div>
         ))}
       </div>
@@ -321,7 +321,7 @@ curl -v https://example.com 2>&1 | grep -E '^<'`}</code>
       </pre>
 
       <div className="not-prose mt-12">
-        <Button variant="primary" asChild>
+        <Button variant="default" asChild>
           <Link href="/docs/redirects">
             Configure Redirects
             <ArrowRight className="h-4 w-4" />

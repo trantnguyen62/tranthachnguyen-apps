@@ -71,6 +71,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (name.trim().length > 100) {
+      return NextResponse.json(
+        { error: "Team name must be 100 characters or less" },
+        { status: 400 }
+      );
+    }
+
     // Generate slug from name
     const baseSlug = name
       .toLowerCase()
@@ -113,8 +120,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Log activity
-    await prisma.activity.create({
+    // Log activity (non-blocking - don't fail team creation if logging fails)
+    prisma.activity.create({
       data: {
         userId: session.user.id,
         type: "team",
@@ -122,7 +129,7 @@ export async function POST(request: NextRequest) {
         description: `Created team "${name}"`,
         metadata: { teamId: team.id },
       },
-    });
+    }).catch((err: unknown) => console.error("Failed to log activity:", err));
 
     return NextResponse.json(team);
   } catch (error) {

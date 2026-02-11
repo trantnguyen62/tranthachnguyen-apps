@@ -29,6 +29,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         },
         logs: {
           orderBy: { timestamp: "asc" },
+          take: 500,
         },
       },
     });
@@ -64,6 +65,25 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const body = await request.json();
     const { status, url, buildTime } = body;
 
+    // Validate status if provided
+    const validStatuses = ["QUEUED", "BUILDING", "DEPLOYING", "READY", "ERROR", "CANCELLED"];
+    if (status && !validStatuses.includes(status)) {
+      return NextResponse.json(
+        { error: `Invalid status. Must be one of: ${validStatuses.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    // Validate url if provided
+    if (url !== undefined && typeof url !== "string") {
+      return NextResponse.json({ error: "URL must be a string" }, { status: 400 });
+    }
+
+    // Validate buildTime if provided
+    if (buildTime !== undefined && (typeof buildTime !== "number" || buildTime < 0)) {
+      return NextResponse.json({ error: "buildTime must be a non-negative number" }, { status: 400 });
+    }
+
     const deployment = await prisma.deployment.findUnique({
       where: { id },
       include: {
@@ -86,7 +106,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       data: {
         ...(status && { status }),
         ...(url && { url }),
-        ...(buildTime && { buildTime }),
+        ...(buildTime !== undefined && { buildTime }),
         ...(status === "READY" || status === "ERROR" ? { finishedAt: new Date() } : {}),
       },
     });

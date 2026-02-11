@@ -153,12 +153,12 @@ const typeConfig: Record<
   improvement: {
     icon: Zap,
     label: "Improved",
-    color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+    color: "bg-secondary text-foreground",
   },
   fix: {
     icon: Bug,
     label: "Fixed",
-    color: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+    color: "bg-gray-100 text-foreground",
   },
   security: {
     icon: Shield,
@@ -174,7 +174,7 @@ const typeConfig: Record<
 
 export default function ChangelogPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
+    <div className="min-h-screen flex flex-col bg-card">
       <Header />
 
       <main className="flex-1">
@@ -183,15 +183,15 @@ export default function ChangelogPage() {
           <div className="text-center mb-16">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-8"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-gray-200 mb-8"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Home
             </Link>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-4xl font-bold text-foreground mb-4">
               Changelog
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+            <p className="text-xl text-muted-foreground">
               New features, improvements, and fixes in Cloudify
             </p>
           </div>
@@ -212,7 +212,7 @@ export default function ChangelogPage() {
                     <Badge variant="outline" className="text-base font-mono">
                       v{release.version}
                     </Badge>
-                    <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
                       {release.date}
                     </div>
@@ -220,11 +220,11 @@ export default function ChangelogPage() {
                 </div>
 
                 <div className="pl-4 border-l-2 border-blue-500">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h2 className="text-2xl font-bold text-foreground mb-2">
                     {release.title}
                   </h2>
                   {release.description && (
-                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    <p className="text-muted-foreground mb-6">
                       {release.description}
                     </p>
                   )}
@@ -245,11 +245,11 @@ export default function ChangelogPage() {
                             {config.label}
                           </Badge>
                           <div>
-                            <p className="font-medium text-gray-900 dark:text-white">
+                            <p className="font-medium text-foreground">
                               {change.title}
                             </p>
                             {change.description && (
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                              <p className="text-sm text-muted-foreground mt-0.5">
                                 {change.description}
                               </p>
                             )}

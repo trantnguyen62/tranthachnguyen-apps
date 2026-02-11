@@ -108,24 +108,24 @@ export default function TokensPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             API Tokens
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-muted-foreground">
             Manage API tokens for programmatic access
           </p>
         </div>
-        <Button variant="primary" onClick={() => setCreateDialogOpen(true)}>
+        <Button variant="default" onClick={() => setCreateDialogOpen(true)}>
           <Plus className="h-4 w-4" />
           Create Token
         </Button>
@@ -154,11 +154,11 @@ export default function TokensPage() {
       {/* Tokens list */}
       <div className="space-y-4">
         {tokens.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+          <div className="text-center py-12 bg-card rounded-xl border border-border">
             <Key className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-            <p className="text-gray-500 dark:text-gray-400">No API tokens yet</p>
+            <p className="text-muted-foreground">No API tokens yet</p>
             <Button
-              variant="primary"
+              variant="default"
               className="mt-4"
               onClick={() => setCreateDialogOpen(true)}
             >
@@ -173,19 +173,19 @@ export default function TokensPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="p-5 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+              className="p-5 bg-card rounded-xl border border-border"
             >
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex items-start gap-4">
-                  <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800">
-                    <Key className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  <div className="p-2 rounded-lg bg-secondary">
+                    <Key className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                    <h3 className="font-semibold text-foreground">
                       {token.name}
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <code className="text-sm text-gray-500 font-mono">
+                      <code className="text-sm text-muted-foreground font-mono">
                         {token.tokenPrefix}••••••••••••
                       </code>
                     </div>
@@ -200,7 +200,7 @@ export default function TokensPage() {
                 </div>
 
                 <div className="flex items-center gap-6">
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="text-sm text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3.5 w-3.5" />
                       {formatLastUsed(token.lastUsedAt)}
@@ -251,7 +251,7 @@ export default function TokensPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 text-sm font-mono p-2 bg-white dark:bg-gray-800 rounded border break-all">
+                  <code className="flex-1 text-sm font-mono p-2 bg-card rounded border break-all">
                     {newTokenValue}
                   </code>
                   <Button variant="outline" onClick={() => handleCopy(newTokenValue)}>
@@ -267,7 +267,7 @@ export default function TokensPage() {
           ) : (
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-foreground">
                   Token Name
                 </label>
                 <Input
@@ -278,7 +278,7 @@ export default function TokensPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-foreground">
                   Expiration (optional)
                 </label>
                 <select
@@ -295,7 +295,7 @@ export default function TokensPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-foreground">
                   Scopes
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -305,8 +305,8 @@ export default function TokensPage() {
                       className={cn(
                         "flex items-start gap-2 p-3 rounded-lg border cursor-pointer transition-colors",
                         selectedScopes.includes(scope.id)
-                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                          : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                          ? "border-foreground bg-secondary"
+                          : "border-border hover:bg-secondary"
                       )}
                     >
                       <input
@@ -322,10 +322,10 @@ export default function TokensPage() {
                         className="mt-0.5"
                       />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-foreground">
                           {scope.name}
                         </p>
-                        <p className="text-xs text-gray-500">{scope.description}</p>
+                        <p className="text-xs text-muted-foreground">{scope.description}</p>
                       </div>
                     </label>
                   ))}
@@ -336,7 +336,7 @@ export default function TokensPage() {
 
           <DialogFooter>
             {newTokenValue ? (
-              <Button variant="primary" onClick={closeCreateDialog}>
+              <Button variant="default" onClick={closeCreateDialog}>
                 Done
               </Button>
             ) : (
@@ -345,7 +345,7 @@ export default function TokensPage() {
                   Cancel
                 </Button>
                 <Button
-                  variant="primary"
+                  variant="default"
                   onClick={handleCreateToken}
                   disabled={!newTokenName || selectedScopes.length === 0 || isCreating}
                 >

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { deleteArtifacts } from "@/lib/build/artifact-manager";
 
 /**
  * Create a preview deployment for a pull request
@@ -135,6 +136,18 @@ export async function cleanupPreviewDeployments(
     data: { status: "CANCELLED" },
   });
 
-  // TODO: Also clean up the actual deployment files
+  // Clean up the actual deployment files from storage
+  for (const deployment of toDelete) {
+    if (deployment.siteSlug) {
+      try {
+        await deleteArtifacts(deployment.siteSlug);
+        console.log(`Cleaned up artifacts for deployment: ${deployment.siteSlug}`);
+      } catch (error) {
+        console.error(`Failed to clean up artifacts for ${deployment.siteSlug}:`, error);
+        // Continue with other cleanups even if one fails
+      }
+    }
+  }
+
   return toDelete.length;
 }

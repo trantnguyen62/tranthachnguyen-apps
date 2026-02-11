@@ -93,8 +93,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Log activity
-    await prisma.activity.create({
+    // Log activity (non-blocking - don't fail token creation if logging fails)
+    prisma.activity.create({
       data: {
         userId: session.user.id,
         type: "api_token",
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         description: `Created API token "${name}"`,
         metadata: { tokenId: apiToken.id, scopes: tokenScopes },
       },
-    });
+    }).catch((err: unknown) => console.error("Failed to log activity:", err));
 
     // Return the raw token ONLY on creation (never shown again)
     return NextResponse.json({

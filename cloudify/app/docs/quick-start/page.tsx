@@ -21,7 +21,7 @@ function CodeBlock({ code, language = "bash" }: { code: string; language?: strin
       </pre>
       <button
         onClick={copyToClipboard}
-        className="absolute top-2 right-2 p-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-2 right-2 p-2 rounded-lg bg-gray-800 text-muted-foreground hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
       >
         {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
       </button>
@@ -55,7 +55,7 @@ export default function QuickStartPage() {
       </p>
 
       <div className="not-prose my-6">
-        <Button variant="primary" asChild>
+        <Button variant="default" asChild>
           <Link href="/signup">
             <Github className="h-4 w-4" />
             Sign Up with GitHub
@@ -141,48 +141,48 @@ export default function QuickStartPage() {
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
         <Link
           href="/docs/git"
-          className="p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+          className="p-4 rounded-lg border border-border hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
         >
-          <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+          <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3]">
             Git Integration
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Set up automatic deployments from your repository
           </p>
         </Link>
 
         <Link
           href="/docs/environment-variables"
-          className="p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+          className="p-4 rounded-lg border border-border hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
         >
-          <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+          <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3]">
             Environment Variables
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Configure secrets and environment-specific settings
           </p>
         </Link>
 
         <Link
           href="/docs/domains"
-          className="p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+          className="p-4 rounded-lg border border-border hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
         >
-          <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+          <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3]">
             Custom Domains
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Add your own domain to your deployment
           </p>
         </Link>
 
         <Link
           href="/docs/functions"
-          className="p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
+          className="p-4 rounded-lg border border-border hover:border-blue-500 dark:hover:border-blue-500 transition-colors group"
         >
-          <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+          <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3]">
             Serverless Functions
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Add backend APIs to your frontend project
           </p>
         </Link>

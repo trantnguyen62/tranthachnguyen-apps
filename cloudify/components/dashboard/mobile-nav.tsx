@@ -42,12 +42,12 @@ export function MobileNav() {
   return (
     <div className="lg:hidden">
       {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200 dark:bg-gray-950 dark:border-gray-800">
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-14 px-4 bg-background border-b border-border">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-500">
-            <Cloud className="h-5 w-5 text-white" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground">
+            <Cloud className="h-4 w-4 text-background" />
           </div>
-          <span className="text-lg font-bold text-gray-900 dark:text-white">
+          <span className="text-sm font-semibold text-foreground">
             Cloudify
           </span>
         </Link>
@@ -71,7 +71,7 @@ export function MobileNav() {
       {/* Mobile menu */}
       <div
         className={cn(
-          "fixed top-16 left-0 right-0 z-40 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 transition-transform duration-200",
+          "fixed top-16 left-0 right-0 z-40 bg-card border-b border-border transition-transform duration-200",
           isOpen ? "translate-y-0" : "-translate-y-full"
         )}
       >
@@ -86,8 +86,8 @@ export function MobileNav() {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                    ? "bg-secondary text-foreground font-medium"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -95,8 +95,8 @@ export function MobileNav() {
               </Link>
             );
           })}
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
-            <Button variant="primary" className="w-full" asChild>
+          <div className="pt-4 border-t border-border">
+            <Button variant="default" className="w-full" asChild>
               <Link href="/new" onClick={() => setIsOpen(false)}>
                 <Plus className="h-4 w-4" />
                 New Project

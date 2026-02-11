@@ -61,7 +61,13 @@
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3",
     "stripe": "^20.3.0",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "ora": "^8.2.0",
+    "inquirer": "^9.3.8",
+    "chalk": "^5.6.2",
+    "commander": "^12.0.0",
+    "conf": "^12.0.0",
+    "tar": "^6.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.1",
@@ -71,6 +77,8 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/inquirer": "^9.0.7",
+    "@types/tar": "^6.1.11",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

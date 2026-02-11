@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Cloud, Github, Twitter, Linkedin, Youtube } from "lucide-react";
+import { Cloud, Github, Twitter, Linkedin, Youtube, ArrowUpRight } from "lucide-react";
 
 const footerLinks = {
   products: [
@@ -9,25 +9,22 @@ const footerLinks = {
     { name: "Edge Network", href: "/products/edge-network" },
     { name: "Serverless Functions", href: "/products/functions" },
     { name: "AI SDK", href: "/products/ai" },
-    { name: "v0", href: "/products/v0" },
     { name: "Analytics", href: "/products/analytics" },
     { name: "Storage", href: "/products/storage" },
   ],
   resources: [
     { name: "Documentation", href: "/docs" },
     { name: "Guides", href: "/guides" },
-    { name: "Blog", href: "/blog" },
     { name: "Templates", href: "/templates" },
-    { name: "Integrations", href: "/docs/integrations" },
     { name: "Changelog", href: "/changelog" },
     { name: "Support", href: "/support" },
+    { name: "Status", href: "/status", external: true },
   ],
   company: [
     { name: "About", href: "/about" },
+    { name: "Blog", href: "/blog" },
     { name: "Careers", href: "/careers" },
     { name: "Contact", href: "/contact" },
-    { name: "Partners", href: "/partners" },
-    { name: "Legal", href: "/legal" },
     { name: "Privacy", href: "/privacy" },
     { name: "Terms", href: "/terms" },
   ],
@@ -36,152 +33,140 @@ const footerLinks = {
     { name: "AI Apps", href: "/solutions/ai-apps" },
     { name: "Web Apps", href: "/solutions/web-apps" },
     { name: "E-commerce", href: "/solutions/ecommerce" },
-    { name: "Marketing", href: "/solutions/marketing" },
     { name: "Platforms", href: "/solutions/platforms" },
   ],
 };
 
 const socialLinks = [
-  { name: "GitHub", href: "https://github.com", icon: Github },
-  { name: "Twitter", href: "https://twitter.com", icon: Twitter },
-  { name: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
-  { name: "YouTube", href: "https://youtube.com", icon: Youtube },
+  { name: "GitHub", href: "https://github.com/cloudify", icon: Github },
+  { name: "Twitter", href: "https://twitter.com/cloudify", icon: Twitter },
+  { name: "LinkedIn", href: "https://linkedin.com/company/cloudify", icon: Linkedin },
+  { name: "YouTube", href: "https://youtube.com/@cloudify", icon: Youtube },
 ];
+
+function FooterLinkSection({
+  title,
+  links,
+}: {
+  title: string;
+  links: Array<{ name: string; href: string; external?: boolean }>;
+}) {
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-foreground">
+        {title}
+      </h3>
+      <ul className="mt-4 space-y-3">
+        {links.map((link) => (
+          <li key={link.name}>
+            {link.external ? (
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.name}
+                <ArrowUpRight className="h-3 w-3 opacity-0 -translate-y-0.5 transition-all group-hover:opacity-100 group-hover:translate-y-0" />
+              </a>
+            ) : (
+              <Link
+                href={link.href}
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {link.name}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <footer className="border-t border-border bg-background">
+      {/* Status bar */}
+      <div className="border-b border-border">
+        <div className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+            </span>
+            All systems operational
+          </div>
+          <Link
+            href="/status"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Status page
+          </Link>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-[1100px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           {/* Logo and description */}
           <div className="col-span-2 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-500">
-                <Cloud className="h-5 w-5 text-white" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground">
+                <Cloud className="h-4 w-4 text-background" />
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">
+              <span className="text-sm font-semibold text-foreground">
                 Cloudify
               </span>
             </Link>
-            <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               The platform for deploying and scaling modern web applications.
+              Built for developers, trusted by enterprises.
             </p>
             {/* Social Links */}
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <social.icon className="h-5 w-5" />
+                  <social.icon className="h-4 w-4" />
                   <span className="sr-only">{social.name}</span>
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Products */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              Products
-            </h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.products.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              Resources
-            </h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.resources.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              Company
-            </h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Solutions */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              Solutions
-            </h3>
-            <ul className="mt-4 space-y-3">
-              {footerLinks.solutions.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterLinkSection title="Products" links={footerLinks.products} />
+          <FooterLinkSection title="Resources" links={footerLinks.resources} />
+          <FooterLinkSection title="Company" links={footerLinks.company} />
+          <FooterLinkSection title="Solutions" links={footerLinks.solutions} />
         </div>
 
         {/* Bottom section */}
-        <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
+        <div className="mt-12 border-t border-border pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Cloudify. All rights reserved.
             </p>
             <div className="flex gap-6">
               <Link
                 href="/privacy"
-                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 Privacy Policy
               </Link>
               <Link
                 href="/terms"
-                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 Terms of Service
               </Link>
               <Link
                 href="/cookies"
-                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 Cookie Policy
               </Link>

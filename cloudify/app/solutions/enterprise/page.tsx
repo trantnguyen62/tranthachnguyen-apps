@@ -75,28 +75,28 @@ export default function EnterprisePage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-900 to-gray-800 dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-foreground">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-4xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-900/50 text-blue-300 mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-muted-foreground mb-6">
                 <Building2 className="h-4 w-4" />
                 <span className="text-sm font-medium">Enterprise</span>
               </div>
               <h1 className="text-4xl sm:text-6xl font-bold text-white leading-tight">
                 Enterprise-grade
                 <br />
-                <span className="text-blue-400">deployment platform</span>
+                <span className="text-[#0070f3]">deployment platform</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-300 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Deploy with confidence. Security, compliance, and support built for
                 the world&apos;s most demanding organizations.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/contact">
                     Contact Sales
                     <ArrowRight className="h-4 w-4" />
@@ -111,9 +111,9 @@ export default function EnterprisePage() {
         </section>
 
         {/* Trusted By */}
-        <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-8">
+        <section className="py-16 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+            <p className="text-center text-sm text-muted-foreground mb-8">
               TRUSTED BY LEADING ENTERPRISES
             </p>
             <div className="grid grid-cols-2 md:grid-cols-6 gap-8 items-center">
@@ -127,7 +127,7 @@ export default function EnterprisePage() {
                   className="text-center"
                 >
                   <div className="h-12 flex items-center justify-center">
-                    <span className="text-gray-400 dark:text-gray-600 font-semibold text-sm">
+                    <span className="text-muted-foreground font-semibold text-sm">
                       {logo}
                     </span>
                   </div>
@@ -139,17 +139,17 @@ export default function EnterprisePage() {
 
         {/* Features Grid */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 Built for enterprise requirements
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Everything you need to deploy at scale with confidence.
               </p>
             </motion.div>
@@ -162,15 +162,15 @@ export default function EnterprisePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4">
+                    <feature.icon className="h-6 w-6 text-foreground" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -180,24 +180,24 @@ export default function EnterprisePage() {
         </section>
 
         {/* Security Section */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Security & Compliance
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Meet the strictest security and compliance requirements with our
                   enterprise-grade infrastructure.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   {securityFeatures.map((feature) => (
-                    <div key={feature} className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                    <div key={feature} className="flex items-center gap-2 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       <span className="text-sm">{feature}</span>
                     </div>
@@ -209,13 +209,13 @@ export default function EnterprisePage() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800"
+                className="p-8 rounded-lg bg-secondary/50 border border-border"
               >
-                <Shield className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                <Shield className="h-12 w-12 text-foreground mb-4" />
+                <h3 className="text-2xl font-bold text-foreground mb-4">
                   Security First
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-muted-foreground mb-6">
                   Our platform is built with security at its core. From encrypted
                   data at rest to continuous monitoring, we protect your applications.
                 </p>
@@ -232,7 +232,7 @@ export default function EnterprisePage() {
 
         {/* Support */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -249,12 +249,12 @@ export default function EnterprisePage() {
                   ].map((stat) => (
                     <div
                       key={stat.label}
-                      className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900 text-center"
+                      className="p-6 rounded-lg bg-background text-center"
                     >
-                      <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                      <div className="text-3xl font-bold text-foreground">
                         {stat.value}
                       </div>
-                      <div className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+                      <div className="text-muted-foreground text-sm mt-1">
                         {stat.label}
                       </div>
                     </div>
@@ -268,10 +268,10 @@ export default function EnterprisePage() {
                 viewport={{ once: true }}
                 className="order-1 lg:order-2"
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   White-glove support
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-lg text-muted-foreground mb-6">
                   Get dedicated support from engineers who understand your infrastructure.
                   We&apos;re here when you need us, 24/7.
                 </p>
@@ -283,7 +283,7 @@ export default function EnterprisePage() {
                     "Migration assistance",
                     "Architecture reviews",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                    <li key={item} className="flex items-center gap-3 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </li>
@@ -295,16 +295,16 @@ export default function EnterprisePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-20 bg-gray-900 dark:bg-black">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <section className="py-20 bg-foreground dark:bg-black">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Ready to scale your deployments?
             </h2>
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Talk to our team about how Cloudify can meet your enterprise requirements.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="primary" size="lg" asChild>
+              <Button variant="default" size="lg" asChild>
                 <Link href="/contact">
                   Contact Sales
                   <ArrowRight className="h-4 w-4" />

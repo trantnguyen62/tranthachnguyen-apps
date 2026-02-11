@@ -63,32 +63,32 @@ cloudify env rm DATABASE_URL`}</code>
       </p>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+        <div className="p-6 rounded-xl border border-border bg-background">
           <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
             <Shield className="h-5 w-5 text-green-600 dark:text-green-400" />
           </div>
-          <h3 className="font-semibold text-gray-900 dark:text-white">Production</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <h3 className="font-semibold text-foreground">Production</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Variables available only in production deployments from your main branch.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-          <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
-            <Eye className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+        <div className="p-6 rounded-xl border border-border bg-background">
+          <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center mb-4">
+            <Eye className="h-5 w-5 text-foreground" />
           </div>
-          <h3 className="font-semibold text-gray-900 dark:text-white">Preview</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <h3 className="font-semibold text-foreground">Preview</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Variables available in preview deployments from pull requests and branches.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+        <div className="p-6 rounded-xl border border-border bg-background">
           <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
             <Lock className="h-5 w-5 text-purple-600 dark:text-purple-400" />
           </div>
-          <h3 className="font-semibold text-gray-900 dark:text-white">Development</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <h3 className="font-semibold text-foreground">Development</h3>
+          <p className="text-sm text-muted-foreground mt-2">
             Variables for local development. Pulled with <code>cloudify env pull</code>.
           </p>
         </div>
@@ -111,10 +111,10 @@ cloudify env rm DATABASE_URL`}</code>
         <div className="flex items-start gap-4">
           <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400 shrink-0" />
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="font-semibold text-foreground mb-2">
               Security Warning
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               Never expose sensitive variables to the browser. Variables prefixed with
               <code className="mx-1">NEXT_PUBLIC_</code> or <code className="mx-1">VITE_</code>
               are bundled into your client-side code and visible to anyone.

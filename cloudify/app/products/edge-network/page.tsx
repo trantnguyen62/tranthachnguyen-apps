@@ -55,8 +55,8 @@ export default function EdgeNetworkPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -66,17 +66,17 @@ export default function EdgeNetworkPage() {
                 <Globe className="h-4 w-4" />
                 <span className="text-sm font-medium">Edge Network</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
                 Global reach,
                 <br />
                 <span className="text-purple-600 dark:text-purple-400">local speed</span>
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Deploy to 100+ edge locations worldwide. Your application loads instantly
                 from anywhere on the planet.
               </p>
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <Link href="/new">
                     Start Deploying
                     <ArrowRight className="h-4 w-4" />
@@ -92,17 +92,17 @@ export default function EdgeNetworkPage() {
 
         {/* World Map Section */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
                 100+ edge locations worldwide
               </h2>
-              <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Deploy once, serve everywhere. Your content is automatically distributed globally.
               </p>
             </motion.div>
@@ -116,10 +116,10 @@ export default function EdgeNetworkPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                  className="p-6 rounded-lg bg-card border border-border"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-semibold text-foreground">
                       {region.name}
                     </h3>
                     <span className="px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm font-medium">
@@ -130,7 +130,7 @@ export default function EdgeNetworkPage() {
                     {region.cities.map((city) => (
                       <span
                         key={city}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 text-sm"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-secondary dark:bg-secondary text-muted-foreground text-sm"
                       >
                         <MapPin className="h-3 w-3" />
                         {city}
@@ -144,18 +144,18 @@ export default function EdgeNetworkPage() {
         </section>
 
         {/* Features */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/50">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Enterprise-grade infrastructure
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                <p className="text-lg text-muted-foreground mb-8">
                   Built on the same infrastructure that powers the world&apos;s largest websites.
                   Get enterprise features without enterprise complexity.
                 </p>
@@ -166,10 +166,10 @@ export default function EdgeNetworkPage() {
                         <feature.icon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                        <h3 className="font-semibold text-foreground">
                           {feature.title}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400">
+                        <p className="text-muted-foreground">
                           {feature.description}
                         </p>
                       </div>
@@ -182,9 +182,9 @@ export default function EdgeNetworkPage() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                className="p-8 rounded-lg bg-card border border-border"
               >
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                <h3 className="text-xl font-semibold text-foreground mb-6">
                   Network Performance
                 </h3>
                 <div className="space-y-6">
@@ -195,8 +195,8 @@ export default function EdgeNetworkPage() {
                     { label: "Bandwidth Capacity", value: "200+ Tbps" },
                   ].map((stat) => (
                     <div key={stat.label} className="flex items-center justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">{stat.label}</span>
-                      <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                      <span className="text-muted-foreground">{stat.label}</span>
+                      <span className="text-2xl font-bold text-foreground">
                         {stat.value}
                       </span>
                     </div>
@@ -209,7 +209,7 @@ export default function EdgeNetworkPage() {
 
         {/* Edge Functions */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -249,10 +249,10 @@ export default async function middleware(req) {
                 viewport={{ once: true }}
                 className="order-1 lg:order-2"
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
                   Edge Functions
                 </h2>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-lg text-muted-foreground mb-6">
                   Run code at the edge for ultra-low latency. Perfect for authentication,
                   personalization, A/B testing, and more.
                 </p>
@@ -263,7 +263,7 @@ export default async function middleware(req) {
                     "WebAssembly support",
                     "Full JavaScript/TypeScript support",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-gray-600 dark:text-gray-400">
+                    <li key={item} className="flex items-center gap-3 text-muted-foreground">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </li>
@@ -282,7 +282,7 @@ export default async function middleware(req) {
 
         {/* CTA */}
         <section className="py-20 bg-purple-600 dark:bg-purple-700">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
               Go global instantly
             </h2>

@@ -30,8 +30,8 @@ import { useLogs } from "@/hooks/use-logs";
 const levelConfig: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
   info: {
     icon: Info,
-    color: "text-blue-500",
-    bg: "bg-blue-100 dark:bg-blue-900/30",
+    color: "text-[#0070f3]",
+    bg: "bg-secondary",
   },
   warn: {
     icon: AlertTriangle,
@@ -45,8 +45,8 @@ const levelConfig: Record<string, { icon: React.ElementType; color: string; bg: 
   },
   debug: {
     icon: Terminal,
-    color: "text-gray-500",
-    bg: "bg-gray-100 dark:bg-gray-800",
+    color: "text-muted-foreground",
+    bg: "bg-secondary",
   },
 };
 
@@ -99,7 +99,7 @@ export default function LogsPage() {
   if (loading && logs.length === 0) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -108,10 +108,10 @@ export default function LogsPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           Failed to load logs
         </h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button variant="outline" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
@@ -125,16 +125,16 @@ export default function LogsPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             Logs Explorer
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-muted-foreground">
             Real-time logs from all your deployments and functions
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
-            variant={isLive ? "primary" : "outline"}
+            variant={isLive ? "default" : "outline"}
             size="sm"
             onClick={() => setIsLive(!isLive)}
           >
@@ -154,7 +154,22 @@ export default function LogsPage() {
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const data = JSON.stringify(filteredLogs, null, 2);
+              const blob = new Blob([data], { type: "application/json" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `cloudify-logs-${new Date().toISOString().slice(0, 10)}.json`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }}
+          >
             <Download className="h-4 w-4" />
             Export
           </Button>
@@ -164,7 +179,7 @@ export default function LogsPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search logs..."
             value={searchQuery}
@@ -213,7 +228,7 @@ export default function LogsPage() {
 
       {/* Live indicator */}
       {isLive && (
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
@@ -226,7 +241,7 @@ export default function LogsPage() {
       <div className="bg-gray-950 rounded-xl border border-gray-800 overflow-hidden">
         <div className="h-[600px] overflow-y-auto font-mono text-sm">
           {filteredLogs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
               <Terminal className="h-12 w-12 mb-4 text-gray-600" />
               <p>No logs found</p>
               <p className="text-sm text-gray-600 mt-2">
@@ -251,7 +266,7 @@ export default function LogsPage() {
                     onClick={() => setExpandedLog(isExpanded ? null : log.id)}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="text-gray-500 shrink-0 select-none">
+                      <span className="text-muted-foreground shrink-0 select-none">
                         {formatTimestamp(log.timestamp)}
                       </span>
                       <span
@@ -274,7 +289,7 @@ export default function LogsPage() {
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="mt-2 ml-24 text-gray-500"
+                        className="mt-2 ml-24 text-muted-foreground"
                       >
                         <pre className="text-xs bg-gray-800 p-2 rounded">
                           {JSON.stringify({
@@ -327,15 +342,15 @@ export default function LogsPage() {
           {
             label: "Info",
             value: filteredLogs.filter((l) => l.level === "info").length,
-            color: "text-blue-500",
+            color: "text-[#0070f3]",
           },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800"
+            className="p-4 bg-card rounded-xl border border-border"
           >
             <p className={cn("text-2xl font-bold", stat.color)}>{stat.value}</p>
-            <p className="text-sm text-gray-500">{stat.label}</p>
+            <p className="text-sm text-muted-foreground">{stat.label}</p>
           </div>
         ))}
       </div>

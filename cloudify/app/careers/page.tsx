@@ -139,22 +139,22 @@ export default function CareersPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-20 bg-secondary/30">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-3xl mx-auto"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Join us in building the future
               </h1>
-              <p className="mt-6 text-xl text-gray-600 dark:text-gray-400">
+              <p className="mt-6 text-xl text-muted-foreground">
                 We&apos;re a team of builders, dreamers, and problem-solvers working to make
                 the web faster and more accessible for everyone.
               </p>
               <div className="mt-8">
-                <Button variant="primary" size="lg" asChild>
+                <Button variant="default" size="lg" asChild>
                   <a href="#openings">
                     View Open Positions
                     <ArrowRight className="h-5 w-5" />
@@ -167,17 +167,17 @@ export default function CareersPage() {
 
         {/* Benefits */}
         <section className="py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl font-bold text-foreground">
                 Why Cloudify?
               </h2>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-xl text-muted-foreground">
                 We take care of our team so they can take care of our customers
               </p>
             </motion.div>
@@ -190,13 +190,13 @@ export default function CareersPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
+                  className="p-6 rounded-lg bg-background border border-border"
                 >
-                  <benefit.icon className="h-8 w-8 text-blue-500 mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <benefit.icon className="h-8 w-8 text-[#0070f3] mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground">
                     {benefit.title}
                   </h3>
-                  <p className="mt-2 text-gray-600 dark:text-gray-400">
+                  <p className="mt-2 text-muted-foreground">
                     {benefit.description}
                   </p>
                 </motion.div>
@@ -206,18 +206,18 @@ export default function CareersPage() {
         </section>
 
         {/* Open Positions */}
-        <section id="openings" className="py-20 bg-gray-50 dark:bg-gray-900">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section id="openings" className="py-20 bg-background">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-3xl font-bold text-foreground">
                 Open Positions
               </h2>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400">
+              <p className="mt-4 text-xl text-muted-foreground">
                 Find your next role at Cloudify
               </p>
             </motion.div>
@@ -232,8 +232,8 @@ export default function CareersPage() {
                     className={cn(
                       "px-4 py-2 rounded-full text-sm font-medium transition-colors",
                       selectedDepartment === dept
-                        ? "bg-blue-600 text-white"
-                        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        ? "bg-foreground text-background"
+                        : "bg-card text-foreground hover:bg-secondary"
                     )}
                   >
                     {dept}
@@ -251,25 +251,25 @@ export default function CareersPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
-                  className="p-6 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow"
+                  className="p-6 rounded-lg bg-card border border-border hover:shadow-lg transition-shadow"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <h3 className="text-lg font-semibold text-foreground">
                         {job.title}
                       </h3>
                       <div className="flex flex-wrap items-center gap-3 mt-2">
                         <Badge variant="secondary">{job.department}</Badge>
-                        <span className="flex items-center gap-1 text-sm text-gray-500">
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
                           <MapPin className="h-4 w-4" />
                           {job.location}
                         </span>
-                        <span className="flex items-center gap-1 text-sm text-gray-500">
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
                           <Briefcase className="h-4 w-4" />
                           {job.type}
                         </span>
                       </div>
-                      <p className="mt-3 text-gray-600 dark:text-gray-400 text-sm">
+                      <p className="mt-3 text-muted-foreground text-sm">
                         {job.description}
                       </p>
                     </div>
@@ -284,7 +284,7 @@ export default function CareersPage() {
               ))}
 
               {filteredJobs.length === 0 && (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-muted-foreground">
                   No positions match your filters. Try adjusting your criteria.
                 </div>
               )}
@@ -295,10 +295,10 @@ export default function CareersPage() {
         {/* CTA */}
         <section className="py-20">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
               Don&apos;t see a role that fits?
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+            <p className="text-xl text-muted-foreground mb-8">
               We&apos;re always looking for talented people. Send us your resume and we&apos;ll
               keep you in mind for future opportunities.
             </p>

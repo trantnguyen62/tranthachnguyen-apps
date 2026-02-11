@@ -9,7 +9,7 @@ import path from "path";
 import chalk from "chalk";
 import ora from "ora";
 import tar from "tar";
-import { requireAuth, apiRequest } from "../config";
+import { requireAuth, apiRequest } from "../config.js";
 
 interface DeployOptions {
   prod?: boolean;

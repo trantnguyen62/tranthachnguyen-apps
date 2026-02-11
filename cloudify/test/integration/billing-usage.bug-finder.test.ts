@@ -198,7 +198,6 @@ describe("Billing Calculation Bug Finder", () => {
     });
 
     it("BUG: Case sensitivity in plan names", () => {
-      // @ts-expect-error - Testing case sensitivity
       const limitsLower = getPlanLimits("free");
       // @ts-expect-error - Testing case sensitivity
       const limitsUpper = getPlanLimits("FREE");

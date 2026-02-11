@@ -40,8 +40,8 @@ const docSections = [
   {
     title: "Deployments",
     icon: GitBranch,
-    color: "text-blue-600 dark:text-blue-400",
-    bg: "bg-blue-100 dark:bg-blue-900/30",
+    color: "text-foreground",
+    bg: "bg-secondary",
     items: [
       { title: "Git Integration", href: "/docs/git" },
       { title: "Build Configuration", href: "/docs/build-config" },
@@ -88,8 +88,8 @@ const docSections = [
   {
     title: "Configuration",
     icon: Settings,
-    color: "text-gray-600 dark:text-gray-400",
-    bg: "bg-gray-100 dark:bg-gray-800",
+    color: "text-muted-foreground",
+    bg: "bg-gray-100 dark:bg-card",
     items: [
       { title: "Environment Variables", href: "/docs/environment-variables" },
       { title: "cloudify.json", href: "/docs/configuration" },
@@ -140,13 +140,13 @@ export default function DocsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 mb-6">
-                <Book className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-secondary mb-6">
+                <Book className="h-8 w-8 text-foreground" />
               </div>
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
                 Documentation
               </h1>
-              <p className="mt-4 text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
                 Learn how to deploy and scale your applications with Cloudify.
               </p>
             </motion.div>
@@ -159,7 +159,7 @@ export default function DocsPage() {
               className="mt-10 max-w-xl mx-auto"
             >
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   placeholder="Search documentation..."
                   value={searchQuery}
@@ -172,8 +172,8 @@ export default function DocsPage() {
         </section>
 
         {/* Quick Links */}
-        <section className="py-12 border-b border-gray-200 dark:border-gray-800">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="py-12 border-b border-border">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {quickLinks.map((link, index) => (
                 <motion.div
@@ -185,11 +185,11 @@ export default function DocsPage() {
                   <Link href={link.href}>
                     <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer group">
                       <CardContent className="p-6">
-                        <link.icon className="h-8 w-8 text-blue-600 dark:text-blue-400 mb-4" />
-                        <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <link.icon className="h-8 w-8 text-foreground mb-4" />
+                        <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                           {link.title}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {link.description}
                         </p>
                       </CardContent>
@@ -203,7 +203,7 @@ export default function DocsPage() {
 
         {/* Documentation Sections */}
         <section className="py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {docSections.map((section, index) => (
                 <motion.div
@@ -218,7 +218,7 @@ export default function DocsPage() {
                         <div className={`p-2 rounded-lg ${section.bg}`}>
                           <section.icon className={`h-5 w-5 ${section.color}`} />
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h2 className="text-lg font-semibold text-foreground">
                           {section.title}
                         </h2>
                       </div>
@@ -227,12 +227,12 @@ export default function DocsPage() {
                           <li key={item.title}>
                             <Link
                               href={item.href}
-                              className="flex items-center justify-between p-2 -mx-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                              className="flex items-center justify-between p-2 -mx-2 rounded-lg hover:bg-secondary transition-colors group"
                             >
-                              <span className="text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+                              <span className="text-muted-foreground group-hover:text-foreground dark:group-hover:text-white transition-colors">
                                 {item.title}
                               </span>
-                              <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-muted-foreground dark:group-hover:text-gray-300 transition-colors" />
                             </Link>
                           </li>
                         ))}
@@ -246,16 +246,16 @@ export default function DocsPage() {
         </section>
 
         {/* Help CTA */}
-        <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <section className="py-16 bg-background">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               Need help?
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
+            <p className="text-muted-foreground mb-8">
               Can&apos;t find what you&apos;re looking for? Our support team is here to help.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="primary" asChild>
+              <Button variant="default" asChild>
                 <Link href="/support">
                   Contact Support
                 </Link>

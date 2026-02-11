@@ -25,7 +25,63 @@ import {
 
 const REPOS_DIR = process.env.REPOS_DIR || "/data/repos";
 const BUILDS_DIR = process.env.BUILDS_DIR || "/data/builds";
+const CACHE_DIR = process.env.CACHE_DIR || "/data/cache";
 const BUILD_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+
+/**
+ * Parse GitHub URL to extract owner and repo name
+ */
+function parseGitHubUrl(url: string): { owner: string; repo: string } | null {
+  // Match patterns like:
+  // https://github.com/owner/repo
+  // https://github.com/owner/repo.git
+  // git@github.com:owner/repo.git
+  const httpsMatch = url.match(/github\.com\/([^/]+)\/([^/.]+)/);
+  const sshMatch = url.match(/github\.com:([^/]+)\/([^/.]+)/);
+
+  const match = httpsMatch || sshMatch;
+  if (match) {
+    return { owner: match[1], repo: match[2] };
+  }
+  return null;
+}
+
+/**
+ * Fetch default branch from GitHub API
+ * Falls back to "main" if API call fails
+ */
+export async function getGitHubDefaultBranch(repoUrl: string): Promise<string> {
+  const parsed = parseGitHubUrl(repoUrl);
+  if (!parsed) {
+    return "main";
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${parsed.owner}/${parsed.repo}`,
+      {
+        headers: {
+          "Accept": "application/vnd.github.v3+json",
+          "User-Agent": "Cloudify-Build-System",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.warn(`GitHub API returned ${response.status} for ${repoUrl}`);
+      return "main";
+    }
+
+    const data = await response.json();
+    return data.default_branch || "main";
+  } catch (error) {
+    console.warn(`Failed to fetch default branch for ${repoUrl}:`, error);
+    return "main";
+  }
+}
+// Set to "false" to run commands directly without Docker isolation
+// This is less secure but works when Docker is not available inside the container
+const USE_DOCKER_ISOLATION = process.env.USE_DOCKER_ISOLATION !== "false";
 
 export interface BuildConfig {
   repoUrl: string;
@@ -39,7 +95,7 @@ export interface BuildConfig {
 }
 
 export interface LogCallback {
-  (level: "info" | "error" | "success", message: string): Promise<void>;
+  (level: "info" | "warn" | "error" | "success", message: string): Promise<void>;
 }
 
 /**
@@ -170,7 +226,12 @@ async function runCommand(
 
     proc.stderr?.on("data", (data: Buffer) => {
       const lines = data.toString().split("\n").filter(Boolean);
-      lines.forEach((line) => options.onLog("error", line));
+      lines.forEach((line) => {
+        // Git writes progress to stderr - classify as warn, not error
+        const isGitProgress =
+          /^(Cloning into|Receiving objects|Resolving deltas|remote:|Updating files|warning:)/i.test(line.trim());
+        options.onLog(isGitProgress ? "warn" : "error", line);
+      });
     });
 
     proc.on("close", (code) => {
@@ -238,7 +299,8 @@ export async function runInstall(
   workDir: string,
   installCmd: string,
   nodeVersion: string,
-  onLog: LogCallback
+  onLog: LogCallback,
+  projectId?: string
 ): Promise<boolean> {
   // Validate install command
   const validation = isValidBuildCommand(installCmd);
@@ -255,26 +317,53 @@ export async function runInstall(
 
   await onLog("info", `Running: ${installCmd}`);
 
-  // Run install command in Docker container with security options
-  const dockerArgs = [
-    "run",
-    "--rm",
-    "--network", "none", // Disable network during install (dependencies should be in package-lock)
-    "--memory", "2g", // Limit memory
-    "--cpus", "2", // Limit CPU
-    "--pids-limit", "512", // Limit processes
-    "--read-only", // Read-only root filesystem
-    "--tmpfs", "/tmp:rw,noexec,nosuid,size=512m", // Writable tmp
-    "-v", `${workDir}:/build:rw`,
-    "-w", "/build",
-    `node:${nodeVersion}-alpine`,
-    "sh", "-c", installCmd,
-  ];
+  let result: { success: boolean; code: number | null };
 
-  const result = await runCommand("docker", dockerArgs, {
-    onLog,
-    timeout: 5 * 60 * 1000, // 5 min for install
-  });
+  if (USE_DOCKER_ISOLATION) {
+    // Prepare cache volumes per project for faster rebuilds
+    const cacheVolumes: string[] = [];
+    if (projectId) {
+      const projectCacheDir = path.join(CACHE_DIR, projectId);
+      const nmCacheDir = path.join(projectCacheDir, "node_modules");
+      await fs.mkdir(nmCacheDir, { recursive: true });
+      cacheVolumes.push("-v", `${nmCacheDir}:/build/node_modules:rw`);
+      await onLog("info", "Using cached node_modules volume");
+    }
+
+    // Run install command in Docker container with security options
+    const dockerArgs = [
+      "run",
+      "--rm",
+      "--network", "none", // Disable network during install (dependencies should be in package-lock)
+      "--memory", "2g", // Limit memory
+      "--cpus", "2", // Limit CPU
+      "--pids-limit", "512", // Limit processes
+      "--read-only", // Read-only root filesystem
+      "--tmpfs", "/tmp:rw,noexec,nosuid,size=512m", // Writable tmp
+      "-v", `${workDir}:/build:rw`,
+      ...cacheVolumes,
+      "-w", "/build",
+      `node:${nodeVersion}-alpine`,
+      "sh", "-c", installCmd,
+    ];
+
+    result = await runCommand("docker", dockerArgs, {
+      onLog,
+      timeout: 5 * 60 * 1000, // 5 min for install
+    });
+  } else {
+    // Run directly without Docker isolation (less secure, for environments without Docker)
+    await onLog("info", "Running without Docker isolation");
+    const cmdParts = installCmd.split(" ");
+    const cmd = cmdParts[0];
+    const args = cmdParts.slice(1);
+
+    result = await runCommand(cmd, args, {
+      cwd: workDir,
+      onLog,
+      timeout: 5 * 60 * 1000, // 5 min for install
+    });
+  }
 
   if (result.success) {
     await onLog("success", "Dependencies installed successfully");
@@ -290,7 +379,8 @@ export async function runBuild(
   buildCmd: string,
   nodeVersion: string,
   envVars: Record<string, string>,
-  onLog: LogCallback
+  onLog: LogCallback,
+  projectId?: string
 ): Promise<boolean> {
   // Validate build command
   const validation = isValidBuildCommand(buildCmd);
@@ -307,36 +397,71 @@ export async function runBuild(
 
   await onLog("info", `Running: ${buildCmd}`);
 
-  // Build environment variables args for docker
+  // Build environment variables
   // SECURITY: Sanitize env var values to prevent injection
-  const envArgs: string[] = [];
+  const sanitizedEnvVars: Record<string, string> = {};
   for (const [key, value] of Object.entries(envVars)) {
     if (isValidEnvKey(key)) {
-      const sanitizedValue = sanitizeEnvValue(value);
-      envArgs.push("-e", `${key}=${sanitizedValue}`);
+      sanitizedEnvVars[key] = sanitizeEnvValue(value);
     } else {
       await onLog("error", `Skipping invalid env var: ${key}`);
     }
   }
 
-  const dockerArgs = [
-    "run",
-    "--rm",
-    "--network", "none", // Disable network during build
-    "--memory", "4g", // Limit memory
-    "--cpus", "4", // Limit CPU
-    "--pids-limit", "1024", // Limit processes
-    "-v", `${workDir}:/build:rw`,
-    "-w", "/build",
-    ...envArgs,
-    `node:${nodeVersion}-alpine`,
-    "sh", "-c", buildCmd,
-  ];
+  let result: { success: boolean; code: number | null };
 
-  const result = await runCommand("docker", dockerArgs, {
-    onLog,
-    timeout: 8 * 60 * 1000, // 8 min for build
-  });
+  if (USE_DOCKER_ISOLATION) {
+    // Build environment variables args for docker
+    const envArgs: string[] = [];
+    for (const [key, value] of Object.entries(sanitizedEnvVars)) {
+      envArgs.push("-e", `${key}=${value}`);
+    }
+
+    // Mount build cache volumes per project for incremental builds
+    const cacheVolumes: string[] = [];
+    if (projectId) {
+      const projectCacheDir = path.join(CACHE_DIR, projectId);
+      const buildCacheDir = path.join(projectCacheDir, "build-cache");
+      const nmCacheDir = path.join(projectCacheDir, "node_modules");
+      await fs.mkdir(buildCacheDir, { recursive: true });
+      cacheVolumes.push("-v", `${nmCacheDir}:/build/node_modules:rw`);
+      cacheVolumes.push("-v", `${buildCacheDir}:/build/.next/cache:rw`);
+      await onLog("info", "Using cached build volumes");
+    }
+
+    const dockerArgs = [
+      "run",
+      "--rm",
+      "--network", "none", // Disable network during build
+      "--memory", "4g", // Limit memory
+      "--cpus", "4", // Limit CPU
+      "--pids-limit", "1024", // Limit processes
+      "-v", `${workDir}:/build:rw`,
+      ...cacheVolumes,
+      "-w", "/build",
+      ...envArgs,
+      `node:${nodeVersion}-alpine`,
+      "sh", "-c", buildCmd,
+    ];
+
+    result = await runCommand("docker", dockerArgs, {
+      onLog,
+      timeout: 8 * 60 * 1000, // 8 min for build
+    });
+  } else {
+    // Run directly without Docker isolation (less secure, for environments without Docker)
+    await onLog("info", "Running without Docker isolation");
+    const cmdParts = buildCmd.split(" ");
+    const cmd = cmdParts[0];
+    const args = cmdParts.slice(1);
+
+    result = await runCommand(cmd, args, {
+      cwd: workDir,
+      env: sanitizedEnvVars,
+      onLog,
+      timeout: 8 * 60 * 1000, // 8 min for build
+    });
+  }
 
   if (result.success) {
     await onLog("success", "Build completed successfully");

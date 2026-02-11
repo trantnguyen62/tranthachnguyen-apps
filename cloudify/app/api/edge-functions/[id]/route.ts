@@ -192,8 +192,14 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const updateData: Record<string, unknown> = {};
 
     if (name !== undefined) {
+      if (typeof name !== "string" || name.length < 1 || name.length > 100) {
+        return NextResponse.json(
+          { error: "Name must be between 1 and 100 characters" },
+          { status: 400 }
+        );
+      }
       updateData.name = name;
-      updateData.slug = name.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      updateData.slug = name.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 100);
     }
     if (code !== undefined) updateData.code = code;
     if (routes !== undefined) updateData.routes = routes;

@@ -14,12 +14,21 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
+    // Log the error and report to Sentry via API
     console.error(error);
+    fetch("/api/error-report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: error.message,
+        stack: error.stack,
+        digest: error.digest,
+      }),
+    }).catch(() => {});
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="text-center max-w-lg">
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
@@ -28,7 +37,7 @@ export default function Error({
           className="mb-8"
         >
           <div className="relative inline-flex">
-            <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-red-600 to-red-500 mx-auto">
+            <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-gradient-to-br from-red-600 to-red-500 mx-auto">
               <AlertTriangle className="h-12 w-12 text-white" />
             </div>
             <motion.div
@@ -46,19 +55,19 @@ export default function Error({
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             Something went wrong
           </h1>
-          <p className="text-xl text-gray-500 dark:text-gray-400 mb-2">
+          <p className="text-xl text-muted-foreground mb-2">
             We encountered an unexpected error.
           </p>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
+          <p className="text-muted-foreground mb-6">
             Don't worry, our team has been notified and is working on a fix.
           </p>
 
           {error.digest && (
             <div className="mb-6 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Error ID: <code className="font-mono">{error.digest}</code>
               </p>
             </div>
@@ -71,7 +80,7 @@ export default function Error({
           transition={{ delay: 0.4 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <Button variant="primary" size="lg" onClick={reset}>
+          <Button variant="default" size="lg" onClick={reset}>
             <RefreshCw className="h-5 w-5" />
             Try Again
           </Button>
@@ -89,14 +98,14 @@ export default function Error({
           transition={{ delay: 0.6 }}
           className="mt-12"
         >
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+          <div className="p-4 bg-secondary rounded-xl border border-blue-100 dark:border-blue-800">
             <div className="flex items-start gap-3">
-              <Cloud className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+              <Cloud className="h-5 w-5 text-foreground shrink-0 mt-0.5" />
               <div className="text-left">
-                <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                <p className="text-sm font-medium text-foreground">
                   Need help?
                 </p>
-                <p className="text-sm text-blue-600 dark:text-blue-300 mt-1">
+                <p className="text-sm text-[#0070f3] mt-1">
                   Check our{" "}
                   <Link href="/docs" className="underline">
                     documentation

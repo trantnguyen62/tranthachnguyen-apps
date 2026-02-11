@@ -1,47 +1,48 @@
 {
   "name": "@cloudify/cli",
   "version": "1.0.0",
-  "description": "Cloudify CLI - Deploy your projects from the command line",
+  "description": "Cloudify CLI - Deploy and manage your projects from the command line",
   "main": "dist/index.js",
   "bin": {
     "cloudify": "./dist/index.js"
   },
+  "type": "module",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "start": "node dist/index.js"
+    "build": "tsup src/index.ts --format esm --dts",
+    "dev": "tsup src/index.ts --format esm --watch",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "cloudify",
+    "deployment",
     "cli",
-    "deploy",
-    "vercel",
-    "hosting"
+    "vercel-alternative"
   ],
-  "author": "Tran Thach Nguyen",
+  "author": "Cloudify",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^5.6.2",
+    "chalk": "^5.3.0",
     "commander": "^12.0.0",
     "conf": "^12.0.0",
-    "inquirer": "^9.3.8",
-    "ora": "^8.2.0",
-    "tar": "^6.2.0"
+    "inquirer": "^9.2.15",
+    "node-fetch": "^3.3.2",
+    "ora": "^8.0.1",
+    "tar": "^7.0.0",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.7",
     "@types/node": "^20.11.0",
     "@types/tar": "^6.1.11",
-    "typescript": "^5.3.0"
+    "@types/ws": "^8.5.10",
+    "tsup": "^8.0.2",
+    "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "files": [
     "dist"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tranthachnguyen/cloudify"
-  }
+  ]
 }

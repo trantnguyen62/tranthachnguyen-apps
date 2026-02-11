@@ -11,12 +11,13 @@
  * - More control over certificate lifecycle
  */
 
-import { exec } from "child_process";
+import { exec, execFile } from "child_process";
 import { promisify } from "util";
 import { promises as fs } from "fs";
 import path from "path";
 import { prisma } from "@/lib/prisma";
 import { updateNginxConfig } from "./nginx";
+import { isValidDomain } from "./validate";
 import {
   provisionCertificate,
   renewCertificate,
@@ -34,6 +35,7 @@ import {
 import { isCloudflareConfigured } from "@/lib/integrations/cloudflare";
 
 const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 // Configuration
 const SSL_CERTS_DIR = process.env.SSL_CERTS_DIR || "/etc/letsencrypt/live";
@@ -122,6 +124,15 @@ async function provisionWithCertbot(domainId: string): Promise<SslProvisionResul
       };
     }
 
+    // Validate domain name to prevent command injection
+    if (!isValidDomain(domain.domain)) {
+      return {
+        success: false,
+        error: "Invalid domain name",
+        method: "certbot",
+      };
+    }
+
     console.log(`[SSL] Provisioning certificate via certbot for ${domain.domain}`);
 
     // Update status to provisioning
@@ -133,24 +144,20 @@ async function provisionWithCertbot(domainId: string): Promise<SslProvisionResul
     // Ensure webroot directory exists
     await fs.mkdir(CERTBOT_WEBROOT, { recursive: true });
 
-    // Run certbot to obtain certificate
-    const certbotCmd = [
-      "certbot",
+    // Run certbot with execFile (safe — no shell interpolation)
+    const certbotArgs = [
       "certonly",
       "--webroot",
-      "-w",
-      CERTBOT_WEBROOT,
-      "-d",
-      domain.domain,
+      "-w", CERTBOT_WEBROOT,
+      "-d", domain.domain,
       "--non-interactive",
       "--agree-tos",
-      "--email",
-      ACME_EMAIL,
+      "--email", ACME_EMAIL,
       "--no-eff-email",
-    ].join(" ");
+    ];
 
     try {
-      await execAsync(certbotCmd);
+      await execFileAsync("certbot", certbotArgs);
     } catch (certbotError) {
       const error = certbotError as Error & { stderr?: string };
       console.error("[SSL] Certbot error:", error.stderr || error.message);
@@ -188,12 +195,12 @@ async function provisionWithCertbot(domainId: string): Promise<SslProvisionResul
       };
     }
 
-    // Get expiration date
+    // Get expiration date (using execFile — safe, no shell)
     let expiresAt: Date | undefined;
     try {
-      const { stdout } = await execAsync(
-        `openssl x509 -enddate -noout -in "${certPath}"`
-      );
+      const { stdout } = await execFileAsync("openssl", [
+        "x509", "-enddate", "-noout", "-in", certPath,
+      ]);
       const match = stdout.match(/notAfter=(.+)/);
       if (match) {
         expiresAt = new Date(match[1]);

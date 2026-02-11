@@ -307,7 +307,7 @@ export function createDeploymentMessage(
     started: {
       emoji: ":rocket:",
       title: "Deployment Started",
-      color: "#3b82f6",
+      color: "#0070f3",
       text: "Your deployment has begun processing.",
     },
     success: {
