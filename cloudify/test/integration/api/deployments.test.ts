@@ -23,12 +23,12 @@ vi.mock("@/lib/prisma", () => ({
   prisma: mockPrisma,
 }));
 
-// Mock session
-vi.mock("@/lib/auth/session", () => ({
-  getSession: vi.fn(),
+// Mock auth
+vi.mock("@/lib/auth/api-auth", () => ({
+  getAuthUser: vi.fn(),
 }));
 
-import { getSession } from "@/lib/auth/session";
+import { getAuthUser } from "@/lib/auth/api-auth";
 
 describe("Deployments API Routes", () => {
   const mockUser = createMockUser({ id: "user-1" });
@@ -46,11 +46,11 @@ describe("Deployments API Routes", () => {
   describe("GET /api/deployments/:id", () => {
     // Test 91: GET returns deployment with logs
     it("returns deployment with logs", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        image: null,
+        authMethod: "session",
       });
 
       mockPrisma.deployment.findUnique.mockResolvedValue({
@@ -79,9 +79,9 @@ describe("Deployments API Routes", () => {
 
     // Test 92: GET returns 401 for unauthorized access
     it("returns 401 for unauthorized access", async () => {
-      vi.mocked(getSession).mockResolvedValue(null);
+      vi.mocked(getAuthUser).mockResolvedValue(null);
 
-      const session = await getSession();
+      const session = await getAuthUser(null as never);
       expect(session).toBeNull();
       // API should return 401
     });
@@ -90,11 +90,11 @@ describe("Deployments API Routes", () => {
   describe("PATCH /api/deployments/:id", () => {
     // Test 93: PATCH updates deployment status
     it("updates deployment status", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        image: null,
+        authMethod: "session",
       });
 
       mockPrisma.deployment.findUnique.mockResolvedValue({
@@ -121,11 +121,11 @@ describe("Deployments API Routes", () => {
   describe("DELETE /api/deployments/:id", () => {
     // Test 94: DELETE cancels queued deployment
     it("cancels queued deployment", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        image: null,
+        authMethod: "session",
       });
 
       const queuedDeployment = mockDeployments[2]; // status: QUEUED
@@ -150,11 +150,11 @@ describe("Deployments API Routes", () => {
 
     // Test 95: DELETE cancels building deployment
     it("cancels building deployment", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        image: null,
+        authMethod: "session",
       });
 
       const buildingDeployment = mockDeployments[1]; // status: BUILDING

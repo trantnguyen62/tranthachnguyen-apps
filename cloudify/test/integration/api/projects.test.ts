@@ -18,12 +18,12 @@ vi.mock("@/lib/prisma", () => ({
   prisma: mockPrisma,
 }));
 
-// Mock session
-vi.mock("@/lib/auth/session", () => ({
-  getSession: vi.fn(),
+// Mock auth
+vi.mock("@/lib/auth/api-auth", () => ({
+  getAuthUser: vi.fn(),
 }));
 
-import { getSession } from "@/lib/auth/session";
+import { getAuthUser } from "@/lib/auth/api-auth";
 
 describe("Projects API Routes", () => {
   const mockUser = createMockUser({ id: "user-1" });
@@ -39,20 +39,20 @@ describe("Projects API Routes", () => {
   describe("GET /api/projects", () => {
     // Test 83: GET returns 401 when unauthenticated
     it("returns 401 when unauthenticated", async () => {
-      vi.mocked(getSession).mockResolvedValue(null);
+      vi.mocked(getAuthUser).mockResolvedValue(null);
 
-      const session = await getSession();
+      const session = await getAuthUser(null as never);
       expect(session).toBeNull();
       // API should return 401
     });
 
     // Test 84: GET returns only user's projects
     it("returns only user's projects", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        image: null,
+        authMethod: "session",
       });
 
       mockPrisma.project.findMany.mockResolvedValue(mockProjects);
@@ -71,11 +71,11 @@ describe("Projects API Routes", () => {
   describe("POST /api/projects", () => {
     // Test 85: POST creates project with generated slug
     it("creates project with generated slug", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        image: null,
+        authMethod: "session",
       });
 
       const projectData = { name: "My New Project" };
@@ -121,11 +121,11 @@ describe("Projects API Routes", () => {
   describe("PATCH /api/projects/:id", () => {
     // Test 88: PATCH updates project fields
     it("updates project fields", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        image: null,
+        authMethod: "session",
       });
 
       const updateData = { name: "Updated Project Name", buildCmd: "npm run build:prod" };
@@ -148,11 +148,11 @@ describe("Projects API Routes", () => {
   describe("DELETE /api/projects/:id", () => {
     // Test 89: DELETE returns 404 for other user's project
     it("returns 404 for other user's project", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: "different-user",
         email: "other@example.com",
         name: "Other User",
-        image: null,
+        authMethod: "session",
       });
 
       mockPrisma.project.findFirst.mockResolvedValue(null);
@@ -167,11 +167,11 @@ describe("Projects API Routes", () => {
 
     // Test 90: DELETE cascades to deployments
     it("cascades delete to deployments", async () => {
-      vi.mocked(getSession).mockResolvedValue({
+      vi.mocked(getAuthUser).mockResolvedValue({
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        image: null,
+        authMethod: "session",
       });
 
       mockPrisma.project.findFirst.mockResolvedValue(mockProjects[0]);
