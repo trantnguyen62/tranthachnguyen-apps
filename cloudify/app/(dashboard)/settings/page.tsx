@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import {
   Loader2,
   Check,
@@ -296,10 +296,11 @@ export default function SettingsPage() {
       });
       if (res.ok) {
         try {
-          await signOut({ callbackUrl: "/" });
+          await fetch("/api/auth/logout", { method: "POST" });
         } catch {
-          window.location.href = "/";
+          // Continue with redirect even if the API call fails
         }
+        window.location.href = "/";
         return;
       } else {
         const data = await res.json();

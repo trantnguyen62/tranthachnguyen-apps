@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import {
   Cloud,
@@ -316,9 +316,14 @@ export function DashboardSidebar() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-[var(--error,#FF3B30)]"
-              onSelect={(e) => {
+              onSelect={async (e) => {
                 e.preventDefault();
-                signOut({ callbackUrl: "/login" });
+                try {
+                  await fetch("/api/auth/logout", { method: "POST" });
+                } catch {
+                  // Continue with redirect even if the API call fails
+                }
+                window.location.href = "/login";
               }}
             >
               <LogOut className="h-4 w-4 mr-2" />
