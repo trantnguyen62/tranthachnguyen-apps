@@ -51,6 +51,8 @@ jobs:
 
       - name: Validate Prisma schema
         run: npx prisma validate
+        env:
+          DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
 
       - name: Run ESLint
         run: npm run lint
