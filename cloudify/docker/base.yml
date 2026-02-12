@@ -23,6 +23,8 @@ services:
     image: redis:7-alpine
     container_name: cloudify-redis
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -36,6 +38,9 @@ services:
     image: minio/minio:latest
     container_name: cloudify-minio
     command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     environment:
       - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:-cloudify}
       - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:-cloudify-minio-secret-key}
