@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { getAuthUser, requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getPlanLimits } from "@/lib/billing/pricing";
 import type { PlanType } from "@/lib/billing/pricing";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects");
 
 // GET /api/projects - List all projects for the user
 export async function GET(request: NextRequest) {
@@ -51,7 +54,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    console.error("Failed to fetch projects:", error);
+    log.error("Failed to fetch projects", error);
 
     // Handle Prisma connection errors
     if (error && typeof error === "object" && "code" in error) {
@@ -179,7 +182,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(project, { status: 201 });
   } catch (error: unknown) {
-    console.error("Failed to create project:", error);
+    log.error("Failed to create project", error);
 
     // Handle Prisma errors
     if (error && typeof error === "object" && "code" in error) {

@@ -5,7 +5,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
 import {
   kvGet,
   kvGetWithMetadata,
@@ -20,13 +22,14 @@ import {
   restoreFromPostgres,
 } from "@/lib/storage/kv-service";
 
+const log = getRouteLogger("storage/kv");
+
 // GET /api/storage/kv - List KV stores, entries, or get specific key
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
@@ -41,7 +44,7 @@ export async function GET(request: NextRequest) {
     // If projectId is provided, verify ownership
     if (projectId) {
       const project = await prisma.project.findFirst({
-        where: { id: projectId, userId: session.user.id },
+        where: { id: projectId, userId: user.id },
       });
 
       if (!project) {
@@ -55,7 +58,7 @@ export async function GET(request: NextRequest) {
       const store = await prisma.kVStore.findFirst({
         where: {
           id: storeId,
-          project: { userId: session.user.id },
+          project: { userId: user.id },
         },
       });
 
@@ -89,7 +92,7 @@ export async function GET(request: NextRequest) {
       const store = await prisma.kVStore.findFirst({
         where: {
           id: storeId,
-          project: { userId: session.user.id },
+          project: { userId: user.id },
         },
       });
 
@@ -110,7 +113,7 @@ export async function GET(request: NextRequest) {
       const store = await prisma.kVStore.findFirst({
         where: {
           id: storeId,
-          project: { userId: session.user.id },
+          project: { userId: user.id },
         },
       });
 
@@ -129,7 +132,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's projects for store listing
     const userProjects = await prisma.project.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: { id: true },
     });
     const projectIds = userProjects.map((p) => p.id);
@@ -148,7 +151,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(stores);
   } catch (error) {
-    console.error("Failed to fetch KV:", error);
+    log.error("Failed to fetch KV", error);
     return NextResponse.json(
       { error: "Failed to fetch KV data" },
       { status: 500 }
@@ -159,12 +162,13 @@ export async function GET(request: NextRequest) {
 // POST /api/storage/kv - Create store, set key, or batch operations
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const {
       projectId,
       storeName,
@@ -187,7 +191,7 @@ export async function POST(request: NextRequest) {
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: session.user.id },
+      where: { id: projectId, userId: user.id },
     });
 
     if (!project) {
@@ -205,7 +209,7 @@ export async function POST(request: NextRequest) {
 
       await prisma.activity.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           projectId,
           type: "storage",
           action: "created",
@@ -222,7 +226,7 @@ export async function POST(request: NextRequest) {
       const store = await prisma.kVStore.findFirst({
         where: {
           id: storeId,
-          project: { userId: session.user.id },
+          project: { userId: user.id },
         },
       });
 
@@ -302,7 +306,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("Failed to create KV:", error);
+    log.error("Failed to create KV", error);
     return NextResponse.json(
       { error: "Failed to create KV" },
       { status: 500 }
@@ -313,10 +317,9 @@ export async function POST(request: NextRequest) {
 // DELETE /api/storage/kv - Delete store or key
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const storeId = searchParams.get("storeId");
@@ -328,7 +331,7 @@ export async function DELETE(request: NextRequest) {
       const store = await prisma.kVStore.findFirst({
         where: {
           id: storeId,
-          project: { userId: session.user.id },
+          project: { userId: user.id },
         },
       });
 
@@ -345,7 +348,7 @@ export async function DELETE(request: NextRequest) {
       const store = await prisma.kVStore.findFirst({
         where: {
           id: storeId,
-          project: { userId: session.user.id },
+          project: { userId: user.id },
         },
         include: {
           project: { select: { id: true, name: true } },
@@ -367,7 +370,7 @@ export async function DELETE(request: NextRequest) {
 
       await prisma.activity.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           projectId: store.projectId,
           type: "storage",
           action: "deleted",
@@ -380,7 +383,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ error: "ID required" }, { status: 400 });
   } catch (error) {
-    console.error("Failed to delete:", error);
+    log.error("Failed to delete KV", error);
     return NextResponse.json(
       { error: "Failed to delete" },
       { status: 500 }

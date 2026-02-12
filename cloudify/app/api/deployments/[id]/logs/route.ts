@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const routeLog = getRouteLogger("deployments/[id]/logs");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -9,10 +12,9 @@ interface RouteParams {
 // GET /api/deployments/[id]/logs - Stream logs via SSE
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
     }
 
-    if (deployment.project.userId !== session.user.id) {
+    if (deployment.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -50,15 +52,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
               orderBy: { timestamp: "asc" },
             });
 
-            for (const log of logs) {
+            for (const logEntry of logs) {
               const data = JSON.stringify({
-                id: log.id,
-                level: log.level,
-                message: log.message,
-                timestamp: log.timestamp,
+                id: logEntry.id,
+                level: logEntry.level,
+                message: logEntry.message,
+                timestamp: logEntry.timestamp,
               });
               controller.enqueue(encoder.encode(`data: ${data}\n\n`));
-              lastLogId = log.id;
+              lastLogId = logEntry.id;
             }
 
             // Check deployment status
@@ -79,7 +81,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
               return;
             }
           } catch (error) {
-            console.error("SSE error:", error);
+            routeLog.error("SSE error", error);
           }
         };
 
@@ -107,7 +109,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Failed to stream logs:", error);
+    routeLog.error("Failed to stream logs", error);
     return NextResponse.json(
       { error: "Failed to stream logs" },
       { status: 500 }
@@ -118,10 +120,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // POST /api/deployments/[id]/logs - Add a log entry (for build worker)
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
     const body = await request.json();
@@ -141,11 +142,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
     }
 
-    if (deployment.project.userId !== session.user.id) {
+    if (deployment.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const log = await prisma.deploymentLog.create({
+    const logEntry = await prisma.deploymentLog.create({
       data: {
         deploymentId: id,
         level: level || "info",
@@ -153,9 +154,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(log, { status: 201 });
+    return NextResponse.json(logEntry, { status: 201 });
   } catch (error) {
-    console.error("Failed to add log:", error);
+    routeLog.error("Failed to add log", error);
     return NextResponse.json(
       { error: "Failed to add log" },
       { status: 500 }

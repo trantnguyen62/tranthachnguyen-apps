@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError, checkProjectAccess, meetsMinimumRole } from "@/lib/auth/api-auth";
 import { deleteSite } from "@/lib/build/site-deployer";
 import { sanitizeSlug } from "@/lib/security/validation";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects/[id]");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -50,7 +54,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(project);
   } catch (error: unknown) {
-    console.error("Failed to fetch project:", error);
+    log.error("Failed to fetch project", error);
 
     if (error && typeof error === "object" && "code" in error) {
       const prismaError = error as { code: string };
@@ -79,7 +83,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { user } = authResult;
 
     const { id } = await params;
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
 
     // Check ownership or team membership (minimum role: admin to update settings)
     const patchAccess = await checkProjectAccess(user.id, id);
@@ -112,7 +118,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(project);
   } catch (error: unknown) {
-    console.error("Failed to update project:", error);
+    log.error("Failed to update project", error);
 
     if (error && typeof error === "object" && "code" in error) {
       const prismaError = error as { code: string };
@@ -171,7 +177,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     try {
       await deleteSite(siteSlug);
     } catch (err) {
-      console.warn(`Failed to cleanup K8s resources for ${siteSlug}:`, err);
+      log.warn(`Failed to cleanup K8s resources for ${siteSlug}`);
       // Continue with database deletion even if K8s cleanup fails
     }
 
@@ -181,7 +187,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    console.error("Failed to delete project:", error);
+    log.error("Failed to delete project", error);
 
     if (error && typeof error === "object" && "code" in error) {
       const prismaError = error as { code: string };

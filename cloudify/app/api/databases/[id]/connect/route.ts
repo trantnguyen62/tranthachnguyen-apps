@@ -9,6 +9,9 @@ import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { decryptConnectionString, rotateCredentials } from "@/lib/database/provisioner";
 import crypto from "crypto";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("databases/connect");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -111,7 +114,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       region: database.region,
     });
   } catch (error) {
-    console.error("Failed to get connection details:", error);
+    log.error("Failed to get connection details", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get connection details" },
       { status: 500 }
@@ -186,7 +189,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       connection: newCredentials,
     });
   } catch (error) {
-    console.error("Failed to rotate credentials:", error);
+    log.error("Failed to rotate credentials", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to rotate credentials" },
       { status: 500 }

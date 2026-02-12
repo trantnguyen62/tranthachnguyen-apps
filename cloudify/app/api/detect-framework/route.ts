@@ -8,19 +8,21 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import {
   detectFramework,
   getSupportedFrameworks,
   parseBuildConfig,
 } from "@/lib/build/framework-detector";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("detect-framework");
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { repoUrl, files, packageJson, vercelJson, cloudifyJson } = body;
@@ -108,7 +110,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("Framework detection error:", error);
+    log.error("Framework detection error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

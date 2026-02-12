@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("functions");
 
 // GET /api/functions - List serverless functions (optionally filtered by project)
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
@@ -16,7 +19,7 @@ export async function GET(request: NextRequest) {
     // If projectId is provided, verify ownership
     if (projectId) {
       const project = await prisma.project.findFirst({
-        where: { id: projectId, userId: session.user.id },
+        where: { id: projectId, userId: user.id },
       });
 
       if (!project) {
@@ -26,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's projects
     const userProjects = await prisma.project.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: { id: true },
     });
     const projectIds = userProjects.map((p) => p.id);
@@ -76,7 +79,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(functionsWithStats);
   } catch (error) {
-    console.error("Failed to fetch functions:", error);
+    log.error("Failed to fetch functions", error);
     return NextResponse.json(
       { error: "Failed to fetch functions" },
       { status: 500 }
@@ -87,12 +90,13 @@ export async function GET(request: NextRequest) {
 // POST /api/functions - Create a new serverless function
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const {
       projectId,
       name,
@@ -113,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: session.user.id },
+      where: { id: projectId, userId: user.id },
     });
 
     if (!project) {
@@ -136,7 +140,7 @@ export async function POST(request: NextRequest) {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId,
         type: "function",
         action: "created",
@@ -147,7 +151,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(fn);
   } catch (error) {
-    console.error("Failed to create function:", error);
+    log.error("Failed to create function", error);
     return NextResponse.json(
       { error: "Failed to create function" },
       { status: 500 }

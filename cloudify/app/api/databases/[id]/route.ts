@@ -8,6 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { deprovisionDatabase } from "@/lib/database/provisioner";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("databases/detail");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -70,7 +73,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ database: safeDatabase });
   } catch (error) {
-    console.error("Failed to fetch database:", error);
+    log.error("Failed to fetch database", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch database" },
       { status: 500 }
@@ -140,7 +143,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       message: "Database deletion initiated",
     });
   } catch (error) {
-    console.error("Failed to delete database:", error);
+    log.error("Failed to delete database", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete database" },
       { status: 500 }
@@ -220,7 +223,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ database: updated });
   } catch (error) {
-    console.error("Failed to update database:", error);
+    log.error("Failed to update database", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to update database" },
       { status: 500 }

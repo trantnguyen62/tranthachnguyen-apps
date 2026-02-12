@@ -4,7 +4,10 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("deployments/[id]/stream");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -12,10 +15,9 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
     }
 
-    if (deployment.project.userId !== session.user.id) {
+    if (deployment.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -70,14 +72,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             });
 
             // Send each log as an event
-            for (const log of logs) {
+            for (const logEntry of logs) {
               sendEvent("log", {
-                id: log.id,
-                timestamp: log.timestamp.toISOString(),
-                level: log.level,
-                message: log.message,
+                id: logEntry.id,
+                timestamp: logEntry.timestamp.toISOString(),
+                level: logEntry.level,
+                message: logEntry.message,
               });
-              lastLogId = log.id;
+              lastLogId = logEntry.id;
             }
 
             // Check deployment status
@@ -142,7 +144,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
             return true; // Continue polling
           } catch (error) {
-            console.error("Polling error:", error);
+            log.error("Polling error", error);
             return true; // Continue polling on error
           }
         };
@@ -179,7 +181,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Stream error:", error);
+    log.error("Stream error", error);
     return NextResponse.json(
       { error: "Failed to create stream" },
       { status: 500 }

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("deployments/[id]");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -9,10 +12,9 @@ interface RouteParams {
 // GET /api/deployments/[id] - Get deployment details
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -39,13 +41,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Verify ownership
-    if (deployment.project.userId !== session.user.id) {
+    if (deployment.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     return NextResponse.json(deployment);
   } catch (error) {
-    console.error("Failed to fetch deployment:", error);
+    log.error("Failed to fetch deployment", error);
     return NextResponse.json(
       { error: "Failed to fetch deployment" },
       { status: 500 }
@@ -56,10 +58,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PATCH /api/deployments/[id] - Update deployment status (for build worker)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
     const body = await request.json();
@@ -97,7 +98,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
     }
 
-    if (deployment.project.userId !== session.user.id) {
+    if (deployment.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -113,7 +114,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Failed to update deployment:", error);
+    log.error("Failed to update deployment", error);
     return NextResponse.json(
       { error: "Failed to update deployment" },
       { status: 500 }
@@ -124,10 +125,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/deployments/[id] - Cancel deployment
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -144,7 +144,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
     }
 
-    if (deployment.project.userId !== session.user.id) {
+    if (deployment.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -169,7 +169,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to cancel deployment:", error);
+    log.error("Failed to cancel deployment", error);
     return NextResponse.json(
       { error: "Failed to cancel deployment" },
       { status: 500 }

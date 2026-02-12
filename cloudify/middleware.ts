@@ -48,7 +48,7 @@ const securityHeaders = {
   // Content Security Policy
   "Content-Security-Policy": [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Required for Next.js
+    "script-src 'self' 'unsafe-inline'", // Next.js App Router does not require unsafe-eval
     "style-src 'self' 'unsafe-inline'", // Required for styled-components/CSS-in-JS
     "img-src 'self' data: https: blob:",
     "font-src 'self' data:",
@@ -69,6 +69,9 @@ const hstsHeader = {
  * Apply security headers to response
  */
 function applySecurityHeaders(response: NextResponse, isProduction: boolean): NextResponse {
+  // Hide server technology stack
+  response.headers.delete("X-Powered-By");
+
   // Apply all security headers
   Object.entries(securityHeaders).forEach(([key, value]) => {
     response.headers.set(key, value);

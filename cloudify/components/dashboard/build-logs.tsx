@@ -32,27 +32,6 @@ interface BuildLogsProps {
   status: "building" | "ready" | "error";
 }
 
-const mockBuildLogs: LogEntry[] = [
-  { timestamp: "00:00:01", level: "info", message: "Cloning repository...", step: "Clone" },
-  { timestamp: "00:00:02", level: "success", message: "Cloned johndoe/my-portfolio (ref: main)", step: "Clone" },
-  { timestamp: "00:00:03", level: "info", message: "Detecting framework...", step: "Detect" },
-  { timestamp: "00:00:03", level: "success", message: "Detected Next.js (16.1.6)", step: "Detect" },
-  { timestamp: "00:00:04", level: "info", message: "Installing dependencies...", step: "Install" },
-  { timestamp: "00:00:05", level: "info", message: "Running: npm install", step: "Install" },
-  { timestamp: "00:00:12", level: "success", message: "added 357 packages in 7s", step: "Install" },
-  { timestamp: "00:00:13", level: "info", message: "Building project...", step: "Build" },
-  { timestamp: "00:00:14", level: "info", message: "Running: npm run build", step: "Build" },
-  { timestamp: "00:00:15", level: "info", message: "Creating optimized production build...", step: "Build" },
-  { timestamp: "00:00:18", level: "success", message: "Compiled successfully", step: "Build" },
-  { timestamp: "00:00:19", level: "info", message: "Generating static pages...", step: "Build" },
-  { timestamp: "00:00:22", level: "success", message: "Generated 12 static pages", step: "Build" },
-  { timestamp: "00:00:23", level: "info", message: "Deploying to edge network...", step: "Deploy" },
-  { timestamp: "00:00:25", level: "info", message: "Uploading build output...", step: "Deploy" },
-  { timestamp: "00:00:28", level: "success", message: "Deployed to 100+ edge locations", step: "Deploy" },
-  { timestamp: "00:00:29", level: "info", message: "Assigning domains...", step: "Deploy" },
-  { timestamp: "00:00:30", level: "success", message: "Ready! Deployment complete", step: "Complete" },
-];
-
 function mapStreamLevel(type: string): LogEntry["level"] {
   switch (type) {
     case "command": return "info";
@@ -89,12 +68,10 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
     },
   });
 
-  // Fallback: fetch logs from REST API, or use mock simulation
+  // Fallback: fetch logs from REST API when stream is not connected
   useEffect(() => {
-    // If the stream is connected and providing logs, skip fallback
     if (stream.isConnected) return;
 
-    // If we haven't detected a stream failure yet, give it a moment
     if (!usedFallback && logs.length === 0) {
       const timeout = setTimeout(() => setUsedFallback(true), 2000);
       return () => clearTimeout(timeout);
@@ -102,7 +79,6 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
 
     if (!usedFallback) return;
 
-    // Try REST API first
     async function fetchLogs() {
       try {
         const res = await fetch(`/api/deployments/${deploymentId}/logs`);
@@ -116,27 +92,10 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
           }));
           if (fetched.length > 0) {
             setLogs(fetched);
-            return;
           }
         }
       } catch {
-        // REST failed too
-      }
-
-      // Final fallback: mock simulation
-      if (status === "building") {
-        let currentIndex = 0;
-        const interval = setInterval(() => {
-          if (currentIndex < mockBuildLogs.length) {
-            setLogs((prev) => [...prev, mockBuildLogs[currentIndex]]);
-            currentIndex++;
-          } else {
-            clearInterval(interval);
-          }
-        }, 500);
-        return () => clearInterval(interval);
-      } else {
-        setLogs(mockBuildLogs);
+        // REST API unavailable
       }
     }
 
@@ -239,19 +198,25 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
 
             {/* Log entries */}
             <div className="h-[400px] overflow-y-auto bg-gray-950 p-4 font-mono text-sm">
-              {filteredLogs.map((log, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex gap-4 py-0.5 hover:bg-gray-900"
-                >
-                  <span className="text-gray-600 shrink-0">{log.timestamp}</span>
-                  <span className={cn("flex-1", levelColors[log.level])}>
-                    {log.message}
-                  </span>
-                </motion.div>
-              ))}
+              {filteredLogs.length === 0 ? (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  No build logs available
+                </div>
+              ) : (
+                filteredLogs.map((log, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex gap-4 py-0.5 hover:bg-gray-900"
+                  >
+                    <span className="text-gray-600 shrink-0">{log.timestamp}</span>
+                    <span className={cn("flex-1", levelColors[log.level])}>
+                      {log.message}
+                    </span>
+                  </motion.div>
+                ))
+              )}
               <div ref={logsEndRef} />
             </div>
 

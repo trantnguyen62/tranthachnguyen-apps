@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("usage");
 
 // GET /api/usage - Get usage summary
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     let periodParam = searchParams.get("period") || "current";
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest) {
       recordedAt: { gte: Date; lte: Date };
       projectId?: string;
     } = {
-      userId: session.user.id,
+      userId: user.id,
       recordedAt: {
         gte: periodStart,
         lte: periodEnd,
@@ -87,7 +89,7 @@ export async function GET(request: NextRequest) {
     // Get deployment count for the period
     const deploymentCount = await prisma.deployment.count({
       where: {
-        project: { userId: session.user.id },
+        project: { userId: user.id },
         createdAt: {
           gte: periodStart,
           lte: periodEnd,
@@ -123,7 +125,7 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Failed to fetch usage:", error);
+    log.error("Failed to fetch usage", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch usage" },
       { status: 500 }

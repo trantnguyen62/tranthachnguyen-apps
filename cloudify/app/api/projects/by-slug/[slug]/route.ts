@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects/by-slug");
 
 interface RouteParams {
   params: Promise<{ slug: string }>;
@@ -9,17 +12,16 @@ interface RouteParams {
 // GET /api/projects/by-slug/[slug] - Get a project by slug
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { slug } = await params;
 
     const project = await prisma.project.findFirst({
       where: {
         slug,
-        userId: session.user.id,
+        userId: user.id,
       },
       include: {
         deployments: {
@@ -82,7 +84,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       lastDeployment: formattedDeployments[0] || null,
     });
   } catch (error) {
-    console.error("Failed to fetch project:", error);
+    log.error("Failed to fetch project", error);
     return NextResponse.json(
       { error: "Failed to fetch project" },
       { status: 500 }

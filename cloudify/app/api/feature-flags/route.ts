@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("feature-flags");
 
 // GET /api/feature-flags - List feature flags for a project
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest) {
     if (projectId) {
       // Verify project ownership
       const project = await prisma.project.findFirst({
-        where: { id: projectId, userId: session.user.id },
+        where: { id: projectId, userId: user.id },
       });
 
       if (!project) {
@@ -34,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     // Get all flags across all user's projects
     const userProjects = await prisma.project.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: { id: true },
     });
 
@@ -48,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(flags);
   } catch (error) {
-    console.error("Failed to fetch feature flags:", error);
+    log.error("Failed to fetch feature flags", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch feature flags" },
       { status: 500 }
@@ -59,10 +61,9 @@ export async function GET(request: NextRequest) {
 // POST /api/feature-flags - Create a new feature flag
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const {
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: session.user.id },
+      where: { id: projectId, userId: user.id },
     });
 
     if (!project) {
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId,
         type: "feature_flag",
         action: "created",
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(flag);
   } catch (error) {
-    console.error("Failed to create feature flag:", error);
+    log.error("Failed to create feature flag", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create feature flag" },
       { status: 500 }

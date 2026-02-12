@@ -15,6 +15,9 @@ import {
   GitLabPushEvent,
   GitLabMergeRequestEvent,
 } from "@/lib/integrations/gitlab";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("webhooks/gitlab");
 
 /**
  * POST /api/webhooks/gitlab
@@ -61,7 +64,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      console.log(`[GitLab Webhook] No project found for GitLab project: ${gitlabProjectUrl}`);
+      log.info(`No project found for GitLab project: ${gitlabProjectUrl}`);
       return NextResponse.json({ message: "Project not found" }, { status: 200 });
     }
 
@@ -76,7 +79,7 @@ export async function POST(request: NextRequest) {
       }
     } else if (!webhookToken) {
       // No integration config and no token - reject unsigned webhooks
-      console.warn(`[GitLab Webhook] Unsigned webhook for project ${project.slug} - rejecting`);
+      log.warn(`Unsigned webhook for project ${project.slug} - rejecting`);
       return NextResponse.json({ error: "Webhook token required" }, { status: 401 });
     }
 
@@ -84,7 +87,7 @@ export async function POST(request: NextRequest) {
     const event = parseGitLabWebhookEvent(eventType, payload);
 
     if (!event) {
-      console.log(`[GitLab Webhook] Ignoring unsupported event type: ${eventType}`);
+      log.info(`Ignoring unsupported event type: ${eventType}`);
       return NextResponse.json({ message: "Event type not supported" }, { status: 200 });
     }
 
@@ -96,7 +99,7 @@ export async function POST(request: NextRequest) {
       // Check if this is the production branch
       const isProductionBranch = branch === project.repoBranch;
 
-      console.log(`[GitLab Webhook] Push to ${branch} on project ${project.slug}`, {
+      log.info(`Push to ${branch} on project ${project.slug}`, {
         commits: pushEvent.total_commits_count,
         isProduction: isProductionBranch,
       });
@@ -128,7 +131,7 @@ export async function POST(request: NextRequest) {
       const mrEvent = event as GitLabMergeRequestEvent;
       const { object_attributes: mr } = mrEvent;
 
-      console.log(`[GitLab Webhook] Merge request ${mr.iid} (${mr.state}) on project ${project.slug}`);
+      log.info(`Merge request ${mr.iid} (${mr.state}) on project ${project.slug}`);
 
       // Only create preview deployments for opened/updated MRs
       if (mr.state === "opened") {
@@ -159,7 +162,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: "Event processed" });
   } catch (error) {
-    console.error("[GitLab Webhook] Error:", error);
+    log.error("Webhook processing failed", error);
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 }

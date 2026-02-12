@@ -395,13 +395,20 @@ export function validateFileUpload(
     return { valid: false, error: `File size exceeds ${maxSize / 1024 / 1024}MB limit` };
   }
 
+  // MIME type is the primary validation (harder to spoof than extension)
   if (allowedTypes.length && !allowedTypes.includes(file.type)) {
     return { valid: false, error: "File type not allowed" };
   }
 
-  const extension = "." + file.name.split(".").pop()?.toLowerCase();
-  if (allowedExtensions.length && !allowedExtensions.includes(extension)) {
-    return { valid: false, error: "File extension not allowed" };
+  // Extension check as secondary validation — check ALL extensions in the filename
+  // to prevent double-extension attacks like "malicious.php.jpg"
+  const nameParts = file.name.split(".");
+  if (nameParts.length > 1) {
+    const allExtensions = nameParts.slice(1).map(ext => "." + ext.toLowerCase());
+    const hasDisallowedExt = allExtensions.some(ext => !allowedExtensions.includes(ext));
+    if (allowedExtensions.length && hasDisallowedExt) {
+      return { valid: false, error: "File extension not allowed" };
+    }
   }
 
   return { valid: true };

@@ -9,6 +9,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { checkRegionHealth } from "@/lib/failover/health-monitor";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("admin/regions/detail");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -94,7 +97,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch region:", error);
+    log.error("Failed to fetch region", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch region" },
       { status: 500 }
@@ -181,7 +184,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ region: updated });
   } catch (error) {
-    console.error("Failed to update region:", error);
+    log.error("Failed to update region", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to update region" },
       { status: 500 }
@@ -250,7 +253,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       message: "Region deleted",
     });
   } catch (error) {
-    console.error("Failed to delete region:", error);
+    log.error("Failed to delete region", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete region" },
       { status: 500 }

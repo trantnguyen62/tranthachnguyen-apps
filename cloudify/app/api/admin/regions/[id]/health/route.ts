@@ -7,6 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { checkRegionHealth } from "@/lib/failover/health-monitor";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("admin/regions/health");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -41,7 +44,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       health: result,
     });
   } catch (error) {
-    console.error("Failed to check region health:", error);
+    log.error("Failed to check region health", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to check region health" },
       { status: 500 }

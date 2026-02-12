@@ -8,9 +8,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { getAuthUser } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath, revalidatePaths, revalidateAll } from "@/lib/isr/revalidator";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("revalidate");
 
 /**
  * POST /api/revalidate
@@ -45,8 +48,8 @@ export async function POST(request: NextRequest) {
     // Validate project access
     if (!projectId) {
       // Try to get project from session
-      const session = await auth();
-      if (!session?.user?.id) {
+      const authUser = await getAuthUser(request);
+      if (!authUser) {
         return NextResponse.json(
           { error: "Missing projectId parameter" },
           { status: 400 }
@@ -100,7 +103,7 @@ export async function POST(request: NextRequest) {
       ...result,
     });
   } catch (error) {
-    console.error("Revalidation failed:", error);
+    log.error("Revalidation failed", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Revalidation failed", revalidated: false },
       { status: 500 }

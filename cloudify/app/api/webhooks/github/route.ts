@@ -13,6 +13,9 @@ import {
   updateCommitStatus,
   postDeploymentComment,
 } from "@/lib/integrations/github-app";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("webhooks/github");
 
 // Types for GitHub webhook payloads
 interface GitHubPushEvent {
@@ -148,7 +151,7 @@ async function triggerDeployment(config: {
 
   // Check if this is the right branch for production deployments
   if (!isPreview && branch !== project.repoBranch) {
-    console.log(
+    log.info(
       `Ignoring push to ${branch}, project configured for ${project.repoBranch}`
     );
     return null;
@@ -378,14 +381,14 @@ export async function POST(request: NextRequest) {
     const event = request.headers.get("x-github-event");
     const deliveryId = request.headers.get("x-github-delivery");
 
-    console.log(`GitHub webhook received: ${event} (${deliveryId})`);
+    log.info(`GitHub webhook received: ${event} (${deliveryId})`);
 
     // Verify signature - REQUIRED for all webhook requests
     const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
 
     // Webhook secret must be configured - this is a server config issue, not a client error
     if (!webhookSecret) {
-      console.error("GITHUB_WEBHOOK_SECRET is not configured");
+      log.error("GITHUB_WEBHOOK_SECRET is not configured");
       return NextResponse.json(
         { error: "Webhook service unavailable" },
         { status: 503 }
@@ -394,13 +397,13 @@ export async function POST(request: NextRequest) {
 
     // Signature header must be present
     if (!signature) {
-      console.error("Missing webhook signature");
+      log.error("Missing webhook signature");
       return NextResponse.json({ error: "Missing signature" }, { status: 401 });
     }
 
     // Verify the signature
     if (!verifySignature(payload, signature, webhookSecret)) {
-      console.error("Invalid webhook signature");
+      log.error("Invalid webhook signature");
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
@@ -409,7 +412,7 @@ export async function POST(request: NextRequest) {
     try {
       data = JSON.parse(payload);
     } catch {
-      console.error("Invalid JSON payload");
+      log.error("Invalid JSON payload");
       return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
     }
 
@@ -447,7 +450,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Webhook processing error:", error);
+    log.error("Webhook processing error", error);
     return NextResponse.json(
       { error: "Failed to process webhook" },
       { status: 500 }

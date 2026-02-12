@@ -14,9 +14,9 @@ import {
 } from "@/lib/billing/stripe";
 import { prisma } from "@/lib/prisma";
 import { sendUpcomingInvoiceNotification } from "@/lib/notifications/service";
-import { createLogger } from "@/lib/logging/logger";
+import { getRouteLogger } from "@/lib/api/logger";
 
-const log = createLogger("stripe-webhook");
+const log = getRouteLogger("webhooks/stripe");
 
 /**
  * POST /api/webhooks/stripe - Handle Stripe webhook events

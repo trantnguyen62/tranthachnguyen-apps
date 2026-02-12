@@ -3,9 +3,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { getFunctionLogs, getFunctionStats } from "@/lib/functions/service";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("functions/[id]/logs");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -16,10 +19,9 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Function not found" }, { status: 404 });
     }
 
-    if (func.project.userId !== session.user.id) {
+    if (func.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -68,7 +70,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Function logs error:", error);
+    log.error("Function logs error", error);
     return NextResponse.json(
       { error: "Failed to get function logs" },
       { status: 500 }
@@ -81,10 +83,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    if (!func || func.project.userId !== session.user.id) {
+    if (!func || func.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
               lastLogId = inv.id;
             }
           } catch (error) {
-            console.error("Log stream error:", error);
+            log.error("Log stream error", error);
           }
         };
 
@@ -156,7 +157,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Log stream error:", error);
+    log.error("Log stream error", error);
     return NextResponse.json(
       { error: "Failed to stream logs" },
       { status: 500 }

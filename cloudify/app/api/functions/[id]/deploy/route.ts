@@ -3,10 +3,14 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { deployFunction } from "@/lib/functions/service";
 import { Runtime } from "@/lib/functions/executor";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("functions/[id]/deploy");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -17,10 +21,9 @@ interface RouteParams {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -38,12 +41,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Function not found" }, { status: 404 });
     }
 
-    if (func.project.userId !== session.user.id) {
+    if (func.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // Parse request body
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { code, runtime, entrypoint, memory, timeout, envVars } = body;
 
     if (!code || typeof code !== "string") {
@@ -107,7 +112,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId: func.project.id,
         type: "function",
         action: "function.deployed",
@@ -140,7 +145,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Function deploy error:", error);
+    log.error("Function deploy error", error);
     return NextResponse.json(
       { error: "Failed to deploy function" },
       { status: 500 }

@@ -155,7 +155,7 @@ export function DashboardSidebar() {
       {/* Navigation */}
       <nav role="navigation" aria-label="Main navigation" className="flex-1 space-y-0.5 px-3 overflow-y-auto">
         {navigation.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href + "/"));
           return (
             <Link
               key={item.name}

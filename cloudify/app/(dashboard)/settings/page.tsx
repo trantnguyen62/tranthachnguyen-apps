@@ -323,7 +323,13 @@ export default function SettingsPage() {
         body: JSON.stringify({ password: deletePassword }),
       });
       if (res.ok) {
-        await signOut({ callbackUrl: "/" });
+        try {
+          await signOut({ callbackUrl: "/" });
+        } catch {
+          // signOut may throw if the session is already cleared — redirect manually
+          window.location.href = "/";
+        }
+        return;
       } else {
         const data = await res.json();
         setDeleteError(data.error || "Failed to delete account");

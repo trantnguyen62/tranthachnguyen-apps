@@ -8,7 +8,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("domains/ssl");
 import { prisma } from "@/lib/prisma";
 import {
   checkSslStatus,
@@ -30,10 +33,9 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: domainId } = await params;
 
@@ -51,7 +53,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Domain not found" }, { status: 404 });
     }
 
-    if (domain.project.userId !== session.user.id) {
+    if (domain.project.userId !== user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -80,7 +82,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         : null,
     });
   } catch (error) {
-    console.error("Failed to get SSL status:", error);
+    log.error("Failed to get SSL status", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get SSL status" },
       { status: 500 }
@@ -97,10 +99,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: domainId } = await params;
     const body = await request.json().catch(() => ({}));
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Domain not found" }, { status: 404 });
     }
 
-    if (domain.project.userId !== session.user.id) {
+    if (domain.project.userId !== user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -181,7 +182,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         );
     }
   } catch (error) {
-    console.error("Failed to provision SSL:", error);
+    log.error("Failed to provision SSL", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to provision SSL" },
       { status: 500 }
@@ -195,10 +196,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: domainId } = await params;
 
@@ -216,7 +216,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Domain not found" }, { status: 404 });
     }
 
-    if (domain.project.userId !== session.user.id) {
+    if (domain.project.userId !== user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -235,7 +235,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       message: "SSL certificate revoked",
     });
   } catch (error) {
-    console.error("Failed to revoke SSL:", error);
+    log.error("Failed to revoke SSL", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to revoke SSL" },
       { status: 500 }

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createHash } from "crypto";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("feature-flags/evaluate");
 
 // POST /api/feature-flags/evaluate - Evaluate feature flags for a user
 // This endpoint is meant to be called from deployed apps
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest) {
       evaluatedAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Failed to evaluate feature flags:", error);
+    log.error("Failed to evaluate feature flags", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to evaluate feature flags" },
       { status: 500 }

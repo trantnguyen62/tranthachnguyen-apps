@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("teams");
 
 // GET /api/teams - List user's teams
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const teamMembers = await prisma.teamMember.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       include: {
         team: {
           include: {
@@ -45,7 +48,7 @@ export async function GET() {
 
     return NextResponse.json(teams);
   } catch (error) {
-    console.error("Failed to fetch teams:", error);
+    log.error("Failed to fetch teams", error);
     return NextResponse.json(
       { error: "Failed to fetch teams" },
       { status: 500 }
@@ -56,12 +59,13 @@ export async function GET() {
 // POST /api/teams - Create a new team
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { name } = body;
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
@@ -99,7 +103,7 @@ export async function POST(request: NextRequest) {
         slug,
         members: {
           create: {
-            userId: session.user.id,
+            userId: user.id,
             role: "owner",
           },
         },
@@ -123,17 +127,17 @@ export async function POST(request: NextRequest) {
     // Log activity (non-blocking - don't fail team creation if logging fails)
     prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         type: "team",
         action: "created",
         description: `Created team "${name}"`,
         metadata: { teamId: team.id },
       },
-    }).catch((err: unknown) => console.error("Failed to log activity:", err));
+    }).catch((err: unknown) => log.error("Failed to log activity", err));
 
     return NextResponse.json(team);
   } catch (error) {
-    console.error("Failed to create team:", error);
+    log.error("Failed to create team", error);
     return NextResponse.json(
       { error: "Failed to create team" },
       { status: 500 }

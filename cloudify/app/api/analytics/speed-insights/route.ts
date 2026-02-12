@@ -13,6 +13,9 @@ import {
   getPathPerformance,
   getResourceBreakdown,
 } from "@/lib/analytics/speed-insights";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("analytics/speed-insights");
 
 // POST /api/analytics/speed-insights - Record speed insight (from SDK)
 export async function POST(request: NextRequest) {
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to record speed insight:", error);
+    log.error("Failed to record speed insight", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to record data" },
       { status: 500 }
@@ -158,7 +161,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ summary });
     }
   } catch (error) {
-    console.error("Failed to get speed insights:", error);
+    log.error("Failed to get speed insights", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get data" },
       { status: 500 }

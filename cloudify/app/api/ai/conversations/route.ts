@@ -6,8 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ai/conversations");
 
 /**
  * GET /api/ai/conversations
@@ -16,11 +19,9 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = request.nextUrl;
     const projectId = searchParams.get("projectId");
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20", 10);
 
     const where: Record<string, unknown> = {
-      userId: session.user.id,
+      userId: user.id,
     };
 
     if (projectId) {
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("[AI Conversations] Error:", error);
+    log.error("AI conversations error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to list conversations" },
       { status: 500 }
@@ -84,11 +85,9 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { projectId, title, context, initialMessage } = body;
@@ -98,7 +97,7 @@ export async function POST(request: NextRequest) {
       const project = await prisma.project.findFirst({
         where: {
           id: projectId,
-          userId: session.user.id,
+          userId: user.id,
         },
       });
 
@@ -113,7 +112,7 @@ export async function POST(request: NextRequest) {
     // Create conversation
     const conversation = await prisma.aIConversation.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId: projectId || null,
         title: title || "New Conversation",
         context: context || "general",
@@ -143,7 +142,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("[AI Conversations] Error:", error);
+    log.error("AI conversations error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create conversation" },
       { status: 500 }

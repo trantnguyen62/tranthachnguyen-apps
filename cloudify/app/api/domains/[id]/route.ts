@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("domains/[id]");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -9,10 +12,9 @@ interface RouteParams {
 // GET /api/domains/[id] - Get a single domain
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       where: {
         id,
         project: {
-          userId: session.user.id,
+          userId: user.id,
         },
       },
       include: {
@@ -50,7 +52,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(domain);
   } catch (error) {
-    console.error("Failed to fetch domain:", error);
+    log.error("Failed to fetch domain", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch domain" },
       { status: 500 }
@@ -61,10 +63,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/domains/[id] - Remove a domain
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -73,7 +74,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: {
         id,
         project: {
-          userId: session.user.id,
+          userId: user.id,
         },
       },
     });
@@ -88,7 +89,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete domain:", error);
+    log.error("Failed to delete domain", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete domain" },
       { status: 500 }

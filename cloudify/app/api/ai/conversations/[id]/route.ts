@@ -6,8 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ai/conversations/detail");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -20,18 +23,16 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
     const conversation = await prisma.aIConversation.findFirst({
       where: {
         id,
-        userId: session.user.id,
+        userId: user.id,
       },
       include: {
         messages: {
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       })),
     });
   } catch (error) {
-    console.error("[AI Conversation] Error:", error);
+    log.error("AI conversation error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get conversation" },
       { status: 500 }
@@ -77,11 +78,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -89,7 +88,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const conversation = await prisma.aIConversation.findFirst({
       where: {
         id,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -107,7 +106,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error("[AI Conversation] Error:", error);
+    log.error("AI conversation error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete conversation" },
       { status: 500 }
@@ -122,11 +121,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
     const body = await request.json();
@@ -136,7 +133,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const conversation = await prisma.aIConversation.findFirst({
       where: {
         id,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -159,7 +156,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       updatedAt: updated.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error("[AI Conversation] Error:", error);
+    log.error("AI conversation error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to update conversation" },
       { status: 500 }

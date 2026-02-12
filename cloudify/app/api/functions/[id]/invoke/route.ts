@@ -3,9 +3,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { invokeFunction } from "@/lib/functions/service";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("functions/[id]/invoke");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -16,10 +19,9 @@ interface RouteParams {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Function not found" }, { status: 404 });
     }
 
-    if (func.project.userId !== session.user.id) {
+    if (func.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       duration: result?.duration,
     });
   } catch (error) {
-    console.error("Function invoke error:", error);
+    log.error("Function invoke error", error);
     return NextResponse.json(
       { error: "Failed to invoke function" },
       { status: 500 }

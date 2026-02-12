@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAuthError } from "@/lib/auth/api-auth";
 import { verifyPassword } from "@/lib/auth/password";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("user/delete");
 
 /**
  * POST /api/user/delete - Delete user account
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete account:", error);
+    log.error("Failed to delete account", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete account" },
       { status: 500 }

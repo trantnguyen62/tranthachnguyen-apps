@@ -8,6 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getAllRegionHealth, checkRegionHealth } from "@/lib/failover/health-monitor";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("admin/regions");
 
 // GET /api/admin/regions - List regions
 export async function GET(request: NextRequest) {
@@ -83,7 +86,7 @@ export async function GET(request: NextRequest) {
       replications,
     });
   } catch (error) {
-    console.error("Failed to fetch regions:", error);
+    log.error("Failed to fetch regions", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch regions" },
       { status: 500 }
@@ -165,7 +168,7 @@ export async function POST(request: NextRequest) {
     try {
       await checkRegionHealth(region.id);
     } catch (e) {
-      console.warn(`Initial health check failed for region ${name}`);
+      log.warn(`Initial health check failed for region ${name}`);
     }
 
     // Log activity
@@ -181,7 +184,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ region }, { status: 201 });
   } catch (error) {
-    console.error("Failed to create region:", error);
+    log.error("Failed to create region", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create region" },
       { status: 500 }

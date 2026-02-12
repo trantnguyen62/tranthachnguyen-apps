@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { triggerBuild } from "@/lib/build/worker";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("deployments/[id]/trigger");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -10,10 +13,9 @@ interface RouteParams {
 // POST /api/deployments/[id]/trigger - Trigger build for a deployment
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -31,7 +33,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
     }
 
-    if (deployment.project.userId !== session.user.id) {
+    if (deployment.project.userId !== user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -48,7 +50,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true, message: "Build triggered" });
   } catch (error) {
-    console.error("Failed to trigger build:", error);
+    log.error("Failed to trigger build", error);
     return NextResponse.json(
       { error: "Failed to trigger build" },
       { status: 500 }

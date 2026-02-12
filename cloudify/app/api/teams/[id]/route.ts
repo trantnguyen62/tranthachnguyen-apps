@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("teams/[id]");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -25,14 +29,13 @@ async function checkTeamAccess(
 // GET /api/teams/[id] - Get team details
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
-    const member = await checkTeamAccess(id, session.user.id);
+    const member = await checkTeamAccess(id, user.id);
     if (!member) {
       return NextResponse.json({ error: "Team not found" }, { status: 404 });
     }
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ ...team, myRole: member.role });
   } catch (error) {
-    console.error("Failed to fetch team:", error);
+    log.error("Failed to fetch team", error);
     return NextResponse.json(
       { error: "Failed to fetch team" },
       { status: 500 }
@@ -80,19 +83,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PATCH /api/teams/[id] - Update team
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
-    const member = await checkTeamAccess(id, session.user.id, ["owner", "admin"]);
+    const member = await checkTeamAccess(id, user.id, ["owner", "admin"]);
     if (!member) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { name, avatar } = body;
 
     const updateData: { name?: string; avatar?: string } = {};
@@ -106,7 +110,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(team);
   } catch (error) {
-    console.error("Failed to update team:", error);
+    log.error("Failed to update team", error);
     return NextResponse.json(
       { error: "Failed to update team" },
       { status: 500 }
@@ -117,14 +121,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/teams/[id] - Delete team
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
-    const member = await checkTeamAccess(id, session.user.id, ["owner"]);
+    const member = await checkTeamAccess(id, user.id, ["owner"]);
     if (!member) {
       return NextResponse.json({ error: "Only team owner can delete" }, { status: 403 });
     }
@@ -148,7 +151,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     // Log activity (non-blocking)
     prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         type: "team",
         action: "deleted",
         description: `Deleted team "${team?.name}"`,
@@ -157,7 +160,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete team:", error);
+    log.error("Failed to delete team", error);
     return NextResponse.json(
       { error: "Failed to delete team" },
       { status: 500 }

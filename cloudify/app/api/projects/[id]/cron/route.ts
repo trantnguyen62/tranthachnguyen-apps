@@ -7,8 +7,11 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { validateCronExpression, describeCronSchedule, parseNextRun } from "@/lib/cron/scheduler";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects/[id]/cron");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -20,10 +23,9 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: projectId } = await params;
 
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -86,7 +88,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ jobs });
   } catch (error) {
-    console.error("Failed to list cron jobs:", error);
+    log.error("Failed to list cron jobs", error);
     return NextResponse.json(
       { error: "Failed to list cron jobs" },
       { status: 500 }
@@ -100,10 +102,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: projectId } = await params;
 
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -181,7 +182,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     }, { status: 201 });
   } catch (error) {
-    console.error("Failed to create cron job:", error);
+    log.error("Failed to create cron job", error);
     return NextResponse.json(
       { error: "Failed to create cron job" },
       { status: 500 }

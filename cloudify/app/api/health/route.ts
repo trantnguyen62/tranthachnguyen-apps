@@ -5,6 +5,9 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("health");
 import { redisHealthCheck } from "@/lib/storage/redis-client";
 import { promises as fs } from "fs";
 import { exec } from "child_process";
@@ -55,7 +58,7 @@ export async function GET() {
       latency: Date.now() - dbStart,
     };
   } catch (error) {
-    console.error("[Health] Database check failed:", error);
+    log.error("Database check failed", { error: error instanceof Error ? error.message : String(error) });
     checks.database = {
       status: "fail",
       error: "Database check failed",
@@ -71,7 +74,7 @@ export async function GET() {
       latency: Date.now() - redisStart,
     };
   } catch (error) {
-    console.error("[Health] Redis check failed:", error);
+    log.error("Redis check failed", { error: error instanceof Error ? error.message : String(error) });
     checks.redis = {
       status: "fail",
       error: "Redis check failed",
@@ -123,7 +126,7 @@ export async function GET() {
       ...(pipelineErrors > 0 && { error: "Build pipeline check failed" }),
     };
   } catch (error) {
-    console.error("[Health] Build pipeline check failed:", error);
+    log.error("Build pipeline check failed", { error: error instanceof Error ? error.message : String(error) });
     checks.buildPipeline = {
       status: "fail",
       error: "Build pipeline check failed",

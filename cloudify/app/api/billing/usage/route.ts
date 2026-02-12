@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import {
   getUsageWithLimits,
@@ -13,16 +13,18 @@ import {
   UsageType,
 } from "@/lib/billing/metering";
 import { PlanType } from "@/lib/billing/pricing";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("billing/usage");
 
 /**
  * GET /api/billing/usage - Get usage details
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user: authUser } = authResult;
 
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") as UsageType | null;
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's plan
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: authUser.id },
       select: { plan: true },
     });
 
@@ -41,22 +43,22 @@ export async function GET(request: NextRequest) {
     const plan = (user.plan || "free") as PlanType;
 
     // Get usage with limits
-    const usageWithLimits = await getUsageWithLimits(session.user.id, plan);
+    const usageWithLimits = await getUsageWithLimits(authUser.id, plan);
 
     // Get overage charges
-    const overageCharges = await calculateOverageCharges(session.user.id, plan);
+    const overageCharges = await calculateOverageCharges(authUser.id, plan);
 
     // Get daily breakdown if type is specified
     let dailyBreakdown: Array<{ date: string; value: number }> | null = null;
     if (type) {
-      dailyBreakdown = await getDailyUsage(session.user.id, type, days);
+      dailyBreakdown = await getDailyUsage(authUser.id, type, days);
     }
 
     // Get usage by project
     const projectUsage = await prisma.usageRecord.groupBy({
       by: ["projectId"],
       where: {
-        userId: session.user.id,
+        userId: authUser.id,
         recordedAt: {
           gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
         },
@@ -106,7 +108,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Failed to get usage:", error);
+    log.error("Failed to get usage", error);
     return NextResponse.json(
       { error: "Failed to get usage" },
       { status: 500 }

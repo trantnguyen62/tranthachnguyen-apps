@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getPlanLimits } from "@/lib/billing/pricing";
 import type { PlanType } from "@/lib/billing/pricing";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects/clone");
 
 /**
  * POST /api/projects/clone - Clone an existing project
@@ -10,10 +13,9 @@ import type { PlanType } from "@/lib/billing/pricing";
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     let body;
     try {
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
     const source = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
       include: {
         envVariables: {
@@ -60,13 +62,13 @@ export async function POST(request: NextRequest) {
 
     // Check plan limits before cloning
     const userRecord = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       select: { plan: true },
     });
     const userPlan = (userRecord?.plan || "free") as PlanType;
     const planLimits = getPlanLimits(userPlan);
     const currentProjectCount = await prisma.project.count({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
     if (planLimits.projects !== -1 && currentProjectCount >= planLimits.projects) {
       return NextResponse.json(
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
     const MAX_ATTEMPTS = 50;
     while (counter <= MAX_ATTEMPTS) {
       const existing = await prisma.project.findUnique({
-        where: { userId_slug: { userId: session.user.id, slug } },
+        where: { userId_slug: { userId: user.id, slug } },
       });
       if (!existing) break;
       slug = `${baseSlug}-${counter}`;
@@ -100,7 +102,7 @@ export async function POST(request: NextRequest) {
       data: {
         name: `${source.name} (Copy)`,
         slug,
-        userId: session.user.id,
+        userId: user.id,
         repoUrl: source.repoUrl,
         repoBranch: source.repoBranch,
         framework: source.framework,
@@ -125,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(cloned, { status: 201 });
   } catch (error) {
-    console.error("Failed to clone project:", error);
+    log.error("Failed to clone project", error);
     return NextResponse.json(
       { error: "Failed to clone project" },
       { status: 500 }

@@ -5,8 +5,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { Readable } from "stream";
+import { getRouteLogger } from "@/lib/api/logger";
 import {
   uploadBlob,
   downloadBlob,
@@ -14,6 +15,8 @@ import {
   deleteBlob,
   getDownloadUrl,
 } from "@/lib/storage/blob-service";
+
+const log = getRouteLogger("storage/blobs/[storeId]/[...pathname]");
 
 interface RouteParams {
   params: Promise<{
@@ -27,10 +30,9 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { storeId, pathname: pathParts } = await params;
     const pathname = pathParts.join("/");
@@ -39,7 +41,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const store = await prisma.blobStore.findFirst({
       where: {
         id: storeId,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
     });
 
@@ -117,7 +119,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return new NextResponse(webStream, { headers });
   } catch (error) {
-    console.error("Blob download error:", error);
+    log.error("Blob download error", error);
     return NextResponse.json(
       { error: "Failed to download blob" },
       { status: 500 }
@@ -130,10 +132,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { storeId, pathname: pathParts } = await params;
     const pathname = pathParts.join("/");
@@ -142,7 +143,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const store = await prisma.blobStore.findFirst({
       where: {
         id: storeId,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
     });
 
@@ -202,7 +203,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId: store.projectId,
         type: "storage",
         action: "uploaded",
@@ -212,7 +213,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(blobInfo, { status: 201 });
   } catch (error) {
-    console.error("Blob upload error:", error);
+    log.error("Blob upload error", error);
     return NextResponse.json(
       { error: "Failed to upload blob" },
       { status: 500 }
@@ -225,10 +226,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { storeId, pathname: pathParts } = await params;
     const pathname = pathParts.join("/");
@@ -237,7 +237,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const store = await prisma.blobStore.findFirst({
       where: {
         id: storeId,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
     });
 
@@ -250,7 +250,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     if (deleted) {
       await prisma.activity.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           projectId: store.projectId,
           type: "storage",
           action: "deleted",
@@ -261,7 +261,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: deleted });
   } catch (error) {
-    console.error("Blob delete error:", error);
+    log.error("Blob delete error", error);
     return NextResponse.json(
       { error: "Failed to delete blob" },
       { status: 500 }
@@ -274,10 +274,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
  */
 export async function HEAD(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return new NextResponse(null, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { storeId, pathname: pathParts } = await params;
     const pathname = pathParts.join("/");
@@ -286,7 +285,7 @@ export async function HEAD(request: NextRequest, { params }: RouteParams) {
     const store = await prisma.blobStore.findFirst({
       where: {
         id: storeId,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
     });
 
@@ -313,7 +312,7 @@ export async function HEAD(request: NextRequest, { params }: RouteParams) {
 
     return new NextResponse(null, { status: 200, headers });
   } catch (error) {
-    console.error("Blob HEAD error:", error);
+    log.error("Blob HEAD error", error);
     return new NextResponse(null, { status: 500 });
   }
 }

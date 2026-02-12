@@ -6,28 +6,30 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import {
   validateCronExpression,
   describeCronSchedule,
   parseNextRun,
 } from "@/lib/cron/scheduler";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("cron");
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
 
     // Get all cron jobs for user's projects
     const where = projectId
-      ? { projectId, project: { userId: session.user.id } }
-      : { project: { userId: session.user.id } };
+      ? { projectId, project: { userId: user.id } }
+      : { project: { userId: user.id } };
 
     const cronJobs = await prisma.cronJob.findMany({
       where,
@@ -57,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ cronJobs: jobsWithDescriptions });
   } catch (error) {
-    console.error("Error fetching cron jobs:", error);
+    log.error("Error fetching cron jobs", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -67,10 +69,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { projectId, name, schedule, path, timezone = "UTC", timeout = 60 } = body;
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -144,7 +145,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error creating cron job:", error);
+    log.error("Error creating cron job", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

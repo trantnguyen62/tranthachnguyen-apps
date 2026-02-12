@@ -8,9 +8,13 @@ import {
   getZoneId,
 } from "@/lib/integrations/cloudflare";
 
-// Server IP where Cloudify is hosted
-// Update this to your actual server IP
-const CLOUDIFY_SERVER_IP = process.env.CLOUDIFY_SERVER_IP || "192.168.0.203";
+// Server IP where Cloudify is hosted — must be set via environment variable in production
+const CLOUDIFY_SERVER_IP = process.env.CLOUDIFY_SERVER_IP || (() => {
+  if (process.env.NODE_ENV === "production") {
+    console.warn("CLOUDIFY_SERVER_IP not set — DNS verification will use fallback IP");
+  }
+  return "192.168.0.203";
+})();
 
 export interface DnsVerificationResult {
   verified: boolean;

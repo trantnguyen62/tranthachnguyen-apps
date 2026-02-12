@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { exportMetrics, getMetricsSummary } from "@/lib/monitoring/metrics";
 import { refreshVitalsMetrics } from "@/lib/monitoring/vitals-exporter";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("metrics");
 
 // Optional: Require authentication for metrics
 const METRICS_AUTH_TOKEN = process.env.METRICS_AUTH_TOKEN;
@@ -33,7 +36,7 @@ export async function GET(request: NextRequest) {
   try {
     await refreshVitalsMetrics();
   } catch (error) {
-    console.error("Failed to refresh vitals metrics:", error);
+    log.error("Failed to refresh vitals metrics", { error: error instanceof Error ? error.message : String(error) });
     // Continue with export even if vitals refresh fails
   }
 

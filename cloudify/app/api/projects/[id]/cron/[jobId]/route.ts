@@ -9,9 +9,12 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { validateCronExpression, describeCronSchedule, parseNextRun } from "@/lib/cron/scheduler";
 import { scheduleCronJob } from "@/lib/cron/executor";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects/[id]/cron/[jobId]");
 
 interface RouteParams {
   params: Promise<{ id: string; jobId: string }>;
@@ -23,10 +26,9 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: projectId, jobId } = await params;
 
@@ -34,7 +36,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -92,7 +94,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Failed to get cron job:", error);
+    log.error("Failed to get cron job", error);
     return NextResponse.json(
       { error: "Failed to get cron job" },
       { status: 500 }
@@ -106,10 +108,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: projectId, jobId } = await params;
 
@@ -117,7 +118,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -196,7 +197,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Failed to update cron job:", error);
+    log.error("Failed to update cron job", error);
     return NextResponse.json(
       { error: "Failed to update cron job" },
       { status: 500 }
@@ -210,10 +211,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: projectId, jobId } = await params;
 
@@ -221,7 +221,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -248,7 +248,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete cron job:", error);
+    log.error("Failed to delete cron job", error);
     return NextResponse.json(
       { error: "Failed to delete cron job" },
       { status: 500 }
@@ -262,10 +262,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: projectId, jobId } = await params;
 
@@ -273,7 +272,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
     });
 
@@ -301,14 +300,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         jobId,
       });
     } catch (execError) {
-      console.error("Failed to trigger cron job:", execError);
+      log.error("Failed to trigger cron job", execError);
       return NextResponse.json(
         { error: "Failed to trigger cron job. BullMQ may not be running." },
         { status: 503 }
       );
     }
   } catch (error) {
-    console.error("Failed to trigger cron job:", error);
+    log.error("Failed to trigger cron job", error);
     return NextResponse.json(
       { error: "Failed to trigger cron job" },
       { status: 500 }

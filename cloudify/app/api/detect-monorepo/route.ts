@@ -8,18 +8,20 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import {
   detectMonorepo,
   getSupportedMonorepoTools,
 } from "@/lib/build/monorepo-detector";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("detect-monorepo");
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { repoUrl, files, fileContents } = body;
@@ -101,7 +103,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("Monorepo detection error:", error);
+    log.error("Monorepo detection error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

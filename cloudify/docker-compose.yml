@@ -1,3 +1,6 @@
+include:
+  - docker/base.yml
+
 services:
   cloudify:
     build:
@@ -40,76 +43,16 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  postgres:
-    image: postgres:16-alpine
-    container_name: cloudify-db
-    command: postgres -c unix_socket_directories=
-    environment:
-      - POSTGRES_USER=cloudify
-      - POSTGRES_PASSWORD=cloudify123
-      - POSTGRES_DB=cloudify
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h localhost -U cloudify -d cloudify"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-  # Redis for KV store, caching, and job queues
+  # Expose Redis port for local dev access
   redis:
-    image: redis:7-alpine
-    container_name: cloudify-redis
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    restart: unless-stopped
 
-  # MinIO for S3-compatible blob storage
+  # Expose MinIO ports for local dev access
   minio:
-    image: minio/minio:latest
-    container_name: cloudify-minio
-    command: server /data --console-address ":9001"
     ports:
       - "9000:9000"   # API
       - "9001:9001"   # Console
-    environment:
-      - MINIO_ROOT_USER=cloudify
-      - MINIO_ROOT_PASSWORD=cloudify-minio-secret-key
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
-  # MinIO bucket initialization
-  minio-init:
-    image: minio/mc:latest
-    container_name: cloudify-minio-init
-    depends_on:
-      minio:
-        condition: service_healthy
-    entrypoint: >
-      /bin/sh -c "
-      mc alias set cloudify http://minio:9000 cloudify cloudify-minio-secret-key &&
-      mc mb --ignore-existing cloudify/cloudify-blobs &&
-      mc mb --ignore-existing cloudify/cloudify-artifacts &&
-      mc mb --ignore-existing cloudify/cloudify-functions &&
-      mc anonymous set download cloudify/cloudify-blobs &&
-      echo 'MinIO buckets initialized'
-      "
-    restart: "no"
 
   # Nginx server for deployed sites
   cloudify-nginx:
@@ -126,8 +69,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
-  redis_data:
-  minio_data:
   repos_data:
   builds_data:

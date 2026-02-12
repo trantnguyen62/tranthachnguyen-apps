@@ -7,6 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getDeploymentDiff, getDeploymentComparisonSummary } from "@/lib/deployments/diff-service";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("deployments/[id]/diff");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -73,7 +76,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ diff });
   } catch (error) {
-    console.error("Failed to get deployment diff:", error);
+    log.error("Failed to get deployment diff", error);
     return NextResponse.json(
       { error: "Failed to get deployment diff" },
       { status: 500 }

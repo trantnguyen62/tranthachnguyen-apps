@@ -8,6 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { EdgeKVStore, getKVStats, deleteEdgeKV } from "@/lib/edge/kv-client";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("edge-kv/[id]");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -81,7 +84,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       complete: listResult.complete,
     });
   } catch (error) {
-    console.error("Failed to fetch Edge KV:", error);
+    log.error("Failed to fetch Edge KV", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch Edge KV namespace" },
       { status: 500 }
@@ -146,7 +149,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       message: "Edge KV namespace deleted",
     });
   } catch (error) {
-    console.error("Failed to delete Edge KV:", error);
+    log.error("Failed to delete Edge KV", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete Edge KV namespace" },
       { status: 500 }

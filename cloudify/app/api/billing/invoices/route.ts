@@ -4,27 +4,29 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getInvoices, getUpcomingInvoice } from "@/lib/billing/stripe";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("billing/invoices");
 
 /**
  * GET /api/billing/invoices - Get invoice history
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
 
     // Get past invoices
-    const invoices = await getInvoices(session.user.id, limit);
+    const invoices = await getInvoices(user.id, limit);
 
     // Get upcoming invoice
-    const upcomingInvoice = await getUpcomingInvoice(session.user.id);
+    const upcomingInvoice = await getUpcomingInvoice(user.id);
 
     // Format invoices for response
     const formattedInvoices = invoices.map((invoice) => ({
@@ -74,7 +76,7 @@ export async function GET(request: NextRequest) {
       upcoming: formattedUpcoming,
     });
   } catch (error) {
-    console.error("Failed to get invoices:", error);
+    log.error("Failed to get invoices", error);
     return NextResponse.json(
       { error: "Failed to get invoices" },
       { status: 500 }

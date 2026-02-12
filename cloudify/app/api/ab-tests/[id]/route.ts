@@ -9,6 +9,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getTestResults, updateABTest, deleteABTest } from "@/lib/edge/ab-testing";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ab-tests/detail");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -100,7 +103,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch A/B test:", error);
+    log.error("Failed to fetch A/B test", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch A/B test" },
       { status: 500 }
@@ -180,7 +183,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ test: updated });
   } catch (error) {
-    console.error("Failed to update A/B test:", error);
+    log.error("Failed to update A/B test", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to update A/B test" },
       { status: 500 }
@@ -245,7 +248,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       message: "A/B test deleted",
     });
   } catch (error) {
-    console.error("Failed to delete A/B test:", error);
+    log.error("Failed to delete A/B test", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete A/B test" },
       { status: 500 }

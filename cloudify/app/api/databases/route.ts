@@ -8,6 +8,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { provisionDatabase } from "@/lib/database/provisioner";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("databases");
 
 // GET /api/databases - List databases
 export async function GET(request: NextRequest) {
@@ -66,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ databases });
   } catch (error) {
-    console.error("Failed to fetch databases:", error);
+    log.error("Failed to fetch databases", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch databases" },
       { status: 500 }
@@ -83,7 +87,9 @@ export async function POST(request: NextRequest) {
     }
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { projectId, name, type, provider, plan, region } = body;
 
     if (!projectId || !name || !type || !provider) {
@@ -216,7 +222,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Failed to create database:", error);
+    log.error("Failed to create database", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create database", message: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }

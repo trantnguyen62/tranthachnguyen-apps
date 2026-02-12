@@ -5,9 +5,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { exportAuditLogs, AuditLogFilters, ExportFormat } from "@/lib/audit";
 import { createAuditContext, audit } from "@/lib/audit";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("audit-logs/export");
 
 /**
  * POST /api/audit-logs/export
@@ -29,11 +32,9 @@ import { createAuditContext, audit } from "@/lib/audit";
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const format: ExportFormat = body.format || "json";
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
     const { data, mimeType, filename } = await exportAuditLogs(filters, format);
 
     // Log this export action
-    const auditContext = createAuditContext(request, session.user.id, {
+    const auditContext = createAuditContext(request, user.id, {
       teamId: filters.teamId,
     });
     await audit.settings(auditContext, "exported", "Exported audit logs", {
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("[Audit Logs Export] Error:", error);
+    log.error("Failed to export audit logs", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to export audit logs" },
       { status: 500 }

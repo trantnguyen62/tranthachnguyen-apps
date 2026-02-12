@@ -14,6 +14,9 @@ import {
   BitbucketPushEvent,
   BitbucketPullRequestEvent,
 } from "@/lib/integrations/bitbucket";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("webhooks/bitbucket");
 
 /**
  * POST /api/webhooks/bitbucket
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      console.log(`[Bitbucket Webhook] No project found for repository: ${repoFullName}`);
+      log.info(`No project found for repository: ${repoFullName}`);
       return NextResponse.json({ message: "Project not found" }, { status: 200 });
     }
 
@@ -67,7 +70,7 @@ export async function POST(request: NextRequest) {
     const event = parseBitbucketWebhookEvent(eventKey, payload);
 
     if (!event) {
-      console.log(`[Bitbucket Webhook] Ignoring unsupported event type: ${eventKey}`);
+      log.info(`Ignoring unsupported event type: ${eventKey}`);
       return NextResponse.json({ message: "Event type not supported" }, { status: 200 });
     }
 
@@ -93,7 +96,7 @@ export async function POST(request: NextRequest) {
       // Check if this is the production branch
       const isProductionBranch = branch === project.repoBranch;
 
-      console.log(`[Bitbucket Webhook] Push to ${branch} on project ${project.slug}`, {
+      log.info(`Push to ${branch} on project ${project.slug}`, {
         commitSha,
         isProduction: isProductionBranch,
       });
@@ -125,7 +128,7 @@ export async function POST(request: NextRequest) {
       const prEvent = event as BitbucketPullRequestEvent;
       const { pullrequest: pr } = prEvent;
 
-      console.log(`[Bitbucket Webhook] Pull request ${pr.id} (${pr.state}) on project ${project.slug}`);
+      log.info(`Pull request ${pr.id} (${pr.state}) on project ${project.slug}`);
 
       // Only create preview deployments for opened/updated PRs
       if (eventKey === "pullrequest:created" || eventKey === "pullrequest:updated") {
@@ -158,7 +161,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: "Event processed" });
   } catch (error) {
-    console.error("[Bitbucket Webhook] Error:", error);
+    log.error("Webhook processing failed", error);
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 }

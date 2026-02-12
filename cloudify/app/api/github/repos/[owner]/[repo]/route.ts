@@ -4,7 +4,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("github/repos/[owner]/[repo]");
 import { prisma } from "@/lib/prisma";
 import {
   getRepository,
@@ -24,17 +27,16 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { owner, repo } = await params;
 
     // Get user's GitHub access token
     const account = await prisma.account.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         provider: "github",
       },
     });
@@ -63,7 +65,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Check if already imported
     const existingProject = await prisma.project.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         repoUrl: repository.htmlUrl,
       },
       select: {
@@ -100,7 +102,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("Failed to get repository:", error);
+    log.error("Failed to get repository", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get repository" },
       { status: 500 }

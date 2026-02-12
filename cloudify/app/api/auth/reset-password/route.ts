@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("auth/reset-password");
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
       message: "Password has been reset successfully. You can now log in with your new password.",
     });
   } catch (error) {
-    console.error("Reset password error:", error);
+    log.error("Reset password error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to reset password" },
       { status: 500 }

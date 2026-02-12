@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
 import {
   getSecuritySettings,
   setSecurityLevel,
@@ -17,6 +18,8 @@ import {
   createRateLimitRule,
   isCloudflareConfigured,
 } from "@/lib/integrations/cloudflare";
+
+const log = getRouteLogger("projects/[id]/security");
 
 interface SecurityConfig {
   securityLevel: "off" | "essentially_off" | "low" | "medium" | "high" | "under_attack";
@@ -111,7 +114,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("Failed to get security settings:", error);
+    log.error("Failed to get security settings", error);
     return NextResponse.json(
       { error: "Failed to get security settings" },
       { status: 500 }
@@ -228,7 +231,7 @@ export async function PUT(
       results,
     });
   } catch (error) {
-    console.error("Failed to update security settings:", error);
+    log.error("Failed to update security settings", error);
     return NextResponse.json(
       { error: "Failed to update security settings" },
       { status: 500 }
@@ -295,7 +298,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete firewall rule:", error);
+    log.error("Failed to delete firewall rule", error);
     return NextResponse.json(
       { error: "Failed to delete firewall rule" },
       { status: 500 }

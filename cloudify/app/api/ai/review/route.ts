@@ -5,10 +5,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { analyzeWithPrompt, parseAIJson, isAIAvailable } from "@/lib/ai/client";
 import { CODE_REVIEW_PROMPT } from "@/lib/ai/prompts";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ai/review");
 
 interface CodeReviewIssue {
   severity: "critical" | "warning" | "suggestion";
@@ -90,11 +93,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { deploymentId, scope = "full", code } = body;
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
         where: {
           id: deploymentId,
           project: {
-            userId: session.user.id,
+            userId: user.id,
           },
         },
         include: {
@@ -209,7 +210,7 @@ ${deployment.logs?.map(l => `[${l.level}] ${l.message}`).join("\n") || "No build
       createdAt: analysis.createdAt.toISOString(),
     });
   } catch (error) {
-    console.error("[AI Code Review] Error:", error);
+    log.error("Code review failed", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Code review failed" },
       { status: 500 }

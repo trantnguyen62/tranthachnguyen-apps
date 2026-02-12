@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { downloadBlob, getBlobInfo } from "@/lib/storage/blob-service";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("public/blobs");
 
 interface RouteParams {
   params: Promise<{
@@ -73,7 +76,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return new NextResponse(webStream, { headers });
   } catch (error) {
-    console.error("Public blob error:", error);
+    log.error("Public blob error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to serve blob" },
       { status: 500 }
@@ -113,7 +116,7 @@ export async function HEAD(request: NextRequest, { params }: RouteParams) {
 
     return new NextResponse(null, { status: 200, headers });
   } catch (error) {
-    console.error("Public blob HEAD error:", error);
+    log.error("Public blob HEAD error", { error: error instanceof Error ? error.message : String(error) });
     return new NextResponse(null, { status: 500 });
   }
 }

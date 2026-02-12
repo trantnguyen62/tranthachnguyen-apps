@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("edge-functions/invoke");
 import { executeEdgeFunction } from "@/lib/edge/runtime";
 import { getGeoData, getClientIP } from "@/lib/edge/geo";
 
@@ -84,7 +87,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       error: result.error,
     });
   } catch (error) {
-    console.error("Failed to invoke edge function:", error);
+    log.error("Failed to invoke edge function", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to invoke edge function" },
       { status: 500 }

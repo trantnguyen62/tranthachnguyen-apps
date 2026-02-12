@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("integrations");
 
 // Available integration types
 const INTEGRATION_TYPES = {
@@ -39,10 +42,9 @@ const INTEGRATION_TYPES = {
 // GET /api/integrations - List integrations
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
@@ -56,7 +58,7 @@ export async function GET(request: NextRequest) {
     // If projectId is provided, verify ownership
     if (projectId) {
       const project = await prisma.project.findFirst({
-        where: { id: projectId, userId: session.user.id },
+        where: { id: projectId, userId: user.id },
       });
 
       if (!project) {
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's projects
     const userProjects = await prisma.project.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: { id: true },
     });
     const projectIds = userProjects.map((p) => p.id);
@@ -97,7 +99,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(safeIntegrations);
   } catch (error) {
-    console.error("Failed to fetch integrations:", error);
+    log.error("Failed to fetch integrations", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch integrations" },
       { status: 500 }
@@ -108,10 +110,9 @@ export async function GET(request: NextRequest) {
 // POST /api/integrations - Create an integration
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { projectId, type, name, config, credentials, webhookUrl } = body;
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: session.user.id },
+      where: { id: projectId, userId: user.id },
     });
 
     if (!project) {
@@ -168,7 +169,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId,
         type: "integration",
         action: "created",
@@ -178,7 +179,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(integration);
   } catch (error) {
-    console.error("Failed to create integration:", error);
+    log.error("Failed to create integration", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create integration" },
       { status: 500 }
@@ -189,10 +190,9 @@ export async function POST(request: NextRequest) {
 // PATCH /api/integrations - Update an integration
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { id, config, credentials, enabled, webhookUrl } = body;
@@ -207,7 +207,7 @@ export async function PATCH(request: NextRequest) {
     const integration = await prisma.integration.findFirst({
       where: {
         id,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
     });
 
@@ -236,7 +236,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Failed to update integration:", error);
+    log.error("Failed to update integration", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to update integration" },
       { status: 500 }
@@ -247,10 +247,9 @@ export async function PATCH(request: NextRequest) {
 // DELETE /api/integrations - Delete an integration
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
@@ -265,7 +264,7 @@ export async function DELETE(request: NextRequest) {
     const integration = await prisma.integration.findFirst({
       where: {
         id,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
     });
 
@@ -277,7 +276,7 @@ export async function DELETE(request: NextRequest) {
 
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId: integration.projectId,
         type: "integration",
         action: "deleted",
@@ -287,7 +286,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete integration:", error);
+    log.error("Failed to delete integration", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete integration" },
       { status: 500 }

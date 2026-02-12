@@ -5,7 +5,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ssl/status");
 import {
   getSslStatus,
   checkAndRenewExpiring,
@@ -18,12 +21,11 @@ import { getCloudflareStatus } from "@/lib/integrations/cloudflare";
  * GET /api/ssl/status
  * Get global SSL status and statistics
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const sslStatus = await getSslStatus();
     const cloudflareStatus = await getCloudflareStatus();
@@ -43,7 +45,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    console.error("Failed to get SSL status:", error);
+    log.error("Failed to get SSL status", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get SSL status" },
       { status: 500 }
@@ -60,10 +62,9 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json().catch(() => ({}));
     const action = body.action;
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error("Failed to perform SSL action:", error);
+    log.error("Failed to perform SSL action", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to perform SSL action" },
       { status: 500 }

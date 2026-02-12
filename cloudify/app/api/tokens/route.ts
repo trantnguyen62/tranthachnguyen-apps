@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { randomBytes, createHash } from "crypto";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("tokens");
 
 // Generate a secure API token
 function generateToken(): { token: string; hash: string; prefix: string } {
@@ -12,15 +16,14 @@ function generateToken(): { token: string; hash: string; prefix: string } {
 }
 
 // GET /api/tokens - List user's API tokens
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const tokens = await prisma.apiToken.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: {
         id: true,
         name: true,
@@ -35,7 +38,7 @@ export async function GET() {
 
     return NextResponse.json(tokens);
   } catch (error) {
-    console.error("Failed to fetch tokens:", error);
+    log.error("Failed to fetch tokens", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch tokens" },
       { status: 500 }
@@ -46,12 +49,13 @@ export async function GET() {
 // POST /api/tokens - Create a new API token
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { name, scopes = ["read"], expiresIn } = body;
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
@@ -87,7 +91,7 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         token: hash,
         tokenPrefix: prefix,
-        userId: session.user.id,
+        userId: user.id,
         scopes: tokenScopes,
         expiresAt,
       },
@@ -96,13 +100,13 @@ export async function POST(request: NextRequest) {
     // Log activity (non-blocking - don't fail token creation if logging fails)
     prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         type: "api_token",
         action: "created",
         description: `Created API token "${name}"`,
         metadata: { tokenId: apiToken.id, scopes: tokenScopes },
       },
-    }).catch((err: unknown) => console.error("Failed to log activity:", err));
+    }).catch((err: unknown) => log.error("Failed to log activity", { error: err instanceof Error ? err.message : String(err) }));
 
     // Return the raw token ONLY on creation (never shown again)
     return NextResponse.json({
@@ -115,7 +119,7 @@ export async function POST(request: NextRequest) {
       createdAt: apiToken.createdAt,
     });
   } catch (error) {
-    console.error("Failed to create token:", error);
+    log.error("Failed to create token", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create token" },
       { status: 500 }

@@ -3,26 +3,28 @@
  * Get subscription status and usage information
  */
 
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { getSubscriptionDetails } from "@/lib/billing/stripe";
 import { getUsageWithLimits } from "@/lib/billing/metering";
 import { PlanType, getPlan } from "@/lib/billing/pricing";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("billing");
 
 /**
  * GET /api/billing - Get current subscription and usage
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user: authUser } = authResult;
 
     // Get user with subscription info
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: authUser.id },
       select: {
         id: true,
         plan: true,
@@ -41,10 +43,10 @@ export async function GET() {
     const planConfig = getPlan(plan);
 
     // Get Stripe subscription details if available
-    const subscriptionDetails = await getSubscriptionDetails(session.user.id);
+    const subscriptionDetails = await getSubscriptionDetails(authUser.id);
 
     // Get usage with limits
-    const usageWithLimits = await getUsageWithLimits(session.user.id, plan);
+    const usageWithLimits = await getUsageWithLimits(authUser.id, plan);
 
     return NextResponse.json({
       subscription: {
@@ -64,7 +66,7 @@ export async function GET() {
       exceeded: usageWithLimits.exceeded,
     });
   } catch (error) {
-    console.error("Failed to get billing info:", error);
+    log.error("Failed to get billing info", error);
     return NextResponse.json(
       { error: "Failed to get billing info" },
       { status: 500 }

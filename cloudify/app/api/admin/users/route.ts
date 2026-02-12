@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSessionFromRequest } from "@/lib/auth/session";
+import { requireAdminAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("admin/users");
 
 // Admin emails from environment variable (comma-separated list)
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
@@ -8,25 +11,19 @@ const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "").split(",").map((e) => e.tr
 /**
  * Check if a user email is an admin
  */
-function isAdmin(email: string): boolean {
+function isAdminEmail(email: string): boolean {
   return ADMIN_EMAILS.includes(email.toLowerCase());
 }
 
 // GET /api/admin/users - List all users (admin only)
 export async function GET(request: NextRequest) {
   try {
-    const session = await getSessionFromRequest(request);
-    if (!session?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireAdminAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { id: session.id },
-      select: { email: true },
-    });
-
-    if (!user || !isAdmin(user.email)) {
+    // For session auth, verify user is in ADMIN_EMAILS list
+    if (user.authMethod === "session" && !isAdminEmail(user.email)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -50,12 +47,12 @@ export async function GET(request: NextRequest) {
     // Add isAdmin flag to response
     const usersWithAdminFlag = users.map((u) => ({
       ...u,
-      isAdmin: isAdmin(u.email),
+      isAdmin: isAdminEmail(u.email),
     }));
 
     return NextResponse.json({ users: usersWithAdminFlag });
   } catch (error) {
-    console.error("Failed to fetch users:", error);
+    log.error("Failed to fetch users", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch users" },
       { status: 500 }

@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("edge-config");
 
 // GET /api/edge-config - List edge configs or items
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
@@ -17,7 +20,7 @@ export async function GET(request: NextRequest) {
     // If projectId is provided, verify ownership
     if (projectId) {
       const project = await prisma.project.findFirst({
-        where: { id: projectId, userId: session.user.id },
+        where: { id: projectId, userId: user.id },
       });
 
       if (!project) {
@@ -36,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's projects
     const userProjects = await prisma.project.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       select: { id: true },
     });
     const projectIds = userProjects.map((p) => p.id);
@@ -55,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(configs);
   } catch (error) {
-    console.error("Failed to fetch edge config:", error);
+    log.error("Failed to fetch edge config", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch edge config" },
       { status: 500 }
@@ -66,12 +69,13 @@ export async function GET(request: NextRequest) {
 // POST /api/edge-config - Create config or set item
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { projectId, configName, configId, key, value } = body;
 
     if (!projectId) {
@@ -83,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { id: projectId, userId: session.user.id },
+      where: { id: projectId, userId: user.id },
     });
 
     if (!project) {
@@ -107,7 +111,7 @@ export async function POST(request: NextRequest) {
 
       await prisma.activity.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           projectId,
           type: "edge_config",
           action: "created",
@@ -140,7 +144,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("Failed to create edge config:", error);
+    log.error("Failed to create edge config", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create edge config" },
       { status: 500 }
@@ -151,10 +155,9 @@ export async function POST(request: NextRequest) {
 // DELETE /api/edge-config - Delete config or item
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const configId = searchParams.get("configId");
@@ -171,7 +174,7 @@ export async function DELETE(request: NextRequest) {
       const config = await prisma.edgeConfig.findFirst({
         where: {
           id: configId,
-          project: { userId: session.user.id },
+          project: { userId: user.id },
         },
       });
 
@@ -185,7 +188,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ error: "ID required" }, { status: 400 });
   } catch (error) {
-    console.error("Failed to delete:", error);
+    log.error("Failed to delete", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete" },
       { status: 500 }

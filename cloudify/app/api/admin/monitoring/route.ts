@@ -3,9 +3,13 @@
  * Provides comprehensive system metrics and deployment status for the Cloudify platform
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAdminAccess, isAuthError } from "@/lib/auth/api-auth";
 import { redisHealthCheck, getRedisClient, set, get } from "@/lib/storage/redis-client";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("admin/monitoring");
 
 interface SystemMetrics {
   status: "healthy" | "degraded" | "unhealthy";
@@ -71,7 +75,10 @@ const LAST_DEPLOY_KEY = "cloudify:platform:lastDeploy";
 /**
  * GET /api/admin/monitoring - Get comprehensive system metrics
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authResult = await requireAdminAccess(request);
+  if (isAuthError(authResult)) return authResult;
+
   const timestamp = new Date().toISOString();
   const version = process.env.npm_package_version || process.env.APP_VERSION || "1.0.0";
   const uptime = Math.floor((Date.now() - startTime) / 1000);
@@ -157,7 +164,7 @@ export async function GET() {
       })),
     };
   } catch (error) {
-    console.error("Failed to fetch deployment stats:", error);
+    log.error("Failed to fetch deployment stats", { error: error instanceof Error ? error.message : String(error) });
   }
 
   // Get CI/CD info from Redis or env
@@ -174,7 +181,7 @@ export async function GET() {
       cicdInfo = { ...cicdInfo, ...JSON.parse(lastDeploy) };
     }
   } catch (error) {
-    console.error("Failed to fetch CI/CD info:", error);
+    log.error("Failed to fetch CI/CD info", { error: error instanceof Error ? error.message : String(error) });
   }
 
   // Get memory usage
@@ -220,18 +227,13 @@ export async function GET() {
 /**
  * POST /api/admin/monitoring - Record a platform deployment event
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const authResult = await requireAdminAccess(request);
+    if (isAuthError(authResult)) return authResult;
+
     const body = await request.json();
     const { commit, branch, buildNumber, status, timestamp } = body;
-
-    // Verify admin token (simple check - in production use proper auth)
-    const authHeader = request.headers.get("authorization");
-    const adminToken = process.env.ADMIN_API_TOKEN;
-
-    if (adminToken && authHeader !== `Bearer ${adminToken}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const deploymentEvent = {
       lastDeployment: timestamp || new Date().toISOString(),
@@ -246,7 +248,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, deployment: deploymentEvent });
   } catch (error) {
-    console.error("Failed to record deployment:", error);
+    log.error("Failed to record deployment", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to record deployment" },
       { status: 500 }

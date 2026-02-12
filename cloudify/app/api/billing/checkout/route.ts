@@ -4,8 +4,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { createCheckoutSession, STRIPE_PRICES } from "@/lib/billing/stripe";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("billing/checkout");
 
 type PriceKey = "PRO_MONTHLY" | "PRO_YEARLY" | "TEAM_MONTHLY" | "TEAM_YEARLY";
 
@@ -14,12 +18,13 @@ type PriceKey = "PRO_MONTHLY" | "PRO_YEARLY" | "TEAM_MONTHLY" | "TEAM_YEARLY";
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { plan, interval } = body;
 
     // Validate plan
@@ -56,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     // Create checkout session
     const checkoutUrl = await createCheckoutSession(
-      session.user.id,
+      user.id,
       priceId,
       successUrl,
       cancelUrl
@@ -73,7 +78,7 @@ export async function POST(request: NextRequest) {
       url: checkoutUrl,
     });
   } catch (error) {
-    console.error("Failed to create checkout session:", error);
+    log.error("Failed to create checkout session", error);
     return NextResponse.json(
       { error: "Failed to create checkout session" },
       { status: 500 }

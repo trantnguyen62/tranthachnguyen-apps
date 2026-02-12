@@ -14,6 +14,9 @@ import {
   rollbackFailover,
   cancelFailover,
 } from "@/lib/failover/failover-manager";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("admin/failover");
 
 // GET /api/admin/failover - Get status and history
 export async function GET(request: NextRequest) {
@@ -72,7 +75,7 @@ export async function GET(request: NextRequest) {
       availableTargets,
     });
   } catch (error) {
-    console.error("Failed to get failover status:", error);
+    log.error("Failed to get failover status", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get failover status" },
       { status: 500 }
@@ -182,7 +185,7 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error("Failover action failed:", error);
+    log.error("Failover action failed", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failover action failed" },
       { status: 500 }

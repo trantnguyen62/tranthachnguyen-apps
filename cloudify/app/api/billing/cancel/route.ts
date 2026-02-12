@@ -4,21 +4,23 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { cancelSubscription, resumeSubscription } from "@/lib/billing/stripe";
 import { prisma } from "@/lib/prisma";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("billing/cancel");
 
 /**
  * POST /api/billing/cancel - Cancel subscription at period end
  */
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    const success = await cancelSubscription(session.user.id);
+    const success = await cancelSubscription(user.id);
 
     if (!success) {
       return NextResponse.json(
@@ -30,7 +32,7 @@ export async function POST() {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         type: "billing",
         action: "subscription.cancel_requested",
         description: "Subscription cancellation requested",
@@ -43,7 +45,7 @@ export async function POST() {
       message: "Subscription will be canceled at the end of the current billing period",
     });
   } catch (error) {
-    console.error("Failed to cancel subscription:", error);
+    log.error("Failed to cancel subscription", error);
     return NextResponse.json(
       { error: "Failed to cancel subscription" },
       { status: 500 }
@@ -54,14 +56,13 @@ export async function POST() {
 /**
  * DELETE /api/billing/cancel - Resume a canceled subscription
  */
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
-    const success = await resumeSubscription(session.user.id);
+    const success = await resumeSubscription(user.id);
 
     if (!success) {
       return NextResponse.json(
@@ -73,7 +74,7 @@ export async function DELETE() {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         type: "billing",
         action: "subscription.resumed",
         description: "Subscription cancellation reversed",
@@ -86,7 +87,7 @@ export async function DELETE() {
       message: "Subscription has been resumed",
     });
   } catch (error) {
-    console.error("Failed to resume subscription:", error);
+    log.error("Failed to resume subscription", error);
     return NextResponse.json(
       { error: "Failed to resume subscription" },
       { status: 500 }

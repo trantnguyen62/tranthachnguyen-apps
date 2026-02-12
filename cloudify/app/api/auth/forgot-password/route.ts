@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { sendRawEmail } from "@/lib/notifications/email";
 import { createPasswordResetEmail } from "@/lib/notifications/auth-emails";
 import crypto from "crypto";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("auth/forgot-password");
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,12 +70,12 @@ export async function POST(request: NextRequest) {
     });
 
     sendRawEmail(emailPayload).catch((err) =>
-      console.error("Failed to send password reset email:", err)
+      log.error("Failed to send password reset email", { error: err instanceof Error ? err.message : String(err) })
     );
 
     return successResponse;
   } catch (error) {
-    console.error("Forgot password error:", error);
+    log.error("Forgot password error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to process request" },
       { status: 500 }

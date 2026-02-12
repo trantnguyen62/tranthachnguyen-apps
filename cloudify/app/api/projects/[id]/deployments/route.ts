@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { triggerBuild } from "@/lib/build/worker";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects/[id]/deployments");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -10,10 +13,9 @@ interface RouteParams {
 // GET /api/projects/[id]/deployments - List deployments for a project
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
     const { searchParams } = new URL(request.url);
@@ -22,7 +24,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { id, userId: session.user.id },
+      where: { id, userId: user.id },
     });
 
     if (!project) {
@@ -44,7 +46,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       nextCursor: hasMore ? deployments[deployments.length - 1]?.id : null,
     });
   } catch (error) {
-    console.error("Failed to fetch deployments:", error);
+    log.error("Failed to fetch deployments", error);
     return NextResponse.json(
       { error: "Failed to fetch deployments" },
       { status: 500 }
@@ -55,10 +57,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // POST /api/projects/[id]/deployments - Create a new deployment
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
     const body = await request.json();
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
-      where: { id, userId: session.user.id },
+      where: { id, userId: user.id },
     });
 
     if (!project) {
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(deployment, { status: 201 });
   } catch (error) {
-    console.error("Failed to create deployment:", error);
+    log.error("Failed to create deployment", error);
     return NextResponse.json(
       { error: "Failed to create deployment" },
       { status: 500 }

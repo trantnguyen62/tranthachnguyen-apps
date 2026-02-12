@@ -42,6 +42,7 @@ export function getRedisClient(): Redis {
         return Math.min(times * 100, 3000);
       },
       maxRetriesPerRequest: 3,
+      connectTimeout: 5000,
       enableReadyCheck: true,
       lazyConnect: true,
     });

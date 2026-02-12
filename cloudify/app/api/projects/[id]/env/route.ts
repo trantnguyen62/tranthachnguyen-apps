@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError, checkProjectAccess, meetsMinimumRole } from "@/lib/auth/api-auth";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects/[id]/env");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -43,7 +47,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ envVariables });
   } catch (error) {
-    console.error("Failed to fetch environment variables:", error);
+    log.error("Failed to fetch environment variables", error);
     return NextResponse.json(
       { error: "Failed to fetch environment variables" },
       { status: 500 }
@@ -74,7 +78,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { key, value, target = "production" } = body;
 
     if (!key || typeof key !== "string") {
@@ -92,7 +98,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(envVariable, { status: 201 });
   } catch (error) {
-    console.error("Failed to create environment variable:", error);
+    log.error("Failed to create environment variable", error);
     return NextResponse.json(
       { error: "Failed to create environment variable" },
       { status: 500 }
@@ -123,7 +129,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const body = await request.json();
+    const deleteParseResult = await parseJsonBody(request);
+    if (isParseError(deleteParseResult)) return deleteParseResult;
+    const body = deleteParseResult.data;
     const { envId, key, target } = body;
 
     // Delete by ID if provided, otherwise by key+target
@@ -151,7 +159,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete environment variable:", error);
+    log.error("Failed to delete environment variable", error);
     return NextResponse.json(
       { error: "Failed to delete environment variable" },
       { status: 500 }

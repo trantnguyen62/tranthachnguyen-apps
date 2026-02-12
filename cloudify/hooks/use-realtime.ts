@@ -1,35 +1,16 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 
 // Singleton socket instance
 let socket: Socket | null = null;
 let connectionPromise: Promise<Socket> | null = null;
 
-interface DeploymentLogEntry {
-  level: string;
-  message: string;
-  timestamp: string;
-}
-
-interface DeploymentStatus {
-  status: string;
-  url?: string;
-  buildTime?: number;
-  timestamp: string;
-}
-
 interface PresenceUser {
   userId: string;
   name: string;
   email?: string;
-}
-
-interface BuildProgress {
-  step: string;
-  progress: number;
-  timestamp: string;
 }
 
 /**
@@ -128,100 +109,6 @@ export function useSocket() {
   }, []);
 
   return { socket, isConnected, error };
-}
-
-/**
- * Hook for deployment log streaming
- */
-export function useDeploymentStream(deploymentId: string | null) {
-  const [logs, setLogs] = useState<DeploymentLogEntry[]>([]);
-  const [status, setStatus] = useState<DeploymentStatus | null>(null);
-  const [progress, setProgress] = useState<BuildProgress | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const joinedRef = useRef(false);
-
-  useEffect(() => {
-    if (!deploymentId) return;
-
-    let mounted = true;
-
-    async function subscribe() {
-      try {
-        const sock = await getSocket();
-
-        if (!mounted) return;
-        setIsConnected(sock.connected);
-
-        // Join deployment room
-        if (!joinedRef.current) {
-          sock.emit("join:deployment", deploymentId);
-          joinedRef.current = true;
-        }
-
-        // Listen for logs
-        const handleLog = (event: any) => {
-          if (event.deploymentId === deploymentId && mounted) {
-            setLogs((prev) => [
-              ...prev,
-              {
-                level: event.level,
-                message: event.message,
-                timestamp: event.timestamp,
-              },
-            ]);
-          }
-        };
-
-        // Listen for status changes
-        const handleStatus = (event: DeploymentStatus & { deploymentId: string }) => {
-          if (event.deploymentId === deploymentId && mounted) {
-            setStatus(event);
-          }
-        };
-
-        // Listen for progress
-        const handleProgress = (event: BuildProgress & { deploymentId: string }) => {
-          if (event.deploymentId === deploymentId && mounted) {
-            setProgress(event);
-          }
-        };
-
-        sock.on("deployment:log", handleLog);
-        sock.on("deployment:status", handleStatus);
-        sock.on("deployment:progress", handleProgress);
-
-        return () => {
-          sock.off("deployment:log", handleLog);
-          sock.off("deployment:status", handleStatus);
-          sock.off("deployment:progress", handleProgress);
-        };
-      } catch (err) {
-        console.error("[useDeploymentStream] Error:", err);
-      }
-    }
-
-    subscribe();
-
-    return () => {
-      mounted = false;
-      if (socket && joinedRef.current) {
-        socket.emit("leave:deployment", deploymentId);
-        joinedRef.current = false;
-      }
-    };
-  }, [deploymentId]);
-
-  const clearLogs = useCallback(() => {
-    setLogs([]);
-  }, []);
-
-  return {
-    logs,
-    status,
-    progress,
-    isConnected,
-    clearLogs,
-  };
 }
 
 /**

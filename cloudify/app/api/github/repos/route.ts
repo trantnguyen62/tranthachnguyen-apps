@@ -4,7 +4,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("github/repos");
 import { prisma } from "@/lib/prisma";
 import {
   listUserRepositories,
@@ -19,15 +22,14 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     // Get user's GitHub access token
     const account = await prisma.account.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         provider: "github",
       },
     });
@@ -73,7 +75,7 @@ export async function GET(request: NextRequest) {
     // Check which repos are already imported
     const existingProjects = await prisma.project.findMany({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         repoUrl: {
           in: repos.map((r) => r.htmlUrl),
         },
@@ -106,7 +108,7 @@ export async function GET(request: NextRequest) {
       hasMore: repos.length === perPage,
     });
   } catch (error) {
-    console.error("Failed to list repositories:", error);
+    log.error("Failed to list repositories", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to list repositories" },
       { status: 500 }
@@ -119,10 +121,9 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { repoFullName, projectName, branch } = body;
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
     // Get user's GitHub access token
     const account = await prisma.account.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         provider: "github",
       },
     });
@@ -175,7 +176,7 @@ export async function POST(request: NextRequest) {
     // Check if already imported
     const existingProject = await prisma.project.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         repoUrl: repo.htmlUrl,
       },
     });
@@ -211,7 +212,7 @@ export async function POST(request: NextRequest) {
     // Create project
     const project = await prisma.project.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         name: projectName || repo.name,
         slug,
         repoUrl: repo.htmlUrl,
@@ -251,14 +252,14 @@ export async function POST(request: NextRequest) {
         });
       }
     } catch (webhookError) {
-      console.warn("Failed to create webhook:", webhookError);
+      log.warn("Failed to create webhook", { error: webhookError instanceof Error ? webhookError.message : String(webhookError) });
       // Continue without webhook - user can set up manually
     }
 
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId: project.id,
         type: "project",
         action: "project.imported",
@@ -287,7 +288,7 @@ export async function POST(request: NextRequest) {
       suggestedSettings: settings,
     });
   } catch (error) {
-    console.error("Failed to import repository:", error);
+    log.error("Failed to import repository", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to import repository" },
       { status: 500 }

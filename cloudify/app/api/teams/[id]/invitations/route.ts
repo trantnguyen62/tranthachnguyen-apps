@@ -11,6 +11,10 @@ import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { randomBytes } from "crypto";
 import { sendRawEmail } from "@/lib/notifications/email";
 import { createInvitationEmail } from "@/lib/notifications/team-emails";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("teams/[id]/invitations");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -26,7 +30,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { user } = authResult;
 
     const { id: teamId } = await params;
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { email, role = "member" } = body;
 
     if (!email || typeof email !== "string") {
@@ -186,7 +192,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       emailSent: emailResult.success,
     });
   } catch (error) {
-    console.error("Failed to send invitation:", error);
+    log.error("Failed to send invitation", error);
     return NextResponse.json(
       { error: "Failed to send invitation" },
       { status: 500 }
@@ -250,7 +256,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ invitations: result });
   } catch (error) {
-    console.error("Failed to fetch invitations:", error);
+    log.error("Failed to fetch invitations", error);
     return NextResponse.json(
       { error: "Failed to fetch invitations" },
       { status: 500 }
@@ -316,7 +322,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to cancel invitation:", error);
+    log.error("Failed to cancel invitation", error);
     return NextResponse.json(
       { error: "Failed to cancel invitation" },
       { status: 500 }

@@ -24,7 +24,7 @@ export default function Error({
         stack: error.stack,
         digest: error.digest,
       }),
-    }).catch(() => {});
+    }).catch((err) => console.warn("Failed to report error:", err));
   }, [error]);
 
   return (

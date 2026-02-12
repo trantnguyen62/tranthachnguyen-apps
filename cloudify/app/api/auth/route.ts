@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { createSession, getSession, clearSession } from "@/lib/auth/session";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/auth/rate-limit";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("auth");
 
 function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -207,7 +210,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error: unknown) {
-    console.error("Auth error:", error);
+    log.error("Auth error", { error: error instanceof Error ? error.message : String(error) });
 
     // Handle Prisma specific errors
     if (error && typeof error === "object" && "code" in error) {
@@ -257,7 +260,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Session check error:", error);
+    log.error("Session check error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Session check failed" },
       { status: 500 }
@@ -270,7 +273,7 @@ export async function DELETE() {
     await clearSession();
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Logout error:", error);
+    log.error("Logout error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Logout failed" },
       { status: 500 }

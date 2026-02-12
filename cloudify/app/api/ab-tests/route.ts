@@ -8,6 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { createABTest, getTestResults } from "@/lib/edge/ab-testing";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ab-tests");
 
 // GET /api/ab-tests - List A/B tests
 export async function GET(request: NextRequest) {
@@ -97,7 +100,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ tests: testsWithStatus });
   } catch (error) {
-    console.error("Failed to fetch A/B tests:", error);
+    log.error("Failed to fetch A/B tests", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch A/B tests" },
       { status: 500 }
@@ -217,7 +220,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ test }, { status: 201 });
   } catch (error) {
-    console.error("Failed to create A/B test:", error);
+    log.error("Failed to create A/B test", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create A/B test" },
       { status: 500 }

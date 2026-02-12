@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   HardDrive,
@@ -70,9 +70,9 @@ export default function StoragePage() {
     s.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalBlobSize = blobStores.reduce((acc, s) => acc + s.totalSize, 0);
-  const totalBlobCount = blobStores.reduce((acc, s) => acc + s.blobCount, 0);
-  const totalKVEntries = kvStores.reduce((acc, s) => acc + (s._count?.entries || 0), 0);
+  const totalBlobSize = useMemo(() => blobStores.reduce((acc, s) => acc + s.totalSize, 0), [blobStores]);
+  const totalBlobCount = useMemo(() => blobStores.reduce((acc, s) => acc + s.blobCount, 0), [blobStores]);
+  const totalKVEntries = useMemo(() => kvStores.reduce((acc, s) => acc + (s._count?.entries || 0), 0), [kvStores]);
   const usedPercentage = (totalBlobSize / (5 * 1024 * 1024 * 1024)) * 100;
 
   const formatSize = (bytes: number) => {

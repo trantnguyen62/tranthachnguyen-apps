@@ -7,7 +7,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("settings/audit/retention");
 import {
   getRetentionPolicy,
   setRetentionPolicy,
@@ -38,11 +41,9 @@ async function verifyTeamAdmin(userId: string, teamId: string): Promise<boolean>
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = request.nextUrl;
     const teamId = searchParams.get("teamId");
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     // Verify user is a member of the team
     const membership = await prisma.teamMember.findFirst({
-      where: { userId: session.user.id, teamId },
+      where: { userId: user.id, teamId },
     });
 
     if (!membership) {
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
       storageEstimate: stats.storageEstimate,
     });
   } catch (error) {
-    console.error("[Retention Policy GET] Error:", error);
+    log.error("Failed to get retention policy", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get retention policy" },
       { status: 500 }
@@ -100,11 +101,9 @@ export async function GET(request: NextRequest) {
  */
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { teamId, policy } = body;
@@ -117,7 +116,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Verify user is admin of the team
-    const isAdmin = await verifyTeamAdmin(session.user.id, teamId);
+    const isAdmin = await verifyTeamAdmin(user.id, teamId);
     if (!isAdmin) {
       return NextResponse.json(
         { error: "Only team admins can modify retention policy" },
@@ -129,7 +128,7 @@ export async function PUT(request: NextRequest) {
     const updatedPolicy = await setRetentionPolicy(teamId, policy);
 
     // Log the change
-    const auditContext = createAuditContext(request, session.user.id, {
+    const auditContext = createAuditContext(request, user.id, {
       teamId,
     });
     await audit.settings(
@@ -146,7 +145,7 @@ export async function PUT(request: NextRequest) {
       policy: updatedPolicy,
     });
   } catch (error) {
-    console.error("[Retention Policy PUT] Error:", error);
+    log.error("Failed to update retention policy", { error: error instanceof Error ? error.message : String(error) });
     const message =
       error instanceof Error ? error.message : "Failed to update retention policy";
     return NextResponse.json({ error: message }, { status: 500 });
@@ -165,11 +164,9 @@ export async function PUT(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { teamId } = body;
@@ -182,7 +179,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user is admin of the team
-    const isAdmin = await verifyTeamAdmin(session.user.id, teamId);
+    const isAdmin = await verifyTeamAdmin(user.id, teamId);
     if (!isAdmin) {
       return NextResponse.json(
         { error: "Only team admins can apply retention policy" },
@@ -204,7 +201,7 @@ export async function POST(request: NextRequest) {
     const deletedCount = await applyRetentionPolicy(teamId);
 
     // Log the cleanup
-    const auditContext = createAuditContext(request, session.user.id, {
+    const auditContext = createAuditContext(request, user.id, {
       teamId,
     });
     await audit.settings(
@@ -222,7 +219,7 @@ export async function POST(request: NextRequest) {
       deletedCount,
     });
   } catch (error) {
-    console.error("[Retention Policy POST] Error:", error);
+    log.error("Failed to apply retention policy", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to apply retention policy" },
       { status: 500 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useDeploymentStream } from "@/hooks/use-realtime";
+import { useDeploymentStream } from "@/hooks/use-deployment-stream";
 import { cn } from "@/lib/utils";
 
 interface LogLine {
@@ -38,13 +38,13 @@ export function RealTimeConsole({
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Subscribe to deployment stream
-  const { isConnected, status, logs: rawLogs, clearLogs: clearStreamLogs } = useDeploymentStream(deploymentId);
+  const { isConnected, status, logs: rawLogs, reset: clearStreamLogs } = useDeploymentStream(deploymentId);
 
   // Transform logs to our LogLine format with memoization
   const logs: LogLine[] = useMemo(() => {
     return rawLogs.slice(-maxLines).map((log, index) => ({
       id: `${log.timestamp}-${index}`,
-      level: (log.level || "info") as LogLine["level"],
+      level: (log.type === "command" ? "info" : log.type === "warning" ? "warn" : log.type || "info") as LogLine["level"],
       message: log.message,
       timestamp: new Date(log.timestamp || Date.now()),
     }));
@@ -128,13 +128,13 @@ export function RealTimeConsole({
             <span
               className={cn(
                 "px-2 py-0.5 text-xs rounded",
-                status.status === "BUILDING" && "bg-yellow-500/20 text-yellow-400",
-                status.status === "DEPLOYING" && "bg-secondary text-[#0070f3]",
-                status.status === "READY" && "bg-green-500/20 text-green-400",
-                status.status === "ERROR" && "bg-red-500/20 text-red-400"
+                status.status === "building" && "bg-yellow-500/20 text-yellow-400",
+                status.status === "starting" && "bg-secondary text-[#0070f3]",
+                status.status === "ready" && "bg-green-500/20 text-green-400",
+                status.status === "error" && "bg-red-500/20 text-red-400"
               )}
             >
-              {status.status}
+              {status.status.toUpperCase()}
             </span>
           )}
         </div>

@@ -139,8 +139,11 @@ export default function ProjectsPage() {
     }
   }
 
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+
   async function handleDeleteProject(projectId: string, projectName: string) {
     if (!confirm(`Are you sure you want to delete "${projectName}"? This action cannot be undone.`)) return;
+    setActionInProgress(projectId);
     try {
       const res = await fetch(`/api/projects?id=${projectId}`, { method: "DELETE" });
       if (res.ok) {
@@ -152,11 +155,14 @@ export default function ProjectsPage() {
       }
     } catch {
       setActionMessage({ type: "error", text: "Network error" });
+    } finally {
+      setActionInProgress(null);
     }
     setTimeout(() => setActionMessage(null), 4000);
   }
 
   async function handleCloneProject(projectId: string, projectName: string) {
+    setActionInProgress(projectId);
     try {
       setActionMessage({ type: "success", text: `Cloning "${projectName}"...` });
       const res = await fetch("/api/projects/clone", {
@@ -174,6 +180,8 @@ export default function ProjectsPage() {
       }
     } catch {
       setActionMessage({ type: "error", text: "Network error" });
+    } finally {
+      setActionInProgress(null);
     }
     setTimeout(() => setActionMessage(null), 4000);
   }

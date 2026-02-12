@@ -8,6 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getKVStats } from "@/lib/edge/kv-client";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("edge-kv");
 
 // GET /api/edge-kv - List KV namespaces
 export async function GET(request: NextRequest) {
@@ -74,7 +77,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ kvStores: kvWithStats });
   } catch (error) {
-    console.error("Failed to fetch Edge KV stores:", error);
+    log.error("Failed to fetch Edge KV stores", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch Edge KV stores" },
       { status: 500 }
@@ -182,7 +185,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ kv }, { status: 201 });
   } catch (error) {
-    console.error("Failed to create Edge KV:", error);
+    log.error("Failed to create Edge KV", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create Edge KV namespace" },
       { status: 500 }

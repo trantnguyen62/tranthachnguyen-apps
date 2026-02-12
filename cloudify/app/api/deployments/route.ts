@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { DeploymentStatus, Prisma } from "@prisma/client";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("deployments");
 
 // GET /api/deployments - List all deployments for the user
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     // Build where clause
     const where: Prisma.DeploymentWhereInput = {
-      project: { userId: session.user.id },
+      project: { userId: user.id },
     };
 
     if (status && status !== "all") {
@@ -85,7 +87,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch deployments:", error);
+    log.error("Failed to fetch deployments", error);
     return NextResponse.json(
       { error: "Failed to fetch deployments" },
       { status: 500 }

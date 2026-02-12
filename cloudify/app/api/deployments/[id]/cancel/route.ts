@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionFromRequest } from "@/lib/auth/session";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("deployments/[id]/cancel");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -55,7 +58,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to cancel deployment:", error);
+    log.error("Failed to cancel deployment", error);
     return NextResponse.json(
       { error: "Failed to cancel deployment" },
       { status: 500 }

@@ -8,6 +8,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("invitations/[token]");
 import { sendRawEmail } from "@/lib/notifications/email";
 import {
   createWelcomeToTeamEmail,
@@ -83,7 +86,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch invitation:", error);
+    log.error("Failed to fetch invitation", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch invitation" },
       { status: 500 }
@@ -254,7 +257,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       role: invitation.role,
     });
   } catch (error) {
-    console.error("Failed to accept invitation:", error);
+    log.error("Failed to accept invitation", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to accept invitation" },
       { status: 500 }
@@ -292,7 +295,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to decline invitation:", error);
+    log.error("Failed to decline invitation", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to decline invitation" },
       { status: 500 }

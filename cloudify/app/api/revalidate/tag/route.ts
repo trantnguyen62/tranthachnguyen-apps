@@ -7,9 +7,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { getAuthUser } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { revalidateTag } from "@/lib/isr/revalidator";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("revalidate/tag");
 
 /**
  * POST /api/revalidate/tag
@@ -48,8 +51,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (!projectId) {
-      const session = await auth();
-      if (!session?.user?.id) {
+      const authUser = await getAuthUser(request);
+      if (!authUser) {
         return NextResponse.json(
           { error: "Missing projectId parameter" },
           { status: 400 }
@@ -90,7 +93,7 @@ export async function POST(request: NextRequest) {
       revalidated: result.success,
     });
   } catch (error) {
-    console.error("Tag revalidation failed:", error);
+    log.error("Tag revalidation failed", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Tag revalidation failed", revalidated: false },
       { status: 500 }

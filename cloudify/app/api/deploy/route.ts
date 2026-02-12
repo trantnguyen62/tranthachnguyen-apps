@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser, requireDeployAccess, isAuthError, checkProjectAccess, meetsMinimumRole } from "@/lib/auth/api-auth";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { prisma } from "@/lib/prisma";
 import { triggerK8sBuild, cancelK8sBuild } from "@/lib/build/k8s-worker";
 import { canDeploy } from "@/lib/billing/metering";
@@ -40,7 +41,9 @@ export async function POST(request: NextRequest) {
     }
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { projectId, branch, commitSha, commitMsg, clean } = body;
 
     if (!projectId) {

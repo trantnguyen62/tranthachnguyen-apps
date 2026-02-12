@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("domains/verify");
 import { verifyDomainDnsWithCloudflare, getRequiredDnsRecords } from "@/lib/domains/dns";
 import { triggerSslProvisioning } from "@/lib/domains/ssl";
 import { updateNginxConfig } from "@/lib/domains/nginx";
@@ -12,10 +15,9 @@ interface RouteParams {
 // POST /api/domains/[id]/verify - Verify DNS configuration for a domain
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       where: {
         id,
         project: {
-          userId: session.user.id,
+          userId: user.id,
         },
       },
     });
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       requiredRecords,
     });
   } catch (error) {
-    console.error("Failed to verify domain:", error);
+    log.error("Failed to verify domain", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to verify domain DNS" },
       { status: 500 }

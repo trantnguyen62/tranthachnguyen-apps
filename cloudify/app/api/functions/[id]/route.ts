@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("functions/[id]");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -9,17 +13,16 @@ interface RouteParams {
 // GET /api/functions/[id] - Get function details with invocation stats
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
     const fn = await prisma.serverlessFunction.findFirst({
       where: {
         id,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
       include: {
         invocations: {
@@ -63,7 +66,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch function:", error);
+    log.error("Failed to fetch function", error);
     return NextResponse.json(
       { error: "Failed to fetch function" },
       { status: 500 }
@@ -74,17 +77,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PATCH /api/functions/[id] - Update function configuration
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
     const fn = await prisma.serverlessFunction.findFirst({
       where: {
         id,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
     });
 
@@ -92,7 +94,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Function not found" }, { status: 404 });
     }
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { runtime, entrypoint, memory, timeout, regions, envVars } = body;
 
     const updateData: Record<string, unknown> = {};
@@ -110,7 +114,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Failed to update function:", error);
+    log.error("Failed to update function", error);
     return NextResponse.json(
       { error: "Failed to update function" },
       { status: 500 }
@@ -121,17 +125,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/functions/[id] - Delete a function
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
 
     const fn = await prisma.serverlessFunction.findFirst({
       where: {
         id,
-        project: { userId: session.user.id },
+        project: { userId: user.id },
       },
     });
 
@@ -144,7 +147,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     // Log activity
     await prisma.activity.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId: fn.projectId,
         type: "function",
         action: "deleted",
@@ -154,7 +157,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete function:", error);
+    log.error("Failed to delete function", error);
     return NextResponse.json(
       { error: "Failed to delete function" },
       { status: 500 }

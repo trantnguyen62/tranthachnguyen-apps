@@ -9,6 +9,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { EdgeKVStore } from "@/lib/edge/kv-client";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("edge-kv/keys");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -80,7 +83,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       metadata: result.metadata,
     });
   } catch (error) {
-    console.error("Failed to get key:", error);
+    log.error("Failed to get key", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get key value" },
       { status: 500 }
@@ -174,7 +177,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       key,
     });
   } catch (error) {
-    console.error("Failed to set key:", error);
+    log.error("Failed to set key", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to set key value" },
       { status: 500 }
@@ -240,7 +243,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       message: "Key deleted",
     });
   } catch (error) {
-    console.error("Failed to delete key:", error);
+    log.error("Failed to delete key", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete key" },
       { status: 500 }

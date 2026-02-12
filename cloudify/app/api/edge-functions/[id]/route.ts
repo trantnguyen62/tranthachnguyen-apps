@@ -9,6 +9,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { validateEdgeFunctionCode } from "@/lib/edge/runtime";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("edge-functions/[id]");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -132,7 +136,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch edge function:", error);
+    log.error("Failed to fetch edge function", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch edge function" },
       { status: 500 }
@@ -174,7 +178,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { name, code, routes, runtime, regions, memory, timeout, enabled, envVars } = body;
 
     // Validate code if provided
@@ -232,7 +238,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ function: updated });
   } catch (error) {
-    console.error("Failed to update edge function:", error);
+    log.error("Failed to update edge function", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to update edge function" },
       { status: 500 }
@@ -303,7 +309,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       message: "Edge function deleted",
     });
   } catch (error) {
-    console.error("Failed to delete edge function:", error);
+    log.error("Failed to delete edge function", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete edge function" },
       { status: 500 }

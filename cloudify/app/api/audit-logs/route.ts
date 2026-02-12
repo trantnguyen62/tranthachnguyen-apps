@@ -5,8 +5,11 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { fetchAuditLogs, getFilterOptions, AuditLogFilters } from "@/lib/audit";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("audit-logs");
 
 /**
  * GET /api/audit-logs
@@ -26,11 +29,9 @@ import { fetchAuditLogs, getFilterOptions, AuditLogFilters } from "@/lib/audit";
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = request.nextUrl;
 
@@ -128,7 +129,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("[Audit Logs API] Error:", error);
+    log.error("Failed to fetch audit logs", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch audit logs" },
       { status: 500 }

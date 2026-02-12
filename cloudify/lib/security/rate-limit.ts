@@ -66,6 +66,8 @@ const store = new Map<string, RateLimitEntry>();
 const CLEANUP_INTERVAL = 60 * 1000;
 let lastCleanup = Date.now();
 
+const MAX_STORE_SIZE = 10000;
+
 function cleanupExpiredEntries(): void {
   const now = Date.now();
   if (now - lastCleanup < CLEANUP_INTERVAL) return;
@@ -73,6 +75,16 @@ function cleanupExpiredEntries(): void {
   lastCleanup = now;
   for (const [key, entry] of store) {
     if (entry.resetAt <= now) {
+      store.delete(key);
+    }
+  }
+
+  // Evict oldest entries if store exceeds maximum size
+  if (store.size > MAX_STORE_SIZE) {
+    const entries = Array.from(store.entries())
+      .sort((a, b) => a[1].resetAt - b[1].resetAt);
+    const toRemove = entries.slice(0, store.size - MAX_STORE_SIZE);
+    for (const [key] of toRemove) {
       store.delete(key);
     }
   }
@@ -235,9 +247,14 @@ export function createRateLimiter(preset: keyof typeof RATE_LIMIT_PRESETS | Rate
 export class SlidingWindowRateLimiter {
   private windows: Map<string, number[]> = new Map();
   private config: RateLimitConfig;
+  private cleanupInterval: ReturnType<typeof setInterval>;
 
   constructor(config: RateLimitConfig) {
     this.config = config;
+    // Auto-cleanup every 60 seconds to prevent memory leaks
+    this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 1000);
+    // Allow Node to exit without waiting for this timer
+    if (this.cleanupInterval.unref) this.cleanupInterval.unref();
   }
 
   check(key: string): { allowed: boolean; remaining: number } {

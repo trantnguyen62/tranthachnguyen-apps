@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("notifications/preferences");
 
 // Available notification types
 const NOTIFICATION_TYPES = [
@@ -18,15 +21,14 @@ const NOTIFICATION_TYPES = [
 const NOTIFICATION_CHANNELS = ["email", "slack", "webhook"];
 
 // GET /api/notifications/preferences - Get notification preferences
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const preferences = await prisma.notificationPreference.findMany({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
     });
 
     // Return preferences with available types and channels
@@ -36,7 +38,7 @@ export async function GET() {
       availableChannels: NOTIFICATION_CHANNELS,
     });
   } catch (error) {
-    console.error("Failed to fetch preferences:", error);
+    log.error("Failed to fetch preferences", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch preferences" },
       { status: 500 }
@@ -47,10 +49,9 @@ export async function GET() {
 // POST /api/notifications/preferences - Create/update preference
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { channel, type, enabled, destination } = body;
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
     const preference = await prisma.notificationPreference.upsert({
       where: {
         userId_channel_type: {
-          userId: session.user.id,
+          userId: user.id,
           channel,
           type,
         },
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
         destination,
       },
       create: {
-        userId: session.user.id,
+        userId: user.id,
         channel,
         type,
         enabled: enabled ?? true,
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(preference);
   } catch (error) {
-    console.error("Failed to update preference:", error);
+    log.error("Failed to update preference", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to update preference" },
       { status: 500 }
@@ -110,10 +111,9 @@ export async function POST(request: NextRequest) {
 // DELETE /api/notifications/preferences - Delete preference
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
@@ -126,12 +126,12 @@ export async function DELETE(request: NextRequest) {
     }
 
     await prisma.notificationPreference.delete({
-      where: { id, userId: session.user.id },
+      where: { id, userId: user.id },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete preference:", error);
+    log.error("Failed to delete preference", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to delete preference" },
       { status: 500 }

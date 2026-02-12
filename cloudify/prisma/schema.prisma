@@ -735,6 +735,7 @@ model PerformanceRecommendation {
   @@index([projectId, severity])
 }
 
+/// @deprecated Speculative feature — not in production use. Safe to remove in future cleanup.
 model PerformanceTrend {
   id          String   @id @default(cuid())
   projectId   String
@@ -891,6 +892,7 @@ model ManagedDatabase {
   @@index([status])
 }
 
+/// @deprecated Speculative feature — not in production use. Only referenced in cascade deletes. Safe to remove in future cleanup.
 model DatabaseMigration {
   id         String @id @default(cuid())
   databaseId String
@@ -915,6 +917,7 @@ model DatabaseMigration {
   @@index([databaseId, status])
 }
 
+/// @deprecated Speculative feature — not in production use. Only referenced in cascade deletes. Safe to remove in future cleanup.
 model DatabaseBackup {
   id         String @id @default(cuid())
   databaseId String
@@ -937,6 +940,7 @@ model DatabaseBackup {
   @@index([status])
 }
 
+/// @deprecated Speculative feature — not in production use. Only referenced in cascade deletes. Safe to remove in future cleanup.
 model DatabaseMetric {
   id         String @id @default(cuid())
   databaseId String

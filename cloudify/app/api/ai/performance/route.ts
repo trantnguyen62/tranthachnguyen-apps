@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import {
   analyzePerformance,
@@ -13,6 +13,9 @@ import {
   getMetricStatus,
   WebVitals,
 } from "@/lib/ai/performance-advisor";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ai/performance");
 
 /**
  * POST /api/ai/performance
@@ -21,11 +24,9 @@ import {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const body = await request.json();
     const { projectId, vitals } = body;
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: session.user.id,
+        userId: user.id,
       },
       select: {
         id: true,
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("[AI Performance] Error:", error);
+    log.error("Performance analysis failed", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Performance analysis failed" },
       { status: 500 }

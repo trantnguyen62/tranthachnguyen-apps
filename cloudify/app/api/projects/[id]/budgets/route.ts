@@ -8,6 +8,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("projects/[id]/budgets");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -77,7 +80,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ budgets: budgetsWithStatus });
   } catch (error) {
-    console.error("Failed to fetch performance budgets:", error);
+    log.error("Failed to fetch performance budgets", error);
     return NextResponse.json(
       { error: "Failed to fetch performance budgets" },
       { status: 500 }
@@ -164,7 +167,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ budget }, { status: 201 });
   } catch (error) {
-    console.error("Failed to create performance budget:", error);
+    log.error("Failed to create performance budget", error);
     return NextResponse.json(
       { error: "Failed to create performance budget" },
       { status: 500 }
@@ -228,7 +231,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ budget: updated });
   } catch (error) {
-    console.error("Failed to update performance budget:", error);
+    log.error("Failed to update performance budget", error);
     return NextResponse.json(
       { error: "Failed to update performance budget" },
       { status: 500 }
@@ -285,7 +288,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete performance budget:", error);
+    log.error("Failed to delete performance budget", error);
     return NextResponse.json(
       { error: "Failed to delete performance budget" },
       { status: 500 }

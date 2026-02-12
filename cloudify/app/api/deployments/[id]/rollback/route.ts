@@ -5,9 +5,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { rollbackToDeployment, canRollback } from "@/lib/deployments/rollback";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("deployments/[id]/rollback");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -18,10 +21,9 @@ export async function POST(
   { params }: RouteParams
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
     const deploymentId = id;
@@ -47,7 +49,7 @@ export async function POST(
       );
     }
 
-    if (deployment.project.userId !== session.user.id) {
+    if (deployment.project.userId !== user.id) {
       return NextResponse.json(
         { error: "You don't have permission to rollback this deployment" },
         { status: 403 }
@@ -67,7 +69,7 @@ export async function POST(
     const result = await rollbackToDeployment(
       deployment.project.id,
       deploymentId,
-      session.user.id
+      user.id
     );
 
     if (!result.success) {
@@ -85,7 +87,7 @@ export async function POST(
       newActiveDeploymentId: result.newActiveDeploymentId,
     });
   } catch (error) {
-    console.error("Rollback error:", error);
+    log.error("Rollback error", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -99,16 +101,15 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireReadAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id } = await params;
     const result = await canRollback(id);
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Rollback check error:", error);
+    log.error("Rollback check error", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

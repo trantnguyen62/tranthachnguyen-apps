@@ -7,6 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getVitalRating } from "@/lib/analytics/sdk-source";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("analytics/ingest");
 
 interface AnalyticsEvent {
   projectId: string;
@@ -180,7 +183,7 @@ export async function POST(request: NextRequest) {
       processed: analyticsEvents.length + webVitals.length,
     });
   } catch (error) {
-    console.error("Analytics ingest error:", error);
+    log.error("Analytics ingest error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to process events" },
       { status: 500 }

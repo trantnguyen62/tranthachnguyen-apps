@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { trackConversion } from "@/lib/edge/ab-testing";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ab-tests/convert");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -70,7 +73,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       message: "Conversion tracked",
     });
   } catch (error) {
-    console.error("Failed to track conversion:", error);
+    log.error("Failed to track conversion", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to track conversion" },
       { status: 500 }

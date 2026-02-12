@@ -5,6 +5,9 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("health/ready");
 
 export async function GET() {
   try {
@@ -19,7 +22,7 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error) {
-    console.error("[Ready] Database check failed:", error);
+    log.error("Database check failed", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       {
         status: "not_ready",

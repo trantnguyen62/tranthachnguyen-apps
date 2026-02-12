@@ -4,17 +4,19 @@
  */
 
 import { NextRequest } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("analytics/realtime");
 
 /**
  * GET /api/analytics/realtime - SSE stream for real-time analytics
  */
 export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const authResult = await requireReadAccess(request);
+  if (isAuthError(authResult)) return authResult;
+  const { user } = authResult;
 
   const { searchParams } = new URL(request.url);
   const projectId = searchParams.get("projectId");
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
   const project = await prisma.project.findFirst({
     where: {
       id: projectId,
-      userId: session.user.id,
+      userId: user.id,
     },
   });
 
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
           const data = await getRealtimeData(projectId);
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
         } catch (error) {
-          console.error("Real-time analytics error:", error);
+          log.error("Real-time analytics error", { error: error instanceof Error ? error.message : String(error) });
         }
       }, 5000);
 

@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/next-auth";
+import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import {
   generateCompletion,
@@ -13,6 +13,9 @@ import {
   AIMessage as AIClientMessage,
 } from "@/lib/ai/client";
 import { CHAT_SYSTEM_PROMPT } from "@/lib/ai/prompts";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ai/conversations/messages");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -85,11 +88,9 @@ ${contextInfo}`;
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireWriteAccess(request);
+    if (isAuthError(authResult)) return authResult;
+    const { user } = authResult;
 
     const { id: conversationId } = await params;
     const body = await request.json();
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const conversation = await prisma.aIConversation.findFirst({
       where: {
         id: conversationId,
-        userId: session.user.id,
+        userId: user.id,
       },
       include: {
         messages: {
@@ -265,7 +266,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("[AI Messages] Error:", error);
+    log.error("Failed to process message", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to process message" },
       { status: 500 }

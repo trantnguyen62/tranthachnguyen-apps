@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface AnalyticsSummary {
   pageviews: number;
@@ -59,14 +59,18 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+
   const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
+      const opts = optionsRef.current;
       const params = new URLSearchParams();
-      if (options.projectId) params.set("projectId", options.projectId);
-      if (options.range) params.set("range", options.range);
+      if (opts.projectId) params.set("projectId", opts.projectId);
+      if (opts.range) params.set("range", opts.range);
 
       const response = await fetch(`/api/analytics?${params}`);
       if (!response.ok) {
@@ -80,11 +84,11 @@ export function useAnalytics(options: UseAnalyticsOptions = {}) {
     } finally {
       setLoading(false);
     }
-  }, [options.projectId, options.range]);
+  }, []);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [fetchAnalytics]);
+  }, [options.projectId, options.range, fetchAnalytics]);
 
   return {
     data,

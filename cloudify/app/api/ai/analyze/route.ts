@@ -13,6 +13,9 @@ import {
   analyzeBuildFailure,
 } from "@/lib/ai/analysis-service";
 import { isAIAvailable } from "@/lib/ai/client";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("ai/analyze");
 
 // POST /api/ai/analyze - Trigger analysis
 export async function POST(request: NextRequest) {
@@ -105,7 +108,7 @@ export async function POST(request: NextRequest) {
       cached: false,
     });
   } catch (error) {
-    console.error("AI analysis error:", error);
+    log.error("AI analysis error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Analysis failed", message: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
@@ -176,7 +179,7 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error("Get analysis error:", error);
+    log.error("Get analysis error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to get analysis" },
       { status: 500 }

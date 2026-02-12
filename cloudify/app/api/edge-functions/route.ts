@@ -8,6 +8,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { validateEdgeFunctionCode } from "@/lib/edge/runtime";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("edge-functions");
 
 // GET /api/edge-functions - List edge functions
 export async function GET(request: NextRequest) {
@@ -108,7 +112,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ functions: functionsWithStats });
   } catch (error) {
-    console.error("Failed to fetch edge functions:", error);
+    log.error("Failed to fetch edge functions", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to fetch edge functions" },
       { status: 500 }
@@ -125,7 +129,9 @@ export async function POST(request: NextRequest) {
     }
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { projectId, name, code, routes, runtime, regions, memory, timeout, envVars } = body;
 
     if (!projectId || !name || !code) {
@@ -239,7 +245,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Failed to create edge function:", error);
+    log.error("Failed to create edge function", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Failed to create edge function" },
       { status: 500 }

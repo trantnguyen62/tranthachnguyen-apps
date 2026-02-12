@@ -5,6 +5,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth/api-auth";
+import { getRouteLogger } from "@/lib/api/logger";
+
+const log = getRouteLogger("auth/me");
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +27,7 @@ export async function GET(request: NextRequest) {
       scopes: user.scopes,
     });
   } catch (error) {
-    console.error("Auth check error:", error);
+    log.error("Auth check error", { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: "Authentication failed" },
       { status: 500 }
