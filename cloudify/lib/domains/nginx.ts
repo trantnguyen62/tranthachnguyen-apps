@@ -121,7 +121,7 @@ export async function generateDomainsConfig(): Promise<string> {
       generateDomainConfig({
         domain: d.domain,
         siteSlug: d.project.deployments[0].siteSlug!,
-        sslEnabled: d.sslStatus === "active",
+        sslEnabled: d.sslStatus === "ACTIVE",
         sslCertPath: d.sslCertPath || undefined,
         sslKeyPath: d.sslKeyPath || undefined,
       })

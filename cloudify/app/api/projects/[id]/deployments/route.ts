@@ -1,8 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { triggerBuild } from "@/lib/build/worker";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import {
+  ok,
+  fail,
+  encodeCursor,
+  buildCursorWhere,
+  parsePaginationParams,
+} from "@/lib/api/response";
 
 const log = getRouteLogger("projects/[id]/deployments");
 
@@ -19,8 +27,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const cursor = searchParams.get("cursor");
+    const { cursor, limit } = parsePaginationParams(searchParams);
+    const cursorWhere = buildCursorWhere(cursor);
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
@@ -28,29 +36,33 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     const deployments = await prisma.deployment.findMany({
-      where: { projectId: id },
+      where: { projectId: id, ...cursorWhere },
       take: limit + 1,
-      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     });
 
     const hasMore = deployments.length > limit;
-    if (hasMore) deployments.pop();
+    const items = hasMore ? deployments.slice(0, limit) : deployments;
+    const nextCursor = hasMore && items.length > 0
+      ? encodeCursor(items[items.length - 1])
+      : undefined;
 
-    return NextResponse.json({
-      deployments,
-      nextCursor: hasMore ? deployments[deployments.length - 1]?.id : null,
-    });
+    return ok(
+      { deployments: items },
+      {
+        pagination: {
+          cursor: nextCursor,
+          hasMore,
+        },
+      }
+    );
   } catch (error) {
     log.error("Failed to fetch deployments", error);
-    return NextResponse.json(
-      { error: "Failed to fetch deployments" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch deployments", 500);
   }
 }
 
@@ -62,8 +74,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { user } = authResult;
 
     const { id } = await params;
-    const body = await request.json();
-    const { commitSha, commitMsg, branch } = body;
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
+    const { commitSha, commitMsg: commitMessage, branch } = body;
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
@@ -71,7 +85,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Create deployment
@@ -80,8 +94,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         projectId: id,
         status: "QUEUED",
         commitSha: commitSha || null,
-        commitMsg: commitMsg || null,
-        branch: branch || project.repoBranch,
+        commitMessage: commitMessage || null,
+        branch: branch || project.repositoryBranch,
       },
     });
 
@@ -97,12 +111,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Trigger build worker to start the deployment
     await triggerBuild(deployment.id);
 
-    return NextResponse.json(deployment, { status: 201 });
+    return ok(deployment, { status: 201 });
   } catch (error) {
     log.error("Failed to create deployment", error);
-    return NextResponse.json(
-      { error: "Failed to create deployment" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create deployment", 500);
   }
 }

@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError, requireProjectAccess } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("deployments/[id]");
 
@@ -14,7 +16,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const authResult = await requireReadAccess(request);
     if (isAuthError(authResult)) return authResult;
-    const { user } = authResult;
 
     const { id } = await params;
 
@@ -37,21 +38,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!deployment) {
-      return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
-    // Verify ownership
-    if (deployment.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Project-scoped RBAC: viewer+ can read
+    const accessResult = await requireProjectAccess(request, deployment.project.id, "viewer");
+    if (isAuthError(accessResult)) {
+      return accessResult;
     }
 
-    return NextResponse.json(deployment);
+    return ok(deployment);
   } catch (error) {
     log.error("Failed to fetch deployment", error);
-    return NextResponse.json(
-      { error: "Failed to fetch deployment" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch deployment", 500);
   }
 }
 
@@ -60,46 +59,46 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const authResult = await requireWriteAccess(request);
     if (isAuthError(authResult)) return authResult;
-    const { user } = authResult;
 
     const { id } = await params;
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { status, url, buildTime } = body;
 
     // Validate status if provided
     const validStatuses = ["QUEUED", "BUILDING", "DEPLOYING", "READY", "ERROR", "CANCELLED"];
     if (status && !validStatuses.includes(status)) {
-      return NextResponse.json(
-        { error: `Invalid status. Must be one of: ${validStatuses.join(", ")}` },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", `Invalid status. Must be one of: ${validStatuses.join(", ")}`, 400);
     }
 
     // Validate url if provided
     if (url !== undefined && typeof url !== "string") {
-      return NextResponse.json({ error: "URL must be a string" }, { status: 400 });
+      return fail("VALIDATION_ERROR", "URL must be a string", 400);
     }
 
     // Validate buildTime if provided
     if (buildTime !== undefined && (typeof buildTime !== "number" || buildTime < 0)) {
-      return NextResponse.json({ error: "buildTime must be a non-negative number" }, { status: 400 });
+      return fail("VALIDATION_ERROR", "buildTime must be a non-negative number", 400);
     }
 
     const deployment = await prisma.deployment.findUnique({
       where: { id },
       include: {
         project: {
-          select: { userId: true },
+          select: { userId: true, id: true },
         },
       },
     });
 
     if (!deployment) {
-      return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
-    if (deployment.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Project-scoped RBAC: developer+ to update deployments
+    const accessResult = await requireProjectAccess(request, deployment.project.id, "developer");
+    if (isAuthError(accessResult)) {
+      return accessResult;
     }
 
     const updated = await prisma.deployment.update({
@@ -112,13 +111,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(updated);
+    return ok(updated);
   } catch (error) {
     log.error("Failed to update deployment", error);
-    return NextResponse.json(
-      { error: "Failed to update deployment" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update deployment", 500);
   }
 }
 
@@ -127,7 +123,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const authResult = await requireWriteAccess(request);
     if (isAuthError(authResult)) return authResult;
-    const { user } = authResult;
 
     const { id } = await params;
 
@@ -135,17 +130,19 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: { id },
       include: {
         project: {
-          select: { userId: true },
+          select: { userId: true, id: true },
         },
       },
     });
 
     if (!deployment) {
-      return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
-    if (deployment.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Project-scoped RBAC: developer+ to cancel
+    const accessResult = await requireProjectAccess(request, deployment.project.id, "developer");
+    if (isAuthError(accessResult)) {
+      return accessResult;
     }
 
     // Only cancel if in progress
@@ -167,12 +164,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    return NextResponse.json({ success: true });
+    return ok({ cancelled: true, deploymentId: id });
   } catch (error) {
     log.error("Failed to cancel deployment", error);
-    return NextResponse.json(
-      { error: "Failed to cancel deployment" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to cancel deployment", 500);
   }
 }

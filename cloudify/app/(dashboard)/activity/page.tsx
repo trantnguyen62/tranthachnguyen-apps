@@ -36,8 +36,8 @@ import { useActivity } from "@/hooks/use-activity";
 const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
   deployment: {
     icon: GitBranch,
-    color: "text-foreground",
-    bg: "bg-secondary",
+    color: "text-[var(--text-primary)]",
+    bg: "bg-[var(--surface-secondary)]",
   },
   domain: {
     icon: Globe,
@@ -51,8 +51,8 @@ const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: s
   },
   settings: {
     icon: Settings,
-    color: "text-muted-foreground",
-    bg: "bg-secondary",
+    color: "text-[var(--text-secondary)]",
+    bg: "bg-[var(--surface-secondary)]",
   },
   security: {
     icon: Shield,
@@ -135,7 +135,7 @@ export default function ActivityPage() {
   if (loading && activities.length === 0) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -144,11 +144,11 @@ export default function ActivityPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
           Failed to load activity
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <p className="text-[var(--text-secondary)] mb-4">{error}</p>
+        <Button variant="secondary" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
         </Button>
@@ -161,20 +161,20 @@ export default function ActivityPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
             Activity
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-[var(--text-secondary)]">
             Track all actions across your projects and team
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="secondary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={async () => {
               try {
                 const res = await fetch("/api/audit-logs?limit=1000");
@@ -202,7 +202,7 @@ export default function ActivityPage() {
       <div className="flex flex-wrap gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button variant="secondary">
               <Filter className="h-4 w-4" />
               Type: {selectedType === "all" ? "All" : selectedType.replace("_", " ")}
               <ChevronDown className="h-4 w-4" />
@@ -224,7 +224,7 @@ export default function ActivityPage() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button variant="secondary">
               <Calendar className="h-4 w-4" />
               Date: {selectedDate === "all" ? "All time" : selectedDate}
               <ChevronDown className="h-4 w-4" />
@@ -246,12 +246,12 @@ export default function ActivityPage() {
 
       {/* Activity timeline */}
       {Object.keys(groupedActivities).length === 0 ? (
-        <div className="text-center py-12 bg-card rounded-xl border border-border">
+        <div className="text-center py-12 bg-card rounded-xl border border-[var(--border-primary)]">
           <GitBranch className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
             No activity yet
           </h3>
-          <p className="text-muted-foreground">
+          <p className="text-[var(--text-secondary)]">
             Activity will appear here as you use the platform.
           </p>
         </div>
@@ -259,7 +259,7 @@ export default function ActivityPage() {
         <div className="space-y-8">
           {Object.entries(groupedActivities).map(([date, dateActivities]) => (
             <div key={date}>
-              <h3 className="text-sm font-semibold text-muted-foreground mb-4">
+              <h3 className="text-sm font-semibold text-[var(--text-secondary)] mb-4">
                 {date}
               </h3>
               <div className="space-y-4">
@@ -275,7 +275,7 @@ export default function ActivityPage() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="flex gap-4 p-4 bg-card rounded-xl border border-border"
+                      className="flex gap-4 p-4 bg-card rounded-xl border border-[var(--border-primary)]"
                     >
                       <div className={cn("p-2 rounded-lg h-fit", config.bg)}>
                         <TypeIcon className={cn("h-5 w-5", config.color)} />
@@ -283,7 +283,7 @@ export default function ActivityPage() {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-medium text-foreground">
+                          <span className="font-medium text-[var(--text-primary)]">
                             {activity.action}
                           </span>
                           {StatusIcon && status && (
@@ -298,7 +298,7 @@ export default function ActivityPage() {
                             <Badge variant="secondary">{activity.project.name}</Badge>
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground mt-0.5">
+                        <p className="text-sm text-[var(--text-secondary)] mt-0.5">
                           {activity.description}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
@@ -307,9 +307,9 @@ export default function ActivityPage() {
                               {activity.user?.name?.charAt(0)?.toUpperCase() || "U"}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-[var(--text-secondary)]">
                             {activity.user?.name && (
-                              <span className="font-medium text-muted-foreground dark:text-gray-300 mr-1">
+                              <span className="font-medium text-[var(--text-secondary)] dark:text-gray-300 mr-1">
                                 {activity.user.name}
                               </span>
                             )}
@@ -329,7 +329,7 @@ export default function ActivityPage() {
       {/* Load more */}
       {hasMore && (
         <div className="text-center">
-          <Button variant="outline" onClick={loadMore} disabled={loading}>
+          <Button variant="secondary" onClick={loadMore} disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />

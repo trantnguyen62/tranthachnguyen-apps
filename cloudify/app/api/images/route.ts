@@ -28,6 +28,7 @@ import {
   shouldReturn304,
 } from "@/lib/images/cache";
 import { createLogger } from "@/lib/logging";
+import { ok, fail } from "@/lib/api/response";
 
 const logger = createLogger("image-api");
 
@@ -98,18 +99,12 @@ export async function GET(request: NextRequest) {
 
     // Validate required parameters
     if (!url) {
-      return NextResponse.json(
-        { error: "Missing required parameter: url" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing required parameter: url", 400);
     }
 
     // Validate URL domain
     if (!isDomainAllowed(url)) {
-      return NextResponse.json(
-        { error: "Image domain not allowed" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Image domain not allowed", 403);
     }
 
     // Parse and validate width
@@ -117,10 +112,7 @@ export async function GET(request: NextRequest) {
     if (width) {
       parsedWidth = parseInt(width, 10);
       if (isNaN(parsedWidth) || parsedWidth < 1) {
-        return NextResponse.json(
-          { error: "Invalid width parameter" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Invalid width parameter", 400);
       }
       parsedWidth = validateWidth(parsedWidth);
     }
@@ -130,10 +122,7 @@ export async function GET(request: NextRequest) {
     if (height) {
       parsedHeight = parseInt(height, 10);
       if (isNaN(parsedHeight) || parsedHeight < 1 || parsedHeight > 4096) {
-        return NextResponse.json(
-          { error: "Invalid height parameter" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Invalid height parameter", 400);
       }
     }
 
@@ -142,10 +131,7 @@ export async function GET(request: NextRequest) {
     if (quality) {
       parsedQuality = parseInt(quality, 10);
       if (isNaN(parsedQuality) || parsedQuality < 1 || parsedQuality > 100) {
-        return NextResponse.json(
-          { error: "Invalid quality parameter (1-100)" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Invalid quality parameter (1-100)", 400);
       }
     }
 
@@ -158,10 +144,7 @@ export async function GET(request: NextRequest) {
     // Validate format
     const validFormats: ImageFormat[] = ["webp", "avif", "jpeg", "png", "auto"];
     if (!validFormats.includes(outputFormat)) {
-      return NextResponse.json(
-        { error: "Invalid format parameter (webp, avif, jpeg, png, auto)" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid format parameter (webp, avif, jpeg, png, auto)", 400);
     }
 
     // Generate cache key
@@ -252,23 +235,14 @@ export async function GET(request: NextRequest) {
 
     // Return appropriate error
     if (err.message.includes("fetch")) {
-      return NextResponse.json(
-        { error: "Failed to fetch source image" },
-        { status: 502 }
-      );
+      return fail("INTERNAL_ERROR", "Failed to fetch source image", 502);
     }
 
     if (err.message.includes("format") || err.message.includes("unsupported")) {
-      return NextResponse.json(
-        { error: "Unsupported image format" },
-        { status: 415 }
-      );
+      return fail("INTERNAL_ERROR", "Unsupported image format", 415);
     }
 
-    return NextResponse.json(
-      { error: "Image optimization failed" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Image optimization failed", 500);
   }
 }
 
@@ -294,18 +268,12 @@ export async function POST(request: NextRequest) {
     const file = formData.get("image") as File | null;
 
     if (!file) {
-      return NextResponse.json(
-        { error: "No image file provided" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "No image file provided", 400);
     }
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      return NextResponse.json(
-        { error: "File must be an image" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "File must be an image", 400);
     }
 
     // Get buffer from file
@@ -347,9 +315,6 @@ export async function POST(request: NextRequest) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error("Image upload optimization failed", err);
 
-    return NextResponse.json(
-      { error: "Image optimization failed" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Image optimization failed", 500);
   }
 }

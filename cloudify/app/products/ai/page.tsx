@@ -55,7 +55,7 @@ export default function AIPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -66,12 +66,12 @@ export default function AIPage() {
                 <Sparkles className="h-4 w-4" />
                 <span className="text-sm font-medium">AI SDK</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-[var(--text-primary)] leading-tight">
                 Build AI apps,
                 <br />
                 <span className="text-pink-600 dark:text-pink-400">faster</span>
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 The AI toolkit for TypeScript. Build conversational AI, content generation,
                 and intelligent features with any model provider.
               </p>
@@ -99,10 +99,10 @@ export default function AIPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-6">
                   Ship AI features in minutes
                 </h2>
-                <p className="text-lg text-muted-foreground mb-8">
+                <p className="text-lg text-[var(--text-secondary)] mb-8">
                   Build streaming chat interfaces, content generators, and AI-powered features
                   with just a few lines of code.
                 </p>
@@ -113,7 +113,7 @@ export default function AIPage() {
                     "Function calling and tool use",
                     "Built-in rate limiting and caching",
                   ].map((item) => (
-                    <div key={item} className="flex items-center gap-3 text-muted-foreground">
+                    <div key={item} className="flex items-center gap-3 text-[var(--text-secondary)]">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </div>
@@ -165,7 +165,7 @@ function Chat() {
         </section>
 
         {/* Features Grid */}
-        <section className="py-20 bg-secondary/50">
+        <section className="py-20 bg-[var(--surface-secondary)]/50">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -173,10 +173,10 @@ function Chat() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Everything you need for AI development
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-lg text-[var(--text-secondary)]">
                 A complete toolkit for building AI-powered applications.
               </p>
             </motion.div>
@@ -189,15 +189,15 @@ function Chat() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-card border border-border"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)]"
                 >
                   <div className="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-pink-600 dark:text-pink-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-[var(--text-secondary)]">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -215,10 +215,10 @@ function Chat() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Works with every major AI provider
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-lg text-[var(--text-secondary)]">
                 Use your favorite models. Switch providers without changing your code.
               </p>
             </motion.div>
@@ -231,16 +231,16 @@ function Chat() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-background border border-border"
+                  className="p-6 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]"
                 >
-                  <h3 className="font-semibold text-foreground mb-2">
+                  <h3 className="font-semibold text-[var(--text-primary)] mb-2">
                     {provider.name}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {provider.models.map((model) => (
                       <span
                         key={model}
-                        className="px-2 py-1 rounded bg-secondary dark:bg-card text-muted-foreground text-xs"
+                        className="px-2 py-1 rounded bg-[var(--surface-secondary)] dark:bg-card text-[var(--text-secondary)] text-xs"
                       >
                         {model}
                       </span>
@@ -253,7 +253,7 @@ function Chat() {
         </section>
 
         {/* Use Cases */}
-        <section className="py-20 bg-secondary/50">
+        <section className="py-20 bg-[var(--surface-secondary)]/50">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -261,7 +261,7 @@ function Chat() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Build any AI experience
               </h2>
             </motion.div>
@@ -290,15 +290,15 @@ function Chat() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-card border border-border text-center"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)] text-center"
                 >
                   <div className="w-12 h-12 mx-auto rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
                     <useCase.icon className="h-6 w-6 text-pink-600 dark:text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                  <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
                     {useCase.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-[var(--text-secondary)] text-sm">
                     {useCase.desc}
                   </p>
                 </motion.div>

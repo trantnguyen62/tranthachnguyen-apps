@@ -4,7 +4,7 @@
  * Provides system-wide SSL certificate statistics and management
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
 
@@ -16,6 +16,7 @@ import {
   sendSslExpirationWarnings,
 } from "@/lib/domains/ssl";
 import { getCloudflareStatus } from "@/lib/integrations/cloudflare";
+import { ok, fail } from "@/lib/api/response";
 
 /**
  * GET /api/ssl/status
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
     const cloudflareStatus = await getCloudflareStatus();
     const expiringCerts = await getExpiringSslCertificates(7); // Expiring within 7 days
 
-    return NextResponse.json({
+    return ok({
       ssl: sslStatus,
       cloudflare: {
         configured: cloudflareStatus.configured,
@@ -46,10 +47,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     log.error("Failed to get SSL status", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to get SSL status" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get SSL status", 500);
   }
 }
 
@@ -72,7 +70,7 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case "check-renewals": {
         const result = await checkAndRenewExpiring();
-        return NextResponse.json({
+        return ok({
           success: true,
           action: "check-renewals",
           result: {
@@ -85,7 +83,7 @@ export async function POST(request: NextRequest) {
 
       case "send-warnings": {
         const warningsSent = await sendSslExpirationWarnings();
-        return NextResponse.json({
+        return ok({
           success: true,
           action: "send-warnings",
           warningsSent,
@@ -93,16 +91,10 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        return NextResponse.json(
-          { error: `Unknown action: ${action}` },
-          { status: 400 }
-        );
+        return fail("BAD_REQUEST", `Unknown action: ${action}`, 400);
     }
   } catch (error) {
     log.error("Failed to perform SSL action", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to perform SSL action" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to perform SSL action", 500);
   }
 }

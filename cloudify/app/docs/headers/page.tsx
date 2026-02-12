@@ -46,10 +46,10 @@ export default function HeadersDocsPage() {
         <div className="flex items-start gap-4">
           <Shield className="h-8 w-8 text-green-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Recommended Security Headers
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-[var(--text-secondary)]">
               These headers help protect your application from common web vulnerabilities.
             </p>
           </div>
@@ -119,35 +119,35 @@ export default function HeadersDocsPage() {
       <div className="not-prose my-8">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border">
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Directive</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Description</th>
+            <tr className="border-b border-[var(--border-primary)]">
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Directive</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Description</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground"><code>default-src</code></td>
-              <td className="py-3 px-4 text-muted-foreground">Fallback for other directives</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>default-src</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Fallback for other directives</td>
             </tr>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground"><code>script-src</code></td>
-              <td className="py-3 px-4 text-muted-foreground">JavaScript sources</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>script-src</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">JavaScript sources</td>
             </tr>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground"><code>style-src</code></td>
-              <td className="py-3 px-4 text-muted-foreground">CSS sources</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>style-src</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">CSS sources</td>
             </tr>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground"><code>img-src</code></td>
-              <td className="py-3 px-4 text-muted-foreground">Image sources</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>img-src</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Image sources</td>
             </tr>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground"><code>connect-src</code></td>
-              <td className="py-3 px-4 text-muted-foreground">Fetch, XHR, WebSocket sources</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>connect-src</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Fetch, XHR, WebSocket sources</td>
             </tr>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground"><code>frame-ancestors</code></td>
-              <td className="py-3 px-4 text-muted-foreground">Embedding sources (iframe)</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>frame-ancestors</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Embedding sources (iframe)</td>
             </tr>
           </tbody>
         </table>
@@ -202,9 +202,9 @@ export default function HeadersDocsPage() {
           { directive: "immutable", desc: "Content will never change" },
           { directive: "stale-while-revalidate=N", desc: "Serve stale while fetching" },
         ].map((item) => (
-          <div key={item.directive} className="p-4 rounded-lg bg-background border border-border">
-            <code className="text-foreground font-semibold">{item.directive}</code>
-            <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
+          <div key={item.directive} className="p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
+            <code className="text-[var(--text-primary)] font-semibold">{item.directive}</code>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">{item.desc}</p>
           </div>
         ))}
       </div>

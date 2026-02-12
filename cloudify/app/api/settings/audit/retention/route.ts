@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 
 const log = getRouteLogger("settings/audit/retention");
 import {
@@ -19,6 +20,7 @@ import {
 } from "@/lib/audit";
 import { createAuditContext, audit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
+import { ok, fail } from "@/lib/api/response";
 
 /**
  * Verify user has admin access to the team
@@ -28,7 +30,7 @@ async function verifyTeamAdmin(userId: string, teamId: string): Promise<boolean>
     where: {
       userId,
       teamId,
-      role: { in: ["owner", "admin"] },
+      role: { in: ["OWNER", "ADMIN"] },
     },
   });
   return !!membership;
@@ -49,10 +51,7 @@ export async function GET(request: NextRequest) {
     const teamId = searchParams.get("teamId");
 
     if (!teamId) {
-      return NextResponse.json(
-        { error: "teamId is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "teamId is required", 400);
     }
 
     // Verify user is a member of the team
@@ -61,26 +60,20 @@ export async function GET(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json(
-        { error: "You are not a member of this team" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "You are not a member of this team", 403);
     }
 
     // Get retention stats (includes policy)
     const stats = await getRetentionStats(teamId);
 
-    return NextResponse.json({
+    return ok({
       policy: stats.policy,
       preview: stats.preview,
       storageEstimate: stats.storageEstimate,
     });
   } catch (error) {
     log.error("Failed to get retention policy", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to get retention policy" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get retention policy", 500);
   }
 }
 
@@ -105,23 +98,19 @@ export async function PUT(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { teamId, policy } = body;
 
     if (!teamId) {
-      return NextResponse.json(
-        { error: "teamId is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "teamId is required", 400);
     }
 
     // Verify user is admin of the team
     const isAdmin = await verifyTeamAdmin(user.id, teamId);
     if (!isAdmin) {
-      return NextResponse.json(
-        { error: "Only team admins can modify retention policy" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Only team admins can modify retention policy", 403);
     }
 
     // Update policy
@@ -140,7 +129,7 @@ export async function PUT(request: NextRequest) {
       }
     );
 
-    return NextResponse.json({
+    return ok({
       message: "Retention policy updated",
       policy: updatedPolicy,
     });
@@ -148,7 +137,7 @@ export async function PUT(request: NextRequest) {
     log.error("Failed to update retention policy", { error: error instanceof Error ? error.message : String(error) });
     const message =
       error instanceof Error ? error.message : "Failed to update retention policy";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return fail("INTERNAL_ERROR", message, 500);
   }
 }
 
@@ -168,33 +157,26 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { teamId } = body;
 
     if (!teamId) {
-      return NextResponse.json(
-        { error: "teamId is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "teamId is required", 400);
     }
 
     // Verify user is admin of the team
     const isAdmin = await verifyTeamAdmin(user.id, teamId);
     if (!isAdmin) {
-      return NextResponse.json(
-        { error: "Only team admins can apply retention policy" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Only team admins can apply retention policy", 403);
     }
 
     // Get current policy
     const policy = await getRetentionPolicy(teamId);
 
     if (!policy.enabled) {
-      return NextResponse.json(
-        { error: "Retention policy is not enabled" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Retention policy is not enabled", 400);
     }
 
     // Apply the policy
@@ -214,15 +196,12 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    return NextResponse.json({
+    return ok({
       message: "Retention policy applied",
       deletedCount,
     });
   } catch (error) {
     log.error("Failed to apply retention policy", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to apply retention policy" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to apply retention policy", 500);
   }
 }

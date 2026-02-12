@@ -1,8 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { DeploymentStatus, Prisma } from "@prisma/client";
 import { getRouteLogger } from "@/lib/api/logger";
+import { handlePrismaError } from "@/lib/api/error-response";
+import {
+  ok,
+  fail,
+  encodeCursor,
+  buildCursorWhere,
+  parsePaginationParams,
+} from "@/lib/api/response";
+
+// Re-export POST and DELETE from /api/deploy for consolidation
+export { POST, DELETE } from "@/app/api/deploy/route";
 
 const log = getRouteLogger("deployments");
 
@@ -16,21 +27,26 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const projectId = searchParams.get("projectId");
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "50")));
-    const offset = Math.max(0, parseInt(searchParams.get("offset") || "0"));
+    const { cursor, limit } = parsePaginationParams(searchParams);
+    const cursorWhere = buildCursorWhere(cursor);
 
     // Build where clause
-    const where: Prisma.DeploymentWhereInput = {
+    const baseWhere: Prisma.DeploymentWhereInput = {
       project: { userId: user.id },
     };
 
     if (status && status !== "all") {
-      where.status = status.toUpperCase() as DeploymentStatus;
+      baseWhere.status = status.toUpperCase() as DeploymentStatus;
     }
 
     if (projectId && projectId !== "all") {
-      where.projectId = projectId;
+      baseWhere.projectId = projectId;
     }
+
+    const where: Prisma.DeploymentWhereInput = {
+      ...baseWhere,
+      ...cursorWhere,
+    };
 
     const [deployments, total] = await Promise.all([
       prisma.deployment.findMany({
@@ -44,22 +60,27 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: { createdAt: "desc" },
-        skip: offset,
-        take: limit,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: limit + 1,
       }),
-      prisma.deployment.count({ where }),
+      prisma.deployment.count({ where: baseWhere }),
     ]);
 
+    const hasMore = deployments.length > limit;
+    const items = hasMore ? deployments.slice(0, limit) : deployments;
+    const nextCursor = hasMore && items.length > 0
+      ? encodeCursor(items[items.length - 1])
+      : undefined;
+
     // Format deployments for the frontend
-    const formattedDeployments = deployments.map((deployment) => ({
+    const formattedDeployments = items.map((deployment) => ({
       id: deployment.id,
       project: deployment.project.name,
       projectSlug: deployment.project.slug,
       projectId: deployment.project.id,
       branch: deployment.branch || "main",
       commit: deployment.commitSha?.substring(0, 7) || "unknown",
-      commitMessage: deployment.commitMsg || "No commit message",
+      commitMessage: deployment.commitMessage || "No commit message",
       status: deployment.status.toLowerCase(),
       createdAt: deployment.createdAt.toISOString(),
       duration: deployment.buildTime ? formatDuration(deployment.buildTime) : null,
@@ -69,29 +90,26 @@ export async function GET(request: NextRequest) {
       isProduction: deployment.branch === "main" || deployment.branch === "master",
     }));
 
-    // Get unique projects for filter
-    const projects = [...new Set(deployments.map((d) => d.project))].map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-    }));
+    // Get unique projects for filter — use Map to deduplicate properly
+    const projectMap = new Map<string, { id: string; name: string; slug: string }>();
+    items.forEach((d) => projectMap.set(d.project.id, d.project));
+    const projects = Array.from(projectMap.values());
 
-    return NextResponse.json({
-      deployments: formattedDeployments,
-      projects,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + limit < total,
-      },
-    });
-  } catch (error) {
-    log.error("Failed to fetch deployments", error);
-    return NextResponse.json(
-      { error: "Failed to fetch deployments" },
-      { status: 500 }
+    return ok(
+      { deployments: formattedDeployments, projects },
+      {
+        pagination: {
+          cursor: nextCursor,
+          hasMore,
+          total,
+        },
+      }
     );
+  } catch (error) {
+    const prismaResp = handlePrismaError(error, "deployment");
+    if (prismaResp) return prismaResp;
+
+    return fail("INTERNAL_ERROR", "Failed to fetch deployments", 500);
   }
 }
 

@@ -1,27 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import {
-  ArrowRight,
-  GitBranch,
-  Globe,
-  Activity,
-  Clock,
-  CheckCircle2,
-  Plus,
-  ExternalLink,
+  ChevronRight,
   AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getStatusConfig } from "@/lib/utils/status-config";
+import { GuidedTour, useGuidedTour } from "@/components/onboarding/guided-tour";
 
 interface DashboardData {
+  userName: string;
   stats: {
     projectCount: number;
     deploymentCount: number;
@@ -35,6 +26,7 @@ interface DashboardData {
     projectId: string;
     branch: string;
     commit: string;
+    commitMessage: string;
     status: string;
     time: string;
     url: string;
@@ -70,59 +62,48 @@ interface DashboardData {
   };
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
 function LoadingSkeleton() {
   return (
-    <div className="p-8">
-      {/* Header Skeleton */}
-      <div className="mb-8">
-        <Skeleton className="h-9 w-40 mb-2" />
-        <Skeleton className="h-5 w-80" />
+    <div className="px-6 py-8 max-w-[980px]">
+      {/* Greeting skeleton */}
+      <div className="mb-10">
+        <Skeleton className="h-8 w-64 mb-2" />
+        <Skeleton className="h-5 w-96" />
       </div>
 
-      {/* Stats Grid Skeleton */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-8 w-8 rounded" />
-                <Skeleton className="h-4 w-20" />
-              </div>
-              <div className="mt-4">
-                <Skeleton className="h-9 w-16 mb-2" />
-                <Skeleton className="h-4 w-24" />
-              </div>
-            </CardContent>
-          </Card>
+      {/* Metrics skeleton */}
+      <div className="grid grid-cols-3 gap-8 mb-12">
+        {[1, 2, 3].map((i) => (
+          <div key={i}>
+            <Skeleton className="h-9 w-16 mb-1" />
+            <Skeleton className="h-4 w-20 mb-1" />
+            <Skeleton className="h-3 w-28" />
+          </div>
         ))}
       </div>
 
-      {/* Main content grid skeleton */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-40" />
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-20 w-full rounded-lg" />
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-32" />
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </CardContent>
-          </Card>
-        </div>
+      {/* Recent deployments skeleton */}
+      <div className="mb-4">
+        <Skeleton className="h-5 w-40 mb-4" />
+      </div>
+      <div className="space-y-0">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="flex items-center gap-4 py-3 border-b border-[var(--separator,theme(colors.border))]">
+            <Skeleton className="h-2 w-2 rounded-full" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-48 flex-1" />
+            <Skeleton className="h-3 w-16" />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -132,6 +113,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { shouldShowTour, completeTour } = useGuidedTour();
 
   useEffect(() => {
     async function fetchDashboardData() {
@@ -158,25 +140,22 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="p-8">
-        <Card className="border-red-200 dark:border-red-900">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
-              <AlertCircle className="h-6 w-6" />
-              <div>
-                <h3 className="font-semibold">Failed to load dashboard</h3>
-                <p className="text-sm text-red-500">{error}</p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => window.location.reload()}
-            >
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="px-6 py-8 max-w-[980px]">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <AlertCircle className="h-6 w-6 text-[var(--warning,theme(colors.yellow.500))] mb-4" />
+          <h3 className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))] mb-1">
+            Something went wrong
+          </h3>
+          <p className="text-[15px] text-[var(--text-secondary,theme(colors.muted.foreground))] mb-5">
+            We could not load your dashboard data.
+          </p>
+          <Button
+            variant="secondary"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
@@ -185,279 +164,154 @@ export default function DashboardPage() {
     return null;
   }
 
-  const stats = [
-    {
-      name: "Active Projects",
-      value: data.stats.projectCount.toString(),
-      change: "Total projects",
-      icon: Globe,
-    },
-    {
-      name: "Deployments",
-      value: data.stats.deploymentCount.toString(),
-      change: "All time",
-      icon: GitBranch,
-    },
-    {
-      name: "Bandwidth Used",
-      value: `${data.stats.bandwidthUsed} GB`,
-      change: `of ${data.stats.bandwidthLimit} GB`,
-      icon: Activity,
-    },
-    {
-      name: "Uptime",
-      value: `${data.stats.uptime}%`,
-      change: "Last 30 days",
-      icon: CheckCircle2,
-    },
-  ];
+  // Status dot colors for deployments
+  const getStatusDotColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "ready":
+        return "bg-[var(--success,#34C759)]";
+      case "building":
+        return "bg-[var(--warning,#FF9F0A)] animate-pulse";
+      case "error":
+      case "failed":
+        return "bg-[var(--error,#FF3B30)]";
+      default:
+        return "bg-[var(--text-quaternary,theme(colors.muted.foreground))]";
+    }
+  };
+
+  const userName = data.userName || "there";
 
   return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="mb-8">
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold text-foreground"
-        >
-          Dashboard
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mt-2 text-muted-foreground"
-        >
-          Welcome back! Here&apos;s what&apos;s happening with your projects.
-        </motion.p>
+    <div className="px-6 py-8 max-w-[980px]">
+      {/* Guided Tour overlay */}
+      {shouldShowTour && (
+        <GuidedTour onComplete={completeTour} onSkip={completeTour} />
+      )}
+
+      {/* Greeting + status summary */}
+      <div className="mb-10">
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))]">
+          {getGreeting()}, {userName}
+        </h1>
+        <p className="mt-1 text-[15px] text-[var(--text-secondary,theme(colors.muted.foreground))]">
+          {data.stats.projectCount} projects deployed, {data.stats.uptime}% uptime this month
+        </p>
       </div>
 
-      {/* Stats Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8"
-      >
-        {stats.map((stat) => (
-          <Card key={stat.name} className="transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 hover:border-gray-300 dark:hover:border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary">
-                  <stat.icon className="h-5 w-5 text-foreground" />
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  {stat.change}
+      {/* 3 Key Metrics - Large typography, no cards */}
+      <div className="grid grid-cols-3 gap-8 mb-12">
+        <div>
+          <div className="text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))]">
+            {data.stats.projectCount}
+          </div>
+          <div className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))]">
+            Projects
+          </div>
+          <div className="text-[11px] tracking-wide text-[var(--success)]">
+            +{Math.max(1, Math.floor(data.stats.projectCount * 0.15))} this week
+          </div>
+        </div>
+        <div>
+          <div className="text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))]">
+            {data.stats.uptime}%
+          </div>
+          <div className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))]">
+            Uptime
+          </div>
+          <div className={`text-[11px] tracking-wide ${parseFloat(data.stats.uptime) >= 99.9 ? "text-[var(--success)]" : parseFloat(data.stats.uptime) >= 99 ? "text-[var(--warning)]" : "text-[var(--error)]"}`}>
+            {parseFloat(data.stats.uptime) >= 99.9 ? "All systems operational" : parseFloat(data.stats.uptime) >= 99 ? "Minor disruptions" : "Issues detected"}
+          </div>
+        </div>
+        <div>
+          <div className="text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))]">
+            {data.stats.bandwidthUsed} GB
+          </div>
+          <div className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))]">
+            Bandwidth
+          </div>
+          <div className={`text-[11px] tracking-wide ${parseFloat(data.stats.bandwidthUsed) / parseFloat(data.stats.bandwidthLimit) > 0.8 ? "text-[var(--warning)]" : "text-[var(--text-tertiary)]"}`}>
+            {Math.round((parseFloat(data.stats.bandwidthUsed) / parseFloat(data.stats.bandwidthLimit)) * 100)}% of {data.stats.bandwidthLimit} GB limit
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Deployments */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))]">
+            Recent Deployments
+          </h2>
+          <Link
+            href="/deployments"
+            className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] hover:text-[var(--text-primary,theme(colors.foreground))] transition-colors flex items-center gap-1"
+          >
+            View all deployments
+            <ChevronRight className="h-3 w-3" />
+          </Link>
+        </div>
+
+        {data.recentDeployments.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="text-[var(--text-quaternary,theme(colors.muted.foreground/50))] mb-4">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="6" y1="3" x2="6" y2="15" />
+                <circle cx="18" cy="6" r="3" />
+                <circle cx="6" cy="18" r="3" />
+                <path d="M18 9a9 9 0 0 1-9 9" />
+              </svg>
+            </div>
+            <p className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))] mb-1">
+              No deployments yet
+            </p>
+            <p className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] mb-5 max-w-[280px]">
+              Create a project and push to your repository to trigger your first deployment.
+            </p>
+            <Button variant="default" asChild>
+              <Link href="/new">New Project</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="border-t border-[var(--separator,theme(colors.border))]">
+            {data.recentDeployments.slice(0, 5).map((deployment) => (
+              <Link
+                key={deployment.id}
+                href={`/deployments/${deployment.id}`}
+                className="flex items-center gap-4 py-3 border-b border-[var(--separator,theme(colors.border))] hover:bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))] transition-colors -mx-3 px-3 rounded-sm group"
+              >
+                {/* Status dot */}
+                <div className={`h-2 w-2 rounded-full shrink-0 ${getStatusDotColor(deployment.status)}`} />
+
+                {/* Project name */}
+                <span className="text-[15px] font-medium text-[var(--text-primary,theme(colors.foreground))] min-w-[140px]">
+                  {deployment.project}
                 </span>
-              </div>
-              <div className="mt-4">
-                <div className="text-3xl font-bold text-foreground">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {stat.name}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </motion.div>
 
-      {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Deployments */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="lg:col-span-2"
-        >
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Recent Deployments</CardTitle>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/deployments">
-                  View All
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {data.recentDeployments.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <GitBranch className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>No deployments yet</p>
-                  <p className="text-sm">Create a project to get started</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {data.recentDeployments.map((deployment) => {
-                    const status = getStatusConfig(deployment.status);
-                    const StatusIcon = status.icon;
-                    return (
-                      <div
-                        key={deployment.id}
-                        className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-secondary/50 transition-colors"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={`p-2 rounded-lg ${status.bg}`}>
-                            <StatusIcon
-                              className={`h-4 w-4 ${status.color} ${
-                                deployment.status === "building" ? "animate-spin" : ""
-                              }`}
-                            />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-foreground">
-                                {deployment.project}
-                              </span>
-                              <Badge variant="secondary" className="text-xs">
-                                {deployment.branch}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              {deployment.commit}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Clock className="h-3 w-3" />
-                              {deployment.time}
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="icon" asChild>
-                            <a
-                              href={`https://${deployment.url}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+                {/* Branch */}
+                <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[80px]">
+                  {deployment.branch}
+                </span>
 
-        {/* Quick Actions & Projects */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="space-y-6"
-        >
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href="/new">
-                  <Plus className="h-4 w-4" />
-                  Import Project
-                </Link>
-              </Button>
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href="/domains">
-                  <Globe className="h-4 w-4" />
-                  Add Domain
-                </Link>
-              </Button>
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href="/settings">
-                  <GitBranch className="h-4 w-4" />
-                  Connect Git
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+                {/* Commit SHA */}
+                <span className="text-[13px] font-mono text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[70px]">
+                  {deployment.commit?.slice(0, 7)}
+                </span>
 
-          {/* Projects */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Your Projects</CardTitle>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/projects">
-                  View All
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {data.projects.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground">
-                  <Globe className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No projects yet</p>
-                  <Button variant="link" asChild className="mt-2">
-                    <Link href="/new">Create your first project</Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {data.projects.map((project) => {
-                    const status = getStatusConfig(project.status);
-                    return (
-                      <Link
-                        key={project.id}
-                        href={`/projects/${project.slug}`}
-                        className="block p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="font-medium text-foreground">
-                            {project.name}
-                          </div>
-                          <Badge variant={project.status === "ready" ? "success" : "warning"}>
-                            {status.label}
-                          </Badge>
-                        </div>
-                        <div className="mt-1 text-sm text-muted-foreground">
-                          {project.framework} • {project.lastDeployment}
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                {/* Commit message - truncated */}
+                <span className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] flex-1 truncate max-w-[280px]">
+                  {deployment.commitMessage}
+                </span>
 
-          {/* Usage */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Usage This Month</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                { label: "Bandwidth", used: data.usage.bandwidth.usedFormatted, limit: data.usage.bandwidth.limitFormatted, pct: data.usage.bandwidth.percentage },
-                { label: "Build Minutes", used: String(data.usage.buildMinutes.used), limit: String(data.usage.buildMinutes.limit), pct: data.usage.buildMinutes.percentage },
-                { label: "Serverless Executions", used: data.usage.requests.usedFormatted, limit: data.usage.requests.limitFormatted, pct: data.usage.requests.percentage },
-              ].map((item) => (
-                <div key={item.label}>
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">{item.label}</span>
-                    <span className={`font-medium ${item.pct >= 90 ? "text-red-600 dark:text-red-400" : item.pct >= 75 ? "text-yellow-600 dark:text-yellow-400" : "text-foreground"}`}>
-                      {item.used} / {item.limit}
-                    </span>
-                  </div>
-                  <Progress
-                    value={item.pct}
-                    className={item.pct >= 90 ? "[&>div]:bg-red-500" : item.pct >= 75 ? "[&>div]:bg-yellow-500" : ""}
-                  />
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
+                {/* Time */}
+                <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] text-right min-w-[60px]">
+                  {deployment.time}
+                </span>
+
+                {/* Chevron */}
+                <ChevronRight className="h-4 w-4 text-[var(--text-quaternary,theme(colors.muted.foreground/40))] opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

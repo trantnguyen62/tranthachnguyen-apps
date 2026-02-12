@@ -21,36 +21,36 @@ export default function BuildConfigPage() {
       <div className="not-prose overflow-x-auto my-8">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border">
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Setting</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Description</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Example</th>
+            <tr className="border-b border-[var(--border-primary)]">
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Setting</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Description</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Example</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             <tr>
-              <td className="py-3 px-4 text-foreground font-medium">Build Command</td>
-              <td className="py-3 px-4 text-muted-foreground">Command to build your project</td>
+              <td className="py-3 px-4 text-[var(--text-primary)] font-medium">Build Command</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Command to build your project</td>
               <td className="py-3 px-4"><code>npm run build</code></td>
             </tr>
             <tr>
-              <td className="py-3 px-4 text-foreground font-medium">Output Directory</td>
-              <td className="py-3 px-4 text-muted-foreground">Directory containing built files</td>
+              <td className="py-3 px-4 text-[var(--text-primary)] font-medium">Output Directory</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Directory containing built files</td>
               <td className="py-3 px-4"><code>dist</code>, <code>.next</code>, <code>build</code></td>
             </tr>
             <tr>
-              <td className="py-3 px-4 text-foreground font-medium">Install Command</td>
-              <td className="py-3 px-4 text-muted-foreground">Command to install dependencies</td>
+              <td className="py-3 px-4 text-[var(--text-primary)] font-medium">Install Command</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Command to install dependencies</td>
               <td className="py-3 px-4"><code>npm install</code></td>
             </tr>
             <tr>
-              <td className="py-3 px-4 text-foreground font-medium">Root Directory</td>
-              <td className="py-3 px-4 text-muted-foreground">Subdirectory containing your app</td>
+              <td className="py-3 px-4 text-[var(--text-primary)] font-medium">Root Directory</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Subdirectory containing your app</td>
               <td className="py-3 px-4"><code>apps/web</code></td>
             </tr>
             <tr>
-              <td className="py-3 px-4 text-foreground font-medium">Node.js Version</td>
-              <td className="py-3 px-4 text-muted-foreground">Node.js version for builds</td>
+              <td className="py-3 px-4 text-[var(--text-primary)] font-medium">Node.js Version</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Node.js version for builds</td>
               <td className="py-3 px-4"><code>20.x</code>, <code>18.x</code></td>
             </tr>
           </tbody>

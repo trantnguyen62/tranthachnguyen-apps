@@ -18,7 +18,7 @@ export function createMockUser(overrides: Partial<MockUser> = {}): MockUser {
     email: `user${userIdCounter}@example.com`,
     name: `Test User ${userIdCounter}`,
     passwordHash: "$2b$12$mockedHashedPasswordValue123456789",
-    avatar: null,
+    image: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

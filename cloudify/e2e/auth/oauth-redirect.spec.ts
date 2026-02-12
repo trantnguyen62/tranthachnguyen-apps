@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// OAuth was removed in favor of credentials-only auth. Skip entire suite.
+test.skip();
+
 test.describe('OAuth Redirect Tests', () => {
   test('GitHub OAuth button redirects to GitHub authorization', async ({ page }) => {
     // Go to login page

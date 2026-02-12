@@ -512,15 +512,6 @@ test.describe('Deep API Probing - Find Real Bugs', () => {
       expect([401, 403]).toContain(response.status());
     });
 
-    test('admin regions endpoint should require auth', async ({ request }) => {
-      const response = await request.get('/api/admin/regions');
-      expect([401, 403]).toContain(response.status());
-    });
-
-    test('admin failover endpoint should require auth', async ({ request }) => {
-      const response = await request.post('/api/admin/failover');
-      expect([401, 403]).toContain(response.status());
-    });
   });
 
   test.describe('Misc API Endpoints', () => {
@@ -558,21 +549,6 @@ test.describe('Deep API Probing - Find Real Bugs', () => {
       const response = await request.post('/api/vitals', {
         data: {},
       });
-      expect(response.status()).toBeLessThan(500);
-    });
-  });
-
-  test.describe('A/B Tests API Edge Cases', () => {
-
-    test('ab-test creation without required fields should return 400', async ({ request }) => {
-      const response = await request.post('/api/ab-tests', {
-        data: {},
-      });
-      expect(response.status()).toBeLessThan(500);
-    });
-
-    test('ab-test convert on non-existent test should handle gracefully', async ({ request }) => {
-      const response = await request.post('/api/ab-tests/non-existent-id/convert');
       expect(response.status()).toBeLessThan(500);
     });
   });

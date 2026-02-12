@@ -3,9 +3,10 @@
  * Used by CLI to validate tokens and retrieve user info
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getAuthUser } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("auth/me");
 
@@ -14,23 +15,19 @@ export async function GET(request: NextRequest) {
     const user = await getAuthUser(request);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return fail("AUTH_REQUIRED", "Unauthorized", 401);
     }
 
-    return NextResponse.json({
+    return ok({
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
       },
       authMethod: user.authMethod,
-      scopes: user.scopes,
     });
   } catch (error) {
     log.error("Auth check error", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Authentication failed" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Authentication failed", 500);
   }
 }

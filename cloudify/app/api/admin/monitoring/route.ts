@@ -3,11 +3,13 @@
  * Provides comprehensive system metrics and deployment status for the Cloudify platform
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminAccess, isAuthError } from "@/lib/auth/api-auth";
 import { redisHealthCheck, getRedisClient, set, get } from "@/lib/storage/redis-client";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("admin/monitoring");
 
@@ -221,7 +223,7 @@ export async function GET(request: NextRequest) {
     cicd: cicdInfo,
   };
 
-  return NextResponse.json(response);
+  return ok(response);
 }
 
 /**
@@ -232,7 +234,9 @@ export async function POST(request: NextRequest) {
     const authResult = await requireAdminAccess(request);
     if (isAuthError(authResult)) return authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { commit, branch, buildNumber, status, timestamp } = body;
 
     const deploymentEvent = {
@@ -246,12 +250,9 @@ export async function POST(request: NextRequest) {
     // Store the latest deployment info
     await set(LAST_DEPLOY_KEY, JSON.stringify(deploymentEvent));
 
-    return NextResponse.json({ success: true, deployment: deploymentEvent });
+    return ok({ success: true, deployment: deploymentEvent });
   } catch (error) {
     log.error("Failed to record deployment", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to record deployment" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to record deployment", 500);
   }
 }

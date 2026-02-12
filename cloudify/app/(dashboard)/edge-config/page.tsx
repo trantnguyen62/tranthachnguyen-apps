@@ -122,7 +122,7 @@ export default function EdgeConfigPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -131,11 +131,11 @@ export default function EdgeConfigPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
           Failed to load edge configs
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <p className="text-[var(--text-secondary)] mb-4">{error}</p>
+        <Button variant="secondary" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
         </Button>
@@ -148,15 +148,15 @@ export default function EdgeConfigPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
             Edge Config
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-[var(--text-secondary)]">
             Ultra-low latency data at the edge
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="secondary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
@@ -201,7 +201,7 @@ export default function EdgeConfigPage() {
                     onChange={(e) => setNewConfig({ ...newConfig, name: e.target.value })}
                   />
                   {newConfig.name && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-[var(--text-secondary)]">
                       Slug: <code className="font-mono">{newConfig.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}</code>
                     </p>
                   )}
@@ -211,7 +211,7 @@ export default function EdgeConfigPage() {
                 )}
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                <Button variant="secondary" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </Button>
                 <Button variant="default" onClick={handleCreate} disabled={isCreating}>
@@ -240,24 +240,24 @@ export default function EdgeConfigPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="p-4 bg-card rounded-xl border border-border"
+            className="p-4 bg-card rounded-xl border border-[var(--border-primary)]"
           >
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold text-[var(--text-primary)]">
               {stat.value}
             </p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <p className="text-sm text-[var(--text-secondary)]">{stat.label}</p>
           </div>
         ))}
       </div>
 
       {/* Info banner */}
-      <div className="flex items-start gap-3 p-4 bg-secondary rounded-xl border border-border">
-        <Zap className="h-5 w-5 text-foreground shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-4 bg-[var(--surface-secondary)] rounded-xl border border-[var(--border-primary)]">
+        <Zap className="h-5 w-5 text-[var(--text-primary)] shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-medium text-foreground">
+          <p className="text-sm font-medium text-[var(--text-primary)]">
             Edge Config provides ultra-low latency reads
           </p>
-          <p className="text-sm text-foreground mt-1">
+          <p className="text-sm text-[var(--text-primary)] mt-1">
             Perfect for feature flags, A/B tests, and configuration that needs to be read frequently at the edge.
           </p>
         </div>
@@ -265,7 +265,7 @@ export default function EdgeConfigPage() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
         <Input
           placeholder="Search configs..."
           value={searchQuery}
@@ -276,12 +276,12 @@ export default function EdgeConfigPage() {
 
       {/* Config list */}
       {filteredConfigs.length === 0 ? (
-        <div className="text-center py-12 bg-card rounded-xl border border-border">
+        <div className="text-center py-12 bg-card rounded-xl border border-[var(--border-primary)]">
           <Zap className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
             No edge configs
           </h3>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-[var(--text-secondary)] mb-4">
             Create an edge config store to start storing configuration.
           </p>
           <Button variant="default" onClick={() => setDialogOpen(true)}>
@@ -297,7 +297,7 @@ export default function EdgeConfigPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="p-5 bg-card rounded-xl border border-border hover:border-foreground/20 cursor-pointer transition-colors"
+              className="p-5 bg-card rounded-xl border border-[var(--border-primary)] hover:border-foreground/20 cursor-pointer transition-colors"
               onClick={() => setSelectedConfig(config)}
             >
               <div className="flex items-start justify-between mb-3">
@@ -306,10 +306,10 @@ export default function EdgeConfigPage() {
                     <Zap className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">
+                    <h3 className="font-semibold text-[var(--text-primary)]">
                       {config.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-[var(--text-secondary)]">
                       {config.project?.name || "Unknown project"}
                     </p>
                   </div>
@@ -339,13 +339,13 @@ export default function EdgeConfigPage() {
                 </DropdownMenu>
               </div>
 
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-4 text-sm text-[var(--text-secondary)]">
                 <code className="font-mono text-xs">{config.slug}</code>
                 <span>·</span>
                 <span>{config._count?.items || 0} items</span>
               </div>
 
-              <div className="flex items-center gap-1.5 mt-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5 mt-3 text-xs text-[var(--text-secondary)]">
                 <Clock className="h-3 w-3" />
                 Updated {formatDate(config.updatedAt)}
               </div>
@@ -371,7 +371,7 @@ export default function EdgeConfigPage() {
             <div className="space-y-4 py-4">
               {/* Usage code */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">
+                <label className="text-sm font-medium text-[var(--text-primary)] mb-2 block">
                   Usage
                 </label>
                 <div className="flex items-center gap-2 p-3 bg-gray-950 rounded-lg">
@@ -388,7 +388,7 @@ export default function EdgeConfigPage() {
                     {copied === "code" ? (
                       <Check className="h-4 w-4 text-green-500" />
                     ) : (
-                      <Copy className="h-4 w-4 text-muted-foreground" />
+                      <Copy className="h-4 w-4 text-[var(--text-secondary)]" />
                     )}
                   </Button>
                 </div>
@@ -397,15 +397,15 @@ export default function EdgeConfigPage() {
               {/* Items */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-foreground">
+                  <label className="text-sm font-medium text-[var(--text-primary)]">
                     Items
                   </label>
-                  <Button variant="outline" size="sm">
+                  <Button variant="secondary" size="sm">
                     <Plus className="h-3 w-3" />
                     Add Item
                   </Button>
                 </div>
-                <div className="border border-border rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
+                <div className="border border-[var(--border-primary)] rounded-lg divide-y divide-gray-200 dark:divide-gray-700">
                   {selectedConfig.items && selectedConfig.items.length > 0 ? (
                     selectedConfig.items.map((item) => (
                       <div
@@ -413,15 +413,15 @@ export default function EdgeConfigPage() {
                         className="flex items-center justify-between p-3 hover:bg-secondary"
                       >
                         <div className="flex items-center gap-3">
-                          <code className="text-sm font-mono text-foreground">
+                          <code className="text-sm font-mono text-[var(--text-primary)]">
                             {item.key}
                           </code>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="secondary" className="text-xs">
                             {typeof item.value}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-3">
-                          <code className="text-sm text-muted-foreground font-mono max-w-[200px] truncate">
+                          <code className="text-sm text-[var(--text-secondary)] font-mono max-w-[200px] truncate">
                             {JSON.stringify(item.value)}
                           </code>
                           <Button variant="ghost" size="sm">
@@ -431,7 +431,7 @@ export default function EdgeConfigPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="p-8 text-center text-muted-foreground">
+                    <div className="p-8 text-center text-[var(--text-secondary)]">
                       No items yet. Add your first configuration item.
                     </div>
                   )}
@@ -440,7 +440,7 @@ export default function EdgeConfigPage() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setSelectedConfig(null)}>
+              <Button variant="secondary" onClick={() => setSelectedConfig(null)}>
                 Close
               </Button>
             </DialogFooter>

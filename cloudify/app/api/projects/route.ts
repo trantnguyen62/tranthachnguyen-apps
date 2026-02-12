@@ -1,9 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuthUser, requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
+import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getPlanLimits } from "@/lib/billing/pricing";
 import type { PlanType } from "@/lib/billing/pricing";
 import { getRouteLogger } from "@/lib/api/logger";
+import { withCache, noCache } from "@/lib/api/cache-headers";
+import { handlePrismaError } from "@/lib/api/error-response";
+import {
+  ok,
+  fail,
+  encodeCursor,
+  buildCursorWhere,
+  parsePaginationParams,
+} from "@/lib/api/response";
 
 const log = getRouteLogger("projects");
 
@@ -16,11 +25,9 @@ export async function GET(request: NextRequest) {
     }
     const { user } = authResult;
 
-    // Parse pagination parameters
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "50")));
-    const skip = (page - 1) * limit;
+    const { cursor, limit } = parsePaginationParams(searchParams);
+    const cursorWhere = buildCursorWhere(cursor);
 
     // Count total for pagination metadata
     const total = await prisma.project.count({
@@ -28,49 +35,59 @@ export async function GET(request: NextRequest) {
     });
 
     const projects = await prisma.project.findMany({
-      where: { userId: user.id },
-      include: {
+      where: {
+        userId: user.id,
+        ...cursorWhere,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        framework: true,
+        repositoryUrl: true,
+        repositoryBranch: true,
+        createdAt: true,
+        updatedAt: true,
         deployments: {
           take: 1,
           orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            status: true,
+            createdAt: true,
+            branch: true,
+            siteSlug: true,
+          },
         },
         _count: {
           select: { deployments: true },
         },
       },
-      orderBy: { updatedAt: "desc" },
-      skip,
-      take: limit,
+      orderBy: { createdAt: "desc" },
+      take: limit + 1, // Fetch one extra to detect hasMore
     });
 
-    return NextResponse.json({
-      projects,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        hasMore: page * limit < total,
-      },
-    });
-  } catch (error: unknown) {
-    log.error("Failed to fetch projects", error);
+    const hasMore = projects.length > limit;
+    const items = hasMore ? projects.slice(0, limit) : projects;
+    const nextCursor = hasMore && items.length > 0
+      ? encodeCursor(items[items.length - 1])
+      : undefined;
 
-    // Handle Prisma connection errors
-    if (error && typeof error === "object" && "code" in error) {
-      const prismaError = error as { code: string };
-      if (prismaError.code === "P1001" || prismaError.code === "P1002") {
-        return NextResponse.json(
-          { error: "Service temporarily unavailable" },
-          { status: 503 }
-        );
-      }
-    }
-
-    return NextResponse.json(
-      { error: "Failed to fetch projects" },
-      { status: 500 }
+    return withCache(
+      ok(items, {
+        pagination: {
+          cursor: nextCursor,
+          hasMore,
+          total,
+        },
+      }),
+      { maxAge: 10, staleWhileRevalidate: 30 }
     );
+  } catch (error: unknown) {
+    const prismaResp = handlePrismaError(error, "project");
+    if (prismaResp) return prismaResp;
+
+    return fail("INTERNAL_ERROR", "Failed to fetch projects", 500);
   }
 }
 
@@ -94,41 +111,42 @@ export async function POST(request: NextRequest) {
       where: { userId: user.id },
     });
     if (planLimits.projects !== -1 && currentProjectCount >= planLimits.projects) {
-      return NextResponse.json(
-        { error: `Project limit reached (${planLimits.projects} projects on ${userPlan} plan). Upgrade to create more projects.` },
-        { status: 402 }
-      );
+      return fail("PAYMENT_REQUIRED", `Project limit reached (${planLimits.projects} projects on ${userPlan} plan). Upgrade to create more projects.`, 402, {
+        currentCount: currentProjectCount,
+        limit: planLimits.projects,
+        plan: userPlan,
+      });
     }
 
     let body;
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Invalid request body", 400);
     }
     const { name, repoUrl, repoBranch, framework, buildCmd, outputDir, installCmd, rootDir, nodeVersion } = body;
 
     // Validate name is a non-empty string
     if (typeof name !== "string" || !name.trim()) {
-      return NextResponse.json({ error: "Project name is required" }, { status: 400 });
+      return fail("VALIDATION_MISSING_FIELD", "Project name is required", 422, {
+        fields: [{ field: "name", message: "Project name is required" }],
+      });
     }
 
     // Sanitize name first - strip HTML tags to prevent XSS
     const sanitizedName = name.trim().replace(/<[^>]*>/g, "");
 
     if (!sanitizedName) {
-      return NextResponse.json({ error: "Project name is required" }, { status: 400 });
+      return fail("VALIDATION_MISSING_FIELD", "Project name is required", 422, {
+        fields: [{ field: "name", message: "Project name is required" }],
+      });
     }
 
     // Validate sanitized name length
     if (sanitizedName.length > 100) {
-      return NextResponse.json(
-        { error: "Project name must be 100 characters or less" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Project name must be 100 characters or less", 422, {
+        fields: [{ field: "name", message: "Project name must be 100 characters or less" }],
+      });
     }
 
     // Validate framework against allowed values
@@ -155,10 +173,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "A project with this name already exists" },
-        { status: 400 }
-      );
+      return fail("CONFLICT", "A project with this name already exists", 409);
     }
 
     // Validate repoBranch if provided (alphanumeric, dots, slashes, hyphens, underscores)
@@ -169,45 +184,22 @@ export async function POST(request: NextRequest) {
         name: sanitizedName,
         slug,
         userId: user.id,
-        repoUrl: repoUrl || null,
-        repoBranch: validBranch,
+        repositoryUrl: repoUrl || null,
+        repositoryBranch: validBranch,
         framework: validFramework,
-        buildCmd: buildCmd || "npm run build",
-        outputDir: outputDir || ".next",
-        installCmd: installCmd || "npm install",
-        rootDir: rootDir || "./",
+        buildCommand: buildCmd || "npm run build",
+        outputDirectory: outputDir || ".next",
+        installCommand: installCmd || "npm install",
+        rootDirectory: rootDir || "./",
         nodeVersion: nodeVersion || "20",
       },
     });
 
-    return NextResponse.json(project, { status: 201 });
+    return noCache(ok(project, { status: 201 }));
   } catch (error: unknown) {
-    log.error("Failed to create project", error);
+    const prismaResp = handlePrismaError(error, "project");
+    if (prismaResp) return prismaResp;
 
-    // Handle Prisma errors
-    if (error && typeof error === "object" && "code" in error) {
-      const prismaError = error as { code: string };
-
-      // Unique constraint violation
-      if (prismaError.code === "P2002") {
-        return NextResponse.json(
-          { error: "A project with this name already exists" },
-          { status: 400 }
-        );
-      }
-
-      // Connection errors
-      if (prismaError.code === "P1001" || prismaError.code === "P1002") {
-        return NextResponse.json(
-          { error: "Service temporarily unavailable" },
-          { status: 503 }
-        );
-      }
-    }
-
-    return NextResponse.json(
-      { error: "Failed to create project" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create project", 500);
   }
 }

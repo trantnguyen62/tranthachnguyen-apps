@@ -14,8 +14,8 @@ export default function VueDocsPage() {
           </svg>
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground m-0">Vue on Cloudify</h1>
-          <p className="text-muted-foreground m-0 mt-1">Deploy Vue.js applications with optimal performance</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] m-0">Vue on Cloudify</h1>
+          <p className="text-[var(--text-secondary)] m-0 mt-1">Deploy Vue.js applications with optimal performance</p>
         </div>
       </div>
 
@@ -33,11 +33,11 @@ export default function VueDocsPage() {
           { name: "Vue CLI", desc: "Classic Vue CLI projects" },
           { name: "Vue 2", desc: "Legacy Vue 2 support" },
         ].map((item) => (
-          <div key={item.name} className="flex items-center gap-3 p-4 rounded-lg bg-background border border-border">
+          <div key={item.name} className="flex items-center gap-3 p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
             <Check className="h-5 w-5 text-green-500 shrink-0" />
             <div>
-              <span className="font-medium text-foreground">{item.name}</span>
-              <p className="text-sm text-muted-foreground">{item.desc}</p>
+              <span className="font-medium text-[var(--text-primary)]">{item.name}</span>
+              <p className="text-sm text-[var(--text-secondary)]">{item.desc}</p>
             </div>
           </div>
         ))}

@@ -1,73 +1,46 @@
 # Cloudify Roadmap to Vercel Parity
 
-## Current Status: 80% Feature Complete
+## Current Status: ~80% Feature Complete
 
-This roadmap outlines the remaining 20% needed to achieve full feature parity with Vercel.
-
----
-
-## Phase 1: Quick Wins (1-2 weeks)
-
-### 1.1 Cron Jobs / Scheduled Tasks
-**Priority:** High | **Effort:** Low
-
-Add scheduled task execution using existing Redis infrastructure.
-
-**Tasks:**
-- [ ] Create `CronJob` model in Prisma schema
-- [ ] Add cron job management API (`/api/projects/[id]/cron`)
-- [ ] Build cron job UI in project settings
-- [ ] Implement scheduler using `node-cron` or Bull queues
-- [ ] Add execution logs to deployment logs
-
-**Files to create/modify:**
-- `prisma/schema.prisma` - Add CronJob model
-- `app/api/projects/[id]/cron/route.ts` - CRUD API
-- `app/(dashboard)/projects/[slug]/settings/cron/page.tsx` - UI
-- `lib/cron/scheduler.ts` - Execution engine
+This roadmap outlines the remaining work needed to achieve full feature parity with Vercel.
 
 ---
 
-### 1.2 Managed Database (Expose PostgreSQL)
-**Priority:** High | **Effort:** Low
+## Completed Features
 
-Expose PostgreSQL as a managed database service for user projects.
+The following features are implemented and working:
 
-**Tasks:**
-- [ ] Create `Database` model in Prisma schema
-- [ ] Add database provisioning API
-- [ ] Generate unique credentials per project
-- [ ] Build connection string UI
-- [ ] Add database metrics to monitoring
-
-**Files to create/modify:**
-- `prisma/schema.prisma` - Add Database model
-- `app/api/projects/[id]/database/route.ts` - Provisioning API
-- `app/(dashboard)/projects/[slug]/database/page.tsx` - UI
-- `lib/database/provisioner.ts` - Database creation logic
-
----
-
-### 1.3 Image Optimization Service
-**Priority:** Medium | **Effort:** Low
-
-Add image optimization endpoint for deployed projects.
-
-**Tasks:**
-- [ ] Create image optimization API using `sharp`
-- [ ] Add caching layer with Redis
-- [ ] Support width, height, quality, format parameters
-- [ ] Integrate with MinIO for source images
-
-**Files to create/modify:**
-- `app/api/images/route.ts` - Optimization endpoint
-- `lib/images/optimizer.ts` - Sharp integration
+- [x] Email/password authentication with session management
+- [x] Git-based deployments with Docker-isolated builds
+- [x] GitHub webhook integration (push, PR events)
+- [x] Framework auto-detection (Next.js, React, Vue, Svelte, etc.)
+- [x] Monorepo support (Turborepo, Nx, Lerna, pnpm/yarn/npm workspaces)
+- [x] Custom domains with automatic SSL (Let's Encrypt ACME)
+- [x] Preview deployments per PR
+- [x] Deployment rollback
+- [x] Environment variables management
+- [x] Serverless functions (Docker-isolated execution)
+- [x] Edge functions with V8-compatible runtime
+- [x] Blob storage (MinIO / S3-compatible)
+- [x] KV store (PostgreSQL-backed with TTL)
+- [x] Edge Config (low-latency config store)
+- [x] Cron jobs / scheduled tasks
+- [x] Feature flags with targeting rules
+- [x] Web vitals and analytics
+- [x] Stripe billing (Free, Pro, Team plans)
+- [x] Team collaboration with roles
+- [x] Notification system (Email, Slack, Discord)
+- [x] Activity audit trail
+- [x] Sentry + Datadog monitoring integration
+- [x] Cloudflare DNS management and tunnel routing
+- [x] Real-time build log streaming
+- [x] Image optimization service
 
 ---
 
-## Phase 2: Edge Network Integration (2-3 weeks)
+## Phase 1: Edge Network Integration (2-3 weeks)
 
-### 2.1 Cloudflare CDN Integration
+### 1.1 Cloudflare CDN Integration
 **Priority:** Critical | **Effort:** Medium
 
 Leverage existing Cloudflare tunnel for edge caching.
@@ -78,33 +51,18 @@ Leverage existing Cloudflare tunnel for edge caching.
 - [ ] Implement stale-while-revalidate headers
 - [ ] Add CDN metrics to analytics
 
-**Files to create/modify:**
-- `lib/cloudflare/cdn.ts` - Cloudflare API client
-- `app/api/projects/[id]/cache/route.ts` - Cache management
-- Update deployment flow to purge cache on deploy
-
----
-
-### 2.2 Cloudflare Workers for Edge Functions
+### 1.2 Cloudflare Workers for Edge Functions
 **Priority:** Critical | **Effort:** High
 
-Replace container-based edge functions with true V8 isolates.
+Replace container-based edge functions with true V8 isolates via Cloudflare Workers.
 
 **Tasks:**
 - [ ] Create Cloudflare Workers deployment pipeline
-- [ ] Migrate EdgeFunction model to support Workers
 - [ ] Build Workers bundler (esbuild)
 - [ ] Add Workers logs streaming
 - [ ] Update edge function UI
 
-**Files to create/modify:**
-- `lib/cloudflare/workers.ts` - Workers deployment
-- `lib/functions/bundler.ts` - esbuild bundling
-- Update `app/api/functions/*` routes
-
----
-
-### 2.3 ISR (Incremental Static Regeneration)
+### 1.3 ISR (Incremental Static Regeneration)
 **Priority:** Medium | **Effort:** Medium
 
 Support on-demand revalidation for static pages.
@@ -113,17 +71,12 @@ Support on-demand revalidation for static pages.
 - [ ] Add revalidation webhook endpoint
 - [ ] Implement tag-based cache invalidation
 - [ ] Build revalidation UI in project dashboard
-- [ ] Add ISR metrics
-
-**Files to create/modify:**
-- `app/api/revalidate/route.ts` - Revalidation endpoint
-- `lib/isr/revalidator.ts` - Cache invalidation logic
 
 ---
 
-## Phase 3: Security & Enterprise (2-3 weeks)
+## Phase 2: Security & Enterprise (2-3 weeks)
 
-### 3.1 Web Application Firewall (WAF)
+### 2.1 Web Application Firewall (WAF)
 **Priority:** High | **Effort:** Medium
 
 Add WAF protection using Cloudflare.
@@ -131,18 +84,10 @@ Add WAF protection using Cloudflare.
 **Tasks:**
 - [ ] Configure Cloudflare WAF rules
 - [ ] Add WAF settings UI per project
-- [ ] Implement rate limiting
+- [ ] Implement configurable rate limiting
 - [ ] Add security headers configuration
-- [ ] Build attack logs dashboard
 
-**Files to create/modify:**
-- `lib/cloudflare/waf.ts` - WAF configuration
-- `app/(dashboard)/projects/[slug]/security/page.tsx` - Security UI
-- `app/api/projects/[id]/security/route.ts` - Security settings API
-
----
-
-### 3.2 DDoS Protection
+### 2.2 DDoS Protection
 **Priority:** High | **Effort:** Low
 
 Enable Cloudflare DDoS protection (mostly configuration).
@@ -151,51 +96,33 @@ Enable Cloudflare DDoS protection (mostly configuration).
 - [ ] Configure Cloudflare DDoS settings
 - [ ] Add traffic analytics
 - [ ] Build alerting for attacks
-- [ ] Document protection features
 
----
-
-### 3.3 Audit Logs
+### 2.3 Audit Logs (Enhanced)
 **Priority:** Medium | **Effort:** Medium
 
-Add comprehensive audit logging for enterprise compliance.
+Enhance existing Activity model with export and compliance features.
 
 **Tasks:**
-- [ ] Create `AuditLog` model
-- [ ] Log all sensitive operations
-- [ ] Build audit log viewer UI
+- [ ] Build audit log viewer UI with filtering
 - [ ] Add export functionality (CSV, JSON)
-
-**Files to create/modify:**
-- `prisma/schema.prisma` - Add AuditLog model
-- `lib/audit/logger.ts` - Audit logging middleware
-- `app/(dashboard)/team/[slug]/audit/page.tsx` - Viewer UI
+- [ ] Add IP geolocation to audit entries
 
 ---
 
-## Phase 4: Multi-Region (4-6 weeks)
+## Phase 3: Multi-Region (4-6 weeks)
 
-### 4.1 Multi-Region K3s Clusters
+### 3.1 Multi-Region K3s Clusters
 **Priority:** High | **Effort:** Very High
 
-Deploy K3s clusters in multiple regions.
-
-**Regions to consider:**
-- US East (current: LXC 203)
-- US West
-- Europe (Frankfurt/Amsterdam)
-- Asia (Singapore/Tokyo)
+Deploy K3s clusters in multiple regions for global performance.
 
 **Tasks:**
-- [ ] Set up additional LXC containers or VPS
+- [ ] Set up additional VPS/LXC in target regions
 - [ ] Install K3s on each region
 - [ ] Implement region selection in project settings
 - [ ] Add geo-routing via Cloudflare
-- [ ] Build region health monitoring
 
----
-
-### 4.2 Global Load Balancing
+### 3.2 Global Load Balancing
 **Priority:** High | **Effort:** Medium
 
 Route traffic to nearest healthy region.
@@ -208,12 +135,12 @@ Route traffic to nearest healthy region.
 
 ---
 
-## Phase 5: Developer Experience (2-3 weeks)
+## Phase 4: Developer Experience (2-3 weeks)
 
-### 5.1 CLI Tool
+### 4.1 CLI Tool
 **Priority:** Medium | **Effort:** Medium
 
-Build `cloudify` CLI for local development.
+Build `cloudify` CLI for local development (packages/cli exists, needs polish).
 
 **Commands:**
 - `cloudify login` - Authenticate
@@ -222,33 +149,20 @@ Build `cloudify` CLI for local development.
 - `cloudify env pull` - Pull environment variables
 - `cloudify logs` - Stream deployment logs
 
-**Files to create:**
-- `packages/cli/` - New CLI package
-- Publish to npm as `@cloudify/cli`
-
----
-
-### 5.2 GitHub App (Enhanced)
+### 4.2 GitHub App (Enhanced)
 **Priority:** Medium | **Effort:** Medium
 
-Improve GitHub integration with deployment status checks.
+Improve GitHub integration beyond webhooks.
 
 **Tasks:**
-- [ ] Create GitHub App (not just OAuth)
-- [ ] Add deployment status checks
-- [ ] Implement PR preview comments
+- [ ] Add deployment status checks on PRs
+- [ ] Implement PR preview comments with deploy URLs
 - [ ] Add commit status badges
 
----
-
-### 5.3 SDK / Client Library
+### 4.3 SDK / Client Library
 **Priority:** Low | **Effort:** Medium
 
-Create JavaScript SDK for Cloudify APIs.
-
-**Files to create:**
-- `packages/sdk/` - New SDK package
-- Publish to npm as `@cloudify/sdk`
+Polish the JavaScript SDK for Cloudify APIs (packages/sdk exists).
 
 ---
 
@@ -258,29 +172,11 @@ Create JavaScript SDK for Cloudify APIs.
 |---------|-----------------|------------------|----------------|
 | Cloudflare CDN | High | Medium | **P0** |
 | Edge Functions (Workers) | High | High | **P0** |
-| Cron Jobs | Medium | Low | **P1** |
-| Managed Database | Medium | Low | **P1** |
 | WAF/DDoS | High | Low | **P1** |
-| Image Optimization | Medium | Low | **P2** |
 | ISR | Medium | Medium | **P2** |
 | Multi-Region | High | Very High | **P2** |
 | CLI Tool | Medium | Medium | **P3** |
-| Audit Logs | Low | Medium | **P3** |
-
----
-
-## Success Metrics
-
-### Technical Metrics
-- [ ] Edge response time < 50ms (P95)
-- [ ] Build time < 60s for standard Next.js app
-- [ ] 99.9% uptime SLA
-- [ ] Support 1000+ concurrent deployments
-
-### Feature Parity Metrics
-- [ ] All Vercel core features implemented
-- [ ] Documentation coverage > 90%
-- [ ] API compatibility with Vercel CLI (optional)
+| Audit Logs (Enhanced) | Low | Medium | **P3** |
 
 ---
 
@@ -288,22 +184,21 @@ Create JavaScript SDK for Cloudify APIs.
 
 | Phase | Duration | Key Deliverables |
 |-------|----------|------------------|
-| Phase 1 | 1-2 weeks | Cron, Database, Images |
-| Phase 2 | 2-3 weeks | CDN, Workers, ISR |
-| Phase 3 | 2-3 weeks | WAF, DDoS, Audit |
-| Phase 4 | 4-6 weeks | Multi-region |
-| Phase 5 | 2-3 weeks | CLI, SDK, GitHub App |
+| Phase 1 | 2-3 weeks | CDN, Workers, ISR |
+| Phase 2 | 2-3 weeks | WAF, DDoS, Audit |
+| Phase 3 | 4-6 weeks | Multi-region |
+| Phase 4 | 2-3 weeks | CLI, SDK, GitHub App |
 
-**Total: 11-17 weeks to full parity**
+**Total: ~10-15 weeks to full parity**
 
 ---
 
 ## Next Steps
 
-1. **Start with Phase 1** - Quick wins to show progress
-2. **Parallel Phase 2.1** - CDN integration can start immediately
-3. **Phase 2.2** after Phase 1 - Workers requires more planning
-4. **Defer Phase 4** - Multi-region is expensive, do after validating demand
+1. **Start with Phase 1.1** - CDN integration leverages existing Cloudflare setup
+2. **Parallel Phase 1.2** - Workers requires more planning but is high impact
+3. **Phase 2** after Phase 1 - Security features are mostly Cloudflare config
+4. **Defer Phase 3** - Multi-region is expensive, do after validating demand
 
 ---
 
@@ -311,4 +206,4 @@ Create JavaScript SDK for Cloudify APIs.
 
 - **Infrastructure:** 2-3 additional VPS/LXC for multi-region
 - **Cloudflare:** Workers Paid plan ($5/month minimum)
-- **Development:** Estimated 200-300 hours of engineering work
+- **Development:** Estimated 150-250 hours of engineering work

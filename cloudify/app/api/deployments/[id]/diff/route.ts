@@ -3,11 +3,12 @@
  * GET - Get diff between this deployment and previous
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getDeploymentDiff, getDeploymentComparisonSummary } from "@/lib/deployments/diff-service";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("deployments/[id]/diff");
 
@@ -37,49 +38,37 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           select: {
             id: true,
             userId: true,
-            repoUrl: true,
+            repositoryUrl: true,
           },
         },
       },
     });
 
     if (!deployment) {
-      return NextResponse.json(
-        { error: "Deployment not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
     // Verify ownership
     if (deployment.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
     // Return summary only if requested
     if (summaryOnly) {
       const summary = await getDeploymentComparisonSummary(id);
-      return NextResponse.json({ summary });
+      return ok({ summary });
     }
 
     // Get full diff
     const diff = await getDeploymentDiff(id, compareWith);
 
     if (!diff) {
-      return NextResponse.json(
-        { error: "Could not generate diff" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Could not generate diff", 404);
     }
 
-    return NextResponse.json({ diff });
+    return ok({ diff });
   } catch (error) {
     log.error("Failed to get deployment diff", error);
-    return NextResponse.json(
-      { error: "Failed to get deployment diff" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get deployment diff", 500);
   }
 }

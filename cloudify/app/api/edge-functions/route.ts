@@ -4,12 +4,13 @@
  * POST - Create a new edge function
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { validateEdgeFunctionCode } from "@/lib/edge/runtime";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("edge-functions");
 
@@ -26,10 +27,7 @@ export async function GET(request: NextRequest) {
     const projectId = searchParams.get("projectId");
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: "Project ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Project ID is required", 400);
     }
 
     // Verify project ownership
@@ -41,10 +39,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     const functions = await prisma.edgeFunction.findMany({
@@ -110,13 +105,10 @@ export async function GET(request: NextRequest) {
       })
     );
 
-    return NextResponse.json({ functions: functionsWithStats });
+    return ok({ functions: functionsWithStats });
   } catch (error) {
     log.error("Failed to fetch edge functions", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch edge functions" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch edge functions", 500);
   }
 }
 
@@ -135,10 +127,7 @@ export async function POST(request: NextRequest) {
     const { projectId, name, code, routes, runtime, regions, memory, timeout, envVars } = body;
 
     if (!projectId || !name || !code) {
-      return NextResponse.json(
-        { error: "Missing required fields: projectId, name, code" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing required fields: projectId, name, code", 400);
     }
 
     // Verify project ownership
@@ -150,19 +139,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Validate code
     const validation = validateEdgeFunctionCode(code);
     if (!validation.valid) {
-      return NextResponse.json(
-        { error: "Invalid code", details: validation.errors },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid code", 400, { details: validation.errors });
     }
 
     // Generate slug
@@ -177,10 +160,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "An edge function with this name already exists" },
-        { status: 409 }
-      );
+      return fail("CONFLICT", "An edge function with this name already exists", 409);
     }
 
     // Check plan limits
@@ -202,10 +182,7 @@ export async function POST(request: NextRequest) {
 
     const maxFunctions = limits[userPlan?.plan || "free"] || 2;
     if (functionCount >= maxFunctions) {
-      return NextResponse.json(
-        { error: `Edge function limit reached for your plan (${maxFunctions})` },
-        { status: 403 }
-      );
+      return fail("PAYMENT_REQUIRED", `Edge function limit reached for your plan (${maxFunctions})`, 403);
     }
 
     // Create function
@@ -240,15 +217,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
-      { function: edgeFunction },
-      { status: 201 }
-    );
+    return ok({ function: edgeFunction }, { status: 201 });
   } catch (error) {
     log.error("Failed to create edge function", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to create edge function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create edge function", 500);
   }
 }

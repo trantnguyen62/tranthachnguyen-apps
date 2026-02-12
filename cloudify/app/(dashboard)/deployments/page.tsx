@@ -1,26 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   GitBranch,
-  GitCommit,
-  Clock,
-  CheckCircle2,
-  ExternalLink,
   MoreHorizontal,
   RefreshCw,
   Eye,
   RotateCcw,
   Trash2,
-  Filter,
-  ChevronDown,
   AlertCircle,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,8 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { getStatusConfig } from "@/lib/utils/status-config";
 import { formatTimeAgo } from "@/lib/utils/format-time";
+import { useToast } from "@/components/notifications/toast";
 
 interface Deployment {
   id: string;
@@ -55,38 +47,50 @@ interface Project {
   slug: string;
 }
 
+const STATUS_FILTERS = [
+  { value: "all", label: "All" },
+  { value: "building", label: "Building" },
+  { value: "ready", label: "Ready" },
+  { value: "error", label: "Error" },
+  { value: "canceled", label: "Canceled" },
+];
+
 function LoadingSkeleton() {
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <Skeleton className="h-9 w-40 mb-2" />
-          <Skeleton className="h-5 w-80" />
-        </div>
-        <Skeleton className="h-10 w-24" />
-      </div>
-      <div className="flex items-center gap-4 mb-6">
-        <Skeleton className="h-10 w-32" />
-        <Skeleton className="h-10 w-32" />
-      </div>
-      <div className="space-y-4">
+    <div className="px-6 py-8 max-w-[980px]">
+      <Skeleton className="h-7 w-40 mb-2" />
+      <Skeleton className="h-4 w-72 mb-8" />
+      <Skeleton className="h-9 w-96 mb-6" />
+      <div className="space-y-0">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Card key={i}>
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <Skeleton className="h-10 w-10 rounded-lg" />
-                <div className="flex-1">
-                  <Skeleton className="h-5 w-48 mb-2" />
-                  <Skeleton className="h-4 w-96 mb-2" />
-                  <Skeleton className="h-3 w-64" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div key={i} className="flex items-center gap-4 py-3 border-b border-[var(--separator,theme(colors.border))]">
+            <Skeleton className="h-2 w-2 rounded-full" />
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-3 w-48 flex-1" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-14" />
+            <Skeleton className="h-3 w-16" />
+          </div>
         ))}
       </div>
     </div>
   );
+}
+
+function getStatusDotColor(status: string) {
+  switch (status.toLowerCase()) {
+    case "ready":
+      return "bg-[var(--success,#34C759)]";
+    case "building":
+      return "bg-[var(--warning,#FF9F0A)] animate-pulse";
+    case "error":
+    case "failed":
+      return "bg-[var(--error,#FF3B30)]";
+    case "canceled":
+      return "bg-[var(--text-quaternary,theme(colors.muted.foreground))]";
+    default:
+      return "bg-[var(--text-quaternary,theme(colors.muted.foreground))]";
+  }
 }
 
 export default function DeploymentsPage() {
@@ -96,33 +100,67 @@ export default function DeploymentsPage() {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [projectFilter, setProjectFilter] = useState<string>("all");
-  const [refreshing, setRefreshing] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { addToast } = useToast();
+
+  const fetchDeployments = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      if (statusFilter !== "all") params.append("status", statusFilter);
+      if (projectFilter !== "all") params.append("projectId", projectFilter);
+
+      const response = await fetch(`/api/deployments?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch deployments");
+      }
+      const data = await response.json();
+      setDeployments(data.deployments || []);
+      setProjects(data.projects || []);
+      setLastUpdated(new Date());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  }, [statusFilter, projectFilter]);
+
+  // Initial fetch + auto-refresh every 10s
+  useEffect(() => {
+    fetchDeployments();
+
+    intervalRef.current = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchDeployments();
+      }
+    }, 10000);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [fetchDeployments]);
 
   async function handleRollback(deploymentId: string) {
     setActionLoading(deploymentId);
-    setActionMessage(null);
     try {
       const res = await fetch(`/api/deployments/${deploymentId}/rollback`, { method: "POST" });
       const data = await res.json();
       if (res.ok) {
-        setActionMessage({ type: "success", text: `Rolled back successfully (${data.rollbackTime}ms)` });
+        addToast({ type: "success", title: "Rollback complete", message: `Rolled back successfully (${data.rollbackTime}ms)` });
         fetchDeployments();
       } else {
-        setActionMessage({ type: "error", text: data.error || "Rollback failed" });
+        addToast({ type: "error", title: "Rollback failed", message: data.error || "Could not roll back" });
       }
     } catch {
-      setActionMessage({ type: "error", text: "Network error" });
+      addToast({ type: "error", title: "Network error", message: "Could not connect to the server" });
     } finally {
       setActionLoading(null);
-      setTimeout(() => setActionMessage(null), 4000);
     }
   }
 
   async function handleRedeploy(deployment: Deployment) {
     setActionLoading(deployment.id);
-    setActionMessage(null);
     try {
       const res = await fetch("/api/deploy", {
         method: "POST",
@@ -136,16 +174,15 @@ export default function DeploymentsPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setActionMessage({ type: "success", text: "Redeployment triggered" });
+        addToast({ type: "success", title: "Deploy started", message: `Redeployment of ${deployment.project} triggered` });
         fetchDeployments();
       } else {
-        setActionMessage({ type: "error", text: data.error || "Redeploy failed" });
+        addToast({ type: "error", title: "Deploy failed", message: data.error || "Could not trigger redeployment" });
       }
     } catch {
-      setActionMessage({ type: "error", text: "Network error" });
+      addToast({ type: "error", title: "Network error", message: "Could not connect to the server" });
     } finally {
       setActionLoading(null);
-      setTimeout(() => setActionMessage(null), 4000);
     }
   }
 
@@ -155,49 +192,18 @@ export default function DeploymentsPage() {
     try {
       const res = await fetch(`/api/deploy?id=${deploymentId}`, { method: "DELETE" });
       if (res.ok) {
-        setActionMessage({ type: "success", text: "Deployment cancelled" });
+        addToast({ type: "success", title: "Deployment deleted", message: "The deployment has been removed" });
         fetchDeployments();
       } else {
         const data = await res.json();
-        setActionMessage({ type: "error", text: data.error || "Delete failed" });
+        addToast({ type: "error", title: "Delete failed", message: data.error || "Could not delete deployment" });
       }
     } catch {
-      setActionMessage({ type: "error", text: "Network error" });
+      addToast({ type: "error", title: "Network error", message: "Could not connect to the server" });
     } finally {
       setActionLoading(null);
-      setTimeout(() => setActionMessage(null), 4000);
     }
   }
-
-  async function fetchDeployments() {
-    try {
-      const params = new URLSearchParams();
-      if (statusFilter !== "all") params.append("status", statusFilter);
-      if (projectFilter !== "all") params.append("projectId", projectFilter);
-
-      const response = await fetch(`/api/deployments?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch deployments");
-      }
-      const data = await response.json();
-      setDeployments(data.deployments || []);
-      setProjects(data.projects || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }
-
-  useEffect(() => {
-    fetchDeployments();
-  }, [statusFilter, projectFilter]);
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchDeployments();
-  };
 
   if (loading) {
     return <LoadingSkeleton />;
@@ -205,298 +211,229 @@ export default function DeploymentsPage() {
 
   if (error) {
     return (
-      <div className="p-8">
-        <Card className="border-red-200 dark:border-red-900">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
-              <AlertCircle className="h-6 w-6" />
-              <div>
-                <h3 className="font-semibold">Failed to load deployments</h3>
-                <p className="text-sm text-red-500">{error}</p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => window.location.reload()}
-            >
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="px-6 py-8 max-w-[980px]">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <AlertCircle className="h-6 w-6 text-[var(--error,#FF3B30)] mb-4" />
+          <h3 className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))] mb-1">
+            Failed to load deployments
+          </h3>
+          <p className="text-[15px] text-[var(--text-secondary,theme(colors.muted.foreground))] mb-5">
+            {error}
+          </p>
+          <Button variant="secondary" onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
 
+  const updatedText = lastUpdated
+    ? `Updated ${formatTimeAgo(lastUpdated.toISOString())}`
+    : "";
+
   return (
-    <div className="p-8">
+    <div className="px-6 py-8 max-w-[980px]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-foreground"
-          >
-            Deployments
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-2 text-muted-foreground"
-          >
-            View and manage all your deployments across projects.
-          </motion.p>
+      <div className="mb-1">
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))]">
+          Deployments
+        </h1>
+      </div>
+      <p className="text-[15px] text-[var(--text-secondary,theme(colors.muted.foreground))] mb-8">
+        All deployments across your projects.
+      </p>
+
+      {/* Filters row */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          {/* Segmented status filter */}
+          <div className="inline-flex items-center rounded-lg border border-[var(--border-primary,theme(colors.border))] bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))] p-0.5">
+            {STATUS_FILTERS.map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setStatusFilter(filter.value)}
+                className={cn(
+                  "px-3 py-1.5 text-[13px] font-medium rounded-md transition-all",
+                  statusFilter === filter.value
+                    ? "bg-[var(--surface-primary,theme(colors.background))] text-[var(--text-primary,theme(colors.foreground))] shadow-sm"
+                    : "text-[var(--text-secondary,theme(colors.muted.foreground))] hover:text-[var(--text-primary,theme(colors.foreground))]"
+                )}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Project filter dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="sm" className="text-[13px]">
+                {projectFilter === "all"
+                  ? "All Projects"
+                  : projects.find((p) => p.id === projectFilter)?.name || "Project"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => setProjectFilter("all")}>
+                All Projects
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {projects.map((project) => (
+                <DropdownMenuItem key={project.id} onClick={() => setProjectFilter(project.id)}>
+                  {project.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
-            <RefreshCw className={cn("h-4 w-4", refreshing && "animate-spin")} />
-            Refresh
-          </Button>
-        </motion.div>
+
+        {/* Updated indicator */}
+        {updatedText && (
+          <span className="text-[11px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))]">
+            {updatedText}
+          </span>
+        )}
       </div>
 
-      {/* Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex items-center gap-4 mb-6"
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              {statusFilter === "all" ? "All Status" : getStatusConfig(statusFilter).label}
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setStatusFilter("all")}>
-              All Status
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setStatusFilter("ready")}>
-              Ready
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("building")}>
-              Building
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("error")}>
-              Error
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setStatusFilter("canceled")}>
-              Canceled
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              {projectFilter === "all"
-                ? "All Projects"
-                : projects.find((p) => p.id === projectFilter)?.name || projectFilter}
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setProjectFilter("all")}>
-              All Projects
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {projects.map((project) => (
-              <DropdownMenuItem key={project.id} onClick={() => setProjectFilter(project.id)}>
-                {project.name}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </motion.div>
-
-      {/* Action Message */}
-      {actionMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={cn(
-            "mb-4 flex items-center gap-2 rounded-lg px-4 py-3 text-sm",
-            actionMessage.type === "success"
-              ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-              : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-          )}
-        >
-          {actionMessage.type === "success" ? (
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-          ) : (
-            <AlertCircle className="h-4 w-4 shrink-0" />
-          )}
-          {actionMessage.text}
-        </motion.div>
-      )}
-
-      {/* Deployments List */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="space-y-4"
-      >
-        {deployments.map((deployment, index) => {
-          const status = getStatusConfig(deployment.status);
-          const StatusIcon = status.icon;
-
-          return (
-            <motion.div
+      {/* Deployments list */}
+      {deployments.length > 0 ? (
+        <div className="border-t border-[var(--separator,theme(colors.border))]">
+          {deployments.map((deployment) => (
+            <div
               key={deployment.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * index }}
+              className="flex items-center gap-4 py-3 border-b border-[var(--separator,theme(colors.border))] hover:bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))] transition-colors -mx-3 px-3 group"
             >
-              <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4">
-                      {/* Status Icon */}
-                      <div className={cn("p-2 rounded-lg mt-1", status.bg)}>
-                        <StatusIcon
-                          className={cn(
-                            "h-5 w-5",
-                            status.color,
-                            deployment.status === "building" && "animate-spin"
-                          )}
-                        />
-                      </div>
+              {/* Status dot */}
+              <div className={`h-2 w-2 rounded-full shrink-0 ${getStatusDotColor(deployment.status)}`} />
 
-                      {/* Details */}
-                      <div>
-                        <div className="flex items-center gap-3 mb-1">
-                          <Link
-                            href={`/projects/${deployment.projectSlug}`}
-                            className="font-semibold text-foreground hover:text-[#0070f3] dark:hover:text-[#0070f3]"
-                          >
-                            {deployment.project}
-                          </Link>
-                          {deployment.isProduction && (
-                            <Badge variant="default" className="text-xs">
-                              Production
-                            </Badge>
-                          )}
-                          <Badge variant="secondary" className="text-xs">
-                            <GitBranch className="h-3 w-3 mr-1" />
-                            {deployment.branch}
-                          </Badge>
-                        </div>
+              {/* Project name + deployment ID */}
+              <div className="min-w-[160px]">
+                <Link
+                  href={`/projects/${deployment.projectSlug}`}
+                  className="text-[15px] font-medium text-[var(--text-primary,theme(colors.foreground))] hover:text-[var(--accent,#0071E3)] transition-colors"
+                >
+                  {deployment.project}
+                </Link>
+                <p className="text-[11px] font-mono text-[var(--text-tertiary,theme(colors.muted.foreground/70))]">
+                  {deployment.id.slice(0, 8)}
+                </p>
+              </div>
 
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {deployment.commitMessage}
-                        </p>
+              {/* Branch */}
+              <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[80px]">
+                {deployment.branch}
+              </span>
 
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <GitCommit className="h-3 w-3" />
-                            {deployment.commit}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatTimeAgo(deployment.createdAt)}
-                          </span>
-                          {deployment.duration && (
-                            <span>Duration: {deployment.duration}</span>
-                          )}
-                        </div>
+              {/* Commit SHA */}
+              <span className="text-[13px] font-mono text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[60px]">
+                {deployment.commit?.slice(0, 7)}
+              </span>
 
-                        {deployment.error && (
-                          <div className="mt-2 p-2 rounded bg-red-50 dark:bg-red-900/20 text-sm text-red-600 dark:text-red-400">
-                            {deployment.error}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+              {/* Commit message */}
+              <span className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] flex-1 truncate">
+                {deployment.commitMessage}
+              </span>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-2">
-                      {deployment.status === "ready" && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a
-                            href={`https://${deployment.url}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                            Visit
-                          </a>
-                        </Button>
-                      )}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/deployments/${deployment.id}`}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              View Logs
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleRedeploy(deployment)}
-                            disabled={actionLoading === deployment.id}
-                          >
-                            <RotateCcw className="h-4 w-4 mr-2" />
-                            Redeploy
-                          </DropdownMenuItem>
-                          {deployment.status === "ready" && !deployment.isProduction && (
-                            <DropdownMenuItem
-                              onClick={() => handleRollback(deployment.id)}
-                              disabled={actionLoading === deployment.id}
-                            >
-                              <CheckCircle2 className="h-4 w-4 mr-2" />
-                              Promote to Production
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-red-600 dark:text-red-400"
-                            onClick={() => handleDelete(deployment.id)}
-                            disabled={actionLoading === deployment.id}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+              {/* Duration */}
+              {deployment.duration && (
+                <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))]">
+                  {deployment.duration}
+                </span>
+              )}
 
-      {/* Empty state */}
-      {deployments.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">🚀</div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+              {/* Time */}
+              <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[60px] text-right">
+                {formatTimeAgo(deployment.createdAt)}
+              </span>
+
+              {/* Error inline */}
+              {deployment.error && (
+                <span className="text-[11px] text-[var(--error,#FF3B30)] max-w-[120px] truncate" title={deployment.error}>
+                  {deployment.error}
+                </span>
+              )}
+
+              {/* Three-dot menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm" 
+                    className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => handleRedeploy(deployment)}
+                    disabled={actionLoading === deployment.id}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Redeploy
+                  </DropdownMenuItem>
+                  {deployment.status === "ready" && (
+                    <DropdownMenuItem
+                      onClick={() => handleRollback(deployment.id)}
+                      disabled={actionLoading === deployment.id}
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Rollback
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link href={`/deployments/${deployment.id}`}>
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Logs
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="text-[var(--error,#FF3B30)]"
+                    onClick={() => handleDelete(deployment.id)}
+                    disabled={actionLoading === deployment.id}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Chevron */}
+              <Link href={`/deployments/${deployment.id}`} className="shrink-0">
+                <ChevronRight className="h-4 w-4 text-[var(--text-quaternary,theme(colors.muted.foreground/40))] opacity-0 group-hover:opacity-100 transition-opacity" />
+              </Link>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <GitBranch className="h-12 w-12 text-[var(--text-quaternary,theme(colors.muted.foreground/40))] mb-4" strokeWidth={1.5} />
+          <p className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))] mb-1">
             No deployments found
-          </h3>
-          <p className="text-muted-foreground">
-            {statusFilter !== "all" || projectFilter !== "all"
-              ? "Try adjusting your filters or deploy a new project."
-              : "Deploy your first project to see deployments here."}
           </p>
-          <Button asChild className="mt-4">
-            <Link href="/new">Create Project</Link>
-          </Button>
+          <p className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] max-w-[320px] mb-5">
+            {statusFilter !== "all" || projectFilter !== "all"
+              ? "No deployments match your current filters."
+              : "Push code to your repository to trigger your first deployment."}
+          </p>
+          {statusFilter !== "all" || projectFilter !== "all" ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setStatusFilter("all");
+                setProjectFilter("all");
+              }}
+            >
+              Clear Filters
+            </Button>
+          ) : (
+            <Button variant="default" size="sm" asChild>
+              <Link href="/new">Deploy Now</Link>
+            </Button>
+          )}
         </div>
       )}
     </div>

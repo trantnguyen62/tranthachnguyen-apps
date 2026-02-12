@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("edge-config");
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Project not found", 404);
       }
     }
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
         where: { id: configId },
         include: { items: true, project: { select: { id: true, name: true, slug: true } } },
       });
-      return NextResponse.json(config);
+      return ok(config);
     }
 
     // Get user's projects
@@ -56,13 +57,10 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(configs);
+    return ok(configs);
   } catch (error) {
     log.error("Failed to fetch edge config", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch edge config" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch edge config", 500);
   }
 }
 
@@ -79,10 +77,7 @@ export async function POST(request: NextRequest) {
     const { projectId, configName, configId, key, value } = body;
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: "Project ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Project ID is required", 400);
     }
 
     // Verify project ownership
@@ -91,7 +86,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Create a new config
@@ -119,7 +114,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json(config);
+      return ok(config);
     }
 
     // Set an item in an existing config
@@ -136,19 +131,13 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json(item);
+      return ok(item);
     }
 
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
-    );
+    return fail("BAD_REQUEST", "Invalid request", 400);
   } catch (error) {
     log.error("Failed to create edge config", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to create edge config" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create edge config", 500);
   }
 }
 
@@ -167,7 +156,7 @@ export async function DELETE(request: NextRequest) {
       await prisma.edgeConfigItem.delete({
         where: { configId_key: { configId, key } },
       });
-      return NextResponse.json({ success: true });
+      return ok({ success: true });
     }
 
     if (configId) {
@@ -179,19 +168,16 @@ export async function DELETE(request: NextRequest) {
       });
 
       if (!config) {
-        return NextResponse.json({ error: "Config not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Config not found", 404);
       }
 
       await prisma.edgeConfig.delete({ where: { id: configId } });
-      return NextResponse.json({ success: true });
+      return ok({ success: true });
     }
 
-    return NextResponse.json({ error: "ID required" }, { status: 400 });
+    return fail("VALIDATION_MISSING_FIELD", "ID required", 400);
   } catch (error) {
     log.error("Failed to delete", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete", 500);
   }
 }

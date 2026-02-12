@@ -8,11 +8,6 @@ test.describe('Login Page - Critical Flows', () => {
   // Basic rendering tests
   test('1. renders login form with all required elements', async ({ page }) => {
     await expect(page.getByText('Welcome back')).toBeVisible();
-    // OAuth buttons are now dynamically loaded from /api/auth/providers
-    // Wait for them to load
-    await page.waitForTimeout(2000);
-    await expect(page.getByText('Continue with GitHub')).toBeVisible();
-    // Google button may or may not be visible depending on provider configuration
     await expect(page.getByLabel('Email')).toBeVisible();
     await expect(page.getByLabel('Password')).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
@@ -82,24 +77,6 @@ test.describe('Login Page - Critical Flows', () => {
 
     // Test passes if form submission triggered some state change
     expect(stillOnLogin || navigatedToDashboard).toBeTruthy();
-  });
-
-  // OAuth button tests
-  test('9. GitHub OAuth button is clickable', async ({ page }) => {
-    const githubButton = page.getByText('Continue with GitHub');
-    await expect(githubButton).toBeEnabled();
-    await githubButton.click();
-    await page.waitForTimeout(500);
-    // Button should have triggered some action
-  });
-
-  test('10. Google OAuth button is clickable when available', async ({ page }) => {
-    await page.waitForTimeout(2000);
-    const googleButton = page.getByText('Continue with Google');
-    // Google button is only shown if provider is configured
-    if (await googleButton.isVisible()) {
-      await expect(googleButton).toBeEnabled();
-    }
   });
 
   // Navigation tests

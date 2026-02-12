@@ -261,7 +261,7 @@ export default function DatabasePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
+        <RefreshCw className="w-8 h-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -284,7 +284,7 @@ export default function DatabasePage() {
   return (
     <div className="min-h-screen bg-black text-white p-6">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+      <nav className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6">
         <Link href="/dashboard" className="hover:text-white">
           Dashboard
         </Link>
@@ -303,13 +303,13 @@ export default function DatabasePage() {
             <Database className="w-6 h-6" />
             Managed Databases
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-[var(--text-secondary)] mt-1">
             Provision and manage databases for your project
           </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-background text-foreground rounded-lg hover:bg-secondary transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--surface-primary)] text-[var(--text-primary)] rounded-lg hover:bg-secondary transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create Database
@@ -322,7 +322,7 @@ export default function DatabasePage() {
           {databases.length === 0 ? (
             <div className="border border-gray-800 rounded-lg p-6 text-center">
               <Server className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-              <p className="text-muted-foreground mb-4">No databases yet</p>
+              <p className="text-[var(--text-secondary)] mb-4">No databases yet</p>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="px-4 py-2 bg-foreground text-background rounded hover:bg-foreground/90"
@@ -347,14 +347,14 @@ export default function DatabasePage() {
                   </span>
                   <div>
                     <div className="font-semibold">{db.name}</div>
-                    <div className="text-sm text-muted-foreground capitalize">{db.type}</div>
+                    <div className="text-sm text-[var(--text-secondary)] capitalize">{db.type}</div>
                   </div>
                   <span
                     className={`ml-auto px-2 py-0.5 text-xs rounded ${
                       db.status === "active"
                         ? "bg-green-500/20 text-green-400"
                         : db.status === "provisioning"
-                        ? "bg-secondary text-[#0070f3]"
+                        ? "bg-[var(--surface-secondary)] text-[#0070f3]"
                         : "bg-red-500/20 text-red-400"
                     }`}
                   >
@@ -376,7 +376,7 @@ export default function DatabasePage() {
                   Connection Details
                   <button
                     onClick={copyConnectionString}
-                    className="ml-auto text-sm text-[#0070f3] hover:text-foreground/70 flex items-center gap-1"
+                    className="ml-auto text-sm text-[#0070f3] hover:text-[var(--text-primary)]/70 flex items-center gap-1"
                   >
                     {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     {copied ? "Copied!" : "Copy connection string"}
@@ -385,27 +385,27 @@ export default function DatabasePage() {
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <div className="text-muted-foreground">Host</div>
+                    <div className="text-[var(--text-secondary)]">Host</div>
                     <div className="font-mono">{selectedDb.host}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground">Port</div>
+                    <div className="text-[var(--text-secondary)]">Port</div>
                     <div className="font-mono">{selectedDb.port}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground">Database</div>
+                    <div className="text-[var(--text-secondary)]">Database</div>
                     <div className="font-mono">{selectedDb.database}</div>
                   </div>
                   <div>
-                    <div className="text-muted-foreground">Username</div>
+                    <div className="text-[var(--text-secondary)]">Username</div>
                     <div className="font-mono">{selectedDb.username}</div>
                   </div>
                   <div className="col-span-2">
-                    <div className="text-muted-foreground flex items-center gap-2">
+                    <div className="text-[var(--text-secondary)] flex items-center gap-2">
                       Password
                       <button
                         onClick={() => setShowPassword(!showPassword)}
-                        className="text-muted-foreground hover:text-gray-300"
+                        className="text-[var(--text-secondary)] hover:text-gray-300"
                       >
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -422,7 +422,7 @@ export default function DatabasePage() {
                 <h3 className="font-semibold mb-4">Usage</h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">Storage</div>
+                    <div className="text-sm text-[var(--text-secondary)]">Storage</div>
                     <div className="text-lg font-semibold">
                       {selectedDb.storageUsed} / {selectedDb.storageLimit} MB
                     </div>
@@ -436,7 +436,7 @@ export default function DatabasePage() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Connections</div>
+                    <div className="text-sm text-[var(--text-secondary)]">Connections</div>
                     <div className="text-lg font-semibold">
                       {selectedDb.connectionsActive} / {selectedDb.connectionLimit}
                     </div>
@@ -450,7 +450,7 @@ export default function DatabasePage() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Plan</div>
+                    <div className="text-sm text-[var(--text-secondary)]">Plan</div>
                     <div className="text-lg font-semibold capitalize">{selectedDb.plan}</div>
                   </div>
                 </div>
@@ -463,7 +463,7 @@ export default function DatabasePage() {
                   <button
                     onClick={handleCreateBackup}
                     disabled={actionLoading === "backup"}
-                    className="flex items-center gap-1 text-sm text-[#0070f3] hover:text-foreground/70"
+                    className="flex items-center gap-1 text-sm text-[#0070f3] hover:text-[var(--text-primary)]/70"
                   >
                     {actionLoading === "backup" ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
@@ -475,7 +475,7 @@ export default function DatabasePage() {
                 </div>
 
                 {backups.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No backups yet</p>
+                  <p className="text-sm text-[var(--text-secondary)]">No backups yet</p>
                 ) : (
                   <div className="space-y-2">
                     {backups.slice(0, 5).map((backup) => (
@@ -484,14 +484,14 @@ export default function DatabasePage() {
                         className="flex items-center justify-between text-sm bg-gray-900 p-2 rounded"
                       >
                         <div className="flex items-center gap-2">
-                          <HardDrive className="w-4 h-4 text-muted-foreground" />
+                          <HardDrive className="w-4 h-4 text-[var(--text-secondary)]" />
                           <span>{new Date(backup.startedAt).toLocaleString()}</span>
                           <span
                             className={`px-2 py-0.5 text-xs rounded ${
                               backup.status === "completed"
                                 ? "bg-green-500/20 text-green-400"
                                 : backup.status === "in_progress"
-                                ? "bg-secondary text-[#0070f3]"
+                                ? "bg-[var(--surface-secondary)] text-[#0070f3]"
                                 : "bg-red-500/20 text-red-400"
                             }`}
                           >
@@ -499,7 +499,7 @@ export default function DatabasePage() {
                           </span>
                         </div>
                         {backup.size && (
-                          <span className="text-muted-foreground">
+                          <span className="text-[var(--text-secondary)]">
                             {(backup.size / 1024 / 1024).toFixed(2)} MB
                           </span>
                         )}
@@ -528,7 +528,7 @@ export default function DatabasePage() {
           ) : (
             <div className="border border-gray-800 rounded-lg p-8 text-center">
               <Database className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <p className="text-muted-foreground">Select a database to view details</p>
+              <p className="text-[var(--text-secondary)]">Select a database to view details</p>
             </div>
           )}
         </div>
@@ -542,7 +542,7 @@ export default function DatabasePage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
                   Database Name
                 </label>
                 <input
@@ -555,7 +555,7 @@ export default function DatabasePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                   Database Type
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -565,7 +565,7 @@ export default function DatabasePage() {
                       onClick={() => setNewDb({ ...newDb, type: type.id })}
                       className={`p-4 border rounded-lg text-center transition-colors ${
                         newDb.type === type.id
-                          ? "border-foreground bg-secondary"
+                          ? "border-foreground bg-[var(--surface-secondary)]"
                           : "border-gray-700 hover:border-gray-600"
                       }`}
                     >
@@ -577,7 +577,7 @@ export default function DatabasePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                   Plan
                 </label>
                 <div className="space-y-2">
@@ -587,13 +587,13 @@ export default function DatabasePage() {
                       onClick={() => setNewDb({ ...newDb, plan: plan.id })}
                       className={`w-full p-3 border rounded-lg text-left transition-colors ${
                         newDb.plan === plan.id
-                          ? "border-foreground bg-secondary"
+                          ? "border-foreground bg-[var(--surface-secondary)]"
                           : "border-gray-700 hover:border-gray-600"
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-medium">{plan.name}</span>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-[var(--text-secondary)]">
                           {plan.storage} MB / {plan.connections} connections
                         </span>
                       </div>
@@ -606,7 +606,7 @@ export default function DatabasePage() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-muted-foreground hover:text-white transition-colors"
+                className="px-4 py-2 text-[var(--text-secondary)] hover:text-white transition-colors"
               >
                 Cancel
               </button>

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { exportMetrics, getMetricsSummary } from "@/lib/monitoring/metrics";
 import { refreshVitalsMetrics } from "@/lib/monitoring/vitals-exporter";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("metrics");
 
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   if (format === "json") {
     // Return JSON summary for debugging
-    return NextResponse.json(getMetricsSummary());
+    return ok(getMetricsSummary());
   }
 
   // Refresh Web Vitals and Analytics metrics from database

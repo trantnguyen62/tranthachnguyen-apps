@@ -139,17 +139,17 @@ export default function CareersPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-3xl mx-auto"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Join us in building the future
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground">
+              <p className="mt-6 text-xl text-[var(--text-secondary)]">
                 We&apos;re a team of builders, dreamers, and problem-solvers working to make
                 the web faster and more accessible for everyone.
               </p>
@@ -174,10 +174,10 @@ export default function CareersPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl font-bold text-foreground">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Why Cloudify?
               </h2>
-              <p className="mt-4 text-xl text-muted-foreground">
+              <p className="mt-4 text-xl text-[var(--text-secondary)]">
                 We take care of our team so they can take care of our customers
               </p>
             </motion.div>
@@ -190,13 +190,13 @@ export default function CareersPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-background border border-border"
+                  className="p-6 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]"
                 >
                   <benefit.icon className="h-8 w-8 text-[#0070f3] mb-4" />
-                  <h3 className="text-lg font-semibold text-foreground">
+                  <h3 className="text-lg font-semibold text-[var(--text-primary)]">
                     {benefit.title}
                   </h3>
-                  <p className="mt-2 text-muted-foreground">
+                  <p className="mt-2 text-[var(--text-secondary)]">
                     {benefit.description}
                   </p>
                 </motion.div>
@@ -206,7 +206,7 @@ export default function CareersPage() {
         </section>
 
         {/* Open Positions */}
-        <section id="openings" className="py-20 bg-background">
+        <section id="openings" className="py-20 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -214,10 +214,10 @@ export default function CareersPage() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl font-bold text-foreground">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Open Positions
               </h2>
-              <p className="mt-4 text-xl text-muted-foreground">
+              <p className="mt-4 text-xl text-[var(--text-secondary)]">
                 Find your next role at Cloudify
               </p>
             </motion.div>
@@ -233,7 +233,7 @@ export default function CareersPage() {
                       "px-4 py-2 rounded-full text-sm font-medium transition-colors",
                       selectedDepartment === dept
                         ? "bg-foreground text-background"
-                        : "bg-card text-foreground hover:bg-secondary"
+                        : "bg-card text-[var(--text-primary)] hover:bg-secondary"
                     )}
                   >
                     {dept}
@@ -251,29 +251,29 @@ export default function CareersPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
-                  className="p-6 rounded-lg bg-card border border-border hover:shadow-lg transition-shadow"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)] hover:shadow-lg transition-shadow"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-foreground">
+                      <h3 className="text-lg font-semibold text-[var(--text-primary)]">
                         {job.title}
                       </h3>
                       <div className="flex flex-wrap items-center gap-3 mt-2">
                         <Badge variant="secondary">{job.department}</Badge>
-                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1 text-sm text-[var(--text-secondary)]">
                           <MapPin className="h-4 w-4" />
                           {job.location}
                         </span>
-                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1 text-sm text-[var(--text-secondary)]">
                           <Briefcase className="h-4 w-4" />
                           {job.type}
                         </span>
                       </div>
-                      <p className="mt-3 text-muted-foreground text-sm">
+                      <p className="mt-3 text-[var(--text-secondary)] text-sm">
                         {job.description}
                       </p>
                     </div>
-                    <Button variant="outline" className="shrink-0" asChild>
+                    <Button variant="secondary" className="shrink-0" asChild>
                       <Link href={`/careers/${job.id}`}>
                         Apply
                         <ExternalLink className="h-4 w-4" />
@@ -284,7 +284,7 @@ export default function CareersPage() {
               ))}
 
               {filteredJobs.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">
+                <div className="text-center py-12 text-[var(--text-secondary)]">
                   No positions match your filters. Try adjusting your criteria.
                 </div>
               )}
@@ -295,14 +295,14 @@ export default function CareersPage() {
         {/* CTA */}
         <section className="py-20">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-4">
               Don&apos;t see a role that fits?
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-[var(--text-secondary)] mb-8">
               We&apos;re always looking for talented people. Send us your resume and we&apos;ll
               keep you in mind for future opportunities.
             </p>
-            <Button variant="outline" size="lg" asChild>
+            <Button variant="secondary" size="lg" asChild>
               <Link href="/contact">
                 Get in Touch
                 <ArrowRight className="h-5 w-5" />

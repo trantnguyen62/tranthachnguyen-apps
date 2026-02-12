@@ -31,8 +31,8 @@ export default function NextJSDocsPage() {
           </svg>
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground m-0">Next.js on Cloudify</h1>
-          <p className="text-muted-foreground m-0 mt-1">The best deployment experience for Next.js</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] m-0">Next.js on Cloudify</h1>
+          <p className="text-[var(--text-secondary)] m-0 mt-1">The best deployment experience for Next.js</p>
         </div>
       </div>
 
@@ -56,9 +56,9 @@ export default function NextJSDocsPage() {
           "Draft Mode",
           "Partial Prerendering",
         ].map((feature) => (
-          <div key={feature} className="flex items-center gap-3 p-3 rounded-lg bg-background">
+          <div key={feature} className="flex items-center gap-3 p-3 rounded-lg bg-[var(--surface-primary)]">
             <Check className="h-5 w-5 text-green-500 shrink-0" />
-            <span className="text-foreground">{feature}</span>
+            <span className="text-[var(--text-primary)]">{feature}</span>
           </div>
         ))}
       </div>
@@ -245,14 +245,14 @@ const apiKey = process.env.API_KEY;
 const publicKey = process.env.NEXT_PUBLIC_ANALYTICS_ID;`}</code>
       </pre>
 
-      <div className="not-prose mt-12 p-6 rounded-lg bg-secondary border border-border">
+      <div className="not-prose mt-12 p-6 rounded-lg bg-[var(--surface-secondary)] border border-[var(--border-primary)]">
         <div className="flex items-start gap-4">
           <Zap className="h-8 w-8 text-[#0070f3] shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Ready to deploy?
             </h3>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-[var(--text-secondary)] mb-4">
               Deploy your Next.js application to Cloudify in seconds.
             </p>
             <Button variant="default" asChild>

@@ -3,13 +3,14 @@
  * Get subscription status and usage information
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { getSubscriptionDetails } from "@/lib/billing/stripe";
 import { getUsageWithLimits } from "@/lib/billing/metering";
 import { PlanType, getPlan } from "@/lib/billing/pricing";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("billing");
 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return fail("NOT_FOUND", "User not found", 404);
     }
 
     const plan = (user.plan || "free") as PlanType;
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
     // Get usage with limits
     const usageWithLimits = await getUsageWithLimits(authUser.id, plan);
 
-    return NextResponse.json({
+    return ok({
       subscription: {
         plan,
         planName: planConfig.name,
@@ -66,10 +67,6 @@ export async function GET(request: NextRequest) {
       exceeded: usageWithLimits.exceeded,
     });
   } catch (error) {
-    log.error("Failed to get billing info", error);
-    return NextResponse.json(
-      { error: "Failed to get billing info" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get billing info", 500);
   }
 }

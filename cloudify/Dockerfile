@@ -1,34 +1,52 @@
-# Build stage - Use full Debian for better compatibility
-FROM node:20 AS builder
+# =============================================================================
+# Stage 1: Dependencies - Cached separately for faster rebuilds
+# =============================================================================
+FROM node:20.11-slim AS deps
 
-# Run as root to avoid permission issues
-USER root
 WORKDIR /app
 
-# Install build dependencies
+# Install build dependencies needed for native modules
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssl \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy package files for layer caching
+# Copy only package files and Prisma schema for dependency layer caching
 COPY package*.json ./
-
-# Copy Prisma schema first (needed for prisma generate)
 COPY prisma ./prisma
 
-# Install dependencies and generate Prisma client
-RUN npm ci
+# Install dependencies (this layer is cached unless package*.json changes)
+RUN npm ci --ignore-scripts \
+    && npx prisma generate
 
-# Copy source files
+# =============================================================================
+# Stage 2: Builder - Compiles the Next.js application
+# =============================================================================
+FROM node:20.11-slim AS builder
+
+WORKDIR /app
+
+# Install openssl (needed for Prisma at build time)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy cached node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/prisma ./prisma
+
+# Copy source files (respects .dockerignore)
 COPY . .
 
-# Build the application
+# Build the application with telemetry disabled
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 RUN npm run build
 
-# Production stage - Use Debian-slim for Prisma compatibility
-FROM node:20-slim AS runner
+# =============================================================================
+# Stage 3: Runner - Minimal production image
+# =============================================================================
+FROM node:20.11-slim AS runner
 
 # Labels for container metadata
 LABEL org.opencontainers.image.title="Cloudify"
@@ -38,7 +56,7 @@ LABEL org.opencontainers.image.source="https://github.com/tranthachnguyen/cloudi
 
 WORKDIR /app
 
-# Install runtime dependencies, build tools, and security updates
+# Install only runtime dependencies and apply security updates in a single layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssl \
     ca-certificates \
@@ -46,8 +64,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dumb-init \
     git \
     && apt-get upgrade -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Create non-root user for security
 RUN groupadd --gid 1001 nodejs \
@@ -81,7 +99,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:3000/api/health || exit 1
+    CMD curl -f http://localhost:3000/api/health/live || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]

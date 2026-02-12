@@ -7,6 +7,7 @@ import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { invokeFunction } from "@/lib/functions/service";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("functions/[id]/invoke");
 
@@ -36,11 +37,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!func) {
-      return NextResponse.json({ error: "Function not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Function not found", 404);
     }
 
     if (func.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Unauthorized", 403);
     }
 
     // Parse request body as event
@@ -75,13 +76,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!success) {
-      return NextResponse.json(
-        {
-          error: error || "Invocation failed",
-          invocationId,
-        },
-        { status: 500 }
-      );
+      return fail("INTERNAL_ERROR", error || "Invocation failed", 500);
     }
 
     // Return function result
@@ -102,17 +97,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    return NextResponse.json({
-      success: true,
+    return ok({
       invocationId,
       duration: result?.duration,
     });
   } catch (error) {
     log.error("Function invoke error", error);
-    return NextResponse.json(
-      { error: "Failed to invoke function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to invoke function", 500);
   }
 }
 

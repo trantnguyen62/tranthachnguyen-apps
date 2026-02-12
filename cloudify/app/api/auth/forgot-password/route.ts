@@ -4,6 +4,7 @@ import { sendRawEmail } from "@/lib/notifications/email";
 import { createPasswordResetEmail } from "@/lib/notifications/auth-emails";
 import crypto from "crypto";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("auth/forgot-password");
 
@@ -13,25 +14,19 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid request body", 400);
     }
 
     const { email } = body;
 
     if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Email is required", 400);
     }
 
     const normalizedEmail = email.toLowerCase().trim();
 
     // Always return success to prevent email enumeration
-    const successResponse = NextResponse.json({
+    const successResponse = ok({
       message: "If an account exists with this email, a password reset link has been sent.",
     });
 
@@ -76,9 +71,6 @@ export async function POST(request: NextRequest) {
     return successResponse;
   } catch (error) {
     log.error("Forgot password error", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to process request" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to process request", 500);
   }
 }

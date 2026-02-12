@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { redisHealthCheck } from "@/lib/storage/redis-client";
+import { exportMetrics } from "@/lib/monitoring/metrics";
 
 const startTime = Date.now();
 
@@ -140,6 +141,13 @@ export async function GET() {
   // Overall health score (0-100)
   const healthScore = (dbHealthy + redisHealthy) * 50;
   addMetric("cloudify_health_score", healthScore, "Overall platform health score (0-100)", "gauge");
+
+  // Append in-memory metrics (counters, gauges, histograms)
+  const inMemoryMetrics = exportMetrics();
+  if (inMemoryMetrics) {
+    metrics.push("");  // blank line separator
+    metrics.push(inMemoryMetrics);
+  }
 
   // Return metrics in Prometheus text format
   return new NextResponse(metrics.join("\n") + "\n", {

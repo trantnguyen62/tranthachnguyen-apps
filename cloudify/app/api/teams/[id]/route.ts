@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("teams/[id]");
 
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const member = await checkTeamAccess(id, user.id);
     if (!member) {
-      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Team not found", 404);
     }
 
     const team = await prisma.team.findUnique({
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                 id: true,
                 name: true,
                 email: true,
-                avatar: true,
+                image: true,
               },
             },
           },
@@ -70,13 +71,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({ ...team, myRole: member.role });
+    return ok({ ...team, myRole: member.role });
   } catch (error) {
     log.error("Failed to fetch team", error);
-    return NextResponse.json(
-      { error: "Failed to fetch team" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch team", 500);
   }
 }
 
@@ -91,30 +89,27 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const member = await checkTeamAccess(id, user.id, ["owner", "admin"]);
     if (!member) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Not authorized", 403);
     }
 
     const parseResult = await parseJsonBody(request);
     if (isParseError(parseResult)) return parseResult;
     const body = parseResult.data;
-    const { name, avatar } = body;
+    const { name, image } = body;
 
-    const updateData: { name?: string; avatar?: string } = {};
+    const updateData: { name?: string; image?: string } = {};
     if (name) updateData.name = name.trim();
-    if (avatar !== undefined) updateData.avatar = avatar;
+    if (image !== undefined) updateData.image = image;
 
     const team = await prisma.team.update({
       where: { id },
       data: updateData,
     });
 
-    return NextResponse.json(team);
+    return ok(team);
   } catch (error) {
     log.error("Failed to update team", error);
-    return NextResponse.json(
-      { error: "Failed to update team" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update team", 500);
   }
 }
 
@@ -129,7 +124,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const member = await checkTeamAccess(id, user.id, ["owner"]);
     if (!member) {
-      return NextResponse.json({ error: "Only team owner can delete" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Only team owner can delete", 403);
     }
 
     const team = await prisma.team.findUnique({ where: { id } });
@@ -158,12 +153,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       },
     }).catch(() => {});
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete team", error);
-    return NextResponse.json(
-      { error: "Failed to delete team" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete team", 500);
   }
 }

@@ -3,10 +3,11 @@
  * Create Stripe billing portal sessions for subscription management
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { createPortalSession } from "@/lib/billing/stripe";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("billing/portal");
 
@@ -27,20 +28,12 @@ export async function POST(request: NextRequest) {
     const portalUrl = await createPortalSession(user.id, returnUrl);
 
     if (!portalUrl) {
-      return NextResponse.json(
-        { error: "Failed to create portal session. Stripe may not be configured." },
-        { status: 500 }
-      );
+      return fail("INTERNAL_ERROR", "Failed to create portal session. Stripe may not be configured.", 500);
     }
 
-    return NextResponse.json({
-      url: portalUrl,
-    });
+    return ok({ url: portalUrl });
   } catch (error) {
     log.error("Failed to create portal session", error);
-    return NextResponse.json(
-      { error: "Failed to create portal session" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create portal session", 500);
   }
 }

@@ -7,6 +7,13 @@ import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/a
 import { prisma } from "@/lib/prisma";
 import { getFunctionLogs, getFunctionStats } from "@/lib/functions/service";
 import { getRouteLogger } from "@/lib/api/logger";
+import {
+  ok,
+  fail,
+  encodeCursor,
+  buildCursorWhere,
+  parsePaginationParams,
+} from "@/lib/api/response";
 
 const log = getRouteLogger("functions/[id]/logs");
 
@@ -36,23 +43,33 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!func) {
-      return NextResponse.json({ error: "Function not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Function not found", 404);
     }
 
     if (func.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Forbidden", 403);
     }
 
     // Parse query params
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "50", 10);
-    const offset = parseInt(searchParams.get("offset") || "0", 10);
+    const { cursor, limit } = parsePaginationParams(searchParams);
+    const cursorWhere = buildCursorWhere(cursor);
     const sinceParam = searchParams.get("since");
     const since = sinceParam ? new Date(sinceParam) : undefined;
     const includeStats = searchParams.get("stats") === "true";
 
-    // Get logs
-    const logs = await getFunctionLogs(id, { limit, offset, since });
+    // Get logs (fetch one extra to detect hasMore)
+    const logs = await getFunctionLogs(id, {
+      limit: limit + 1,
+      since,
+      cursorWhere: Object.keys(cursorWhere).length > 0 ? cursorWhere : undefined,
+    });
+
+    const hasMore = logs.length > limit;
+    const items = hasMore ? logs.slice(0, limit) : logs;
+    const nextCursor = hasMore && items.length > 0
+      ? encodeCursor(items[items.length - 1])
+      : undefined;
 
     // Optionally get stats
     let stats = null;
@@ -60,21 +77,18 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       stats = await getFunctionStats(id);
     }
 
-    return NextResponse.json({
-      logs,
-      stats,
-      pagination: {
-        limit,
-        offset,
-        hasMore: logs.length === limit,
-      },
-    });
+    return ok(
+      { logs: items, stats },
+      {
+        pagination: {
+          cursor: nextCursor,
+          hasMore,
+        },
+      }
+    );
   } catch (error) {
     log.error("Function logs error", error);
-    return NextResponse.json(
-      { error: "Failed to get function logs" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get function logs", 500);
   }
 }
 
@@ -100,7 +114,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!func || func.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Forbidden", 403);
     }
 
     const encoder = new TextEncoder();
@@ -158,9 +172,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Log stream error", error);
-    return NextResponse.json(
-      { error: "Failed to stream logs" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to stream logs", 500);
   }
 }

@@ -274,7 +274,7 @@ describeWithDb("Database Constraints & Integrity", () => {
         },
       });
 
-      expect(project.repoUrl).toBeNull();
+      expect(project.repositoryUrl).toBeNull();
 
       await prisma.project.delete({ where: { id: project.id } });
     });

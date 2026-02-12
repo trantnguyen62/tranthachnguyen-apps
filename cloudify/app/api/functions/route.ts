@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { handlePrismaError } from "@/lib/api/error-response";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("functions");
 
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Project not found", 404);
       }
     }
 
@@ -77,13 +79,9 @@ export async function GET(request: NextRequest) {
       })
     );
 
-    return NextResponse.json(functionsWithStats);
+    return ok(functionsWithStats);
   } catch (error) {
-    log.error("Failed to fetch functions", error);
-    return NextResponse.json(
-      { error: "Failed to fetch functions" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch functions", 500);
   }
 }
 
@@ -109,10 +107,10 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!projectId || !name) {
-      return NextResponse.json(
-        { error: "Project ID and name are required" },
-        { status: 400 }
-      );
+      const fields = [];
+      if (!projectId) fields.push({ field: "projectId", message: "Project ID is required" });
+      if (!name) fields.push({ field: "name", message: "Function name is required" });
+      return fail("VALIDATION_MISSING_FIELD", "Validation failed", 422, { fields });
     }
 
     // Verify project ownership
@@ -121,7 +119,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     const fn = await prisma.serverlessFunction.create({
@@ -149,12 +147,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(fn);
+    return ok(fn, { status: 201 });
   } catch (error) {
-    log.error("Failed to create function", error);
-    return NextResponse.json(
-      { error: "Failed to create function" },
-      { status: 500 }
-    );
+    const prismaResp = handlePrismaError(error, "function");
+    if (prismaResp) return prismaResp;
+
+    return fail("INTERNAL_ERROR", "Failed to create function", 500);
   }
 }

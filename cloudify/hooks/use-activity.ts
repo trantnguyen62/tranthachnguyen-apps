@@ -51,16 +51,18 @@ export function useActivity(options: UseActivityOptions = {}) {
           throw new Error("Failed to fetch activity");
         }
 
-        const data = await response.json();
+        const envelope = await response.json();
+        const data = envelope.data ?? envelope;
+        const pagination = envelope.meta?.pagination;
 
         if (cursor) {
-          setActivities((prev) => [...prev, ...data.activities]);
+          setActivities((prev) => [...prev, ...(data.activities ?? [])]);
         } else {
-          setActivities(data.activities);
+          setActivities(data.activities ?? []);
         }
 
-        setNextCursor(data.nextCursor);
-        setHasMore(data.hasMore);
+        setNextCursor(pagination?.cursor ?? null);
+        setHasMore(pagination?.hasMore ?? false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch activity");
       } finally {

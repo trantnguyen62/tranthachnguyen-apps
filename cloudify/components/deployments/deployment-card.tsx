@@ -8,7 +8,7 @@ interface DeploymentCardProps {
     id: string;
     status: "QUEUED" | "BUILDING" | "DEPLOYING" | "READY" | "ERROR" | "CANCELLED";
     commitSha: string | null;
-    commitMsg: string | null;
+    commitMessage: string | null;
     branch: string;
     url: string | null;
     buildTime: number | null;
@@ -29,7 +29,7 @@ export function DeploymentCard({ deployment, projectSlug }: DeploymentCardProps)
       case "DEPLOYING":
         return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
       case "QUEUED":
-        return "bg-secondary text-[#0070f3] border-blue-500/20";
+        return "bg-[var(--surface-secondary)] text-[#0070f3] border-blue-500/20";
       case "CANCELLED":
         return "bg-gray-500/10 text-gray-400 border-gray-500/20";
       default:
@@ -76,8 +76,8 @@ export function DeploymentCard({ deployment, projectSlug }: DeploymentCardProps)
         </span>
       </div>
 
-      {deployment.commitMsg && (
-        <p className="text-sm text-gray-300 mb-2 line-clamp-1">{deployment.commitMsg}</p>
+      {deployment.commitMessage && (
+        <p className="text-sm text-gray-300 mb-2 line-clamp-1">{deployment.commitMessage}</p>
       )}
 
       {deployment.commitSha && (

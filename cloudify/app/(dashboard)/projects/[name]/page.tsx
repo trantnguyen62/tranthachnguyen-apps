@@ -1,28 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
-  ArrowLeft,
   ExternalLink,
   GitBranch,
   Globe,
   Settings,
   MoreHorizontal,
   RefreshCw,
-  Clock,
-  CheckCircle2,
   Copy,
   RotateCcw,
   Trash2,
   Eye,
   AlertCircle,
+  Code,
+  Check,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
@@ -60,8 +57,8 @@ interface Project {
   name: string;
   slug: string;
   framework: string | null;
-  repoUrl: string | null;
-  repoBranch: string | null;
+  repositoryUrl: string | null;
+  repositoryBranch: string | null;
   createdAt: string;
   deployments: Deployment[];
   lastDeployment: Deployment | null;
@@ -70,33 +67,22 @@ interface Project {
 
 function LoadingSkeleton() {
   return (
-    <div className="p-8">
-      <div className="flex items-center gap-4 mb-4">
-        <Skeleton className="h-10 w-10 rounded" />
-        <div className="flex-1">
-          <Skeleton className="h-8 w-48 mb-2" />
-          <Skeleton className="h-4 w-72" />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {[1, 2, 3].map((i) => (
-          <Card key={i}>
-            <CardContent className="p-4">
-              <Skeleton className="h-12 w-full" />
-            </CardContent>
-          </Card>
+    <div className="px-6 py-8 max-w-[980px]">
+      <Skeleton className="h-4 w-32 mb-6" />
+      <Skeleton className="h-8 w-48 mb-2" />
+      <Skeleton className="h-4 w-96 mb-8" />
+      <Skeleton className="h-10 w-96 mb-6" />
+      <div className="space-y-0">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex items-center gap-4 py-3 border-b border-[var(--separator,theme(colors.border))]">
+            <Skeleton className="h-2 w-2 rounded-full" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-48 flex-1" />
+            <Skeleton className="h-3 w-16" />
+          </div>
         ))}
       </div>
-      <Skeleton className="h-10 w-96 mb-4" />
-      <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-20 w-full" />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
@@ -108,6 +94,7 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDeployment, setSelectedDeployment] = useState<Deployment | null>(null);
+  const [snippetCopied, setSnippetCopied] = useState(false);
 
   useEffect(() => {
     async function fetchProject() {
@@ -144,177 +131,93 @@ export default function ProjectDetailPage() {
 
   if (error || !project) {
     return (
-      <div className="p-8">
-        <Card className="border-red-200 dark:border-red-900">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
-              <AlertCircle className="h-6 w-6" />
-              <div>
-                <h3 className="font-semibold">Failed to load project</h3>
-                <p className="text-sm text-red-500">{error || "Project not found"}</p>
-              </div>
-            </div>
-            <Button variant="outline" className="mt-4" asChild>
-              <Link href="/projects">Back to Projects</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="px-6 py-8 max-w-[980px]">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <AlertCircle className="h-6 w-6 text-[var(--warning,theme(colors.yellow.500))] mb-4" />
+          <h3 className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))] mb-1">
+            {error === "Project not found" ? "Project not found" : "Something went wrong"}
+          </h3>
+          <p className="text-[15px] text-[var(--text-secondary,theme(colors.muted.foreground))] mb-5">
+            {error || "Could not load project details."}
+          </p>
+          <Button variant="secondary" asChild>
+            <Link href="/projects">Back to Projects</Link>
+          </Button>
+        </div>
       </div>
     );
   }
 
-  const projectStatus = project.lastDeployment?.status || "ready";
-  const status = getStatusConfig(projectStatus);
-  const StatusIcon = status.icon;
   const primaryDomain = project.domains?.find((d) => d.isPrimary)?.domain || `${project.slug}.cloudify.tranthachnguyen.com`;
-  const gitRepo = project.repoUrl || "";
+  const lastCommit = project.lastDeployment?.commit?.slice(0, 7);
+  const lastBranch = project.lastDeployment?.branch || project.repositoryBranch || "main";
+  const lastTime = project.lastDeployment?.time || "No deployments";
+
+  // Status dot color
+  const getStatusDotColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "ready":
+        return "bg-[var(--success,#34C759)]";
+      case "building":
+        return "bg-[var(--warning,#FF9F0A)] animate-pulse";
+      case "error":
+      case "failed":
+        return "bg-[var(--error,#FF3B30)]";
+      default:
+        return "bg-[var(--text-quaternary,theme(colors.muted.foreground))]";
+    }
+  };
 
   return (
-    <div className="p-8">
+    <div className="px-6 py-8 max-w-[980px]">
+      {/* Back link */}
+      <Link
+        href="/projects"
+        className="inline-flex items-center gap-1 text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] hover:text-[var(--text-primary,theme(colors.foreground))] transition-colors mb-6"
+      >
+        &larr; Back to Projects
+      </Link>
+
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/projects">
-              <ArrowLeft className="h-5 w-5" />
+      <div className="flex items-start justify-between mb-1">
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))]">
+          {project.name}
+        </h1>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" size="sm" asChild>
+            <a href={`https://${primaryDomain}`} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="h-3.5 w-3.5" />
+              Visit
+            </a>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={`/projects/${project.slug}/settings`}>
+              <Settings className="h-3.5 w-3.5" />
             </Link>
           </Button>
-          <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <motion.h1
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-3xl font-bold text-foreground"
-              >
-                {project.name}
-              </motion.h1>
-              <Badge variant={projectStatus === "ready" ? "success" : "warning"}>
-                <StatusIcon className={`h-3 w-3 mr-1 ${projectStatus === "building" ? "animate-spin" : ""}`} />
-                {status.label}
-              </Badge>
-            </div>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mt-1 text-muted-foreground"
-            >
-              {project.framework || "Next.js"} project
-            </motion.p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" asChild>
-              <a
-                href={`https://${primaryDomain}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Visit
-              </a>
-            </Button>
-            <Button variant="outline">
-              <RefreshCw className="h-4 w-4" />
-              Redeploy
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreHorizontal className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href={`/projects/${project.slug}/settings`}>
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Clone Project
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600 dark:text-red-400">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Project
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <Button variant="default" size="sm">
+            <RefreshCw className="h-3.5 w-3.5" />
+            Redeploy
+          </Button>
         </div>
+      </div>
 
-        {/* Quick info cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4"
-        >
-          {/* Domain */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Globe className="h-5 w-5 text-[#0070f3]" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Domain</p>
-                    <a
-                      href={`https://${primaryDomain}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-foreground hover:text-[#0070f3]"
-                    >
-                      {primaryDomain}
-                    </a>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => copyDomain(primaryDomain)}>
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Git */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <GitBranch className="h-5 w-5 text-gray-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Repository</p>
-                  {gitRepo ? (
-                    <a
-                      href={gitRepo.startsWith("http") ? gitRepo : `https://${gitRepo}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-foreground hover:text-[#0070f3]"
-                    >
-                      {gitRepo.replace(/^https?:\/\//, "")}
-                    </a>
-                  ) : (
-                    <p className="font-medium text-muted-foreground">Not connected</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Last deployment */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Last Deployment</p>
-                  <p className="font-medium text-foreground">
-                    {project.lastDeployment?.time || "No deployments"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+      {/* Metadata line */}
+      <div className="flex items-center gap-2 text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] mb-8">
+        <span>{project.framework || "Next.js"}</span>
+        <span className="text-[var(--text-quaternary,theme(colors.muted.foreground/40))]">&middot;</span>
+        <span className="flex items-center gap-1">
+          <GitBranch className="h-3 w-3" />
+          {lastBranch}
+        </span>
+        {lastCommit && (
+          <>
+            <span className="text-[var(--text-quaternary,theme(colors.muted.foreground/40))]">&middot;</span>
+            <span className="font-mono">{lastCommit}</span>
+          </>
+        )}
+        <span className="text-[var(--text-quaternary,theme(colors.muted.foreground/40))]">&middot;</span>
+        <span>Updated {lastTime}</span>
       </div>
 
       {/* Tabs */}
@@ -324,92 +227,64 @@ export default function ProjectDetailPage() {
           <TabsTrigger value="logs">Build Logs</TabsTrigger>
           <TabsTrigger value="environment">Environment</TabsTrigger>
           <TabsTrigger value="domains">Domains</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
         {/* Deployments Tab */}
         <TabsContent value="deployments">
-          <Card>
-            <CardHeader>
-              <CardTitle>Deployment History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {project.deployments.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <GitBranch className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>No deployments yet</p>
-                  <p className="text-sm">Push to your repository to trigger a deployment</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {project.deployments.map((deployment) => {
-                    const depStatus = getStatusConfig(deployment.status);
-                    const DepStatusIcon = depStatus.icon;
-                    return (
-                      <div
-                        key={deployment.id}
-                        onClick={() => setSelectedDeployment(deployment)}
-                        className={`flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-colors ${
-                          selectedDeployment?.id === deployment.id
-                            ? "border-foreground bg-secondary"
-                            : "border-border hover:bg-secondary/50"
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={`p-2 rounded-lg ${depStatus.bg}`}>
-                            <DepStatusIcon className={`h-4 w-4 ${depStatus.color} ${deployment.status === "building" ? "animate-spin" : ""}`} />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-foreground">
-                                {deployment.commitMessage}
-                              </span>
-                              {deployment.isProduction && (
-                                <Badge variant="default" className="text-xs">Production</Badge>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span className="font-mono">{deployment.commit}</span>
-                              <span>{deployment.branch}</span>
-                              <span>{deployment.time}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">{deployment.duration}</span>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem asChild>
-                                <Link href={`/deployments/${deployment.id}`}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  View Logs
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <RotateCcw className="h-4 w-4 mr-2" />
-                                Redeploy
-                              </DropdownMenuItem>
-                              {!deployment.isProduction && (
-                                <DropdownMenuItem>
-                                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                                  Promote to Production
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {project.deployments.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <GitBranch className="h-12 w-12 text-[var(--text-quaternary,theme(colors.muted.foreground/40))] mb-4" strokeWidth={1.5} />
+              <p className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))] mb-1">
+                No deployments yet
+              </p>
+              <p className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] max-w-[280px]">
+                Push to your repository to trigger a deployment.
+              </p>
+            </div>
+          ) : (
+            <div className="border-t border-[var(--separator,theme(colors.border))]">
+              {project.deployments.map((deployment) => (
+                <Link
+                  key={deployment.id}
+                  href={`/deployments/${deployment.id}`}
+                  className="flex items-center gap-4 py-3 border-b border-[var(--separator,theme(colors.border))] hover:bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))] transition-colors -mx-3 px-3 group"
+                >
+                  {/* Status dot */}
+                  <div className={`h-2 w-2 rounded-full shrink-0 ${getStatusDotColor(deployment.status)}`} />
+
+                  {/* Commit message */}
+                  <span className="text-[15px] font-medium text-[var(--text-primary,theme(colors.foreground))] min-w-[180px] truncate">
+                    {deployment.commitMessage || "Deployment"}
+                  </span>
+
+                  {/* Branch */}
+                  <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[80px]">
+                    {deployment.branch}
+                  </span>
+
+                  {/* Commit SHA */}
+                  <span className="text-[13px] font-mono text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[70px]">
+                    {deployment.commit?.slice(0, 7)}
+                  </span>
+
+                  {/* Duration */}
+                  {deployment.duration && (
+                    <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))]">
+                      {deployment.duration}
+                    </span>
+                  )}
+
+                  {/* Time */}
+                  <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] text-right flex-1">
+                    {deployment.time}
+                  </span>
+
+                  {/* Chevron */}
+                  <ChevronRight className="h-4 w-4 text-[var(--text-quaternary,theme(colors.muted.foreground/40))] opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         {/* Build Logs Tab */}
@@ -420,91 +295,63 @@ export default function ProjectDetailPage() {
               status={selectedDeployment.status as "building" | "ready" | "error"}
             />
           ) : (
-            <Card>
-              <CardContent className="p-6 text-center text-muted-foreground">
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <p className="text-[15px] text-[var(--text-secondary,theme(colors.muted.foreground))]">
                 No deployment selected
-              </CardContent>
-            </Card>
+              </p>
+            </div>
           )}
         </TabsContent>
 
         {/* Environment Tab */}
         <TabsContent value="environment">
-          <Card>
-            <CardContent className="p-6">
-              <EnvVariables projectId={project.id} />
-            </CardContent>
-          </Card>
+          <EnvVariables projectId={project.id} />
         </TabsContent>
 
         {/* Domains Tab */}
         <TabsContent value="domains">
-          <Card>
-            <CardHeader>
-              <CardTitle>Custom Domains</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {project.domains && project.domains.length > 0 ? (
-                  project.domains.map((domain) => (
-                    <div
-                      key={domain.id}
-                      className="flex items-center justify-between p-4 rounded-lg border border-border"
-                    >
-                      <div className="flex items-center gap-3">
-                        <CheckCircle2 className={`h-5 w-5 ${domain.verified ? "text-green-600" : "text-muted-foreground"}`} />
-                        <div>
-                          <p className="font-medium text-foreground">
-                            {domain.domain}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {domain.isPrimary ? "Primary domain" : "Custom domain"}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant={domain.verified ? "success" : "warning"}>
-                        {domain.verified ? "Active" : "Pending"}
-                      </Badge>
+          <div className="space-y-3">
+            {project.domains && project.domains.length > 0 ? (
+              project.domains.map((domain) => (
+                <div
+                  key={domain.id}
+                  className="flex items-center justify-between py-3 border-b border-[var(--separator,theme(colors.border))]"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`h-2 w-2 rounded-full shrink-0 ${domain.verified ? "bg-[var(--success,#34C759)]" : "bg-[var(--warning,#FF9F0A)]"}`} />
+                    <div>
+                      <p className="text-[15px] font-medium text-[var(--text-primary,theme(colors.foreground))]">
+                        {domain.domain}
+                      </p>
+                      <p className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))]">
+                        {domain.isPrimary ? "Primary domain" : "Custom domain"}
+                      </p>
                     </div>
-                  ))
-                ) : (
-                  <div className="flex items-center justify-between p-4 rounded-lg border border-border">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {primaryDomain}
-                        </p>
-                        <p className="text-sm text-muted-foreground">Default domain</p>
-                      </div>
-                    </div>
-                    <Badge variant="success">Active</Badge>
                   </div>
-                )}
-                <Button variant="outline">
-                  <Globe className="h-4 w-4" />
-                  Add Domain
-                </Button>
+                  <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))]">
+                    {domain.verified ? "Verified" : "Pending verification"}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="flex items-center justify-between py-3 border-b border-[var(--separator,theme(colors.border))]">
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full shrink-0 bg-[var(--success,#34C759)]" />
+                  <div>
+                    <p className="text-[15px] font-medium text-[var(--text-primary,theme(colors.foreground))]">
+                      {primaryDomain}
+                    </p>
+                    <p className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))]">Default domain</p>
+                  </div>
+                </div>
+                <span className="text-[13px] text-[var(--success,#34C759)]">Active</span>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Analytics Tab */}
-        <TabsContent value="analytics">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytics Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <p>Analytics data would be displayed here</p>
-                <Button variant="outline" className="mt-4" asChild>
-                  <Link href="/analytics">View Full Analytics</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            )}
+            <Button variant="secondary" size="sm">
+              <Globe className="h-3.5 w-3.5" />
+              Add Domain
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

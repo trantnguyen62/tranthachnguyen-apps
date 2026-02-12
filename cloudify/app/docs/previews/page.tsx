@@ -12,14 +12,14 @@ export default function PreviewsPage() {
         Review changes in a production-like environment before merging.
       </p>
 
-      <div className="not-prose p-6 rounded-xl border border-border bg-secondary my-8">
+      <div className="not-prose p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-secondary)] my-8">
         <div className="flex items-start gap-4">
           <Eye className="h-8 w-8 text-[#0070f3] shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Preview Every Change
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-[var(--text-secondary)]">
               Cloudify creates a unique URL for every push to a non-production branch.
               Share with your team for instant feedback.
             </p>
@@ -67,17 +67,17 @@ https://my-app-abc123def.cloudify.app  # Commit-based`}</code>
       </p>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
-        <div className="p-4 rounded-lg border border-border bg-background">
+        <div className="p-4 rounded-lg border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <GitPullRequest className="h-6 w-6 text-green-500 mb-2" />
-          <h4 className="font-semibold text-foreground">Status Checks</h4>
-          <p className="text-sm text-muted-foreground">
+          <h4 className="font-semibold text-[var(--text-primary)]">Status Checks</h4>
+          <p className="text-sm text-[var(--text-secondary)]">
             Adds deployment status to your PR with a link to the preview
           </p>
         </div>
-        <div className="p-4 rounded-lg border border-border bg-background">
+        <div className="p-4 rounded-lg border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <MessageSquare className="h-6 w-6 text-[#0070f3] mb-2" />
-          <h4 className="font-semibold text-foreground">PR Comments</h4>
-          <p className="text-sm text-muted-foreground">
+          <h4 className="font-semibold text-[var(--text-primary)]">PR Comments</h4>
+          <p className="text-sm text-[var(--text-secondary)]">
             Posts a comment with the preview URL and deployment details
           </p>
         </div>
@@ -115,18 +115,18 @@ Branch: feature/*`}</code>
 
       <h2>Protecting Previews</h2>
 
-      <div className="not-prose p-6 rounded-xl border border-border bg-background my-8">
+      <div className="not-prose p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)] my-8">
         <div className="flex items-start gap-4">
           <Shield className="h-8 w-8 text-orange-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Password Protection
             </h3>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-[var(--text-secondary)] mb-4">
               Add a password to your preview deployments to prevent unauthorized access.
               Available on Pro and Enterprise plans.
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--text-secondary)]">
               Settings → General → Password Protection
             </p>
           </div>
@@ -158,14 +158,14 @@ Branch: feature/*`}</code>
 
       <h2>Sharing Previews</h2>
 
-      <div className="not-prose p-4 rounded-lg border border-border bg-background my-8">
+      <div className="not-prose p-4 rounded-lg border border-[var(--border-primary)] bg-[var(--surface-primary)] my-8">
         <div className="flex items-center gap-3">
           <Share2 className="h-6 w-6 text-purple-500" />
           <div>
-            <p className="text-foreground font-medium">
+            <p className="text-[var(--text-primary)] font-medium">
               Share preview URLs with anyone
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--text-secondary)]">
               Stakeholders, designers, and clients can review without needing a Cloudify account
             </p>
           </div>

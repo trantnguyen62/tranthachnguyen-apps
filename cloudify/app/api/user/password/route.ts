@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAuthError } from "@/lib/auth/api-auth";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import { ok, fail } from "@/lib/api/response";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,25 +14,16 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid request body", 400);
     }
     const { currentPassword, newPassword } = body;
 
     if (!currentPassword || !newPassword) {
-      return NextResponse.json(
-        { error: "Current password and new password are required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Current password and new password are required", 400);
     }
 
     if (newPassword.length < 8) {
-      return NextResponse.json(
-        { error: "New password must be at least 8 characters" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "New password must be at least 8 characters", 400);
     }
 
     const user = await prisma.user.findUnique({
@@ -40,18 +32,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user?.passwordHash) {
-      return NextResponse.json(
-        { error: "Password change is not available for OAuth accounts" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Password change is not available for OAuth accounts", 400);
     }
 
     const isValid = await verifyPassword(currentPassword, user.passwordHash);
     if (!isValid) {
-      return NextResponse.json(
-        { error: "Current password is incorrect" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Current password is incorrect", 400);
     }
 
     const newHash = await hashPassword(newPassword);
@@ -60,11 +46,8 @@ export async function POST(request: NextRequest) {
       data: { passwordHash: newHash },
     });
 
-    return NextResponse.json({ message: "Password updated successfully" });
+    return ok({ message: "Password updated successfully" });
   } catch {
-    return NextResponse.json(
-      { error: "Failed to update password" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update password", 500);
   }
 }

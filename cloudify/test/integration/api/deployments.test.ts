@@ -26,10 +26,9 @@ vi.mock("@/lib/prisma", () => ({
 // Mock session
 vi.mock("@/lib/auth/session", () => ({
   getSession: vi.fn(),
-  getSessionFromRequest: vi.fn(),
 }));
 
-import { getSession, getSessionFromRequest } from "@/lib/auth/session";
+import { getSession } from "@/lib/auth/session";
 
 describe("Deployments API Routes", () => {
   const mockUser = createMockUser({ id: "user-1" });
@@ -51,7 +50,7 @@ describe("Deployments API Routes", () => {
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       mockPrisma.deployment.findUnique.mockResolvedValue({
@@ -95,7 +94,7 @@ describe("Deployments API Routes", () => {
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       mockPrisma.deployment.findUnique.mockResolvedValue({
@@ -126,7 +125,7 @@ describe("Deployments API Routes", () => {
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       const queuedDeployment = mockDeployments[2]; // status: QUEUED
@@ -155,7 +154,7 @@ describe("Deployments API Routes", () => {
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       const buildingDeployment = mockDeployments[1]; // status: BUILDING

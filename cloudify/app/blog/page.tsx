@@ -96,17 +96,17 @@ export default function BlogPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-3xl mx-auto"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Blog
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground">
+              <p className="mt-6 text-xl text-[var(--text-secondary)]">
                 Insights, tutorials, and updates from the Cloudify team
               </p>
             </motion.div>
@@ -121,7 +121,7 @@ export default function BlogPage() {
                     "px-4 py-2 rounded-full text-sm font-medium transition-colors",
                     selectedCategory === category
                       ? "bg-foreground text-background"
-                      : "bg-card text-foreground hover:bg-secondary"
+                      : "bg-card text-[var(--text-primary)] hover:bg-secondary"
                   )}
                 >
                   {category}
@@ -135,7 +135,7 @@ export default function BlogPage() {
         {featuredPosts.length > 0 && (
           <section className="py-12">
             <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-              <h2 className="text-2xl font-bold text-foreground mb-8">
+              <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-8">
                 Featured
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -159,13 +159,13 @@ export default function BlogPage() {
                         </span>
                       </div>
                       <Badge className="mb-2">{post.category}</Badge>
-                      <h3 className="text-xl font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                      <h3 className="text-xl font-semibold text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                         {post.title}
                       </h3>
-                      <p className="mt-2 text-muted-foreground line-clamp-2">
+                      <p className="mt-2 text-[var(--text-secondary)] line-clamp-2">
                         {post.excerpt}
                       </p>
-                      <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-4 mt-4 text-sm text-[var(--text-secondary)]">
                         <span className="flex items-center gap-1">
                           <User className="h-4 w-4" />
                           {post.author}
@@ -184,9 +184,9 @@ export default function BlogPage() {
         )}
 
         {/* All Posts */}
-        <section className="py-12 bg-background">
+        <section className="py-12 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-8">
               All Posts
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -196,7 +196,7 @@ export default function BlogPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="group bg-card rounded-lg border border-border overflow-hidden hover:shadow-lg transition-shadow"
+                  className="group bg-card rounded-lg border border-[var(--border-primary)] overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   <Link href={`/blog/${post.id}`}>
                     <div
@@ -213,13 +213,13 @@ export default function BlogPage() {
                       <Badge variant="secondary" className="mb-2">
                         {post.category}
                       </Badge>
-                      <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                      <h3 className="font-semibold text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                         {post.title}
                       </h3>
-                      <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                      <p className="mt-2 text-sm text-[var(--text-secondary)] line-clamp-2">
                         {post.excerpt}
                       </p>
-                      <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-4 mt-4 text-xs text-[var(--text-secondary)]">
                         <span>{post.date}</span>
                         <span>{post.readTime}</span>
                       </div>
@@ -230,7 +230,7 @@ export default function BlogPage() {
             </div>
 
             <div className="text-center mt-12">
-              <Button variant="outline" size="lg">
+              <Button variant="secondary" size="lg">
                 Load More Posts
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -241,17 +241,17 @@ export default function BlogPage() {
         {/* Newsletter */}
         <section className="py-20">
           <div className="mx-auto max-w-xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-4">
               Subscribe to our newsletter
             </h2>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-[var(--text-secondary)] mb-8">
               Get the latest posts delivered straight to your inbox. No spam, unsubscribe anytime.
             </p>
             <form className="flex gap-3">
               <input
                 type="email"
                 placeholder="you@example.com"
-                className="flex-1 rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground"
+                className="flex-1 rounded-lg border border-[var(--border-primary)] bg-card px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
               />
               <Button variant="default">Subscribe</Button>
             </form>

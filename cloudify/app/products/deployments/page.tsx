@@ -64,23 +64,23 @@ export default function DeploymentsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-4xl mx-auto"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-foreground mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface-secondary)] text-[var(--text-primary)] mb-6">
                 <Rocket className="h-4 w-4" />
                 <span className="text-sm font-medium">Deployments</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-[var(--text-primary)] leading-tight">
                 Deploy in seconds,
                 <br />
-                <span className="text-foreground">scale forever</span>
+                <span className="text-[var(--text-primary)]">scale forever</span>
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Push your code and watch it go live instantly. Cloudify handles building,
                 deploying, and scaling so you can focus on what matters.
               </p>
@@ -108,10 +108,10 @@ export default function DeploymentsPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 From code to production in seconds
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-lg text-[var(--text-secondary)]">
                 A streamlined workflow that gets your code live faster than ever.
               </p>
             </motion.div>
@@ -126,13 +126,13 @@ export default function DeploymentsPage() {
                   transition={{ delay: index * 0.1 }}
                   className="text-center"
                 >
-                  <div className="w-16 h-16 mx-auto rounded-full bg-secondary flex items-center justify-center text-2xl font-bold text-foreground mb-4">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-[var(--surface-secondary)] flex items-center justify-center text-2xl font-bold text-[var(--text-primary)] mb-4">
                     {item.step}
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                  <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-muted-foreground">{item.desc}</p>
+                  <p className="text-[var(--text-secondary)]">{item.desc}</p>
                   {index < deploymentSteps.length - 1 && (
                     <div className="hidden md:block absolute top-8 right-0 w-full h-0.5 bg-border -z-10" />
                   )}
@@ -143,7 +143,7 @@ export default function DeploymentsPage() {
         </section>
 
         {/* Features Grid */}
-        <section className="py-20 bg-secondary/50">
+        <section className="py-20 bg-[var(--surface-secondary)]/50">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -151,10 +151,10 @@ export default function DeploymentsPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Everything you need for production
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-lg text-[var(--text-secondary)]">
                 Enterprise-grade deployment infrastructure without the complexity.
               </p>
             </motion.div>
@@ -167,15 +167,15 @@ export default function DeploymentsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-card border border-border"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)]"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-foreground" />
+                  <div className="w-12 h-12 rounded-xl bg-[var(--surface-secondary)] flex items-center justify-center mb-4">
+                    <feature.icon className="h-6 w-6 text-[var(--text-primary)]" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-[var(--text-secondary)]">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -201,10 +201,10 @@ export default function DeploymentsPage() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <div className="text-4xl font-bold text-foreground">
+                  <div className="text-4xl font-bold text-[var(--text-primary)]">
                     {stat.value}
                   </div>
-                  <div className="text-muted-foreground mt-2">
+                  <div className="text-[var(--text-secondary)] mt-2">
                     {stat.label}
                   </div>
                 </motion.div>

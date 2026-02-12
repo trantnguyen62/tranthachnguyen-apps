@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { sendDomainNotification } from "@/lib/notifications";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("domains/verify");
 import { verifyDomainDnsWithCloudflare, getRequiredDnsRecords } from "@/lib/domains/dns";
@@ -29,10 +31,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           userId: user.id,
         },
       },
+      include: {
+        project: {
+          select: { id: true, name: true, userId: true },
+        },
+      },
     });
 
     if (!domain) {
-      return NextResponse.json({ error: "Domain not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Domain not found", 404);
     }
 
     // Perform DNS verification (uses Cloudflare API when available, falls back to DNS lookup)
@@ -44,7 +51,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         where: { id },
         data: {
           verified: true,
-          sslStatus: "provisioning",
+          sslStatus: "PROVISIONING",
         },
       });
 
@@ -53,6 +60,31 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
       // Trigger SSL provisioning in background
       triggerSslProvisioning(id);
+
+      // Send domain verified notification (non-blocking)
+      try {
+        await sendDomainNotification("verified", {
+          userId: domain.project.userId,
+          projectId: domain.project.id,
+          projectName: domain.project.name,
+          domain: domain.domain,
+        });
+      } catch (notifError) {
+        log.error("Failed to send domain verified notification", { error: notifError instanceof Error ? notifError.message : String(notifError) });
+      }
+    } else if (!result.verified && result.errors.length > 0) {
+      // Send domain verification failure notification (non-blocking)
+      try {
+        await sendDomainNotification("error", {
+          userId: domain.project.userId,
+          projectId: domain.project.id,
+          projectName: domain.project.name,
+          domain: domain.domain,
+          error: result.errors.join("; "),
+        });
+      } catch (notifError) {
+        log.error("Failed to send domain error notification", { error: notifError instanceof Error ? notifError.message : String(notifError) });
+      }
     }
 
     // Get required DNS records for user reference
@@ -61,7 +93,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       domain.verificationToken
     );
 
-    return NextResponse.json({
+    return ok({
       verified: result.verified,
       txtRecordFound: result.txtRecordFound,
       domainResolvable: result.domainResolvable,
@@ -72,9 +104,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to verify domain", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to verify domain DNS" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to verify domain DNS", 500);
   }
 }

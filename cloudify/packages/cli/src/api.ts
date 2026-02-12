@@ -46,13 +46,13 @@ export async function api<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  const data = await response.json();
+  const data = (await response.json()) as Record<string, unknown>;
 
   if (!response.ok) {
     throw new ApiError(
-      data.error || data.message || "API request failed",
+      (data.error as string) || (data.message as string) || "API request failed",
       response.status,
-      data.code
+      data.code as string | undefined
     );
   }
 

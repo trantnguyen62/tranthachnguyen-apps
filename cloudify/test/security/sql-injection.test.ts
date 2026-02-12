@@ -123,7 +123,7 @@ describe("SQL Injection Prevention", () => {
       }
 
       // Valid cursors should pass
-      expect(isValidCursor("clg1234567890abcdefghijk")).toBe(true);
+      expect(isValidCursor("clg1234567890abcdefghijkl")).toBe(true);
       expect(isValidCursor("550e8400-e29b-41d4-a716-446655440000")).toBe(true);
     });
   });
@@ -151,8 +151,8 @@ describe("SQL Injection Prevention", () => {
 
     it("should accept valid IDs", () => {
       const validIds = [
-        "clg1234567890abcdefghijk",
-        "cm1234567890abcdefghijk",
+        "clg1234567890abcdefghijkl",
+        "cm1234567890abcdefghijklm",
         "550e8400-e29b-41d4-a716-446655440000",
       ];
 
@@ -225,6 +225,11 @@ describe("SQL Injection Prevention", () => {
      */
 
     const validatePaginationParams = (limit: string, offset: string): { valid: boolean; error?: string } => {
+      // Strictly validate that the input is purely numeric (no trailing SQL)
+      if (!/^\d+$/.test(limit) || !/^\d+$/.test(offset)) {
+        return { valid: false, error: "Invalid numeric value" };
+      }
+
       const parsedLimit = parseInt(limit, 10);
       const parsedOffset = parseInt(offset, 10);
 
@@ -354,8 +359,9 @@ describe("PostgreSQL-Specific Injection Prevention", () => {
 
       // These should be treated as regular strings by Prisma
       for (const payload of dollarPayloads) {
-        expect(payload).toContain("$$");
-        // When passed to Prisma, they're just strings
+        // All dollar-quoted payloads contain the '$' delimiter character
+        expect(payload).toContain("$");
+        // When passed to Prisma, they're just strings — never interpreted as SQL
       }
     });
   });

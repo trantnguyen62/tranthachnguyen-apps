@@ -4,11 +4,13 @@
  * DELETE - Delete database
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { deprovisionDatabase } from "@/lib/database/provisioner";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("databases/detail");
 
@@ -54,30 +56,21 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!database) {
-      return NextResponse.json(
-        { error: "Database not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Database not found", 404);
     }
 
     // Verify ownership
     if (database.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
     // Remove sensitive fields from response
     const { password, ...safeDatabase } = database;
 
-    return NextResponse.json({ database: safeDatabase });
+    return ok({ database: safeDatabase });
   } catch (error) {
     log.error("Failed to fetch database", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch database" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch database", 500);
   }
 }
 
@@ -105,18 +98,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!database) {
-      return NextResponse.json(
-        { error: "Database not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Database not found", 404);
     }
 
     // Verify ownership
     if (database.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
     // Start deprovisioning
@@ -138,16 +125,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       success: true,
       message: "Database deletion initiated",
     });
   } catch (error) {
     log.error("Failed to delete database", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete database" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete database", 500);
   }
 }
 
@@ -174,21 +158,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!database) {
-      return NextResponse.json(
-        { error: "Database not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Database not found", 404);
     }
 
     // Verify ownership
     if (database.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { name, plan, connectionLimit } = body;
 
     // Only allow updating certain fields
@@ -221,12 +201,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({ database: updated });
+    return ok({ database: updated });
   } catch (error) {
     log.error("Failed to update database", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to update database" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update database", 500);
   }
 }

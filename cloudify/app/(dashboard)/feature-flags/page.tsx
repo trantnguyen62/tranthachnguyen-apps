@@ -153,7 +153,7 @@ export default function FeatureFlagsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -162,11 +162,11 @@ export default function FeatureFlagsPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
           Failed to load feature flags
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <p className="text-[var(--text-secondary)] mb-4">{error}</p>
+        <Button variant="secondary" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
         </Button>
@@ -179,15 +179,15 @@ export default function FeatureFlagsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
             Feature Flags
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-[var(--text-secondary)]">
             Control feature rollouts with real-time flags
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="secondary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
@@ -208,19 +208,19 @@ export default function FeatureFlagsPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="p-4 bg-card rounded-xl border border-border"
+            className="p-4 bg-card rounded-xl border border-[var(--border-primary)]"
           >
-            <p className="text-2xl font-bold text-foreground">
+            <p className="text-2xl font-bold text-[var(--text-primary)]">
               {stat.value}
             </p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <p className="text-sm text-[var(--text-secondary)]">{stat.label}</p>
           </div>
         ))}
       </div>
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
         <Input
           placeholder="Search flags..."
           value={searchQuery}
@@ -232,9 +232,9 @@ export default function FeatureFlagsPage() {
       {/* Flags list */}
       <div className="space-y-3">
         {filteredFlags.length === 0 ? (
-          <div className="text-center py-12 bg-card rounded-xl border border-border">
+          <div className="text-center py-12 bg-card rounded-xl border border-[var(--border-primary)]">
             <Flag className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
-            <p className="text-muted-foreground">No feature flags found</p>
+            <p className="text-[var(--text-secondary)]">No feature flags found</p>
           </div>
         ) : (
           filteredFlags.map((flag, index) => {
@@ -248,29 +248,29 @@ export default function FeatureFlagsPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="p-5 bg-card rounded-xl border border-border"
+                className="p-5 bg-card rounded-xl border border-[var(--border-primary)]"
               >
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className={cn("p-2 rounded-lg", flag.enabled ? "bg-green-100 dark:bg-green-900/30" : "bg-secondary")}>
-                      <Flag className={cn("h-5 w-5", flag.enabled ? "text-green-600 dark:text-green-400" : "text-muted-foreground")} />
+                    <div className={cn("p-2 rounded-lg", flag.enabled ? "bg-green-100 dark:bg-green-900/30" : "bg-[var(--surface-secondary)]")}>
+                      <Flag className={cn("h-5 w-5", flag.enabled ? "text-green-600 dark:text-green-400" : "text-[var(--text-secondary)]")} />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-semibold text-foreground">
+                        <h3 className="font-semibold text-[var(--text-primary)]">
                           {flag.name}
                         </h3>
                         <Badge variant="secondary">
                           {flag.project?.name || "Unknown"}
                         </Badge>
-                        <Badge variant="outline" className="font-mono text-xs">
+                        <Badge variant="secondary" className="font-mono text-xs">
                           {flag.key}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-[var(--text-secondary)] mt-1">
                         {flag.description || "No description"}
                       </p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-4 mt-2 text-xs text-[var(--text-secondary)]">
                         <div className="flex items-center gap-1">
                           <TypeIcon className={cn("h-3 w-3", typeInfo.color)} />
                           {typeInfo.label}
@@ -392,8 +392,8 @@ export default function FeatureFlagsPage() {
                       className={cn(
                         "p-3 rounded-lg border text-left transition-colors",
                         newFlag.type === type
-                          ? "border-foreground bg-secondary"
-                          : "border-border hover:bg-secondary"
+                          ? "border-foreground bg-[var(--surface-secondary)]"
+                          : "border-[var(--border-primary)] hover:bg-secondary"
                       )}
                     >
                       <Icon className={cn("h-5 w-5 mb-1", config.color)} />
@@ -421,7 +421,7 @@ export default function FeatureFlagsPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+            <Button variant="secondary" onClick={() => setCreateDialogOpen(false)}>
               Cancel
             </Button>
             <Button

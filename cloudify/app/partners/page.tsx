@@ -91,10 +91,10 @@ export default function PartnersPage() {
               <Badge className="mb-4" variant="secondary">
                 Partner Program
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Grow Together with Cloudify
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Join our partner ecosystem and unlock new opportunities for your business.
                 Whether you're a technology vendor, agency, or enterprise, we have a program for you.
               </p>
@@ -120,13 +120,13 @@ export default function PartnersPage() {
                 >
                   <Card className="h-full">
                     <CardContent className="p-6 text-center">
-                      <div className="w-12 h-12 mx-auto rounded-xl bg-secondary flex items-center justify-center mb-4">
-                        <benefit.icon className="h-6 w-6 text-foreground" />
+                      <div className="w-12 h-12 mx-auto rounded-xl bg-[var(--surface-secondary)] flex items-center justify-center mb-4">
+                        <benefit.icon className="h-6 w-6 text-[var(--text-primary)]" />
                       </div>
-                      <h3 className="font-semibold text-foreground">
+                      <h3 className="font-semibold text-[var(--text-primary)]">
                         {benefit.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground mt-2">
+                      <p className="text-sm text-[var(--text-secondary)] mt-2">
                         {benefit.description}
                       </p>
                     </CardContent>
@@ -140,7 +140,7 @@ export default function PartnersPage() {
         {/* Partner Types */}
         <section className="py-16">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-8 text-center">
               Partner Programs
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -151,7 +151,7 @@ export default function PartnersPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="rounded-lg border border-border bg-card overflow-hidden"
+                  className="rounded-lg border border-[var(--border-primary)] bg-card overflow-hidden"
                 >
                   <div className={`h-2 bg-gradient-to-r ${type.color}`} />
                   <div className="p-6">
@@ -160,24 +160,24 @@ export default function PartnersPage() {
                     >
                       <type.icon className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground">
+                    <h3 className="text-xl font-semibold text-[var(--text-primary)]">
                       {type.name}
                     </h3>
-                    <p className="mt-2 text-muted-foreground">
+                    <p className="mt-2 text-[var(--text-secondary)]">
                       {type.description}
                     </p>
                     <ul className="mt-6 space-y-3">
                       {type.benefits.map((benefit) => (
                         <li key={benefit} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm text-[var(--text-secondary)]">
                             {benefit}
                           </span>
                         </li>
                       ))}
                     </ul>
                     <div className="mt-6">
-                      <Button variant="outline" className="w-full" asChild>
+                      <Button variant="secondary" className="w-full" asChild>
                         <Link href="/contact">
                           Learn More
                           <ArrowRight className="ml-2 h-4 w-4" />
@@ -201,7 +201,7 @@ export default function PartnersPage() {
               Fill out the form and our partnerships team will get in touch within 48 hours.
             </p>
             <div className="mt-8">
-              <Button size="lg" variant="secondary" className="bg-background text-foreground" asChild>
+              <Button size="lg" variant="secondary" className="bg-[var(--surface-primary)] text-[var(--text-primary)]" asChild>
                 <Link href="/contact">Apply Now</Link>
               </Button>
             </div>

@@ -1,139 +1,76 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { GitBranch, Rocket, Globe, Eye } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const steps = [
   {
-    icon: GitBranch,
-    title: "Connect your repo",
-    description:
-      "Import your Git repository from GitHub, GitLab, or Bitbucket. Cloudify auto-detects your framework and configures your build.",
-    color: "blue",
+    number: 1,
+    title: "Connect",
+    description: "Link your GitHub repository in one click.",
   },
   {
-    icon: Rocket,
-    title: "Push to deploy",
-    description:
-      "Every push to your main branch triggers a production deployment. Every PR gets its own unique preview URL automatically.",
-    color: "purple",
+    number: 2,
+    title: "Push Code",
+    description: "Every commit triggers a build on our infrastructure.",
   },
   {
-    icon: Eye,
-    title: "Preview & collaborate",
-    description:
-      "Share preview URLs with your team. Leave comments directly on the preview. Approve and merge with confidence.",
-    color: "green",
-  },
-  {
-    icon: Globe,
-    title: "Go global instantly",
-    description:
-      "Your app is deployed to 100+ edge locations worldwide. Custom domains, SSL certificates, and CDN — all automatic.",
-    color: "orange",
+    number: 3,
+    title: "Go Live",
+    description: "Your site is live on a global edge network.",
   },
 ];
 
-const colorMap: Record<string, { bg: string; text: string; border: string }> = {
-  blue: {
-    bg: "bg-secondary",
-    text: "text-foreground",
-    border: "border-blue-500/20",
-  },
-  purple: {
-    bg: "bg-purple-500/10",
-    text: "text-purple-600 dark:text-purple-400",
-    border: "border-purple-500/20",
-  },
-  green: {
-    bg: "bg-green-500/10",
-    text: "text-green-600 dark:text-green-400",
-    border: "border-green-500/20",
-  },
-  orange: {
-    bg: "bg-orange-500/10",
-    text: "text-orange-600 dark:text-orange-400",
-    border: "border-orange-500/20",
-  },
-};
-
 export function HowItWorks() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true);
+      },
+      { threshold: 0.2 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="relative py-24 bg-secondary/50">
-      <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
+    <section className="py-32 bg-[var(--surface-primary,theme(colors.background))]">
+      <div ref={ref} className="mx-auto max-w-[980px] px-4 sm:px-6 lg:px-8">
         {/* Section header */}
-        <div className="text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3 }}
-            className="text-sm font-semibold text-muted-foreground"
-          >
-            HOW IT WORKS
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1, duration: 0.3 }}
-            className="mt-2 text-4xl font-bold tracking-tight text-foreground sm:text-5xl"
-          >
-            From code to production in minutes
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-            className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground"
-          >
-            No infrastructure to configure. No servers to manage. Just push your
-            code and we handle the rest.
-          </motion.p>
+        <div className="text-center mb-20">
+          <h2 className={`text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))] transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+            How It Works
+          </h2>
         </div>
 
-        {/* Steps */}
-        <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, index) => {
-            const colors = colorMap[step.color];
-            return (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.15, duration: 0.3 }}
-                className="relative"
-              >
-                {/* Connector line */}
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-px bg-gradient-to-r from-border to-border" />
-                )}
+        {/* 3 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+          {steps.map((step, index) => (
+            <div
+              key={step.number}
+              className={`text-center transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+              style={{ transitionDelay: visible ? `${index * 100}ms` : "0ms" }}
+            >
+              {/* Step number */}
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))]">
+                <span className="text-[20px] font-bold text-[var(--text-primary,theme(colors.foreground))]">
+                  {step.number}
+                </span>
+              </div>
 
-                <div className="relative rounded-lg border border-border bg-card p-6">
-                  {/* Step number */}
-                  <div className="absolute -top-3 -left-1 flex h-7 w-7 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
-                    {index + 1}
-                  </div>
+              {/* Title */}
+              <h3 className="mt-5 text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))]">
+                {step.title}
+              </h3>
 
-                  {/* Icon */}
-                  <div
-                    className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg}`}
-                  >
-                    <step.icon className={`h-7 w-7 ${colors.text}`} />
-                  </div>
-
-                  <h3 className="mt-4 text-lg font-semibold text-foreground">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
+              {/* Description */}
+              <p className="mt-2 text-[15px] leading-relaxed text-[var(--text-secondary,theme(colors.muted.foreground))]">
+                {step.description}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

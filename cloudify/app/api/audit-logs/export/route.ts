@@ -9,6 +9,8 @@ import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { exportAuditLogs, AuditLogFilters, ExportFormat } from "@/lib/audit";
 import { createAuditContext, audit } from "@/lib/audit";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("audit-logs/export");
 
@@ -36,14 +38,13 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const format: ExportFormat = body.format || "json";
 
     if (format !== "json" && format !== "csv") {
-      return NextResponse.json(
-        { error: "Invalid format. Must be 'json' or 'csv'" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid format. Must be 'json' or 'csv'", 400);
     }
 
     // Build filters from request body
@@ -86,9 +87,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     log.error("Failed to export audit logs", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to export audit logs" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to export audit logs", 500);
   }
 }

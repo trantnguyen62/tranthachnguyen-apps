@@ -90,10 +90,10 @@ export function TrafficChart({
   if (!chartData || !data || data.length === 0) {
     return (
       <div
-        className="flex items-center justify-center rounded-lg bg-background"
+        className="flex items-center justify-center rounded-lg bg-[var(--surface-primary)]"
         style={{ height }}
       >
-        <p className="text-muted-foreground">No data available</p>
+        <p className="text-[var(--text-secondary)]">No data available</p>
       </div>
     );
   }

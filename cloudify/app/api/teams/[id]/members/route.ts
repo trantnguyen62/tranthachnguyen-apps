@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("teams/[id]/members");
 
@@ -24,12 +25,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       where: {
         teamId: id,
         userId: authUser.id,
-        role: { in: ["owner", "admin"] },
+        role: { in: ["OWNER", "ADMIN"] },
       },
     });
 
     if (!currentMember) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Not authorized", 403);
     }
 
     const parseResult = await parseJsonBody(request);
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { email, role = "member" } = body;
 
     if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+      return fail("VALIDATION_MISSING_FIELD", "Email is required", 400);
     }
 
     // Find user by email
@@ -47,10 +48,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found. They need to sign up first." },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "User not found. They need to sign up first.", 404);
     }
 
     // Check if already a member
@@ -59,15 +57,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (existingMember) {
-      return NextResponse.json(
-        { error: "User is already a team member" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "User is already a team member", 400);
     }
 
-    // Validate role
-    const validRoles = ["admin", "member", "viewer"];
-    const memberRole = validRoles.includes(role) ? role : "member";
+    // Validate and normalize role to uppercase enum
+    const roleUpper = (role as string).toUpperCase();
+    const validRoles: Array<"ADMIN" | "MEMBER" | "VIEWER"> = ["ADMIN", "MEMBER", "VIEWER"];
+    const memberRole = (validRoles.includes(roleUpper as typeof validRoles[number]) ? roleUpper : "MEMBER") as "ADMIN" | "MEMBER" | "VIEWER";
 
     // Add member
     const member = await prisma.teamMember.create({
@@ -82,7 +78,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             id: true,
             name: true,
             email: true,
-            avatar: true,
+            image: true,
           },
         },
       },
@@ -102,13 +98,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(member);
+    return ok(member);
   } catch (error) {
     log.error("Failed to add team member", error);
-    return NextResponse.json(
-      { error: "Failed to add team member" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to add team member", 500);
   }
 }
 
@@ -124,7 +117,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const userId = searchParams.get("userId");
 
     if (!userId) {
-      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+      return fail("VALIDATION_MISSING_FIELD", "User ID is required", 400);
     }
 
     // Check if current user is owner or admin (or removing themselves)
@@ -133,14 +126,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!currentMember) {
-      return NextResponse.json({ error: "Not a team member" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Not a team member", 403);
     }
 
     const isSelf = userId === authUser.id;
-    const canRemoveOthers = ["owner", "admin"].includes(currentMember.role);
+    const canRemoveOthers = ["OWNER", "ADMIN"].includes(currentMember.role);
 
     if (!isSelf && !canRemoveOthers) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Not authorized", 403);
     }
 
     // Cannot remove the last owner
@@ -149,16 +142,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         where: { teamId: id, userId },
       });
 
-      if (targetMember?.role === "owner") {
+      if (targetMember?.role === "OWNER") {
         const ownerCount = await prisma.teamMember.count({
-          where: { teamId: id, role: "owner" },
+          where: { teamId: id, role: "OWNER" },
         });
 
         if (ownerCount <= 1) {
-          return NextResponse.json(
-            { error: "Cannot remove the last owner" },
-            { status: 400 }
-          );
+          return fail("BAD_REQUEST", "Cannot remove the last owner", 400);
         }
       }
     }
@@ -187,12 +177,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       }).catch(() => {});
     }
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to remove team member", error);
-    return NextResponse.json(
-      { error: "Failed to remove team member" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to remove team member", 500);
   }
 }

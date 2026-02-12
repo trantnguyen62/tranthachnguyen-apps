@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError, checkProjectAccess, meetsMinimumRole } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("projects/[id]/env");
 
@@ -24,13 +25,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Check ownership or team membership (minimum role: admin for env secrets)
     const access = await checkProjectAccess(user.id, id);
     if (!access.hasAccess) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
     if (!access.isOwner && (!access.teamRole || !meetsMinimumRole(access.teamRole, "admin"))) {
-      return NextResponse.json(
-        { error: "Insufficient role - viewing env vars requires admin role or higher" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Insufficient role - viewing env vars requires admin role or higher", 403);
     }
 
     const envVariables = await prisma.envVariable.findMany({
@@ -45,13 +43,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({ envVariables });
+    return ok({ envVariables });
   } catch (error) {
     log.error("Failed to fetch environment variables", error);
-    return NextResponse.json(
-      { error: "Failed to fetch environment variables" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch environment variables", 500);
   }
 }
 
@@ -69,13 +64,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Check ownership or team membership (minimum role: admin for env secrets)
     const writeAccess = await checkProjectAccess(user.id, id);
     if (!writeAccess.hasAccess) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
     if (!writeAccess.isOwner && (!writeAccess.teamRole || !meetsMinimumRole(writeAccess.teamRole, "admin"))) {
-      return NextResponse.json(
-        { error: "Insufficient role - editing env vars requires admin role or higher" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Insufficient role - editing env vars requires admin role or higher", 403);
     }
 
     const parseResult = await parseJsonBody(request);
@@ -84,7 +76,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { key, value, target = "production" } = body;
 
     if (!key || typeof key !== "string") {
-      return NextResponse.json({ error: "Key is required" }, { status: 400 });
+      return fail("VALIDATION_MISSING_FIELD", "Key is required", 400);
     }
 
     const envVariable = await prisma.envVariable.create({
@@ -96,13 +88,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(envVariable, { status: 201 });
+    return ok(envVariable, { status: 201 });
   } catch (error) {
     log.error("Failed to create environment variable", error);
-    return NextResponse.json(
-      { error: "Failed to create environment variable" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create environment variable", 500);
   }
 }
 
@@ -120,13 +109,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     // Check ownership or team membership (minimum role: admin for env secrets)
     const deleteAccess = await checkProjectAccess(user.id, id);
     if (!deleteAccess.hasAccess) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
     if (!deleteAccess.isOwner && (!deleteAccess.teamRole || !meetsMinimumRole(deleteAccess.teamRole, "admin"))) {
-      return NextResponse.json(
-        { error: "Insufficient role - deleting env vars requires admin role or higher" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Insufficient role - deleting env vars requires admin role or higher", 403);
     }
 
     const deleteParseResult = await parseJsonBody(request);
@@ -140,7 +126,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         where: { id: envId, projectId: id },
       });
       if (!envVar) {
-        return NextResponse.json({ error: "Environment variable not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Environment variable not found", 404);
       }
       await prisma.envVariable.delete({ where: { id: envId } });
     } else if (key && target) {
@@ -148,21 +134,15 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         where: { projectId: id, key, target },
       });
       if (deleted.count === 0) {
-        return NextResponse.json({ error: "Environment variable not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Environment variable not found", 404);
       }
     } else {
-      return NextResponse.json(
-        { error: "Either envId or both key and target are required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Either envId or both key and target are required", 400);
     }
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete environment variable", error);
-    return NextResponse.json(
-      { error: "Failed to delete environment variable" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete environment variable", 500);
   }
 }

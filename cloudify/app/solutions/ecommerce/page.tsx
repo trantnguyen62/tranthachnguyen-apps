@@ -63,7 +63,7 @@ export default function EcommercePage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -74,12 +74,12 @@ export default function EcommercePage() {
                 <ShoppingCart className="h-4 w-4" />
                 <span className="text-sm font-medium">E-commerce</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-[var(--text-primary)] leading-tight">
                 Sell more with
                 <br />
                 <span className="text-emerald-600 dark:text-emerald-400">faster stores</span>
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Build high-converting online stores that load instantly.
                 Every millisecond matters when it comes to sales.
               </p>
@@ -128,10 +128,10 @@ export default function EcommercePage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Built for commerce performance
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-lg text-[var(--text-secondary)]">
                 Everything you need to run a world-class online store.
               </p>
             </motion.div>
@@ -144,15 +144,15 @@ export default function EcommercePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-card border border-border"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)]"
                 >
                   <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-[var(--text-secondary)]">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -162,7 +162,7 @@ export default function EcommercePage() {
         </section>
 
         {/* Platforms */}
-        <section className="py-20 bg-secondary/50">
+        <section className="py-20 bg-[var(--surface-secondary)]/50">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -170,10 +170,10 @@ export default function EcommercePage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Works with your commerce platform
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-lg text-[var(--text-secondary)]">
                 Deploy headless commerce solutions with any backend.
               </p>
             </motion.div>
@@ -186,10 +186,10 @@ export default function EcommercePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-4 rounded-xl bg-card border border-border"
+                  className="p-4 rounded-xl bg-card border border-[var(--border-primary)]"
                 >
-                  <h4 className="font-semibold text-foreground">{platform.name}</h4>
-                  <p className="text-sm text-muted-foreground mt-1">{platform.desc}</p>
+                  <h4 className="font-semibold text-[var(--text-primary)]">{platform.name}</h4>
+                  <p className="text-sm text-[var(--text-secondary)] mt-1">{platform.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -205,10 +205,10 @@ export default function EcommercePage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-6">
                   Speed = Revenue
                 </h2>
-                <p className="text-lg text-muted-foreground mb-8">
+                <p className="text-lg text-[var(--text-secondary)] mb-8">
                   Studies show that every 100ms of latency costs e-commerce sites 1% in
                   conversions. With Cloudify, your store loads in milliseconds.
                 </p>
@@ -220,7 +220,7 @@ export default function EcommercePage() {
                     "Automatic image optimization",
                     "Smart caching strategies",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-muted-foreground">
+                    <li key={item} className="flex items-center gap-3 text-[var(--text-secondary)]">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </li>
@@ -236,34 +236,34 @@ export default function EcommercePage() {
               >
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Page Load</span>
+                    <span className="text-[var(--text-secondary)]">Page Load</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
+                      <div className="w-32 h-2 bg-[var(--surface-secondary)] rounded-full overflow-hidden">
                         <div className="w-1/4 h-full bg-emerald-500 rounded-full" />
                       </div>
-                      <span className="text-sm font-medium text-foreground">0.8s</span>
+                      <span className="text-sm font-medium text-[var(--text-primary)]">0.8s</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">First Input Delay</span>
+                    <span className="text-[var(--text-secondary)]">First Input Delay</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
+                      <div className="w-32 h-2 bg-[var(--surface-secondary)] rounded-full overflow-hidden">
                         <div className="w-1/5 h-full bg-emerald-500 rounded-full" />
                       </div>
-                      <span className="text-sm font-medium text-foreground">12ms</span>
+                      <span className="text-sm font-medium text-[var(--text-primary)]">12ms</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Layout Shift</span>
+                    <span className="text-[var(--text-secondary)]">Layout Shift</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
+                      <div className="w-32 h-2 bg-[var(--surface-secondary)] rounded-full overflow-hidden">
                         <div className="w-1/6 h-full bg-emerald-500 rounded-full" />
                       </div>
-                      <span className="text-sm font-medium text-foreground">0.02</span>
+                      <span className="text-sm font-medium text-[var(--text-primary)]">0.02</span>
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-6 text-center">
+                <p className="text-sm text-[var(--text-secondary)] mt-6 text-center">
                   Core Web Vitals - All passing
                 </p>
               </motion.div>

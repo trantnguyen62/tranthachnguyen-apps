@@ -12,6 +12,7 @@ import { getAuthUser } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath, revalidatePaths, revalidateAll } from "@/lib/isr/revalidator";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("revalidate");
 
@@ -50,10 +51,7 @@ export async function POST(request: NextRequest) {
       // Try to get project from session
       const authUser = await getAuthUser(request);
       if (!authUser) {
-        return NextResponse.json(
-          { error: "Missing projectId parameter" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_MISSING_FIELD", "Missing projectId parameter", 400);
       }
     }
 
@@ -69,7 +67,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Check secret if configured
@@ -78,16 +76,13 @@ export async function POST(request: NextRequest) {
       // Also check X-Revalidate-Secret header
       const headerSecret = request.headers.get("x-revalidate-secret");
       if (headerSecret !== configuredSecret) {
-        return NextResponse.json({ error: "Invalid secret" }, { status: 401 });
+        return fail("AUTH_REQUIRED", "Invalid secret", 401);
       }
     }
 
     // Validate that we have something to revalidate
     if (!path && !paths) {
-      return NextResponse.json(
-        { error: "Missing path or paths parameter" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing path or paths parameter", 400);
     }
 
     // Perform revalidation
@@ -98,16 +93,13 @@ export async function POST(request: NextRequest) {
       result = await revalidatePath(projectId!, path, { purgeCloudflare, secret: secret || undefined });
     }
 
-    return NextResponse.json({
+    return ok({
       revalidated: true,
       ...result,
     });
   } catch (error) {
     log.error("Revalidation failed", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Revalidation failed", revalidated: false },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Revalidation failed", 500);
   }
 }
 
@@ -117,7 +109,7 @@ export async function POST(request: NextRequest) {
  * Health check / documentation endpoint
  */
 export async function GET() {
-  return NextResponse.json({
+  return ok({
     status: "ok",
     endpoints: {
       "POST /api/revalidate": {

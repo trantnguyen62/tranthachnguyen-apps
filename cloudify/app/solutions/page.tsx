@@ -74,7 +74,7 @@ export default function SolutionsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -84,10 +84,10 @@ export default function SolutionsPage() {
               <Badge className="mb-4" variant="secondary">
                 Solutions
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Solutions for Every Use Case
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Whether you're building AI applications, e-commerce stores, or enterprise
                 platforms, Cloudify has the tools and infrastructure you need.
               </p>
@@ -109,28 +109,28 @@ export default function SolutionsPage() {
                 >
                   <Link
                     href={solution.href}
-                    className="group block h-full p-6 rounded-lg border border-border bg-card hover:shadow-xl transition-all hover:border-foreground/20"
+                    className="group block h-full p-6 rounded-lg border border-[var(--border-primary)] bg-card hover:shadow-xl transition-all hover:border-foreground/20"
                   >
                     <div
                       className={`inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${solution.color}`}
                     >
                       <solution.icon className="h-7 w-7 text-white" />
                     </div>
-                    <h3 className="mt-4 text-xl font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                    <h3 className="mt-4 text-xl font-semibold text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                       {solution.name}
                     </h3>
-                    <p className="mt-2 text-muted-foreground">
+                    <p className="mt-2 text-[var(--text-secondary)]">
                       {solution.description}
                     </p>
                     <ul className="mt-4 space-y-2">
                       {solution.features.map((feature) => (
-                        <li key={feature} className="flex items-center text-sm text-muted-foreground">
+                        <li key={feature} className="flex items-center text-sm text-[var(--text-secondary)]">
                           <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
                           {feature}
                         </li>
                       ))}
                     </ul>
-                    <div className="mt-6 flex items-center text-foreground font-medium">
+                    <div className="mt-6 flex items-center text-[var(--text-primary)] font-medium">
                       Learn more
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -151,10 +151,10 @@ export default function SolutionsPage() {
               Talk to our team to find the perfect solution for your needs.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" className="bg-background text-foreground" asChild>
+              <Button size="lg" variant="secondary" className="bg-[var(--surface-primary)] text-[var(--text-primary)]" asChild>
                 <Link href="/contact">Talk to Sales</Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-background/30 text-background hover:bg-background/10" asChild>
+              <Button size="lg" variant="secondary" className="border-[var(--surface-primary)]/30 text-background hover:bg-[var(--surface-primary)]/10" asChild>
                 <Link href="/demo">Request a Demo</Link>
               </Button>
             </div>

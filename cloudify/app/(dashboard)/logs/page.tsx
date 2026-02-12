@@ -31,7 +31,7 @@ const levelConfig: Record<string, { icon: React.ElementType; color: string; bg: 
   info: {
     icon: Info,
     color: "text-[#0070f3]",
-    bg: "bg-secondary",
+    bg: "bg-[var(--surface-secondary)]",
   },
   warn: {
     icon: AlertTriangle,
@@ -45,8 +45,8 @@ const levelConfig: Record<string, { icon: React.ElementType; color: string; bg: 
   },
   debug: {
     icon: Terminal,
-    color: "text-muted-foreground",
-    bg: "bg-secondary",
+    color: "text-[var(--text-secondary)]",
+    bg: "bg-[var(--surface-secondary)]",
   },
 };
 
@@ -99,7 +99,7 @@ export default function LogsPage() {
   if (loading && logs.length === 0) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -108,11 +108,11 @@ export default function LogsPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
           Failed to load logs
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <p className="text-[var(--text-secondary)] mb-4">{error}</p>
+        <Button variant="secondary" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
         </Button>
@@ -125,16 +125,16 @@ export default function LogsPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
             Logs Explorer
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-[var(--text-secondary)]">
             Real-time logs from all your deployments and functions
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
-            variant={isLive ? "default" : "outline"}
+            variant={isLive ? "default" : "secondary"}
             size="sm"
             onClick={() => setIsLive(!isLive)}
           >
@@ -150,12 +150,12 @@ export default function LogsPage() {
               </>
             )}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => refetch()}>
+          <Button variant="secondary" size="sm" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => {
               const data = JSON.stringify(filteredLogs, null, 2);
@@ -179,7 +179,7 @@ export default function LogsPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
           <Input
             placeholder="Search logs..."
             value={searchQuery}
@@ -189,7 +189,7 @@ export default function LogsPage() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto">
+            <Button variant="secondary" className="w-full sm:w-auto">
               <Filter className="h-4 w-4" />
               Level: {selectedLevel === "all" ? "All" : selectedLevel}
               <ChevronDown className="h-4 w-4" />
@@ -208,7 +208,7 @@ export default function LogsPage() {
         </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto">
+            <Button variant="secondary" className="w-full sm:w-auto">
               Source: {selectedSource === "all" ? "All" : selectedSource}
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -228,7 +228,7 @@ export default function LogsPage() {
 
       {/* Live indicator */}
       {isLive && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
@@ -241,7 +241,7 @@ export default function LogsPage() {
       <div className="bg-gray-950 rounded-xl border border-gray-800 overflow-hidden">
         <div className="h-[600px] overflow-y-auto font-mono text-sm">
           {filteredLogs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+            <div className="flex flex-col items-center justify-center h-full text-[var(--text-secondary)]">
               <Terminal className="h-12 w-12 mb-4 text-gray-600" />
               <p>No logs found</p>
               <p className="text-sm text-gray-600 mt-2">
@@ -266,7 +266,7 @@ export default function LogsPage() {
                     onClick={() => setExpandedLog(isExpanded ? null : log.id)}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="text-muted-foreground shrink-0 select-none">
+                      <span className="text-[var(--text-secondary)] shrink-0 select-none">
                         {formatTimestamp(log.timestamp)}
                       </span>
                       <span
@@ -289,7 +289,7 @@ export default function LogsPage() {
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="mt-2 ml-24 text-muted-foreground"
+                        className="mt-2 ml-24 text-[var(--text-secondary)]"
                       >
                         <pre className="text-xs bg-gray-800 p-2 rounded">
                           {JSON.stringify({
@@ -312,7 +312,7 @@ export default function LogsPage() {
       {/* Load more */}
       {hasMore && (
         <div className="text-center">
-          <Button variant="outline" onClick={loadMore} disabled={loading}>
+          <Button variant="secondary" onClick={loadMore} disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -347,10 +347,10 @@ export default function LogsPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="p-4 bg-card rounded-xl border border-border"
+            className="p-4 bg-card rounded-xl border border-[var(--border-primary)]"
           >
             <p className={cn("text-2xl font-bold", stat.color)}>{stat.value}</p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <p className="text-sm text-[var(--text-secondary)]">{stat.label}</p>
           </div>
         ))}
       </div>

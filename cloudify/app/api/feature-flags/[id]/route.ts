@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("feature-flags/[id]");
 
@@ -26,19 +28,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!flag) {
-      return NextResponse.json(
-        { error: "Feature flag not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Feature flag not found", 404);
     }
 
-    return NextResponse.json(flag);
+    return ok(flag);
   } catch (error) {
     log.error("Failed to fetch feature flag", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch feature flag" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch feature flag", 500);
   }
 }
 
@@ -59,13 +55,12 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!flag) {
-      return NextResponse.json(
-        { error: "Feature flag not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Feature flag not found", 404);
     }
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { name, description, enabled, percentage, conditions } = body;
 
     const updateData: {
@@ -78,25 +73,25 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (name !== undefined) {
       if (typeof name !== "string" || name.length < 1 || name.length > 100) {
-        return NextResponse.json({ error: "Name must be a string (1-100 chars)" }, { status: 400 });
+        return fail("VALIDATION_ERROR", "Name must be a string (1-100 chars)", 400);
       }
       updateData.name = name;
     }
     if (description !== undefined) {
       if (typeof description !== "string") {
-        return NextResponse.json({ error: "Description must be a string" }, { status: 400 });
+        return fail("VALIDATION_ERROR", "Description must be a string", 400);
       }
       updateData.description = description;
     }
     if (enabled !== undefined) {
       if (typeof enabled !== "boolean") {
-        return NextResponse.json({ error: "Enabled must be a boolean" }, { status: 400 });
+        return fail("VALIDATION_ERROR", "Enabled must be a boolean", 400);
       }
       updateData.enabled = enabled;
     }
     if (percentage !== undefined) {
       if (typeof percentage !== "number" || isNaN(percentage)) {
-        return NextResponse.json({ error: "Percentage must be a number" }, { status: 400 });
+        return fail("VALIDATION_ERROR", "Percentage must be a number", 400);
       }
       updateData.percentage = Math.min(100, Math.max(0, percentage));
     }
@@ -119,13 +114,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(updated);
+    return ok(updated);
   } catch (error) {
     log.error("Failed to update feature flag", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to update feature flag" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update feature flag", 500);
   }
 }
 
@@ -146,10 +138,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!flag) {
-      return NextResponse.json(
-        { error: "Feature flag not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Feature flag not found", 404);
     }
 
     await prisma.featureFlag.delete({ where: { id } });
@@ -166,12 +155,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete feature flag", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete feature flag" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete feature flag", 500);
   }
 }

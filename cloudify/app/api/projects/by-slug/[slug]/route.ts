@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("projects/by-slug");
 
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             status: true,
             branch: true,
             commitSha: true,
-            commitMsg: true,
+            commitMessage: true,
             createdAt: true,
             finishedAt: true,
             buildTime: true,
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Format deployments with calculated duration
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       status: d.status.toLowerCase(),
       branch: d.branch || "main",
       commit: d.commitSha?.substring(0, 7) || "unknown",
-      commitMessage: d.commitMsg || "No commit message",
+      commitMessage: d.commitMessage || "No commit message",
       time: formatTimeAgo(d.createdAt),
       duration: d.buildTime ? formatDuration(d.buildTime) : null,
       isProduction: d.branch === "main" || d.branch === "master",
@@ -78,17 +79,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         : `${project.slug}.cloudify.tranthachnguyen.com`,
     }));
 
-    return NextResponse.json({
+    return ok({
       ...project,
       deployments: formattedDeployments,
       lastDeployment: formattedDeployments[0] || null,
     });
   } catch (error) {
     log.error("Failed to fetch project", error);
-    return NextResponse.json(
-      { error: "Failed to fetch project" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch project", 500);
   }
 }
 

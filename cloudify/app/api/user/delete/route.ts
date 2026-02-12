@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAuthError } from "@/lib/auth/api-auth";
 import { verifyPassword } from "@/lib/auth/password";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("user/delete");
 
@@ -20,10 +21,7 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid request body", 400);
     }
 
     const { password } = body;
@@ -39,24 +37,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return fail("NOT_FOUND", "User not found", 404);
     }
 
     // For users with password (non-OAuth), require password confirmation
     if (user.passwordHash) {
       if (!password) {
-        return NextResponse.json(
-          { error: "Password confirmation required" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_MISSING_FIELD", "Password confirmation required", 400);
       }
 
       const valid = await verifyPassword(password, user.passwordHash);
       if (!valid) {
-        return NextResponse.json(
-          { error: "Incorrect password" },
-          { status: 403 }
-        );
+        return fail("AUTH_FORBIDDEN", "Incorrect password", 403);
       }
     }
 
@@ -65,20 +57,15 @@ export async function POST(request: NextRequest) {
     await prisma.$transaction([
       // Delete user's notification preferences
       prisma.notificationPreference.deleteMany({ where: { userId: user.id } }),
-      // Delete user's sessions
-      prisma.session.deleteMany({ where: { userId: user.id } }),
       // Delete user's OAuth accounts
       prisma.account.deleteMany({ where: { userId: user.id } }),
       // Delete the user (cascades to projects, teams, etc.)
       prisma.user.delete({ where: { id: user.id } }),
     ]);
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete account", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete account" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete account", 500);
   }
 }

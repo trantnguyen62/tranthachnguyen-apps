@@ -16,6 +16,8 @@ import {
 import { artifactsExist, getArtifactsSize } from "./artifact-manager";
 import { deploySite } from "./site-deployer";
 import type { LogCallback } from "./executor";
+import { sendDeploymentNotification } from "@/lib/notifications";
+import { injectAnalyticsIntoMinioBuild } from "@/lib/analytics/inject";
 
 interface BuildContext {
   deploymentId: string;
@@ -89,7 +91,7 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
       return;
     }
 
-    if (!project.repoUrl) {
+    if (!project.repositoryUrl) {
       await onLog("error", "No repository URL configured");
       await updateDeploymentStatus(deploymentId, "ERROR");
       return;
@@ -100,7 +102,7 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
       where: { id: deploymentId },
     });
 
-    const branch = deployment?.branch || project.repoBranch;
+    const branch = deployment?.branch || project.repositoryBranch;
 
     // Start building
     await updateDeploymentStatus(deploymentId, "BUILDING");
@@ -109,6 +111,19 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
     await onLog("info", `Framework: ${project.framework}`);
     await onLog("info", `Node.js version: ${project.nodeVersion}`);
     await onLog("info", `Branch: ${branch}`);
+
+    // Send deployment started notification (non-blocking)
+    try {
+      await sendDeploymentNotification("started", {
+        userId: project.userId,
+        projectId,
+        projectName: project.name,
+        deploymentId,
+        branch,
+      });
+    } catch (notifError) {
+      console.error("Failed to send deployment started notification:", notifError);
+    }
 
     // Generate site slug for this deployment
     const siteSlug = generateSiteSlug(project.slug, deploymentId);
@@ -129,12 +144,12 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
       deploymentId,
       projectId,
       projectSlug: project.slug,
-      repoUrl: project.repoUrl,
+      repoUrl: project.repositoryUrl,
       branch,
-      installCmd: project.installCmd,
-      buildCmd: project.buildCmd,
-      outputDir: project.outputDir,
-      rootDir: project.rootDir,
+      installCmd: project.installCommand,
+      buildCmd: project.buildCommand,
+      outputDir: project.outputDirectory,
+      rootDir: project.rootDirectory,
       nodeVersion: project.nodeVersion,
       envVars,
       siteSlug,
@@ -147,6 +162,17 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
     if (!jobCreated) {
       await onLog("error", "Failed to create K8s build job");
       await updateDeploymentStatus(deploymentId, "ERROR");
+      try {
+        await sendDeploymentNotification("failure", {
+          userId: project.userId,
+          projectId,
+          projectName: project.name,
+          deploymentId,
+          error: "Failed to create K8s build job",
+        });
+      } catch (notifError) {
+        console.error("Failed to send deployment failure notification:", notifError);
+      }
       return;
     }
 
@@ -158,6 +184,18 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
       await onLog("error", "Build failed");
       await cleanupBuildResources(deploymentId, onLog);
       await updateDeploymentStatus(deploymentId, "ERROR");
+      try {
+        await sendDeploymentNotification("failure", {
+          userId: project.userId,
+          projectId,
+          projectName: project.name,
+          deploymentId,
+          branch,
+          error: "Build failed",
+        });
+      } catch (notifError) {
+        console.error("Failed to send deployment failure notification:", notifError);
+      }
       return;
     }
 
@@ -173,11 +211,35 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
       await onLog("error", "Build artifacts not found in MinIO");
       await cleanupBuildResources(deploymentId, onLog);
       await updateDeploymentStatus(deploymentId, "ERROR");
+      try {
+        await sendDeploymentNotification("failure", {
+          userId: project.userId,
+          projectId,
+          projectName: project.name,
+          deploymentId,
+          branch,
+          error: "Build artifacts not found in MinIO",
+        });
+      } catch (notifError) {
+        console.error("Failed to send deployment failure notification:", notifError);
+      }
       return;
     }
 
     const artifactsSize = await getArtifactsSize(siteSlug);
     await onLog("info", `Build artifacts: ${formatBytes(artifactsSize)}`);
+
+    // Inject analytics tracking script into index.html
+    try {
+      const injected = await injectAnalyticsIntoMinioBuild(siteSlug, projectId);
+      if (injected) {
+        await onLog("info", "Analytics tracking script injected");
+      }
+    } catch (analyticsError) {
+      // Non-fatal: log but don't fail the deployment
+      await onLog("warn", "Failed to inject analytics script (non-fatal)");
+      console.warn("Analytics injection failed:", analyticsError);
+    }
 
     // Create site deployment in K8s (also creates DNS record)
     await onLog("info", "Creating site deployment in K3s...");
@@ -191,6 +253,18 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
       await onLog("error", `Failed to deploy site: ${siteError}`);
       await cleanupBuildResources(deploymentId, onLog);
       await updateDeploymentStatus(deploymentId, "ERROR");
+      try {
+        await sendDeploymentNotification("failure", {
+          userId: project.userId,
+          projectId,
+          projectName: project.name,
+          deploymentId,
+          branch,
+          error: `Failed to deploy site: ${siteError}`,
+        });
+      } catch (notifError) {
+        console.error("Failed to send deployment failure notification:", notifError);
+      }
       return;
     }
 
@@ -213,6 +287,21 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
       artifactPath: `minio://cloudify-builds/${siteSlug}`,
       siteSlug,
     });
+
+    // Send deployment success notification (non-blocking)
+    try {
+      await sendDeploymentNotification("success", {
+        userId: project.userId,
+        projectId,
+        projectName: project.name,
+        deploymentId,
+        branch,
+        url: deploymentUrl,
+        duration: buildTime,
+      });
+    } catch (notifError) {
+      console.error("Failed to send deployment success notification:", notifError);
+    }
   } catch (error) {
     console.error("Build pipeline error:", error);
     await onLog(
@@ -220,13 +309,40 @@ export async function runK8sBuildPipeline(context: BuildContext): Promise<void> 
       `Build failed: ${error instanceof Error ? error.message : "Unknown error"}`
     );
     await updateDeploymentStatus(deploymentId, "ERROR");
+
+    // Send deployment failure notification (non-blocking)
+    try {
+      const proj = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { userId: true, name: true },
+      });
+      if (proj) {
+        await sendDeploymentNotification("failure", {
+          userId: proj.userId,
+          projectId,
+          projectName: proj.name,
+          deploymentId,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    } catch (notifError) {
+      console.error("Failed to send deployment failure notification:", notifError);
+    }
   }
 }
 
 /**
- * Trigger a build (public API)
+ * Trigger a build (public API).
+ *
+ * Enqueues the build into the Redis-based build queue instead of
+ * running it as a fire-and-forget background task.
  */
-export async function triggerK8sBuild(deploymentId: string): Promise<void> {
+export async function triggerK8sBuild(
+  deploymentId: string,
+  options?: { isPreview?: boolean }
+): Promise<void> {
+  const { enqueueBuild } = await import("./queue");
+
   const deployment = await prisma.deployment.findUnique({
     where: { id: deploymentId },
     select: { projectId: true },
@@ -236,11 +352,8 @@ export async function triggerK8sBuild(deploymentId: string): Promise<void> {
     throw new Error("Deployment not found");
   }
 
-  // Run build in background (fire and forget)
-  runK8sBuildPipeline({
-    deploymentId,
-    projectId: deployment.projectId,
-  }).catch(console.error);
+  const priority = options?.isPreview ? "low" : "high";
+  await enqueueBuild(deploymentId, deployment.projectId, priority);
 }
 
 /**

@@ -104,10 +104,10 @@ export default function GuidesPage() {
                 <BookOpen className="h-3 w-3 mr-1" />
                 Guides
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Learn How to Build with Cloudify
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Step-by-step tutorials and best practices to help you get the most out of
                 our platform.
               </p>
@@ -119,7 +119,7 @@ export default function GuidesPage() {
         {guideCategories.map((category, categoryIndex) => (
           <section
             key={category.name}
-            className={`py-16 ${categoryIndex % 2 === 1 ? "bg-background" : ""}`}
+            className={`py-16 ${categoryIndex % 2 === 1 ? "bg-[var(--surface-primary)]" : ""}`}
           >
             <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
               <motion.div
@@ -133,7 +133,7 @@ export default function GuidesPage() {
                 >
                   <category.icon className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-foreground">
+                <h2 className="text-2xl font-bold text-[var(--text-primary)]">
                   {category.name}
                 </h2>
               </motion.div>
@@ -149,17 +149,17 @@ export default function GuidesPage() {
                   >
                     <Link
                       href={guide.href}
-                      className="group flex items-center justify-between p-4 rounded-xl border border-border bg-card hover:border-blue-500 dark:hover:border-blue-500 transition-all hover:shadow-md"
+                      className="group flex items-center justify-between p-4 rounded-xl border border-[var(--border-primary)] bg-card hover:border-blue-500 dark:hover:border-blue-500 transition-all hover:shadow-md"
                     >
-                      <span className="font-medium text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                      <span className="font-medium text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                         {guide.title}
                       </span>
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center text-sm text-muted-foreground">
+                        <span className="flex items-center text-sm text-[var(--text-secondary)]">
                           <Clock className="h-4 w-4 mr-1" />
                           {guide.time}
                         </span>
-                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-[#0070f3] group-hover:translate-x-1 transition-all" />
+                        <ArrowRight className="h-4 w-4 text-[var(--text-secondary)] group-hover:text-[#0070f3] group-hover:translate-x-1 transition-all" />
                       </div>
                     </Link>
                   </motion.div>
@@ -182,7 +182,7 @@ export default function GuidesPage() {
               <Button size="lg" variant="secondary" asChild>
                 <Link href="/docs">Browse Documentation</Link>
               </Button>
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10" asChild>
+              <Button size="lg" variant="secondary" className="text-white border-white hover:bg-white/10" asChild>
                 <Link href="/support">Contact Support</Link>
               </Button>
             </div>

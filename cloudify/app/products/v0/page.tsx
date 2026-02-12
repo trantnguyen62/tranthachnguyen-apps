@@ -54,7 +54,7 @@ export default function V0Page() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -66,14 +66,14 @@ export default function V0Page() {
                 <span className="text-sm font-medium">v0 by Cloudify</span>
                 <Badge variant="secondary" className="ml-2">New</Badge>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-[var(--text-primary)] leading-tight">
                 Turn ideas into
                 <br />
                 <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   production code
                 </span>
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 v0 is an AI-powered app builder. Describe your UI in plain English and get
                 production-ready React components in seconds.
               </p>
@@ -99,20 +99,20 @@ export default function V0Page() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="rounded-lg border border-border bg-background overflow-hidden"
+              className="rounded-lg border border-[var(--border-primary)] bg-[var(--surface-primary)] overflow-hidden"
             >
-              <div className="p-4 border-b border-border flex items-center gap-2">
+              <div className="p-4 border-b border-[var(--border-primary)] flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
                 <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="ml-4 text-sm text-muted-foreground">v0.cloudify.app</span>
+                <span className="ml-4 text-sm text-[var(--text-secondary)]">v0.cloudify.app</span>
               </div>
               <div className="p-8 flex flex-col items-center justify-center min-h-[400px] text-center">
                 <Wand2 className="h-16 w-16 text-purple-500 mb-6" />
-                <h3 className="text-2xl font-semibold text-foreground mb-2">
+                <h3 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
                   What would you like to build?
                 </h3>
-                <p className="text-muted-foreground mb-8 max-w-md">
+                <p className="text-[var(--text-secondary)] mb-8 max-w-md">
                   Type a description of the UI component you want to create
                 </p>
                 <div className="w-full max-w-2xl">
@@ -120,7 +120,7 @@ export default function V0Page() {
                     {examples.map((example, index) => (
                       <button
                         key={index}
-                        className="px-4 py-2 rounded-lg bg-card border border-border text-sm text-muted-foreground hover:border-purple-500 hover:text-purple-600 transition-colors"
+                        className="px-4 py-2 rounded-lg bg-card border border-[var(--border-primary)] text-sm text-[var(--text-secondary)] hover:border-purple-500 hover:text-purple-600 transition-colors"
                       >
                         {example}
                       </button>
@@ -133,7 +133,7 @@ export default function V0Page() {
         </section>
 
         {/* Features */}
-        <section className="py-20 bg-background">
+        <section className="py-20 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -141,10 +141,10 @@ export default function V0Page() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 From prompt to production
               </h2>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 v0 understands your intent and generates clean, accessible, well-structured code.
               </p>
             </motion.div>
@@ -157,15 +157,15 @@ export default function V0Page() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-card border border-border"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)]"
                 >
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-[var(--text-secondary)]">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -183,7 +183,7 @@ export default function V0Page() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 How it works
               </h2>
             </motion.div>
@@ -205,10 +205,10 @@ export default function V0Page() {
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl font-bold text-white">{item.step}</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-[var(--text-secondary)]">
                     {item.description}
                   </p>
                 </motion.div>

@@ -3,10 +3,11 @@
  * GET - Get usage statistics for billing and dashboard
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("analytics/usage-stats");
 
@@ -54,10 +55,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!project) {
-        return NextResponse.json(
-          { error: "Project not found" },
-          { status: 404 }
-        );
+        return fail("NOT_FOUND", "Project not found", 404);
       }
 
       whereClause.projectId = projectId;
@@ -142,7 +140,7 @@ export async function GET(request: NextRequest) {
       _sum: { size: true },
     });
 
-    return NextResponse.json({
+    return ok({
       period: {
         start: startDate,
         end: now,
@@ -161,10 +159,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     log.error("Failed to fetch usage stats", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch usage stats" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch usage stats", 500);
   }
 }
 

@@ -8,7 +8,6 @@ test.describe('Signup Page - Critical Flows', () => {
   // Basic rendering tests
   test('21. renders signup form with all required elements', async ({ page }) => {
     await expect(page.getByText('Create your account')).toBeVisible();
-    await expect(page.getByText('Continue with GitHub')).toBeVisible();
     await expect(page.getByLabel('Name')).toBeVisible();
     await expect(page.getByLabel('Email')).toBeVisible();
     await expect(page.getByLabel('Password')).toBeVisible();

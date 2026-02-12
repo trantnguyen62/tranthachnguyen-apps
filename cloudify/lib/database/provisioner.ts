@@ -5,6 +5,30 @@
 
 import { prisma } from "@/lib/prisma";
 import { randomBytes, createCipheriv, createDecipheriv } from "crypto";
+import {
+  createDatabaseContainer,
+  removeDatabaseContainer,
+  generateDatabaseCredentials,
+  waitForDatabaseReady,
+  getContainerName,
+} from "@/lib/database/docker-provisioner";
+import {
+  createK8sDatabase,
+  removeK8sDatabase,
+  generateK8sCredentials,
+  getK8sResourceName,
+} from "@/lib/database/k8s-provisioner";
+import { createLogger } from "@/lib/logging/logger";
+
+const log = createLogger("database:provisioner");
+
+/**
+ * Whether to use K8s (StatefulSets) instead of Docker containers
+ * for Cloudify-hosted databases.
+ */
+const useK8sMode =
+  process.env.USE_K3S_BUILDS === "true" ||
+  process.env.K3S_ENABLED === "true";
 
 // Encryption for database credentials
 const ENCRYPTION_KEY = process.env.DATABASE_ENCRYPTION_KEY || randomBytes(32).toString("hex");
@@ -77,13 +101,14 @@ export async function provisionDatabase(
   request: DatabaseProvisionRequest
 ): Promise<{ databaseId: string }> {
   // Create database record
+  const dbType = request.type.toUpperCase() as "POSTGRESQL" | "MYSQL" | "REDIS" | "MONGODB";
   const db = await prisma.managedDatabase.create({
     data: {
       projectId: request.projectId,
       name: request.name,
-      type: request.type,
+      type: dbType,
       provider: request.provider,
-      status: "provisioning",
+      status: "PROVISIONING",
       plan: request.plan,
       region: request.region || "us-east-1",
       // Placeholder credentials
@@ -115,7 +140,10 @@ async function provisionAsync(
 
     switch (request.provider) {
       case "cloudify":
-        credentials = await provisionCloudifyDatabase(request);
+        credentials = await provisionCloudifyDatabase({
+          ...request,
+          databaseId,
+        });
         break;
       case "neon":
         credentials = await provisionNeonDatabase(request);
@@ -141,7 +169,7 @@ async function provisionAsync(
         database: credentials.database,
         username: credentials.username,
         password: encryptedPassword,
-        status: "active",
+        status: "ACTIVE",
         version: credentials.version,
       },
     });
@@ -152,7 +180,7 @@ async function provisionAsync(
     await prisma.managedDatabase.update({
       where: { id: databaseId },
       data: {
-        status: "error",
+        status: "ERROR",
         errorMessage: error instanceof Error ? error.message : "Provisioning failed",
       },
     });
@@ -161,42 +189,161 @@ async function provisionAsync(
 }
 
 /**
- * Provision a Cloudify-managed database (Docker-based for development)
+ * Provision a Cloudify-managed database.
+ * Uses K8s StatefulSets when K3S_ENABLED is set, otherwise Docker containers.
  */
 async function provisionCloudifyDatabase(
-  request: DatabaseProvisionRequest
+  request: DatabaseProvisionRequest & { databaseId: string }
 ): Promise<DatabaseCredentials> {
-  const password = generatePassword();
+  if (useK8sMode) {
+    return provisionCloudifyDatabaseK8s(request);
+  }
+  return provisionCloudifyDatabaseDocker(request);
+}
+
+/**
+ * Provision via Docker containers.
+ */
+async function provisionCloudifyDatabaseDocker(
+  request: DatabaseProvisionRequest & { databaseId: string }
+): Promise<DatabaseCredentials> {
+  const { username, password } = generateDatabaseCredentials();
   const dbName = `cloudify_${request.projectId.slice(0, 8)}_${request.name}`.replace(
     /[^a-zA-Z0-9_]/g,
     "_"
   );
 
-  // In production, this would create a K8s StatefulSet
-  // For now, return development credentials
+  log.info("Provisioning Cloudify database via Docker", {
+    type: request.type,
+    databaseId: request.databaseId,
+    dbName,
+  });
+
+  // Create the Docker container
+  const containerResult = await createDatabaseContainer(request.type, {
+    databaseId: request.databaseId,
+    type: request.type,
+    name: dbName,
+    username,
+    password,
+  });
+
+  // Store the container ID in the database record
+  await prisma.managedDatabase.update({
+    where: { id: request.databaseId },
+    data: { containerId: containerResult.containerId },
+  });
+
+  // Wait for the database to be ready
+  const containerName = getContainerName(request.databaseId);
+  await waitForDatabaseReady(request.type, containerName, {
+    username,
+    password,
+    database: dbName,
+  });
+
+  log.info("Cloudify database provisioned successfully", {
+    type: request.type,
+    databaseId: request.databaseId,
+    containerName,
+  });
+
+  // Build credentials based on type
   switch (request.type) {
     case "postgresql":
       return {
-        host: process.env.CLOUDIFY_PG_HOST || "localhost",
-        port: parseInt(process.env.CLOUDIFY_PG_PORT || "5432"),
+        host: containerName,
+        port: 5432,
         database: dbName,
-        username: `user_${request.projectId.slice(0, 8)}`,
+        username,
         password,
         version: "16",
       };
     case "mysql":
       return {
-        host: process.env.CLOUDIFY_MYSQL_HOST || "localhost",
-        port: parseInt(process.env.CLOUDIFY_MYSQL_PORT || "3306"),
+        host: containerName,
+        port: 3306,
         database: dbName,
-        username: `user_${request.projectId.slice(0, 8)}`,
+        username,
         password,
         version: "8.0",
       };
     case "redis":
       return {
-        host: process.env.CLOUDIFY_REDIS_HOST || "localhost",
-        port: parseInt(process.env.CLOUDIFY_REDIS_PORT || "6379"),
+        host: containerName,
+        port: 6379,
+        database: "0",
+        username: "",
+        password,
+        version: "7",
+      };
+    default:
+      throw new Error(`Unsupported database type: ${request.type}`);
+  }
+}
+
+/**
+ * Provision via K8s StatefulSets.
+ */
+async function provisionCloudifyDatabaseK8s(
+  request: DatabaseProvisionRequest & { databaseId: string }
+): Promise<DatabaseCredentials> {
+  const { username, password } = generateK8sCredentials();
+  const dbName = `cloudify_${request.projectId.slice(0, 8)}_${request.name}`.replace(
+    /[^a-zA-Z0-9_]/g,
+    "_"
+  );
+
+  log.info("Provisioning Cloudify database via K8s", {
+    type: request.type,
+    databaseId: request.databaseId,
+    dbName,
+  });
+
+  const result = await createK8sDatabase({
+    databaseId: request.databaseId,
+    type: request.type,
+    name: dbName,
+    username,
+    password,
+    plan: request.plan,
+  });
+
+  // Store the K8s resource name as containerId for tracking
+  await prisma.managedDatabase.update({
+    where: { id: request.databaseId },
+    data: { containerId: result.serviceName },
+  });
+
+  log.info("Cloudify database provisioned via K8s", {
+    type: request.type,
+    databaseId: request.databaseId,
+    host: result.host,
+  });
+
+  switch (request.type) {
+    case "postgresql":
+      return {
+        host: result.host,
+        port: result.port,
+        database: dbName,
+        username,
+        password,
+        version: "16",
+      };
+    case "mysql":
+      return {
+        host: result.host,
+        port: result.port,
+        database: dbName,
+        username,
+        password,
+        version: "8.0",
+      };
+    case "redis":
+      return {
+        host: result.host,
+        port: result.port,
         database: "0",
         username: "",
         password,
@@ -459,8 +606,33 @@ export async function deleteDatabase(databaseId: string) {
 
   if (!db) return;
 
-  // In production, deprovision from provider
-  // For now, just delete the record
+  // Remove infrastructure for Cloudify-hosted databases
+  if (db.provider === "cloudify") {
+    if (useK8sMode) {
+      try {
+        await removeK8sDatabase(
+          databaseId,
+          db.type as "postgresql" | "mysql" | "redis"
+        );
+      } catch (error) {
+        log.warn("Failed to remove K8s resources during delete", {
+          databaseId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    } else {
+      const containerName = getContainerName(databaseId);
+      try {
+        await removeDatabaseContainer(containerName);
+      } catch (error) {
+        log.warn("Failed to remove container during delete", {
+          containerName,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+  }
+
   await prisma.managedDatabase.delete({
     where: { id: databaseId },
   });
@@ -480,7 +652,7 @@ export async function deprovisionDatabase(databaseId: string): Promise<void> {
   // Mark as deleting
   await prisma.managedDatabase.update({
     where: { id: databaseId },
-    data: { status: "deleting" },
+    data: { status: "DELETING" },
   });
 
   // Deprovision asynchronously
@@ -494,11 +666,61 @@ export async function deprovisionDatabase(databaseId: string): Promise<void> {
  */
 async function deprovisionAsync(
   databaseId: string,
-  db: { type: string; provider: string; name: string; projectId: string }
+  db: {
+    type: string;
+    provider: string;
+    name: string;
+    projectId: string;
+    containerId?: string | null;
+  }
 ) {
   try {
-    // Provider-specific cleanup would go here
-    // For now, just clean up the record and related env vars
+    log.info("Starting deprovisioning", {
+      databaseId,
+      provider: db.provider,
+      type: db.type,
+    });
+
+    // Provider-specific cleanup
+    if (db.provider === "cloudify") {
+      if (useK8sMode) {
+        // Remove K8s StatefulSet, Service, Secret, PVC
+        try {
+          await removeK8sDatabase(
+            databaseId,
+            db.type.toLowerCase() as "postgresql" | "mysql" | "redis"
+          );
+          log.info("K8s database resources removed", { databaseId });
+        } catch (error) {
+          log.warn("Failed to remove K8s resources (may already be removed)", {
+            databaseId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      } else {
+        // Remove the Docker container
+        const containerName = getContainerName(databaseId);
+        try {
+          await removeDatabaseContainer(containerName);
+          log.info("Docker container removed", { containerName, databaseId });
+        } catch (error) {
+          log.warn("Failed to remove Docker container (may already be removed)", {
+            containerName,
+            databaseId,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+
+        // Also try removing by container ID if available
+        if (db.containerId) {
+          try {
+            await removeDatabaseContainer(db.containerId);
+          } catch {
+            // Already removed by name, this is expected
+          }
+        }
+      }
+    }
 
     // Remove associated env variable
     const envVarName = `${db.type.toUpperCase()}_URL`;
@@ -522,15 +744,21 @@ async function deprovisionAsync(
       where: { databaseId },
     });
 
-    // Finally delete the database record
-    await prisma.managedDatabase.delete({
+    // Update status to DELETED instead of hard-deleting
+    await prisma.managedDatabase.update({
       where: { id: databaseId },
+      data: { status: "DELETED" },
     });
+
+    log.info("Database deprovisioned successfully", { databaseId });
   } catch (error) {
+    log.error("Deprovisioning failed", error instanceof Error ? error : undefined, {
+      databaseId,
+    });
     await prisma.managedDatabase.update({
       where: { id: databaseId },
       data: {
-        status: "error",
+        status: "ERROR",
         errorMessage: error instanceof Error ? error.message : "Deprovisioning failed",
       },
     });
@@ -564,7 +792,7 @@ export async function rotateCredentials(databaseId: string): Promise<{
     throw new Error("Database not found");
   }
 
-  if (db.status !== "ready" && db.status !== "active") {
+  if (db.status !== "ACTIVE") {
     throw new Error("Database is not ready for credential rotation");
   }
 

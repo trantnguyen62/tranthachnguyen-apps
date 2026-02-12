@@ -14,14 +14,14 @@ export default function ApiRoutesDocsPage() {
         Cloudify automatically deploys your API routes as serverless functions.
       </p>
 
-      <div className="not-prose p-6 rounded-xl border border-border bg-secondary my-8">
+      <div className="not-prose p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-secondary)] my-8">
         <div className="flex items-start gap-4">
           <Zap className="h-8 w-8 text-[#0070f3] shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Zero Configuration
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-[var(--text-secondary)]">
               API routes are automatically detected and deployed. No server
               configuration required.
             </p>
@@ -38,11 +38,11 @@ export default function ApiRoutesDocsPage() {
           { name: "SvelteKit", path: "/src/routes/api" },
           { name: "Astro", path: "/src/pages/api" },
         ].map((item) => (
-          <div key={item.name} className="flex items-center gap-3 p-4 rounded-lg bg-background border border-border">
+          <div key={item.name} className="flex items-center gap-3 p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
             <Check className="h-5 w-5 text-green-500 shrink-0" />
             <div>
-              <span className="font-medium text-foreground">{item.name}</span>
-              <p className="text-sm text-muted-foreground">{item.path}</p>
+              <span className="font-medium text-[var(--text-primary)]">{item.name}</span>
+              <p className="text-sm text-[var(--text-secondary)]">{item.path}</p>
             </div>
           </div>
         ))}
@@ -333,11 +333,11 @@ export async function GET() {
           { icon: FileCode, title: "Type Your APIs", desc: "Use TypeScript for better developer experience and fewer runtime errors" },
           { icon: Globe, title: "Handle CORS", desc: "Configure CORS headers when your API is accessed from different origins" },
         ].map((item) => (
-          <div key={item.title} className="flex items-start gap-4 p-4 rounded-lg bg-background border border-border">
+          <div key={item.title} className="flex items-start gap-4 p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
             <item.icon className="h-6 w-6 text-[#0070f3] shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-foreground">{item.title}</h4>
-              <p className="text-sm text-muted-foreground">{item.desc}</p>
+              <h4 className="font-semibold text-[var(--text-primary)]">{item.title}</h4>
+              <p className="text-sm text-[var(--text-secondary)]">{item.desc}</p>
             </div>
           </div>
         ))}

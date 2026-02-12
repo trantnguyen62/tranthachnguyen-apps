@@ -83,10 +83,10 @@ export default function ResourcesPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Resources
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Everything you need to build, deploy, and scale your applications on Cloudify.
               </p>
             </motion.div>
@@ -99,7 +99,7 @@ export default function ResourcesPage() {
               className="mt-10 max-w-xl mx-auto"
             >
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
                 <Input
                   placeholder="Search documentation, guides, and more..."
                   className="pl-12 h-14 text-lg"
@@ -122,20 +122,20 @@ export default function ResourcesPage() {
                 >
                   <Link
                     href={resource.href}
-                    className="group block p-6 rounded-lg border border-border hover:shadow-lg transition-all hover:border-foreground/20"
+                    className="group block p-6 rounded-lg border border-[var(--border-primary)] hover:shadow-lg transition-all hover:border-foreground/20"
                   >
                     <div
                       className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${resource.color}`}
                     >
                       <resource.icon className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="mt-4 text-xl font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                    <h3 className="mt-4 text-xl font-semibold text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                       {resource.name}
                     </h3>
-                    <p className="mt-2 text-muted-foreground">
+                    <p className="mt-2 text-[var(--text-secondary)]">
                       {resource.description}
                     </p>
-                    <div className="mt-4 flex items-center text-foreground font-medium">
+                    <div className="mt-4 flex items-center text-[var(--text-primary)] font-medium">
                       Explore
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -147,9 +147,9 @@ export default function ResourcesPage() {
         </section>
 
         {/* Popular Guides */}
-        <section className="py-16 bg-background">
+        <section className="py-16 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-8">
               Popular Guides
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -162,18 +162,18 @@ export default function ResourcesPage() {
                 >
                   <Link
                     href={guide.href}
-                    className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:border-foreground/20 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-primary)] bg-card hover:border-foreground/20 transition-colors"
                   >
-                    <span className="font-medium text-foreground">
+                    <span className="font-medium text-[var(--text-primary)]">
                       {guide.title}
                     </span>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    <ArrowRight className="h-4 w-4 text-[var(--text-secondary)]" />
                   </Link>
                 </motion.div>
               ))}
             </div>
             <div className="mt-8 text-center">
-              <Button variant="outline" asChild>
+              <Button variant="secondary" asChild>
                 <Link href="/docs">
                   View All Documentation
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -193,10 +193,10 @@ export default function ResourcesPage() {
               Our team is here to help you succeed. Reach out for personalized guidance.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" className="bg-background text-foreground" asChild>
+              <Button size="lg" variant="secondary" className="bg-[var(--surface-primary)] text-[var(--text-primary)]" asChild>
                 <Link href="/contact">Contact Sales</Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-background/30 text-background hover:bg-background/10" asChild>
+              <Button size="lg" variant="secondary" className="border-[var(--surface-primary)]/30 text-background hover:bg-[var(--surface-primary)]/10" asChild>
                 <Link href="/support">Get Support</Link>
               </Button>
             </div>

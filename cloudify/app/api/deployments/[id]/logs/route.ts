@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const routeLog = getRouteLogger("deployments/[id]/logs");
 
@@ -29,11 +31,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!deployment) {
-      return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
     if (deployment.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return fail("AUTH_REQUIRED", "Unauthorized", 401);
     }
 
     // Create SSE stream
@@ -110,10 +112,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     routeLog.error("Failed to stream logs", error);
-    return NextResponse.json(
-      { error: "Failed to stream logs" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to stream logs", 500);
   }
 }
 
@@ -125,7 +124,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { user } = authResult;
 
     const { id } = await params;
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { level, message } = body;
 
     // Verify deployment ownership
@@ -139,11 +140,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!deployment) {
-      return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
     if (deployment.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return fail("AUTH_REQUIRED", "Unauthorized", 401);
     }
 
     const logEntry = await prisma.deploymentLog.create({
@@ -154,12 +155,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(logEntry, { status: 201 });
+    return ok(logEntry, { status: 201 });
   } catch (error) {
     routeLog.error("Failed to add log", error);
-    return NextResponse.json(
-      { error: "Failed to add log" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to add log", 500);
   }
 }

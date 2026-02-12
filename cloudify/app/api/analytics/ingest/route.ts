@@ -8,6 +8,8 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getVitalRating } from "@/lib/analytics/sdk-source";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("analytics/ingest");
 
@@ -78,28 +80,21 @@ export async function POST(request: NextRequest) {
 
     // Check rate limit
     if (!checkRateLimit(clientIp)) {
-      return NextResponse.json(
-        { error: "Rate limit exceeded" },
-        { status: 429 }
-      );
+      return fail("RATE_LIMITED", "Rate limit exceeded", 429);
     }
 
-    const body: IngestPayload = await request.json();
+    const parseResult = await parseJsonBody<IngestPayload>(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { events } = body;
 
     if (!events || !Array.isArray(events) || events.length === 0) {
-      return NextResponse.json(
-        { error: "No events provided" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "No events provided", 400);
     }
 
     // Limit batch size
     if (events.length > 50) {
-      return NextResponse.json(
-        { error: "Too many events in batch (max 50)" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Too many events in batch (max 50)", 400);
     }
 
     // Get valid project IDs
@@ -178,22 +173,19 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    return ok({
       success: true,
       processed: analyticsEvents.length + webVitals.length,
     });
   } catch (error) {
     log.error("Analytics ingest error", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to process events" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to process events", 500);
   }
 }
 
 // Also support GET for beacon fallback (some browsers)
 export async function GET() {
-  return NextResponse.json({ error: "Use POST method" }, { status: 405 });
+  return fail("BAD_REQUEST", "Use POST method", 405);
 }
 
 // Enable CORS for cross-origin requests from deployed sites

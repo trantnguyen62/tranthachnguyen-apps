@@ -52,7 +52,7 @@ describe("Projects API Routes", () => {
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       mockPrisma.project.findMany.mockResolvedValue(mockProjects);
@@ -75,7 +75,7 @@ describe("Projects API Routes", () => {
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       const projectData = { name: "My New Project" };
@@ -125,7 +125,7 @@ describe("Projects API Routes", () => {
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       const updateData = { name: "Updated Project Name", buildCmd: "npm run build:prod" };
@@ -152,7 +152,7 @@ describe("Projects API Routes", () => {
         id: "different-user",
         email: "other@example.com",
         name: "Other User",
-        avatar: null,
+        image: null,
       });
 
       mockPrisma.project.findFirst.mockResolvedValue(null);
@@ -171,7 +171,7 @@ describe("Projects API Routes", () => {
         id: mockUser.id,
         email: mockUser.email!,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       mockPrisma.project.findFirst.mockResolvedValue(mockProjects[0]);

@@ -387,13 +387,13 @@ export async function handleSubscriptionEvent(
 
   // Determine plan from price
   const priceId = subscription.items.data[0]?.price.id;
-  let plan = "pro";
+  let plan: "PRO" | "TEAM" = "PRO";
 
   if (
     priceId === STRIPE_PRICES.TEAM_MONTHLY ||
     priceId === STRIPE_PRICES.TEAM_YEARLY
   ) {
-    plan = "team";
+    plan = "TEAM";
   }
 
   // Get current period end from subscription items
@@ -439,7 +439,7 @@ export async function handleSubscriptionDeleted(
   await prisma.user.update({
     where: { id: userId },
     data: {
-      plan: "free",
+      plan: "FREE",
       subscriptionStatus: "canceled",
       subscriptionId: null,
       currentPeriodEnd: null,

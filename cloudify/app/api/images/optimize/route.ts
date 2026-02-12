@@ -22,6 +22,7 @@ import {
   type ImageFormat,
 } from "@/lib/images/optimizer";
 import { createLogger } from "@/lib/logging";
+import { ok, fail } from "@/lib/api/response";
 
 const logger = createLogger("api:images");
 
@@ -58,13 +59,7 @@ export async function GET(request: NextRequest) {
     // Rate limiting
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
     if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: "Too many requests" },
-        {
-          status: 429,
-          headers: { "Retry-After": "60" },
-        }
-      );
+      return fail("RATE_LIMITED", "Too many requests", 429);
     }
 
     const { searchParams } = new URL(request.url);
@@ -79,10 +74,7 @@ export async function GET(request: NextRequest) {
 
     // Validate URL
     if (!url) {
-      return NextResponse.json(
-        { error: "Missing required parameter: url" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing required parameter: url", 400);
     }
 
     // Validate width if provided
@@ -90,10 +82,7 @@ export async function GET(request: NextRequest) {
     if (widthParam) {
       width = parseInt(widthParam, 10);
       if (isNaN(width) || width < 1) {
-        return NextResponse.json(
-          { error: `Invalid width. Valid widths: ${VALID_WIDTHS.join(", ")}` },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", `Invalid width. Valid widths: ${VALID_WIDTHS.join(", ")}`, 400);
       }
       width = validateWidth(width);
     }
@@ -103,10 +92,7 @@ export async function GET(request: NextRequest) {
     if (heightParam) {
       height = parseInt(heightParam, 10);
       if (isNaN(height) || height < 1 || height > 4096) {
-        return NextResponse.json(
-          { error: "Invalid height. Must be between 1 and 4096" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Invalid height. Must be between 1 and 4096", 400);
       }
     }
 
@@ -115,10 +101,7 @@ export async function GET(request: NextRequest) {
     if (qualityParam) {
       quality = parseInt(qualityParam, 10);
       if (isNaN(quality) || quality < 1 || quality > 100) {
-        return NextResponse.json(
-          { error: "Invalid quality. Must be between 1 and 100" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Invalid quality. Must be between 1 and 100", 400);
       }
     }
 
@@ -170,13 +153,7 @@ export async function GET(request: NextRequest) {
     const err = error instanceof Error ? error : new Error(String(error));
     logger.error("Image optimization failed", err);
 
-    return NextResponse.json(
-      { error: err.message || "Failed to optimize image" },
-      {
-        status: 500,
-        headers: { "Cache-Control": CACHE_CONTROL_ERROR },
-      }
-    );
+    return fail("INTERNAL_ERROR", err.message || "Failed to optimize image", 500);
   }
 }
 

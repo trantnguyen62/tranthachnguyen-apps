@@ -48,7 +48,7 @@ interface DeploymentDetails {
   status: string;
   branch: string | null;
   commitSha: string | null;
-  commitMsg: string | null;
+  commitMessage: string | null;
   createdAt: string;
   finishedAt: string | null;
   duration: number | null;
@@ -93,22 +93,22 @@ const statusConfig = {
   },
   queued: {
     icon: Clock,
-    color: "text-muted-foreground",
-    bg: "bg-secondary",
+    color: "text-[var(--text-secondary)]",
+    bg: "bg-[var(--surface-secondary)]",
     label: "Queued",
     animate: false,
   },
   deploying: {
     icon: Loader2,
-    color: "text-foreground",
-    bg: "bg-secondary",
+    color: "text-[var(--text-primary)]",
+    bg: "bg-[var(--surface-secondary)]",
     label: "Deploying",
     animate: true,
   },
   cancelled: {
     icon: XCircle,
-    color: "text-muted-foreground",
-    bg: "bg-secondary",
+    color: "text-[var(--text-secondary)]",
+    bg: "bg-[var(--surface-secondary)]",
     label: "Cancelled",
     animate: false,
   },
@@ -214,7 +214,7 @@ export default function DeploymentDetailsPage({
       <div className="space-y-6">
         <Link
           href="/deployments"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-gray-700 dark:text-muted-foreground dark:hover:text-gray-200"
+          className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-gray-700 dark:text-[var(--text-secondary)] dark:hover:text-gray-200"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Deployments
@@ -228,7 +228,7 @@ export default function DeploymentDetailsPage({
                 <p className="text-sm text-red-500">{error || "Deployment not found"}</p>
               </div>
             </div>
-            <Button variant="outline" className="mt-4" asChild>
+            <Button variant="secondary" className="mt-4" asChild>
               <Link href="/deployments">Back to Deployments</Link>
             </Button>
           </CardContent>
@@ -249,7 +249,7 @@ export default function DeploymentDetailsPage({
       {/* Back button */}
       <Link
         href="/deployments"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-gray-700 dark:text-muted-foreground dark:hover:text-gray-200"
+        className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-gray-700 dark:text-[var(--text-secondary)] dark:hover:text-gray-200"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Deployments
@@ -259,7 +259,7 @@ export default function DeploymentDetailsPage({
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)]">
               Deployment
             </h1>
             <Badge
@@ -274,13 +274,13 @@ export default function DeploymentDetailsPage({
               />
               {config.label}
             </Badge>
-            <Badge variant="outline">
+            <Badge variant="secondary">
               {isProduction ? "production" : "preview"}
             </Badge>
           </div>
 
           {/* Meta info */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--text-secondary)]">
             <div className="flex items-center gap-1.5">
               <GitBranch className="h-4 w-4" />
               {deployment.branch || "main"}
@@ -303,7 +303,7 @@ export default function DeploymentDetailsPage({
           </div>
 
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            {deployment.commitMsg || "No commit message"}
+            {deployment.commitMessage || "No commit message"}
           </p>
 
           {deployment.error && (
@@ -315,7 +315,7 @@ export default function DeploymentDetailsPage({
 
         <div className="flex items-center gap-2">
           {deployment.status.toLowerCase() === "ready" && (
-            <Button variant="outline" asChild>
+            <Button variant="secondary" asChild>
               <a
                 href={deploymentUrl}
                 target="_blank"
@@ -327,7 +327,7 @@ export default function DeploymentDetailsPage({
             </Button>
           )}
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleRedeploy}
             disabled={isRedeploying}
           >
@@ -338,7 +338,7 @@ export default function DeploymentDetailsPage({
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="sm" >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -385,13 +385,13 @@ export default function DeploymentDetailsPage({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="p-4 bg-card rounded-xl border border-border"
+            className="p-4 bg-card rounded-xl border border-[var(--border-primary)]"
           >
-            <metric.icon className="h-5 w-5 text-muted-foreground mb-2" />
-            <p className="text-2xl font-bold text-foreground truncate">
+            <metric.icon className="h-5 w-5 text-[var(--text-secondary)] mb-2" />
+            <p className="text-2xl font-bold text-[var(--text-primary)] truncate">
               {metric.value}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--text-secondary)]">
               {metric.label}
             </p>
           </motion.div>
@@ -409,17 +409,17 @@ export default function DeploymentDetailsPage({
 
         <TabsContent value="overview" className="space-y-6 mt-6">
           {/* Deployment URL */}
-          <div className="p-6 bg-card rounded-xl border border-border">
-            <h3 className="font-semibold text-foreground mb-4">
+          <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
+            <h3 className="font-semibold text-[var(--text-primary)] mb-4">
               Deployment URL
             </h3>
             <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <Globe className="h-5 w-5 text-muted-foreground" />
+              <Globe className="h-5 w-5 text-[var(--text-secondary)]" />
               <a
                 href={deploymentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 text-foreground hover:underline"
+                className="flex-1 text-[var(--text-primary)] hover:underline"
               >
                 {deploymentUrl}
               </a>
@@ -434,15 +434,15 @@ export default function DeploymentDetailsPage({
           </div>
 
           {/* Project info */}
-          <div className="p-6 bg-card rounded-xl border border-border">
-            <h3 className="font-semibold text-foreground mb-4">
+          <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
+            <h3 className="font-semibold text-[var(--text-primary)] mb-4">
               Project
             </h3>
             <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <Server className="h-5 w-5 text-muted-foreground" />
+              <Server className="h-5 w-5 text-[var(--text-secondary)]" />
               <Link
                 href={`/projects/${deployment.project.slug}`}
-                className="flex-1 text-foreground hover:underline"
+                className="flex-1 text-[var(--text-primary)] hover:underline"
               >
                 {deployment.project.name}
               </Link>
@@ -454,19 +454,19 @@ export default function DeploymentDetailsPage({
           {deployment.status.toLowerCase() === "building" || deployment.status.toLowerCase() === "deploying" ? (
             <DeploymentStream deploymentId={deployment.id} />
           ) : (
-            <div className="p-6 bg-card rounded-xl border border-border">
+            <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
               <div className="flex items-center gap-2 mb-4">
                 {deployment.status.toLowerCase() === "ready" ? (
                   <>
                     <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    <h3 className="font-semibold text-foreground">
+                    <h3 className="font-semibold text-[var(--text-primary)]">
                       Build completed successfully
                     </h3>
                   </>
                 ) : (
                   <>
                     <XCircle className="h-5 w-5 text-red-500" />
-                    <h3 className="font-semibold text-foreground">
+                    <h3 className="font-semibold text-[var(--text-primary)]">
                       Build failed
                     </h3>
                   </>
@@ -481,7 +481,7 @@ export default function DeploymentDetailsPage({
                         "py-0.5",
                         log.level === "error" && "text-red-400",
                         log.level === "warn" && "text-yellow-400",
-                        log.level === "info" && "text-muted-foreground",
+                        log.level === "info" && "text-[var(--text-secondary)]",
                         log.level === "success" && "text-green-400"
                       )}
                     >
@@ -489,7 +489,7 @@ export default function DeploymentDetailsPage({
                     </p>
                   ))
                 ) : (
-                  <div className="text-muted-foreground">
+                  <div className="text-[var(--text-secondary)]">
                     {deployment.status.toLowerCase() === "ready" ? (
                       <>
                         <p>✓ Repository cloned</p>
@@ -512,11 +512,11 @@ export default function DeploymentDetailsPage({
         </TabsContent>
 
         <TabsContent value="functions" className="mt-6">
-          <div className="p-6 bg-card rounded-xl border border-border">
-            <h3 className="font-semibold text-foreground mb-4">
+          <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
+            <h3 className="font-semibold text-[var(--text-primary)] mb-4">
               Serverless Functions
             </h3>
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-[var(--text-secondary)]">
               <Server className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p>No serverless functions detected in this deployment</p>
             </div>
@@ -524,12 +524,12 @@ export default function DeploymentDetailsPage({
         </TabsContent>
 
         <TabsContent value="domains" className="mt-6">
-          <div className="p-6 bg-card rounded-xl border border-border">
+          <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-foreground">
+              <h3 className="font-semibold text-[var(--text-primary)]">
                 Connected Domains
               </h3>
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="secondary" size="sm" asChild>
                 <Link href={`/projects/${deployment.project.slug}`}>
                   Manage Domains
                 </Link>
@@ -542,10 +542,10 @@ export default function DeploymentDetailsPage({
                     <Globe className="h-5 w-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">
+                    <p className="font-medium text-[var(--text-primary)]">
                       {deployment.siteSlug || deployment.project.slug}.cloudify.tranthachnguyen.com
                     </p>
-                    <p className="text-sm text-muted-foreground">Default domain</p>
+                    <p className="text-sm text-[var(--text-secondary)]">Default domain</p>
                   </div>
                 </div>
                 <Badge variant="success">Configured</Badge>

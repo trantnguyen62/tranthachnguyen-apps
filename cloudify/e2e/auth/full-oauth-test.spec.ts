@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// OAuth was removed in favor of credentials-only auth. Skip entire suite.
+test.skip();
+
 test('Full GitHub OAuth flow with credentials', async ({ page }) => {
   // Go to login page
   await page.goto('https://cloudify.tranthachnguyen.com/login', { waitUntil: 'domcontentloaded' });

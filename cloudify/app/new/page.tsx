@@ -20,6 +20,7 @@ import {
   RefreshCw,
   AlertCircle,
   CheckCircle,
+  Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { ImportProject } from "@/components/dashboard/import-project";
 
 // Repository type from API
 interface Repository {
@@ -70,6 +72,7 @@ export default function NewProjectPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [gitProvider, setGitProvider] = useState("github");
   const [selectedBranch, setSelectedBranch] = useState("");
+  const [showGitUrlImport, setShowGitUrlImport] = useState(false);
 
   // Real data states
   const [repositories, setRepositories] = useState<Repository[]>([]);
@@ -186,21 +189,21 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[var(--surface-primary)]">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-gray-200 bg-background border-border">
+      <header className="sticky top-0 z-50 border-b border-gray-200 bg-[var(--surface-primary)] border-[var(--border-primary)]">
         <div className="mx-auto max-w-4xl px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
+            <Button variant="ghost" size="sm"  asChild>
               <Link href="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
             <div>
-              <h1 className="text-lg font-semibold text-foreground">
+              <h1 className="text-lg font-semibold text-[var(--text-primary)]">
                 Import Project
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-[var(--text-secondary)]">
                 Import a Git repository or start from a template
               </p>
             </div>
@@ -209,7 +212,7 @@ export default function NewProjectPage() {
       </header>
 
       {/* Progress Steps */}
-      <div className="border-b border-gray-200 bg-background border-border">
+      <div className="border-b border-gray-200 bg-[var(--surface-primary)] border-[var(--border-primary)]">
         <div className="mx-auto max-w-4xl px-4 py-4">
           <div className="flex items-center gap-2">
             {["source", "configure", "deploy"].map((s, i) => (
@@ -234,8 +237,8 @@ export default function NewProjectPage() {
                   className={cn(
                     "ml-2 text-sm font-medium capitalize",
                     step === s
-                      ? "text-foreground"
-                      : "text-muted-foreground"
+                      ? "text-[var(--text-primary)]"
+                      : "text-[var(--text-secondary)]"
                   )}
                 >
                   {s}
@@ -269,7 +272,7 @@ export default function NewProjectPage() {
                 <div className="mb-6 flex items-center gap-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="gap-2">
+                      <Button variant="secondary" className="gap-2">
                         <Github className="h-4 w-4" />
                         {gitProvider === "github" ? "GitHub" : "GitLab"}
                         <ChevronDown className="h-4 w-4" />
@@ -299,7 +302,7 @@ export default function NewProjectPage() {
                   </div>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="sm" 
                     onClick={fetchRepositories}
                     disabled={isLoading}
                   >
@@ -312,7 +315,7 @@ export default function NewProjectPage() {
                   {isLoading ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <Loader2 className="h-8 w-8 animate-spin text-[#0070f3] mb-4" />
-                      <p className="text-muted-foreground">Loading repositories...</p>
+                      <p className="text-[var(--text-secondary)]">Loading repositories...</p>
                     </div>
                   ) : error ? (
                     <div className="flex flex-col items-center justify-center py-12">
@@ -323,7 +326,7 @@ export default function NewProjectPage() {
                           <Link href="/login">Sign in with GitHub</Link>
                         </Button>
                       ) : (
-                        <Button variant="outline" onClick={fetchRepositories}>
+                        <Button variant="secondary" onClick={fetchRepositories}>
                           <RefreshCw className="h-4 w-4 mr-2" />
                           Retry
                         </Button>
@@ -332,7 +335,7 @@ export default function NewProjectPage() {
                   ) : filteredRepos.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12">
                       <Folder className="h-8 w-8 text-gray-400 mb-4" />
-                      <p className="text-muted-foreground">
+                      <p className="text-[var(--text-secondary)]">
                         {searchQuery ? "No repositories found matching your search" : "No repositories found"}
                       </p>
                     </div>
@@ -352,7 +355,7 @@ export default function NewProjectPage() {
                           <Folder className="h-5 w-5 text-gray-400" />
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-medium text-foreground">
+                              <span className="font-medium text-[var(--text-primary)]">
                                 {repo.name}
                               </span>
                               {repo.private && (
@@ -367,13 +370,13 @@ export default function NewProjectPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-[var(--text-secondary)]">
                               {repo.fullName}
                               {repo.description && ` • ${repo.description.substring(0, 50)}${repo.description.length > 50 ? '...' : ''}`}
                             </p>
                           </div>
                         </div>
-                        <div className="text-sm text-muted-foreground text-right">
+                        <div className="text-sm text-[var(--text-secondary)] text-right">
                           <div>{new Date(repo.updatedAt).toLocaleDateString()}</div>
                           {repo.language && (
                             <div className="text-xs">{repo.language}</div>
@@ -406,7 +409,7 @@ export default function NewProjectPage() {
                       >
                         {template.icon}
                       </div>
-                      <span className="font-medium text-foreground">
+                      <span className="font-medium text-[var(--text-primary)]">
                         {template.name}
                       </span>
                     </button>
@@ -415,23 +418,48 @@ export default function NewProjectPage() {
               </CardContent>
             </Card>
 
-            {/* Manual Import */}
-            <Card>
-              <CardContent className="py-8">
-                <div className="flex items-center justify-center gap-4">
-                  <Upload className="h-8 w-8 text-gray-400" />
-                  <div className="text-center">
-                    <p className="font-medium text-foreground">
-                      Import Third-Party Git Repository
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Deploy from any public Git URL
-                    </p>
-                  </div>
-                  <Button variant="outline">Import</Button>
+            {/* Manual Import from Git URL */}
+            {showGitUrlImport ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                    <Globe className="h-5 w-5" />
+                    Import from Git URL
+                  </h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowGitUrlImport(false)}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    Back to repos
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+                <ImportProject />
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="py-8">
+                  <div className="flex items-center justify-center gap-4">
+                    <Upload className="h-8 w-8 text-gray-400" />
+                    <div className="text-center">
+                      <p className="font-medium text-[var(--text-primary)]">
+                        Import Third-Party Git Repository
+                      </p>
+                      <p className="text-sm text-[var(--text-secondary)]">
+                        Deploy from any public Git URL
+                      </p>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setShowGitUrlImport(true)}
+                    >
+                      Import
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </motion.div>
         )}
 
@@ -448,11 +476,11 @@ export default function NewProjectPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Repository Info */}
-                <div className="p-4 rounded-lg bg-background border border-border">
+                <div className="p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
                   <div className="flex items-center gap-3">
                     <Github className="h-5 w-5 text-gray-500" />
                     <div className="flex-1">
-                      <p className="font-medium text-foreground">
+                      <p className="font-medium text-[var(--text-primary)]">
                         {selectedRepo.fullName}
                       </p>
                     </div>
@@ -470,7 +498,7 @@ export default function NewProjectPage() {
                     onChange={(e) => setSelectedBranch(e.target.value)}
                     placeholder={selectedRepo.defaultBranch}
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     Default: {selectedRepo.defaultBranch}. Common branches: main, master, develop
                   </p>
                 </div>
@@ -485,7 +513,7 @@ export default function NewProjectPage() {
                     onChange={(e) => setProjectName(e.target.value)}
                     placeholder="my-project"
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-[var(--text-secondary)]">
                     Your project will be available at {projectName}.cloudify.app
                   </p>
                 </div>
@@ -497,7 +525,7 @@ export default function NewProjectPage() {
                   </label>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="w-full justify-between">
+                      <Button variant="secondary" className="w-full justify-between">
                         {framework}
                         <ChevronDown className="h-4 w-4" />
                       </Button>
@@ -525,21 +553,21 @@ export default function NewProjectPage() {
                     </Button>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="p-3 rounded-lg bg-background">
-                      <p className="text-muted-foreground">Build Command</p>
-                      <p className="font-mono text-foreground">npm run build</p>
+                    <div className="p-3 rounded-lg bg-[var(--surface-primary)]">
+                      <p className="text-[var(--text-secondary)]">Build Command</p>
+                      <p className="font-mono text-[var(--text-primary)]">npm run build</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-background">
-                      <p className="text-muted-foreground">Output Directory</p>
-                      <p className="font-mono text-foreground">.next</p>
+                    <div className="p-3 rounded-lg bg-[var(--surface-primary)]">
+                      <p className="text-[var(--text-secondary)]">Output Directory</p>
+                      <p className="font-mono text-[var(--text-primary)]">.next</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-background">
-                      <p className="text-muted-foreground">Install Command</p>
-                      <p className="font-mono text-foreground">npm install</p>
+                    <div className="p-3 rounded-lg bg-[var(--surface-primary)]">
+                      <p className="text-[var(--text-secondary)]">Install Command</p>
+                      <p className="font-mono text-[var(--text-primary)]">npm install</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-background">
-                      <p className="text-muted-foreground">Root Directory</p>
-                      <p className="font-mono text-foreground">./</p>
+                    <div className="p-3 rounded-lg bg-[var(--surface-primary)]">
+                      <p className="text-[var(--text-secondary)]">Root Directory</p>
+                      <p className="font-mono text-[var(--text-primary)]">./</p>
                     </div>
                   </div>
                 </div>
@@ -555,7 +583,7 @@ export default function NewProjectPage() {
                       Add Variable
                     </Button>
                   </div>
-                  <div className="p-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 text-center text-sm text-muted-foreground">
+                  <div className="p-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 text-center text-sm text-[var(--text-secondary)]">
                     No environment variables configured
                   </div>
                 </div>
@@ -605,15 +633,15 @@ export default function NewProjectPage() {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
               <Check className="h-10 w-10 text-green-600 dark:text-green-400" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
               Project Imported Successfully!
             </h2>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-[var(--text-secondary)] mb-8">
               Your project has been imported from GitHub. The first deployment will start automatically.
             </p>
             <Card className="max-w-md mx-auto mb-8">
               <CardContent className="p-6">
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-sm text-[var(--text-secondary)] mb-2">
                   Your project will be available at
                 </p>
                 <a
@@ -627,7 +655,7 @@ export default function NewProjectPage() {
               </CardContent>
             </Card>
             <div className="flex items-center justify-center gap-4">
-              <Button variant="outline" asChild>
+              <Button variant="secondary" asChild>
                 <Link href={`/projects/${createdProject.slug}`}>
                   View Project Dashboard
                 </Link>

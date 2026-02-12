@@ -7,9 +7,10 @@
  * - DELETE: Revoke SSL certificate
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("domains/ssl");
 import { prisma } from "@/lib/prisma";
@@ -50,18 +51,18 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!domain) {
-      return NextResponse.json({ error: "Domain not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Domain not found", 404);
     }
 
     if (domain.project.userId !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Forbidden", 403);
     }
 
     // Get detailed SSL info
     const sslStatus = await checkSslStatus(domainId);
     const certificateInfo = await getSslCertificateInfo(domainId);
 
-    return NextResponse.json({
+    return ok({
       domain: domain.domain,
       verified: domain.verified,
       ssl: {
@@ -83,10 +84,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to get SSL status", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to get SSL status" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get SSL status", 500);
   }
 }
 
@@ -118,19 +116,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!domain) {
-      return NextResponse.json({ error: "Domain not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Domain not found", 404);
     }
 
     if (domain.project.userId !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Forbidden", 403);
     }
 
     // Check if domain is verified
     if (!domain.verified) {
-      return NextResponse.json(
-        { error: "Domain must be verified before provisioning SSL" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Domain must be verified before provisioning SSL", 400);
     }
 
     switch (action) {
@@ -143,14 +138,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             : await provisionSslCertificate(domainId);
 
         if (!result.success) {
-          return NextResponse.json(
-            { error: result.error || "SSL provisioning failed" },
-            { status: 500 }
-          );
+          return fail("INTERNAL_ERROR", result.error || "SSL provisioning failed", 500);
         }
 
-        return NextResponse.json({
-          success: true,
+        return ok({
           message: `SSL certificate ${action === "renew" ? "renewed" : "provisioned"} successfully`,
           certPath: result.certPath,
           method: result.method,
@@ -159,34 +150,24 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
       case "provision-async": {
         // Asynchronous provisioning (returns immediately)
-        if (domain.sslStatus === "provisioning") {
-          return NextResponse.json(
-            { error: "SSL provisioning already in progress" },
-            { status: 409 }
-          );
+        if (domain.sslStatus === "PROVISIONING") {
+          return fail("CONFLICT", "SSL provisioning already in progress", 409);
         }
 
         await triggerSslProvisioning(domainId);
 
-        return NextResponse.json({
-          success: true,
+        return ok({
           message: "SSL provisioning started",
           status: "provisioning",
         });
       }
 
       default:
-        return NextResponse.json(
-          { error: `Unknown action: ${action}` },
-          { status: 400 }
-        );
+        return fail("BAD_REQUEST", `Unknown action: ${action}`, 400);
     }
   } catch (error) {
     log.error("Failed to provision SSL", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to provision SSL" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to provision SSL", 500);
   }
 }
 
@@ -213,32 +194,25 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!domain) {
-      return NextResponse.json({ error: "Domain not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Domain not found", 404);
     }
 
     if (domain.project.userId !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Forbidden", 403);
     }
 
     // Revoke certificate
     const success = await revokeSslCertificate(domainId);
 
     if (!success) {
-      return NextResponse.json(
-        { error: "Failed to revoke SSL certificate" },
-        { status: 500 }
-      );
+      return fail("INTERNAL_ERROR", "Failed to revoke SSL certificate", 500);
     }
 
-    return NextResponse.json({
-      success: true,
+    return ok({
       message: "SSL certificate revoked",
     });
   } catch (error) {
     log.error("Failed to revoke SSL", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to revoke SSL" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to revoke SSL", 500);
   }
 }

@@ -78,17 +78,17 @@ export default function AboutPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-3xl mx-auto"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Building the future of the web
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground">
+              <p className="mt-6 text-xl text-[var(--text-secondary)]">
                 Cloudify is on a mission to make the web faster, more accessible, and easier
                 to build. We&apos;re creating tools that empower developers to ship their best work.
               </p>
@@ -103,10 +103,10 @@ export default function AboutPage() {
             >
               {stats.map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-4xl font-bold text-foreground">
+                  <div className="text-4xl font-bold text-[var(--text-primary)]">
                     {stat.value}
                   </div>
-                  <div className="mt-2 text-muted-foreground">{stat.label}</div>
+                  <div className="mt-2 text-[var(--text-secondary)]">{stat.label}</div>
                 </div>
               ))}
             </motion.div>
@@ -121,7 +121,7 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-foreground mb-8">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-8">
                 Our Story
               </h2>
               <div className="prose prose-lg dark:prose-invert">
@@ -147,7 +147,7 @@ export default function AboutPage() {
         </section>
 
         {/* Values */}
-        <section className="py-20 bg-background">
+        <section className="py-20 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -155,10 +155,10 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl font-bold text-foreground">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Our Values
               </h2>
-              <p className="mt-4 text-xl text-muted-foreground">
+              <p className="mt-4 text-xl text-[var(--text-secondary)]">
                 The principles that guide everything we do
               </p>
             </motion.div>
@@ -171,13 +171,13 @@ export default function AboutPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-8 rounded-lg bg-card border border-border"
+                  className="p-8 rounded-lg bg-card border border-[var(--border-primary)]"
                 >
                   <value.icon className="h-10 w-10 text-[#0070f3] mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)]">
                     {value.title}
                   </h3>
-                  <p className="mt-2 text-muted-foreground">
+                  <p className="mt-2 text-[var(--text-secondary)]">
                     {value.description}
                   </p>
                 </motion.div>
@@ -195,10 +195,10 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl font-bold text-foreground">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Leadership
               </h2>
-              <p className="mt-4 text-xl text-muted-foreground">
+              <p className="mt-4 text-xl text-[var(--text-secondary)]">
                 Meet the team building Cloudify
               </p>
             </motion.div>
@@ -218,10 +218,10 @@ export default function AboutPage() {
                   >
                     {person.image}
                   </div>
-                  <h3 className="font-semibold text-foreground">
+                  <h3 className="font-semibold text-[var(--text-primary)]">
                     {person.name}
                   </h3>
-                  <p className="text-muted-foreground">{person.role}</p>
+                  <p className="text-[var(--text-secondary)]">{person.role}</p>
                 </motion.div>
               ))}
             </div>
@@ -229,7 +229,7 @@ export default function AboutPage() {
         </section>
 
         {/* Offices */}
-        <section className="py-20 bg-background">
+        <section className="py-20 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -237,10 +237,10 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl font-bold text-foreground">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Our Offices
               </h2>
-              <p className="mt-4 text-xl text-muted-foreground">
+              <p className="mt-4 text-xl text-[var(--text-secondary)]">
                 We&apos;re a global team with offices around the world
               </p>
             </motion.div>
@@ -249,14 +249,14 @@ export default function AboutPage() {
               {offices.map((office) => (
                 <div
                   key={office.city}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-[var(--border-primary)]"
                 >
                   <MapPin className="h-4 w-4 text-[#0070f3]" />
-                  <span className="text-foreground font-medium">
+                  <span className="text-[var(--text-primary)] font-medium">
                     {office.city}
                   </span>
                   {office.type === "HQ" && (
-                    <span className="text-xs bg-secondary text-foreground px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-[var(--surface-secondary)] text-[var(--text-primary)] px-2 py-0.5 rounded-full">
                       HQ
                     </span>
                   )}
@@ -269,10 +269,10 @@ export default function AboutPage() {
         {/* CTA */}
         <section className="py-20">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-4">
               Join our team
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-[var(--text-secondary)] mb-8">
               We&apos;re always looking for talented people to help us build the future of the web.
             </p>
             <Button variant="default" size="lg" asChild>

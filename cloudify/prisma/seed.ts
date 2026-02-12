@@ -34,14 +34,12 @@ async function main() {
   await prisma.teamMember.deleteMany({});
   await prisma.team.deleteMany({});
   await prisma.activity.deleteMany({});
-  await prisma.apiToken.deleteMany({});
   await prisma.domain.deleteMany({});
   await prisma.envVariable.deleteMany({});
   await prisma.deploymentLog.deleteMany({});
   await prisma.deployment.deleteMany({});
   await prisma.integration.deleteMany({});
   await prisma.project.deleteMany({});
-  await prisma.session.deleteMany({});
   await prisma.account.deleteMany({});
   await prisma.user.deleteMany({});
 
@@ -55,8 +53,8 @@ async function main() {
         email: "demo@cloudify.app",
         name: "Demo User",
         passwordHash: await hashPassword("demo123"),
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=demo",
-        plan: "pro",
+        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=demo",
+        plan: "PRO",
       },
     }),
     // Free tier user
@@ -65,8 +63,8 @@ async function main() {
         email: "free@cloudify.app",
         name: "Free User",
         passwordHash: await hashPassword("free123"),
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=free",
-        plan: "free",
+        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=free",
+        plan: "FREE",
       },
     }),
     // Team admin
@@ -75,8 +73,8 @@ async function main() {
         email: "team@cloudify.app",
         name: "Team Admin",
         passwordHash: await hashPassword("team123"),
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=team",
-        plan: "team",
+        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=team",
+        plan: "TEAM",
       },
     }),
     // Enterprise user
@@ -85,8 +83,8 @@ async function main() {
         email: "enterprise@cloudify.app",
         name: "Enterprise User",
         passwordHash: await hashPassword("enterprise123"),
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=enterprise",
-        plan: "enterprise",
+        image: "https://api.dicebear.com/7.x/avataaars/svg?seed=enterprise",
+        plan: "ENTERPRISE",
       },
     }),
   ]);
@@ -104,11 +102,11 @@ async function main() {
         name: "Next.js Blog",
         slug: "nextjs-blog",
         userId: demoUser.id,
-        repoUrl: "https://github.com/vercel/next.js",
-        repoBranch: "main",
+        repositoryUrl: "https://github.com/vercel/next.js",
+        repositoryBranch: "main",
         framework: "nextjs",
-        buildCmd: "npm run build",
-        outputDir: ".next",
+        buildCommand: "npm run build",
+        outputDirectory: ".next",
         nodeVersion: "20",
       },
     }),
@@ -117,11 +115,11 @@ async function main() {
         name: "React Dashboard",
         slug: "react-dashboard",
         userId: demoUser.id,
-        repoUrl: "https://github.com/facebook/react",
-        repoBranch: "main",
+        repositoryUrl: "https://github.com/facebook/react",
+        repositoryBranch: "main",
         framework: "vite",
-        buildCmd: "npm run build",
-        outputDir: "dist",
+        buildCommand: "npm run build",
+        outputDirectory: "dist",
         nodeVersion: "20",
       },
     }),
@@ -130,11 +128,11 @@ async function main() {
         name: "API Service",
         slug: "api-service",
         userId: demoUser.id,
-        repoUrl: "https://github.com/expressjs/express",
-        repoBranch: "master",
+        repositoryUrl: "https://github.com/expressjs/express",
+        repositoryBranch: "master",
         framework: "other",
-        buildCmd: "npm run build",
-        outputDir: "dist",
+        buildCommand: "npm run build",
+        outputDirectory: "dist",
         nodeVersion: "18",
       },
     }),
@@ -144,11 +142,11 @@ async function main() {
         name: "Personal Portfolio",
         slug: "personal-portfolio",
         userId: freeUser.id,
-        repoUrl: "https://github.com/vercel/next.js",
-        repoBranch: "main",
+        repositoryUrl: "https://github.com/vercel/next.js",
+        repositoryBranch: "main",
         framework: "nextjs",
-        buildCmd: "npm run build",
-        outputDir: ".next",
+        buildCommand: "npm run build",
+        outputDirectory: ".next",
         nodeVersion: "20",
       },
     }),
@@ -158,11 +156,11 @@ async function main() {
         name: "E-commerce Store",
         slug: "ecommerce-store",
         userId: teamUser.id,
-        repoUrl: "https://github.com/vercel/commerce",
-        repoBranch: "main",
+        repositoryUrl: "https://github.com/vercel/commerce",
+        repositoryBranch: "main",
         framework: "nextjs",
-        buildCmd: "pnpm build",
-        outputDir: ".next",
+        buildCommand: "pnpm build",
+        outputDirectory: ".next",
         nodeVersion: "20",
       },
     }),
@@ -171,11 +169,11 @@ async function main() {
         name: "Documentation Site",
         slug: "docs-site",
         userId: teamUser.id,
-        repoUrl: "https://github.com/facebook/docusaurus",
-        repoBranch: "main",
+        repositoryUrl: "https://github.com/facebook/docusaurus",
+        repositoryBranch: "main",
         framework: "other",
-        buildCmd: "npm run build",
-        outputDir: "build",
+        buildCommand: "npm run build",
+        outputDirectory: "build",
         nodeVersion: "18",
       },
     }),
@@ -199,7 +197,7 @@ async function main() {
         projectId: project.id,
         status,
         commitSha: `abc${Math.random().toString(36).substring(7)}`,
-        commitMsg: `Deployment ${i + 1}: ${["Fix bug", "Add feature", "Update deps", "Refactor code", "Initial commit"][i % 5]}`,
+        commitMessage: `Deployment ${i + 1}: ${["Fix bug", "Add feature", "Update deps", "Refactor code", "Initial commit"][i % 5]}`,
         branch: "main",
         url: status === "READY" ? `https://${project.slug}-${Math.random().toString(36).substring(7)}.cloudify.app` : null,
         buildTime: status === "READY" ? Math.floor(Math.random() * 120 + 30) : null,
@@ -258,11 +256,11 @@ async function main() {
   // ============ CREATE DOMAINS ============
   console.log("🌐 Creating custom domains...");
 
-  const domainsData = [
-    { domain: "blog.example.com", projectId: projects[0].id, verified: true, sslStatus: "active", verificationToken: "verify_" + Math.random().toString(36).substring(7) },
-    { domain: "dashboard.example.com", projectId: projects[1].id, verified: true, sslStatus: "active", verificationToken: "verify_" + Math.random().toString(36).substring(7) },
-    { domain: "api.example.com", projectId: projects[2].id, verified: false, sslStatus: "pending", verificationToken: "verify_" + Math.random().toString(36).substring(7) },
-    { domain: "shop.example.com", projectId: projects[4].id, verified: true, sslStatus: "active", verificationToken: "verify_" + Math.random().toString(36).substring(7) },
+  const domainsData: Array<{ domain: string; projectId: string; verified: boolean; sslStatus: "PENDING" | "PROVISIONING" | "ACTIVE" | "ERROR"; verificationToken: string }> = [
+    { domain: "blog.example.com", projectId: projects[0].id, verified: true, sslStatus: "ACTIVE", verificationToken: "verify_" + Math.random().toString(36).substring(7) },
+    { domain: "dashboard.example.com", projectId: projects[1].id, verified: true, sslStatus: "ACTIVE", verificationToken: "verify_" + Math.random().toString(36).substring(7) },
+    { domain: "api.example.com", projectId: projects[2].id, verified: false, sslStatus: "PENDING", verificationToken: "verify_" + Math.random().toString(36).substring(7) },
+    { domain: "shop.example.com", projectId: projects[4].id, verified: true, sslStatus: "ACTIVE", verificationToken: "verify_" + Math.random().toString(36).substring(7) },
   ];
 
   const domains = await prisma.domain.createMany({ data: domainsData });
@@ -275,15 +273,15 @@ async function main() {
     data: {
       name: "Acme Corp",
       slug: "acme-corp",
-      plan: "team",
+      plan: "TEAM",
     },
   });
 
   await prisma.teamMember.createMany({
     data: [
-      { teamId: team.id, userId: teamUser.id, role: "owner" },
-      { teamId: team.id, userId: demoUser.id, role: "admin" },
-      { teamId: team.id, userId: freeUser.id, role: "member" },
+      { teamId: team.id, userId: teamUser.id, role: "OWNER" },
+      { teamId: team.id, userId: demoUser.id, role: "ADMIN" },
+      { teamId: team.id, userId: freeUser.id, role: "MEMBER" },
     ],
   });
 
@@ -295,34 +293,11 @@ async function main() {
   });
   console.log(`   ✓ Created team with 3 members and 2 projects`);
 
-  // ============ CREATE API TOKENS ============
-  console.log("🔑 Creating API tokens...");
-
-  await prisma.apiToken.createMany({
-    data: [
-      {
-        name: "CI/CD Token",
-        token: "cl_" + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2),
-        tokenPrefix: "cl_abc123",
-        userId: demoUser.id,
-        scopes: ["read", "write", "deploy"],
-      },
-      {
-        name: "Read-only Token",
-        token: "cl_" + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2),
-        tokenPrefix: "cl_xyz789",
-        userId: demoUser.id,
-        scopes: ["read"],
-      },
-    ],
-  });
-  console.log(`   ✓ Created 2 API tokens`);
-
   // ============ CREATE USAGE RECORDS ============
   console.log("📊 Creating usage records...");
 
   const usageData = [];
-  const usageTypes = ["build_minutes", "bandwidth", "requests", "function_invocations", "deployments"];
+  const usageTypes: Array<"BUILD_MINUTES" | "BANDWIDTH" | "REQUESTS" | "FUNCTION_INVOCATIONS" | "DEPLOYMENTS"> = ["BUILD_MINUTES", "BANDWIDTH", "REQUESTS", "FUNCTION_INVOCATIONS", "DEPLOYMENTS"];
 
   for (const user of users) {
     for (let day = 0; day < 30; day++) {
@@ -331,7 +306,7 @@ async function main() {
           userId: user.id,
           projectId: projects[0].id,
           type,
-          value: Math.random() * (type === "requests" ? 10000 : type === "bandwidth" ? 100 : 10),
+          value: Math.random() * (type === "REQUESTS" ? 10000 : type === "BANDWIDTH" ? 100 : 10),
           recordedAt: new Date(Date.now() - day * 24 * 60 * 60 * 1000),
         });
       }

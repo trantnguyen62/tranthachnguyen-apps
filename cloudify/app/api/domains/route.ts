@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import crypto from "crypto";
 import { getRouteLogger } from "@/lib/api/logger";
+import { handlePrismaError } from "@/lib/api/error-response";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("domains");
 
@@ -33,13 +35,9 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(domains);
+    return ok(domains);
   } catch (error) {
-    log.error("Failed to fetch domains", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch domains" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch domains", 500);
   }
 }
 
@@ -56,27 +54,23 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Invalid request body", 400);
     }
     const { domain, projectId } = body;
 
     if (!domain || !projectId) {
-      return NextResponse.json(
-        { error: "Domain and projectId are required" },
-        { status: 400 }
-      );
+      const fields = [];
+      if (!domain) fields.push({ field: "domain", message: "Domain is required" });
+      if (!projectId) fields.push({ field: "projectId", message: "Project ID is required" });
+      return fail("VALIDATION_MISSING_FIELD", "Validation failed", 422, { fields });
     }
 
     // Validate domain format
     const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
     if (!domainRegex.test(domain)) {
-      return NextResponse.json(
-        { error: "Invalid domain format" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid domain format", 422, {
+        fields: [{ field: "domain", message: "Invalid domain format" }],
+      });
     }
 
     // Check if project belongs to user
@@ -88,10 +82,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Check if domain already exists
@@ -100,10 +91,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingDomain) {
-      return NextResponse.json(
-        { error: "This domain is already registered" },
-        { status: 409 }
-      );
+      return fail("CONFLICT", "This domain is already registered", 409);
     }
 
     // Generate verification token
@@ -115,7 +103,7 @@ export async function POST(request: NextRequest) {
         projectId,
         verificationToken,
         verified: false,
-        sslStatus: "pending",
+        sslStatus: "PENDING",
       },
       include: {
         project: {
@@ -128,12 +116,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(newDomain, { status: 201 });
+    return ok(newDomain, { status: 201 });
   } catch (error) {
-    log.error("Failed to add domain", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to add domain" },
-      { status: 500 }
-    );
+    const prismaResp = handlePrismaError(error, "domain");
+    if (prismaResp) return prismaResp;
+
+    return fail("INTERNAL_ERROR", "Failed to add domain", 500);
   }
 }

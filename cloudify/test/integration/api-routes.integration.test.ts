@@ -327,8 +327,8 @@ describe("Deploy API Integration", () => {
         name: "Deploy Test Project",
         slug: "deploy-test-project",
         userId: TEST_USER.id,
-        repoUrl: "https://github.com/test/deploy-test",
-        repoBranch: "main",
+        repositoryUrl: "https://github.com/test/deploy-test",
+        repositoryBranch: "main",
       },
     });
   });
@@ -699,7 +699,7 @@ describe("Database Transaction Integrity", () => {
         name: "Transaction Test",
         slug: "transaction-test",
         userId: TEST_USER.id,
-        repoUrl: "https://github.com/test/transaction-test",
+        repositoryUrl: "https://github.com/test/transaction-test",
       },
     });
 

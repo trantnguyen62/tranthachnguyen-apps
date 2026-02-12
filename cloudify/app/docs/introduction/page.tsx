@@ -24,42 +24,42 @@ export default function IntroductionPage() {
       </p>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Zap className="h-8 w-8 text-[#0070f3] mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
             Instant Deployments
           </h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-[var(--text-secondary)] text-sm">
             Push to Git and your site is live. Preview deployments for every pull request.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Globe className="h-8 w-8 text-green-500 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
             Global Edge Network
           </h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-[var(--text-secondary)] text-sm">
             Serve your content from 100+ edge locations worldwide for the fastest experience.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Cpu className="h-8 w-8 text-purple-500 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
             Serverless Functions
           </h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-[var(--text-secondary)] text-sm">
             Run backend code without managing servers. Scale automatically from zero to millions.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Shield className="h-8 w-8 text-orange-500 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
             Enterprise Security
           </h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-[var(--text-secondary)] text-sm">
             Automatic HTTPS, DDoS protection, and SOC 2 compliance built-in.
           </p>
         </div>

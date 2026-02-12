@@ -182,12 +182,12 @@ export default function StatusPage() {
             <div className="flex items-center gap-4">
               <OverallIcon className={cn("h-10 w-10", overallConfig.color)} />
               <div>
-                <h1 className="text-3xl font-bold text-foreground">
+                <h1 className="text-3xl font-bold text-[var(--text-primary)]">
                   {overallStatus === "operational"
                     ? "All Systems Operational"
                     : "System Issues Detected"}
                 </h1>
-                <p className="text-muted-foreground mt-1">
+                <p className="text-[var(--text-secondary)] mt-1">
                   Last updated: {new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })} UTC
                 </p>
               </div>
@@ -196,7 +196,7 @@ export default function StatusPage() {
 
           {/* Services */}
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-foreground mb-6">
+            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">
               Services
             </h2>
             <div className="space-y-3">
@@ -210,17 +210,17 @@ export default function StatusPage() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="flex items-center justify-between p-4 bg-card rounded-xl border border-border"
+                    className="flex items-center justify-between p-4 bg-card rounded-xl border border-[var(--border-primary)]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-secondary">
-                        <service.icon className="h-5 w-5 text-muted-foreground" />
+                      <div className="p-2 rounded-lg bg-[var(--surface-secondary)]">
+                        <service.icon className="h-5 w-5 text-[var(--text-secondary)]" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-foreground">
+                        <h3 className="font-medium text-[var(--text-primary)]">
                           {service.name}
                         </h3>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-[var(--text-secondary)]">
                           {service.description}
                         </p>
                       </div>
@@ -239,10 +239,10 @@ export default function StatusPage() {
 
           {/* Uptime */}
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-foreground mb-6">
+            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">
               90-Day Uptime
             </h2>
-            <div className="p-6 bg-card rounded-xl border border-border">
+            <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-3xl font-bold text-green-600 dark:text-green-400">
                   99.99%
@@ -263,7 +263,7 @@ export default function StatusPage() {
                   />
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground mt-2">
+              <p className="text-sm text-[var(--text-secondary)] mt-2">
                 Each bar represents one day. Green = 100% uptime.
               </p>
             </div>
@@ -271,13 +271,13 @@ export default function StatusPage() {
 
           {/* Recent incidents */}
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-foreground mb-6">
+            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">
               Recent Incidents
             </h2>
             {incidents.length === 0 ? (
-              <div className="p-8 bg-card rounded-xl border border-border text-center">
+              <div className="p-8 bg-card rounded-xl border border-[var(--border-primary)] text-center">
                 <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-3" />
-                <p className="text-muted-foreground">
+                <p className="text-[var(--text-secondary)]">
                   No incidents in the past 30 days
                 </p>
               </div>
@@ -286,7 +286,7 @@ export default function StatusPage() {
                 {incidents.map((incident) => (
                   <div
                     key={incident.id}
-                    className="p-6 bg-card rounded-xl border border-border"
+                    className="p-6 bg-card rounded-xl border border-[var(--border-primary)]"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div>
@@ -299,11 +299,11 @@ export default function StatusPage() {
                           >
                             {incidentStatusConfig[incident.status].label}
                           </Badge>
-                          <Badge variant="outline" className="capitalize">
+                          <Badge variant="secondary" className="capitalize">
                             {incident.severity}
                           </Badge>
                         </div>
-                        <h3 className="font-semibold text-foreground">
+                        <h3 className="font-semibold text-[var(--text-primary)]">
                           {incident.title}
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">
@@ -311,13 +311,13 @@ export default function StatusPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="space-y-3 border-l-2 border-border pl-4">
+                    <div className="space-y-3 border-l-2 border-[var(--border-primary)] pl-4">
                       {incident.updates.map((update, i) => (
                         <div key={i}>
                           <p className="text-xs text-gray-500 mb-1">
                             {update.time}
                           </p>
-                          <p className="text-sm text-foreground">
+                          <p className="text-sm text-[var(--text-primary)]">
                             {update.message}
                           </p>
                         </div>
@@ -330,14 +330,14 @@ export default function StatusPage() {
           </section>
 
           {/* Subscribe */}
-          <section className="p-6 bg-secondary rounded-xl border border-blue-100 dark:border-blue-800">
+          <section className="p-6 bg-[var(--surface-secondary)] rounded-xl border border-blue-100 dark:border-blue-800">
             <div className="flex items-start gap-4">
-              <Bell className="h-6 w-6 text-foreground shrink-0" />
+              <Bell className="h-6 w-6 text-[var(--text-primary)] shrink-0" />
               <div className="flex-1">
-                <h3 className="font-semibold text-foreground mb-1">
+                <h3 className="font-semibold text-[var(--text-primary)] mb-1">
                   Get Status Updates
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-[var(--text-secondary)] mb-4">
                   Subscribe to receive notifications when incidents occur or are resolved.
                 </p>
                 <div className="flex gap-2">

@@ -169,7 +169,7 @@ export function NotificationCenter() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="sm"  className="relative">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
@@ -180,8 +180,8 @@ export function NotificationCenter() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-96 p-0">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <h3 className="font-semibold text-foreground">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-primary)]">
+          <h3 className="font-semibold text-[var(--text-primary)]">
             Notifications
           </h3>
           <div className="flex items-center gap-2">
@@ -201,7 +201,7 @@ export function NotificationCenter() {
                 variant="ghost"
                 size="sm"
                 onClick={clearAll}
-                className="text-xs text-muted-foreground"
+                className="text-xs text-[var(--text-secondary)]"
               >
                 <Trash2 className="h-3 w-3 mr-1" />
                 Clear
@@ -214,15 +214,15 @@ export function NotificationCenter() {
         <div className="max-h-[400px] overflow-y-auto">
           {isLoading ? (
             <div className="py-12 text-center">
-              <Bell className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3 animate-pulse" />
-              <p className="text-sm text-muted-foreground">
+              <Bell className="h-12 w-12 mx-auto text-[var(--text-secondary)]/30 mb-3 animate-pulse" />
+              <p className="text-sm text-[var(--text-secondary)]">
                 Loading notifications...
               </p>
             </div>
           ) : notifications.length === 0 ? (
             <div className="py-12 text-center">
-              <Bell className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">
+              <Bell className="h-12 w-12 mx-auto text-[var(--text-secondary)]/30 mb-3" />
+              <p className="text-sm text-[var(--text-secondary)]">
                 No notifications yet
               </p>
             </div>
@@ -239,15 +239,15 @@ export function NotificationCenter() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     className={cn(
-                      "relative px-4 py-3 border-b border-border last:border-0 hover:bg-secondary/50 transition-colors",
-                      !notification.read && "bg-secondary/50"
+                      "relative px-4 py-3 border-b border-[var(--border-primary)] last:border-0 hover:bg-secondary/50 transition-colors",
+                      !notification.read && "bg-[var(--surface-secondary)]/50"
                     )}
                     onClick={() => markAsRead(notification.id)}
                   >
                     <div className="flex items-start gap-3">
                       <div className="relative shrink-0">
-                        <div className="p-2 rounded-lg bg-secondary">
-                          <TypeIcon className="h-4 w-4 text-muted-foreground" />
+                        <div className="p-2 rounded-lg bg-[var(--surface-secondary)]">
+                          <TypeIcon className="h-4 w-4 text-[var(--text-secondary)]" />
                         </div>
                         <StatusIcon
                           className={cn(
@@ -262,8 +262,8 @@ export function NotificationCenter() {
                             className={cn(
                               "text-sm",
                               !notification.read
-                                ? "font-semibold text-foreground"
-                                : "font-medium text-foreground"
+                                ? "font-semibold text-[var(--text-primary)]"
+                                : "font-medium text-[var(--text-primary)]"
                             )}
                           >
                             {notification.title}
@@ -275,20 +275,20 @@ export function NotificationCenter() {
                             }}
                             className="p-1 rounded hover:bg-secondary opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            <X className="h-3 w-3 text-muted-foreground" />
+                            <X className="h-3 w-3 text-[var(--text-secondary)]" />
                           </button>
                         </div>
-                        <p className="text-sm text-muted-foreground truncate">
+                        <p className="text-sm text-[var(--text-secondary)] truncate">
                           {notification.message}
                         </p>
                         <div className="flex items-center justify-between mt-1">
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-[var(--text-secondary)]">
                             {notification.timestamp}
                           </span>
                           {notification.link && (
                             <a
                               href={notification.link}
-                              className="text-xs text-foreground hover:underline flex items-center gap-1"
+                              className="text-xs text-[var(--text-primary)] hover:underline flex items-center gap-1"
                               onClick={(e) => e.stopPropagation()}
                             >
                               View <ExternalLink className="h-3 w-3" />
@@ -309,7 +309,7 @@ export function NotificationCenter() {
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="px-4 py-3 border-t border-border">
+          <div className="px-4 py-3 border-t border-[var(--border-primary)]">
             <Button variant="ghost" className="w-full text-sm" asChild>
               <a href="/activity">View all notifications</a>
             </Button>

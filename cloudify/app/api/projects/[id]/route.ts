@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError, checkProjectAccess, meetsMinimumRole } from "@/lib/auth/api-auth";
 import { deleteSite } from "@/lib/build/site-deployer";
 import { sanitizeSlug } from "@/lib/security/validation";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { handlePrismaError } from "@/lib/api/error-response";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("projects/[id]");
 
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Check ownership or team membership (any team member can view)
     const access = await checkProjectAccess(user.id, id);
     if (!access.hasAccess) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     const project = await prisma.project.findUnique({
@@ -49,27 +51,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
-    return NextResponse.json(project);
+    return ok(project);
   } catch (error: unknown) {
     log.error("Failed to fetch project", error);
 
-    if (error && typeof error === "object" && "code" in error) {
-      const prismaError = error as { code: string };
-      if (prismaError.code === "P1001" || prismaError.code === "P1002") {
-        return NextResponse.json(
-          { error: "Service temporarily unavailable" },
-          { status: 503 }
-        );
-      }
-    }
+    const prismaResp = handlePrismaError(error, "project");
+    if (prismaResp) return prismaResp;
 
-    return NextResponse.json(
-      { error: "Failed to fetch project" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch project", 500);
   }
 }
 
@@ -90,13 +82,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     // Check ownership or team membership (minimum role: admin to update settings)
     const patchAccess = await checkProjectAccess(user.id, id);
     if (!patchAccess.hasAccess) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
     if (!patchAccess.isOwner && (!patchAccess.teamRole || !meetsMinimumRole(patchAccess.teamRole, "admin"))) {
-      return NextResponse.json(
-        { error: "Insufficient role - updating project requires admin role or higher" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Insufficient role - updating project requires admin role or higher", 403);
     }
 
     const { name, repoUrl, repoBranch, framework, buildCmd, outputDir, installCmd, rootDir, nodeVersion } = body;
@@ -105,45 +94,25 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       where: { id },
       data: {
         ...(name && { name }),
-        ...(repoUrl !== undefined && { repoUrl }),
-        ...(repoBranch && { repoBranch }),
+        ...(repoUrl !== undefined && { repositoryUrl: repoUrl }),
+        ...(repoBranch && { repositoryBranch: repoBranch }),
         ...(framework && { framework }),
-        ...(buildCmd && { buildCmd }),
-        ...(outputDir && { outputDir }),
-        ...(installCmd && { installCmd }),
-        ...(rootDir && { rootDir }),
+        ...(buildCmd && { buildCommand: buildCmd }),
+        ...(outputDir && { outputDirectory: outputDir }),
+        ...(installCmd && { installCommand: installCmd }),
+        ...(rootDir && { rootDirectory: rootDir }),
         ...(nodeVersion && { nodeVersion }),
       },
     });
 
-    return NextResponse.json(project);
+    return ok(project);
   } catch (error: unknown) {
     log.error("Failed to update project", error);
 
-    if (error && typeof error === "object" && "code" in error) {
-      const prismaError = error as { code: string };
+    const prismaResp = handlePrismaError(error, "project");
+    if (prismaResp) return prismaResp;
 
-      // Record not found (deleted by concurrent request)
-      if (prismaError.code === "P2025") {
-        return NextResponse.json(
-          { error: "Project not found" },
-          { status: 404 }
-        );
-      }
-
-      // Connection errors
-      if (prismaError.code === "P1001" || prismaError.code === "P1002") {
-        return NextResponse.json(
-          { error: "Service temporarily unavailable" },
-          { status: 503 }
-        );
-      }
-    }
-
-    return NextResponse.json(
-      { error: "Failed to update project" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update project", 500);
   }
 }
 
@@ -161,7 +130,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     // Only project owner can delete (not team members)
     const deleteAccess = await checkProjectAccess(user.id, id);
     if (!deleteAccess.hasAccess || !deleteAccess.isOwner) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     const existing = await prisma.project.findUnique({
@@ -169,7 +138,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!existing) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Clean up K8s deployment and DNS record using same slug format as deployment
@@ -185,23 +154,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: { id },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error: unknown) {
     log.error("Failed to delete project", error);
 
-    if (error && typeof error === "object" && "code" in error) {
-      const prismaError = error as { code: string };
-      if (prismaError.code === "P1001" || prismaError.code === "P1002") {
-        return NextResponse.json(
-          { error: "Service temporarily unavailable" },
-          { status: 503 }
-        );
-      }
-    }
+    const prismaResp = handlePrismaError(error, "project");
+    if (prismaResp) return prismaResp;
 
-    return NextResponse.json(
-      { error: "Failed to delete project" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete project", 500);
   }
 }

@@ -121,14 +121,14 @@ export async function getDeploymentDiff(
 
   // Get commit diff (if Git repo connected)
   const commitDiff = await getCommitDiff(
-    deployment.project.repoUrl,
+    deployment.project.repositoryUrl,
     previousDeployment.commitSha,
     deployment.commitSha
   );
 
   // Get file diff
   const fileDiff = await getFileDiff(
-    deployment.project.repoUrl,
+    deployment.project.repositoryUrl,
     previousDeployment.commitSha,
     deployment.commitSha
   );

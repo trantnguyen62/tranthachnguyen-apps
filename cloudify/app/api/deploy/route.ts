@@ -4,14 +4,23 @@
  * Supports both session (web UI) and token (CLI) authentication
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { getAuthUser, requireDeployAccess, isAuthError, checkProjectAccess, meetsMinimumRole } from "@/lib/auth/api-auth";
+import { NextRequest } from "next/server";
+import { requireDeployAccess, isAuthError, requireProjectAccess } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { prisma } from "@/lib/prisma";
 import { triggerK8sBuild, cancelK8sBuild } from "@/lib/build/k8s-worker";
 import { canDeploy } from "@/lib/billing/metering";
 import type { PlanType } from "@/lib/billing/pricing";
 import { loggers } from "@/lib/logging/logger";
+import { withCache, noCache } from "@/lib/api/cache-headers";
+import { handlePrismaError } from "@/lib/api/error-response";
+import {
+  ok,
+  fail,
+  encodeCursor,
+  buildCursorWhere,
+  parsePaginationParams,
+} from "@/lib/api/response";
 
 const log = loggers.deploy;
 
@@ -34,7 +43,6 @@ async function triggerBuild(deploymentId: string) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Authenticate user (supports both session and API token)
     const authResult = await requireDeployAccess(request);
     if (isAuthError(authResult)) {
       return authResult;
@@ -44,16 +52,19 @@ export async function POST(request: NextRequest) {
     const parseResult = await parseJsonBody(request);
     if (isParseError(parseResult)) return parseResult;
     const body = parseResult.data;
-    const { projectId, branch, commitSha, commitMsg, clean } = body;
+    const { projectId, branch, commitSha, commitMsg: commitMessage, clean } = body;
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: "Missing required field: projectId" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing required field: projectId", 400);
     }
 
-    // Get project and verify ownership
+    // Project-scoped RBAC: require developer+ to deploy
+    const accessResult = await requireProjectAccess(request, projectId, "developer");
+    if (isAuthError(accessResult)) {
+      return accessResult;
+    }
+
+    // Get project details with owner plan in a single query
     const project = await prisma.project.findUnique({
       where: { id: projectId },
       select: {
@@ -61,53 +72,26 @@ export async function POST(request: NextRequest) {
         name: true,
         slug: true,
         userId: true,
-        repoUrl: true,
-        repoBranch: true,
+        repositoryUrl: true,
+        repositoryBranch: true,
+        user: { select: { plan: true } },
       },
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
-    // Check ownership or team membership (minimum role: developer)
-    const access = await checkProjectAccess(user.id, projectId);
-    if (!access.hasAccess) {
-      return NextResponse.json(
-        { error: "Unauthorized - no access to this project" },
-        { status: 403 }
-      );
-    }
-    if (!access.isOwner && access.teamRole && !meetsMinimumRole(access.teamRole, "developer")) {
-      return NextResponse.json(
-        { error: "Insufficient role - deploying requires developer role or higher" },
-        { status: 403 }
-      );
+    if (!project.repositoryUrl) {
+      return fail("BAD_REQUEST", "Project has no repository URL configured", 400);
     }
 
-    if (!project.repoUrl) {
-      return NextResponse.json(
-        { error: "Project has no repository URL configured" },
-        { status: 400 }
-      );
-    }
-
-    // Check plan limits — use project owner's plan (team members deploy under owner's quota)
+    // Check plan limits -- use project owner's plan (team members deploy under owner's quota)
     const projectOwnerId = project.userId;
-    const ownerRecord = await prisma.user.findUnique({
-      where: { id: projectOwnerId },
-      select: { plan: true },
-    });
-    const ownerPlan = (ownerRecord?.plan || "free") as PlanType;
+    const ownerPlan = (project.user?.plan || "free") as PlanType;
     const deployAllowed = await canDeploy(projectOwnerId, ownerPlan);
     if (!deployAllowed) {
-      return NextResponse.json(
-        { error: "Deployment limit reached for your plan. Upgrade to continue deploying." },
-        { status: 402 }
-      );
+      return fail("PAYMENT_REQUIRED", "Deployment limit reached for your plan. Upgrade to continue deploying.", 402);
     }
 
     // Create deployment record
@@ -115,9 +99,9 @@ export async function POST(request: NextRequest) {
       data: {
         projectId,
         status: "QUEUED",
-        branch: branch || project.repoBranch,
+        branch: branch || project.repositoryBranch,
         commitSha: commitSha || null,
-        commitMsg: commitMsg || null,
+        commitMessage: commitMessage || null,
       },
     });
 
@@ -153,23 +137,18 @@ export async function POST(request: NextRequest) {
       }).catch((e: unknown) => log.error("Failed to mark deployment as errored", e as Error));
     });
 
-    return NextResponse.json({
-      success: true,
-      deployment: {
-        id: deployment.id,
-        projectId: deployment.projectId,
-        status: deployment.status,
-        branch: deployment.branch,
-        createdAt: deployment.createdAt,
-      },
-      message: "Deployment created and build triggered",
-    });
+    return noCache(ok({
+      id: deployment.id,
+      projectId: deployment.projectId,
+      status: deployment.status,
+      branch: deployment.branch,
+      createdAt: deployment.createdAt,
+    }, { status: 201 }));
   } catch (error) {
-    log.error("Deployment creation failed", error);
-    return NextResponse.json(
-      { error: "Failed to create deployment" },
-      { status: 500 }
-    );
+    const prismaResp = handlePrismaError(error, "deployment");
+    if (prismaResp) return prismaResp;
+
+    return fail("INTERNAL_ERROR", "Failed to create deployment", 500);
   }
 }
 
@@ -178,7 +157,6 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Authenticate user (supports both session and API token)
     const authResult = await requireDeployAccess(request);
     if (isAuthError(authResult)) {
       return authResult;
@@ -188,11 +166,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const deploymentId = searchParams.get("id");
     const projectId = searchParams.get("projectId");
-    // Handle NaN gracefully by using defaults when parseInt fails
-    const parsedLimit = parseInt(searchParams.get("limit") || "20", 10);
-    const parsedOffset = parseInt(searchParams.get("offset") || "0", 10);
-    const limit = Math.max(1, Math.min(100, isNaN(parsedLimit) ? 20 : parsedLimit));
-    const offset = Math.max(0, isNaN(parsedOffset) ? 0 : parsedOffset);
+    const { cursor, limit } = parsePaginationParams(searchParams);
+    const cursorWhere = buildCursorWhere(cursor);
 
     // Get single deployment by ID
     if (deploymentId) {
@@ -215,42 +190,44 @@ export async function GET(request: NextRequest) {
       });
 
       if (!deployment) {
-        return NextResponse.json(
-          { error: "Deployment not found" },
-          { status: 404 }
-        );
+        return fail("NOT_FOUND", "Deployment not found", 404);
       }
 
-      // Verify ownership or team access
-      const deployAccess = await checkProjectAccess(user.id, deployment.project.id);
-      if (!deployAccess.hasAccess) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 403 }
-        );
+      // Project-scoped RBAC: viewer+ can read deployments
+      const accessResult = await requireProjectAccess(request, deployment.project.id, "viewer");
+      if (isAuthError(accessResult)) {
+        return accessResult;
       }
 
-      return NextResponse.json({ deployment });
+      return withCache(ok(deployment), { maxAge: 5, staleWhileRevalidate: 15 });
     }
 
     // Get deployments for a project
     if (projectId) {
-      // Verify project access (ownership or team membership)
-      const projAccess = await checkProjectAccess(user.id, projectId);
-      if (!projAccess.hasAccess) {
-        return NextResponse.json(
-          { error: "Project not found or unauthorized" },
-          { status: 404 }
-        );
+      // Project-scoped RBAC: viewer+ can read
+      const accessResult = await requireProjectAccess(request, projectId, "viewer");
+      if (isAuthError(accessResult)) {
+        return accessResult;
       }
 
       const [deployments, total] = await Promise.all([
         prisma.deployment.findMany({
-          where: { projectId },
-          orderBy: { createdAt: "desc" },
-          take: limit,
-          skip: offset,
-          include: {
+          where: { projectId, ...cursorWhere },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          take: limit + 1,
+          select: {
+            id: true,
+            status: true,
+            branch: true,
+            commitSha: true,
+            commitMessage: true,
+            siteSlug: true,
+            buildTime: true,
+            createdAt: true,
+            finishedAt: true,
+            isActive: true,
+            isPreview: true,
+            prNumber: true,
             project: {
               select: { name: true, slug: true },
             },
@@ -259,15 +236,22 @@ export async function GET(request: NextRequest) {
         prisma.deployment.count({ where: { projectId } }),
       ]);
 
-      return NextResponse.json({
-        deployments,
-        pagination: {
-          total,
-          limit,
-          offset,
-          hasMore: offset + deployments.length < total,
-        },
-      });
+      const hasMore = deployments.length > limit;
+      const items = hasMore ? deployments.slice(0, limit) : deployments;
+      const nextCursor = hasMore && items.length > 0
+        ? encodeCursor(items[items.length - 1])
+        : undefined;
+
+      return withCache(
+        ok(items, {
+          pagination: {
+            cursor: nextCursor,
+            hasMore,
+            total,
+          },
+        }),
+        { maxAge: 10, staleWhileRevalidate: 30 }
+      );
     }
 
     // Get all user's deployments (owned + team projects)
@@ -291,13 +275,26 @@ export async function GET(request: NextRequest) {
       ]),
     ];
 
+    const allWhere = { projectId: { in: projectIds }, ...cursorWhere };
+
     const [deployments, total] = await Promise.all([
       prisma.deployment.findMany({
-        where: { projectId: { in: projectIds } },
-        orderBy: { createdAt: "desc" },
-        take: limit,
-        skip: offset,
-        include: {
+        where: allWhere,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: limit + 1,
+        select: {
+          id: true,
+          status: true,
+          branch: true,
+          commitSha: true,
+          commitMessage: true,
+          siteSlug: true,
+          buildTime: true,
+          createdAt: true,
+          finishedAt: true,
+          isActive: true,
+          isPreview: true,
+          prNumber: true,
           project: {
             select: { name: true, slug: true },
           },
@@ -308,21 +305,27 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    return NextResponse.json({
-      deployments,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + deployments.length < total,
-      },
-    });
-  } catch (error) {
-    log.error("Failed to get deployments", error);
-    return NextResponse.json(
-      { error: "Failed to get deployments" },
-      { status: 500 }
+    const hasMore = deployments.length > limit;
+    const items = hasMore ? deployments.slice(0, limit) : deployments;
+    const nextCursor = hasMore && items.length > 0
+      ? encodeCursor(items[items.length - 1])
+      : undefined;
+
+    return withCache(
+      ok(items, {
+        pagination: {
+          cursor: nextCursor,
+          hasMore,
+          total,
+        },
+      }),
+      { maxAge: 10, staleWhileRevalidate: 30 }
     );
+  } catch (error) {
+    const prismaResp = handlePrismaError(error, "deployment");
+    if (prismaResp) return prismaResp;
+
+    return fail("INTERNAL_ERROR", "Failed to get deployments", 500);
   }
 }
 
@@ -331,61 +334,41 @@ export async function GET(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    // Authenticate user (supports both session and API token)
     const authResult = await requireDeployAccess(request);
     if (isAuthError(authResult)) {
       return authResult;
     }
-    const { user } = authResult;
 
     const { searchParams } = new URL(request.url);
     const deploymentId = searchParams.get("id");
 
     if (!deploymentId) {
-      return NextResponse.json(
-        { error: "Missing deployment ID" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing deployment ID", 400);
     }
 
-    // Get deployment and verify ownership
+    // Get deployment
     const deployment = await prisma.deployment.findUnique({
       where: { id: deploymentId },
       include: {
         project: {
-          select: { userId: true },
+          select: { userId: true, id: true },
         },
       },
     });
 
     if (!deployment) {
-      return NextResponse.json(
-        { error: "Deployment not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
-    // Verify ownership or team access (minimum role: developer to cancel)
-    const cancelAccess = await checkProjectAccess(user.id, deployment.projectId);
-    if (!cancelAccess.hasAccess) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 403 }
-      );
-    }
-    if (!cancelAccess.isOwner && cancelAccess.teamRole && !meetsMinimumRole(cancelAccess.teamRole, "developer")) {
-      return NextResponse.json(
-        { error: "Insufficient role - cancelling requires developer role or higher" },
-        { status: 403 }
-      );
+    // Project-scoped RBAC: developer+ to cancel
+    const accessResult = await requireProjectAccess(request, deployment.project.id, "developer");
+    if (isAuthError(accessResult)) {
+      return accessResult;
     }
 
     // Can only cancel queued or building deployments
     if (!["QUEUED", "BUILDING", "DEPLOYING"].includes(deployment.status)) {
-      return NextResponse.json(
-        { error: `Cannot cancel deployment with status: ${deployment.status}` },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", `Cannot cancel deployment with status: ${deployment.status}`, 400);
     }
 
     // Cancel the build
@@ -401,15 +384,11 @@ export async function DELETE(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Deployment cancelled",
-    });
+    return noCache(ok({ cancelled: true, deploymentId }));
   } catch (error) {
-    log.error("Failed to cancel deployment", error);
-    return NextResponse.json(
-      { error: "Failed to cancel deployment" },
-      { status: 500 }
-    );
+    const prismaResp = handlePrismaError(error, "deployment");
+    if (prismaResp) return prismaResp;
+
+    return fail("INTERNAL_ERROR", "Failed to cancel deployment", 500);
   }
 }

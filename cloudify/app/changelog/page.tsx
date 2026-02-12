@@ -35,6 +35,46 @@ interface Release {
 
 const releases: Release[] = [
   {
+    version: "2.5.0",
+    date: "February 15, 2024",
+    title: "Self-Hosting & Docker Compose",
+    description: "Run Cloudify on your own infrastructure with our production-ready Docker Compose setup.",
+    changes: [
+      {
+        type: "feature",
+        title: "Production Docker Compose configuration",
+        description: "One-command deployment with PostgreSQL, Redis, MinIO, and Traefik reverse proxy",
+      },
+      {
+        type: "feature",
+        title: "Kubernetes build pipeline",
+        description: "Run builds in isolated K3s pods for better security and resource management",
+      },
+      {
+        type: "feature",
+        title: "Self-hosting documentation",
+        description: "Comprehensive guide covering installation, environment variables, and security hardening",
+      },
+      {
+        type: "improvement",
+        title: "Automatic framework detection for 8+ frameworks",
+        description: "Next.js, React, Vue, Astro, Svelte, Angular, Remix, and static sites",
+      },
+      {
+        type: "improvement",
+        title: "API reference documentation with interactive examples",
+      },
+      {
+        type: "fix",
+        title: "Fixed MinIO bucket initialization on first startup",
+      },
+      {
+        type: "security",
+        title: "Added read-only filesystem and no-new-privileges security options to containers",
+      },
+    ],
+  },
+  {
     version: "2.4.0",
     date: "January 30, 2024",
     title: "Real-time Build Logs",
@@ -139,6 +179,39 @@ const releases: Release[] = [
       },
     ],
   },
+  {
+    version: "2.0.0",
+    date: "October 15, 2023",
+    title: "Cloudify 2.0 - Complete Rewrite",
+    description: "A ground-up rebuild with Next.js App Router, new dashboard, and Stripe billing.",
+    changes: [
+      {
+        type: "feature",
+        title: "New dashboard built with Next.js App Router",
+        description: "Faster navigation, server components, and streaming UI",
+      },
+      {
+        type: "feature",
+        title: "Stripe billing integration",
+        description: "Subscription management with Hobby, Pro, and Enterprise tiers",
+      },
+      {
+        type: "feature",
+        title: "Serverless functions with isolated Docker execution",
+        description: "Run backend code in secure, isolated containers",
+      },
+      {
+        type: "feature",
+        title: "Blob storage powered by MinIO",
+        description: "S3-compatible object storage for static assets and user uploads",
+      },
+      {
+        type: "breaking",
+        title: "Migrated from Pages Router to App Router",
+        description: "All existing custom integrations need to be updated for the new API",
+      },
+    ],
+  },
 ];
 
 const typeConfig: Record<
@@ -153,12 +226,12 @@ const typeConfig: Record<
   improvement: {
     icon: Zap,
     label: "Improved",
-    color: "bg-secondary text-foreground",
+    color: "bg-[var(--surface-secondary)] text-[var(--text-primary)]",
   },
   fix: {
     icon: Bug,
     label: "Fixed",
-    color: "bg-gray-100 text-foreground",
+    color: "bg-gray-100 text-[var(--text-primary)]",
   },
   security: {
     icon: Shield,
@@ -183,15 +256,15 @@ export default function ChangelogPage() {
           <div className="text-center mb-16">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-gray-200 mb-8"
+              className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] dark:text-[var(--text-secondary)] dark:hover:text-gray-200 mb-8"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Home
             </Link>
-            <h1 className="text-4xl font-bold text-foreground mb-4">
+            <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-4">
               Changelog
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-[var(--text-secondary)]">
               New features, improvements, and fixes in Cloudify
             </p>
           </div>
@@ -209,10 +282,10 @@ export default function ChangelogPage() {
                 {/* Version header */}
                 <div className="flex items-center gap-4 mb-6">
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="text-base font-mono">
+                    <Badge variant="secondary" className="text-base font-mono">
                       v{release.version}
                     </Badge>
-                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
                       <Calendar className="h-4 w-4" />
                       {release.date}
                     </div>
@@ -220,11 +293,11 @@ export default function ChangelogPage() {
                 </div>
 
                 <div className="pl-4 border-l-2 border-blue-500">
-                  <h2 className="text-2xl font-bold text-foreground mb-2">
+                  <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
                     {release.title}
                   </h2>
                   {release.description && (
-                    <p className="text-muted-foreground mb-6">
+                    <p className="text-[var(--text-secondary)] mb-6">
                       {release.description}
                     </p>
                   )}
@@ -245,11 +318,11 @@ export default function ChangelogPage() {
                             {config.label}
                           </Badge>
                           <div>
-                            <p className="font-medium text-foreground">
+                            <p className="font-medium text-[var(--text-primary)]">
                               {change.title}
                             </p>
                             {change.description && (
-                              <p className="text-sm text-muted-foreground mt-0.5">
+                              <p className="text-sm text-[var(--text-secondary)] mt-0.5">
                                 {change.description}
                               </p>
                             )}
@@ -265,7 +338,7 @@ export default function ChangelogPage() {
 
           {/* Load more */}
           <div className="text-center mt-16">
-            <Button variant="outline" size="lg">
+            <Button variant="secondary" size="lg">
               View Older Releases
               <ArrowRight className="h-4 w-4" />
             </Button>

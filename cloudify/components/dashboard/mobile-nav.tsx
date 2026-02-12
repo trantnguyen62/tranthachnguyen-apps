@@ -1,110 +1,61 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Menu,
-  X,
-  Home,
+  LayoutDashboard,
   Folder,
   GitBranch,
   Globe,
-  BarChart3,
   Settings,
-  Plus,
-  Cloud,
-  Users,
-  CreditCard,
-  Terminal,
-  Puzzle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const navigation = [
-  { name: "Overview", href: "/dashboard", icon: Home },
+const tabs = [
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Projects", href: "/projects", icon: Folder },
-  { name: "Deployments", href: "/deployments", icon: GitBranch },
+  { name: "Deploys", href: "/deployments", icon: GitBranch },
   { name: "Domains", href: "/domains", icon: Globe },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Logs", href: "/logs", icon: Terminal },
-  { name: "Team", href: "/team", icon: Users },
-  { name: "Integrations", href: "/integrations", icon: Puzzle },
-  { name: "Usage", href: "/usage", icon: CreditCard },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function MobileNav() {
-  const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <div className="lg:hidden">
-      {/* Mobile header */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-14 px-4 bg-background border-b border-border">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground">
-            <Cloud className="h-4 w-4 text-background" />
-          </div>
-          <span className="text-sm font-semibold text-foreground">
-            Cloudify
-          </span>
-        </Link>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
-      </div>
-
-      {/* Mobile menu overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Mobile menu */}
+    <nav
+      role="navigation"
+      aria-label="Mobile navigation"
+      className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
+    >
       <div
-        className={cn(
-          "fixed top-16 left-0 right-0 z-40 bg-card border-b border-border transition-transform duration-200",
-          isOpen ? "translate-y-0" : "-translate-y-full"
-        )}
+        className="flex items-end justify-around border-t border-[var(--separator,theme(colors.border))] bg-[var(--material-regular,theme(colors.background/90))] backdrop-blur-[20px] saturate-[180%]"
+        style={{ height: 83, paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
-        <nav role="navigation" aria-label="Mobile navigation" className="p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-secondary text-foreground font-medium"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                )}
-              >
-                <item.icon className="h-5 w-5" />
-                {item.name}
-              </Link>
-            );
-          })}
-          <div className="pt-4 border-t border-border">
-            <Button variant="default" className="w-full" asChild>
-              <Link href="/new" onClick={() => setIsOpen(false)}>
-                <Plus className="h-4 w-4" />
-                New Project
-              </Link>
-            </Button>
-          </div>
-        </nav>
+        {tabs.map((tab) => {
+          const isActive =
+            pathname === tab.href ||
+            (tab.href !== "/dashboard" &&
+              pathname.startsWith(tab.href + "/"));
+          return (
+            <Link
+              key={tab.name}
+              href={tab.href}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 px-3 py-2 min-w-[64px] transition-colors",
+                isActive
+                  ? "text-[var(--accent,#0071E3)]"
+                  : "text-[var(--text-tertiary,theme(colors.muted.foreground/70))]"
+              )}
+            >
+              <tab.icon className="h-5 w-5" strokeWidth={isActive ? 2 : 1.5} />
+              <span className="text-[10px] font-medium leading-none">
+                {tab.name}
+              </span>
+            </Link>
+          );
+        })}
       </div>
-    </div>
+    </nav>
   );
 }

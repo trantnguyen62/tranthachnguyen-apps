@@ -28,34 +28,34 @@ export default function FunctionsPage() {
       </ul>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Zap className="h-8 w-8 text-yellow-500 mb-4" />
-          <h3 className="font-semibold text-foreground">Instant Scale</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Instant Scale</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Functions scale automatically based on traffic. Handle 1 or 1 million requests.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Globe className="h-8 w-8 text-[#0070f3] mb-4" />
-          <h3 className="font-semibold text-foreground">Global Deployment</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Global Deployment</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Functions run in multiple regions worldwide for low latency.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Clock className="h-8 w-8 text-green-500 mb-4" />
-          <h3 className="font-semibold text-foreground">Pay Per Use</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Pay Per Use</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Only pay for the compute time you use. No idle costs.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Code className="h-8 w-8 text-purple-500 mb-4" />
-          <h3 className="font-semibold text-foreground">Multiple Runtimes</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Multiple Runtimes</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Support for Node.js, Python, Go, Ruby, and more.
           </p>
         </div>

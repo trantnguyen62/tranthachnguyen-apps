@@ -82,10 +82,10 @@ export default function ContactPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center max-w-3xl mx-auto"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Get in touch
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground">
+              <p className="mt-6 text-xl text-[var(--text-secondary)]">
                 Have a question or need help? We&apos;re here for you. Reach out and our
                 team will get back to you as soon as possible.
               </p>
@@ -107,16 +107,16 @@ export default function ContactPage() {
                 >
                   <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
                     <CardContent className="p-6 text-center">
-                      <div className="w-12 h-12 mx-auto rounded-xl bg-secondary flex items-center justify-center mb-4">
-                        <method.icon className="h-6 w-6 text-foreground" />
+                      <div className="w-12 h-12 mx-auto rounded-xl bg-[var(--surface-secondary)] flex items-center justify-center mb-4">
+                        <method.icon className="h-6 w-6 text-[var(--text-primary)]" />
                       </div>
-                      <h3 className="font-semibold text-foreground">
+                      <h3 className="font-semibold text-[var(--text-primary)]">
                         {method.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-[var(--text-secondary)] mt-1">
                         {method.description}
                       </p>
-                      <p className="text-foreground font-medium mt-2">
+                      <p className="text-[var(--text-primary)] font-medium mt-2">
                         {method.value}
                       </p>
                     </CardContent>
@@ -137,17 +137,17 @@ export default function ContactPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-2xl font-bold text-foreground mb-6">
+                <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6">
                   Send us a message
                 </h2>
 
                 {submitted ? (
                   <div className="p-8 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-center">
                     <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                    <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                       Message sent!
                     </h3>
-                    <p className="text-muted-foreground">
+                    <p className="text-[var(--text-secondary)]">
                       Thank you for reaching out. We&apos;ll get back to you within 24 hours.
                     </p>
                   </div>
@@ -155,7 +155,7 @@ export default function ContactPage() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
+                        <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                           Name
                         </label>
                         <Input
@@ -168,7 +168,7 @@ export default function ContactPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
+                        <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                           Email
                         </label>
                         <Input
@@ -184,7 +184,7 @@ export default function ContactPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Company (optional)
                       </label>
                       <Input
@@ -197,7 +197,7 @@ export default function ContactPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Subject
                       </label>
                       <Input
@@ -211,7 +211,7 @@ export default function ContactPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                         Message
                       </label>
                       <textarea
@@ -222,7 +222,7 @@ export default function ContactPage() {
                           setFormState({ ...formState, message: e.target.value })
                         }
                         placeholder="Tell us more about your inquiry..."
-                        className="w-full rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full rounded-lg border border-[var(--border-primary)] bg-card px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-blue-500 focus:ring-blue-500"
                       />
                     </div>
 
@@ -240,27 +240,27 @@ export default function ContactPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-2xl font-bold text-foreground mb-6">
+                <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-6">
                   Our offices
                 </h2>
                 <div className="space-y-6">
                   {offices.map((office) => (
                     <div
                       key={office.city}
-                      className="p-6 rounded-lg bg-background border border-border"
+                      className="p-6 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]"
                     >
                       <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                          <MapPin className="h-5 w-5 text-foreground" />
+                        <div className="w-10 h-10 rounded-lg bg-[var(--surface-secondary)] flex items-center justify-center shrink-0">
+                          <MapPin className="h-5 w-5 text-[var(--text-primary)]" />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-foreground">
+                          <h3 className="font-semibold text-[var(--text-primary)]">
                             {office.city}
                           </h3>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-[var(--text-secondary)]">
                             {office.type}
                           </p>
-                          <p className="text-muted-foreground mt-2">
+                          <p className="text-[var(--text-secondary)] mt-2">
                             {office.address}
                             <br />
                             {office.zip}

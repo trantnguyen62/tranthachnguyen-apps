@@ -4,12 +4,22 @@
  * POST - Create a new managed database
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { ok, fail } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { provisionDatabase } from "@/lib/database/provisioner";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import {
+  badRequest,
+  notFound,
+  conflict,
+  paymentRequired,
+  validationError,
+  serverError,
+  handlePrismaError,
+} from "@/lib/api/error-response";
 
 const log = getRouteLogger("databases");
 
@@ -26,10 +36,7 @@ export async function GET(request: NextRequest) {
     const projectId = searchParams.get("projectId");
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: "Project ID is required" },
-        { status: 400 }
-      );
+      return badRequest("Project ID is required");
     }
 
     // Verify project ownership
@@ -41,10 +48,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return notFound("Project not found");
     }
 
     const databases = await prisma.managedDatabase.findMany({
@@ -68,13 +72,9 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ databases });
+    return ok({ databases });
   } catch (error) {
-    log.error("Failed to fetch databases", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch databases" },
-      { status: 500 }
-    );
+    return serverError("Failed to fetch databases", error);
   }
 }
 
@@ -93,28 +93,30 @@ export async function POST(request: NextRequest) {
     const { projectId, name, type, provider, plan, region } = body;
 
     if (!projectId || !name || !type || !provider) {
-      return NextResponse.json(
-        { error: "Missing required fields: projectId, name, type, provider" },
-        { status: 400 }
-      );
+      const fields = [];
+      if (!projectId) fields.push({ field: "projectId", message: "Project ID is required" });
+      if (!name) fields.push({ field: "name", message: "Database name is required" });
+      if (!type) fields.push({ field: "type", message: "Database type is required" });
+      if (!provider) fields.push({ field: "provider", message: "Provider is required" });
+      return validationError(fields);
     }
 
     // Validate type
     const validTypes = ["postgresql", "mysql", "redis"];
     if (!validTypes.includes(type)) {
-      return NextResponse.json(
-        { error: `Invalid type. Must be one of: ${validTypes.join(", ")}` },
-        { status: 400 }
-      );
+      return validationError([{
+        field: "type",
+        message: `Invalid type. Must be one of: ${validTypes.join(", ")}`,
+      }]);
     }
 
     // Validate provider
     const validProviders = ["cloudify", "neon", "planetscale", "upstash"];
     if (!validProviders.includes(provider)) {
-      return NextResponse.json(
-        { error: `Invalid provider. Must be one of: ${validProviders.join(", ")}` },
-        { status: 400 }
-      );
+      return validationError([{
+        field: "provider",
+        message: `Invalid provider. Must be one of: ${validProviders.join(", ")}`,
+      }]);
     }
 
     // Validate type-provider compatibility
@@ -126,10 +128,7 @@ export async function POST(request: NextRequest) {
     };
 
     if (!providerTypes[provider].includes(type)) {
-      return NextResponse.json(
-        { error: `Provider ${provider} does not support ${type}` },
-        { status: 400 }
-      );
+      return badRequest(`Provider ${provider} does not support ${type}`);
     }
 
     // Verify project ownership
@@ -141,10 +140,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return notFound("Project not found");
     }
 
     // Check for existing database with same name
@@ -156,10 +152,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "A database with this name already exists" },
-        { status: 409 }
-      );
+      return conflict("A database with this name already exists");
     }
 
     // Check plan limits
@@ -181,9 +174,9 @@ export async function POST(request: NextRequest) {
 
     const maxDatabases = limits[userPlan?.plan || "free"] || 1;
     if (dbCount >= maxDatabases) {
-      return NextResponse.json(
-        { error: `Database limit reached for your plan (${maxDatabases})` },
-        { status: 403 }
+      return paymentRequired(
+        `Database limit reached for your plan (${maxDatabases})`,
+        { currentCount: dbCount, limit: maxDatabases }
       );
     }
 
@@ -213,19 +206,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
-      {
+    return ok({
         success: true,
         databaseId: result.databaseId,
         message: "Database provisioning started",
-      },
-      { status: 201 }
-    );
+      }, { status: 201 });
   } catch (error) {
-    log.error("Failed to create database", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to create database", message: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    const prismaResp = handlePrismaError(error, "database");
+    if (prismaResp) return prismaResp;
+
+    return serverError("Failed to create database", error);
   }
 }

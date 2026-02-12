@@ -75,10 +75,10 @@ export default function LegalPage() {
               <Badge className="mb-4" variant="secondary">
                 Legal
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Legal Documents
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Important policies and agreements governing your use of Cloudify services.
               </p>
             </motion.div>
@@ -98,17 +98,17 @@ export default function LegalPage() {
                 >
                   <Link
                     href={doc.href}
-                    className="group flex items-center justify-between p-6 rounded-lg border border-border bg-card hover:shadow-lg transition-all hover:border-blue-500 dark:hover:border-blue-500"
+                    className="group flex items-center justify-between p-6 rounded-lg border border-[var(--border-primary)] bg-card hover:shadow-lg transition-all hover:border-blue-500 dark:hover:border-blue-500"
                   >
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
-                        <doc.icon className="h-6 w-6 text-muted-foreground" />
+                        <doc.icon className="h-6 w-6 text-[var(--text-secondary)]" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                        <h3 className="font-semibold text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                           {doc.name}
                         </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-[var(--text-secondary)] mt-1">
                           {doc.description}
                         </p>
                         <p className="text-xs text-gray-500 mt-2">
@@ -125,12 +125,12 @@ export default function LegalPage() {
         </section>
 
         {/* Contact Section */}
-        <section className="py-16 bg-background">
+        <section className="py-16 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-bold text-foreground">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)]">
               Have Questions?
             </h2>
-            <p className="mt-4 text-muted-foreground">
+            <p className="mt-4 text-[var(--text-secondary)]">
               For legal inquiries, please contact us at{" "}
               <a
                 href="mailto:legal@cloudify.app"

@@ -9,10 +9,10 @@ export default function CookiePolicyPage() {
       <Header />
       <main className="flex-1 pt-16">
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-foreground mb-8">
+          <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-8">
             Cookie Policy
           </h1>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-[var(--text-secondary)] mb-8">
             Last updated: January 30, 2025
           </p>
 

@@ -7,12 +7,14 @@
  * POST   /api/projects/:id/cron/:jobId/run - Trigger a cron job manually
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { validateCronExpression, describeCronSchedule, parseNextRun } from "@/lib/cron/scheduler";
 import { scheduleCronJob } from "@/lib/cron/executor";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("projects/[id]/cron/[jobId]");
 
@@ -41,7 +43,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Get cron job with executions
@@ -64,7 +66,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!cronJob) {
-      return NextResponse.json({ error: "Cron job not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Cron job not found", 404);
     }
 
     // Calculate success rate
@@ -72,7 +74,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const totalRecent = cronJob.executions.length;
     const successRate = totalRecent > 0 ? (successfulExecutions / totalRecent) * 100 : 0;
 
-    return NextResponse.json({
+    return ok({
       job: {
         id: cronJob.id,
         name: cronJob.name,
@@ -95,10 +97,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to get cron job", error);
-    return NextResponse.json(
-      { error: "Failed to get cron job" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get cron job", 500);
   }
 }
 
@@ -123,7 +122,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Verify cron job exists
@@ -135,10 +134,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!existingJob) {
-      return NextResponse.json({ error: "Cron job not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Cron job not found", 404);
     }
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { name, schedule, path, enabled, timezone, timeout, retryCount } = body;
 
     // Build update data
@@ -147,10 +148,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (name !== undefined) updateData.name = name;
     if (path !== undefined) {
       if (!path.startsWith("/")) {
-        return NextResponse.json(
-          { error: "Path must start with /" },
-          { status: 400 }
-        );
+        return fail("BAD_REQUEST", "Path must start with /", 400);
       }
       updateData.path = path;
     }
@@ -163,10 +161,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (schedule !== undefined) {
       const validation = validateCronExpression(schedule);
       if (!validation.valid) {
-        return NextResponse.json(
-          { error: `Invalid cron expression: ${validation.error}` },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", `Invalid cron expression: ${validation.error}`, 400);
       }
       updateData.schedule = schedule;
       updateData.nextRunAt = parseNextRun(
@@ -181,7 +176,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       data: updateData,
     });
 
-    return NextResponse.json({
+    return ok({
       job: {
         id: updatedJob.id,
         name: updatedJob.name,
@@ -198,10 +193,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to update cron job", error);
-    return NextResponse.json(
-      { error: "Failed to update cron job" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update cron job", 500);
   }
 }
 
@@ -226,7 +218,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Verify cron job exists
@@ -238,7 +230,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!existingJob) {
-      return NextResponse.json({ error: "Cron job not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Cron job not found", 404);
     }
 
     // Delete the cron job (cascades to executions)
@@ -246,13 +238,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: { id: jobId },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete cron job", error);
-    return NextResponse.json(
-      { error: "Failed to delete cron job" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete cron job", 500);
   }
 }
 
@@ -277,7 +266,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Verify cron job exists
@@ -289,28 +278,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!cronJob) {
-      return NextResponse.json({ error: "Cron job not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Cron job not found", 404);
     }
 
     // Schedule the job for immediate execution
     try {
       await scheduleCronJob(jobId);
-      return NextResponse.json({
+      return ok({
         message: "Cron job triggered successfully",
         jobId,
       });
     } catch (execError) {
       log.error("Failed to trigger cron job", execError);
-      return NextResponse.json(
-        { error: "Failed to trigger cron job. BullMQ may not be running." },
-        { status: 503 }
-      );
+      return fail("SERVICE_UNAVAILABLE", "Failed to trigger cron job. BullMQ may not be running.", 503);
     }
   } catch (error) {
     log.error("Failed to trigger cron job", error);
-    return NextResponse.json(
-      { error: "Failed to trigger cron job" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to trigger cron job", 500);
   }
 }

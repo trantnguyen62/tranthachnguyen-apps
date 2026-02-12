@@ -3,9 +3,11 @@
  * List and manage user's GitHub repositories for import
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { ok, fail } from "@/lib/api/response";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 
 const log = getRouteLogger("github/repos");
 import { prisma } from "@/lib/prisma";
@@ -35,10 +37,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!account?.access_token) {
-      return NextResponse.json(
-        { error: "GitHub account not connected. Please sign in with GitHub." },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "GitHub account not connected. Please sign in with GitHub.", 400);
     }
 
     const { searchParams } = new URL(request.url);
@@ -76,19 +75,19 @@ export async function GET(request: NextRequest) {
     const existingProjects = await prisma.project.findMany({
       where: {
         userId: user.id,
-        repoUrl: {
+        repositoryUrl: {
           in: repos.map((r) => r.htmlUrl),
         },
       },
       select: {
         id: true,
-        repoUrl: true,
+        repositoryUrl: true,
         slug: true,
       },
     });
 
     const importedUrls = new Map(
-      existingProjects.map((p) => [p.repoUrl, { id: p.id, slug: p.slug }])
+      existingProjects.map((p) => [p.repositoryUrl, { id: p.id, slug: p.slug }])
     );
 
     const reposWithStatus = repos.map((repo) => {
@@ -101,7 +100,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({
+    return ok({
       repos: reposWithStatus,
       page,
       perPage,
@@ -109,10 +108,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     log.error("Failed to list repositories", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to list repositories" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to list repositories", 500);
   }
 }
 
@@ -125,14 +121,13 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { repoFullName, projectName, branch } = body;
 
     if (!repoFullName) {
-      return NextResponse.json(
-        { error: "Repository name is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Repository name is required", 400);
     }
 
     // Get user's GitHub access token
@@ -144,19 +139,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (!account?.access_token) {
-      return NextResponse.json(
-        { error: "GitHub account not connected" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "GitHub account not connected", 400);
     }
 
     // Parse repo info
     const repoInfo = parseRepoInfo(repoFullName);
     if (!repoInfo) {
-      return NextResponse.json(
-        { error: "Invalid repository name format" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid repository name format", 400);
     }
 
     // Get repository details
@@ -167,29 +156,19 @@ export async function POST(request: NextRequest) {
     );
 
     if (!repo) {
-      return NextResponse.json(
-        { error: "Repository not found or not accessible" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Repository not found or not accessible", 404);
     }
 
     // Check if already imported
     const existingProject = await prisma.project.findFirst({
       where: {
         userId: user.id,
-        repoUrl: repo.htmlUrl,
+        repositoryUrl: repo.htmlUrl,
       },
     });
 
     if (existingProject) {
-      return NextResponse.json(
-        {
-          error: "Repository already imported",
-          projectId: existingProject.id,
-          projectSlug: existingProject.slug,
-        },
-        { status: 409 }
-      );
+      return fail("CONFLICT", "Repository already imported", 409);
     }
 
     // Get suggested settings based on package.json
@@ -215,13 +194,13 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         name: projectName || repo.name,
         slug,
-        repoUrl: repo.htmlUrl,
-        repoBranch: branch || repo.defaultBranch,
+        repositoryUrl: repo.htmlUrl,
+        repositoryBranch: branch || repo.defaultBranch,
         framework: settings.framework || "other",
-        buildCmd: settings.buildCommand,
-        outputDir: settings.outputDir,
-        installCmd: settings.installCommand,
-        rootDir: ".",
+        buildCommand: settings.buildCommand,
+        outputDirectory: settings.outputDir,
+        installCommand: settings.installCommand,
+        rootDirectory: ".",
         nodeVersion: "20",
       },
     });
@@ -272,26 +251,23 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       success: true,
       project: {
         id: project.id,
         name: project.name,
         slug: project.slug,
-        repoUrl: project.repoUrl,
-        repoBranch: project.repoBranch,
+        repoUrl: project.repositoryUrl,
+        repoBranch: project.repositoryBranch,
         framework: project.framework,
-        buildCmd: project.buildCmd,
-        outputDir: project.outputDir,
+        buildCmd: project.buildCommand,
+        outputDir: project.outputDirectory,
       },
       webhookCreated,
       suggestedSettings: settings,
     });
   } catch (error) {
     log.error("Failed to import repository", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to import repository" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to import repository", 500);
   }
 }

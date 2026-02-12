@@ -5,7 +5,8 @@
  * DELETE - Decline invitation
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { ok, fail } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       where: { token },
       include: {
         team: {
-          select: { name: true, slug: true, avatar: true },
+          select: { name: true, slug: true, image: true },
         },
         inviter: {
           select: { name: true },
@@ -39,21 +40,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!invitation) {
-      return NextResponse.json(
-        { error: "Invitation not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Invitation not found", 404);
     }
 
     // Check if already processed
-    if (invitation.status !== "pending") {
-      return NextResponse.json(
-        {
-          error: "Invitation already processed",
-          status: invitation.status,
-        },
-        { status: 400 }
-      );
+    if (invitation.status !== "PENDING") {
+      return fail("BAD_REQUEST", "Invitation already processed", 400);
     }
 
     // Check if expired
@@ -61,23 +53,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       // Update status to expired
       await prisma.teamInvitation.update({
         where: { id: invitation.id },
-        data: { status: "expired" },
+        data: { status: "EXPIRED" },
       });
 
-      return NextResponse.json(
-        { error: "Invitation has expired" },
-        { status: 410 }
-      );
+      return fail("INTERNAL_ERROR", "Invitation has expired", 410);
     }
 
-    return NextResponse.json({
+    return ok({
       invitation: {
         email: invitation.email,
         role: invitation.role,
         team: {
           name: invitation.team.name,
           slug: invitation.team.slug,
-          avatar: invitation.team.avatar,
+          image: invitation.team.image,
         },
         inviter: {
           name: invitation.inviter.name,
@@ -87,10 +76,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to fetch invitation", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch invitation" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch invitation", 500);
   }
 }
 
@@ -100,10 +86,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const user = await getAuthUser(request);
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Please log in to accept the invitation" },
-        { status: 401 }
-      );
+      return fail("AUTH_REQUIRED", "Please log in to accept the invitation", 401);
     }
 
     const { token } = await params;
@@ -118,40 +101,26 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!invitation) {
-      return NextResponse.json(
-        { error: "Invitation not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Invitation not found", 404);
     }
 
-    if (invitation.status !== "pending") {
-      return NextResponse.json(
-        { error: "Invitation already processed" },
-        { status: 400 }
-      );
+    if (invitation.status !== "PENDING") {
+      return fail("BAD_REQUEST", "Invitation already processed", 400);
     }
 
     if (invitation.expiresAt < new Date()) {
       await prisma.teamInvitation.update({
         where: { id: invitation.id },
-        data: { status: "expired" },
+        data: { status: "EXPIRED" },
       });
 
-      return NextResponse.json(
-        { error: "Invitation has expired" },
-        { status: 410 }
-      );
+      return fail("INTERNAL_ERROR", "Invitation has expired", 410);
     }
 
     // Verify the user's email matches the invitation
     // (Or allow any logged-in user - depends on requirements)
     if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
-      return NextResponse.json(
-        {
-          error: "This invitation was sent to a different email address",
-          invitedEmail: invitation.email,
-        },
-        { status: 403 }
+      return fail("AUTH_FORBIDDEN", "This invitation was sent to a different email address", 403
       );
     }
 
@@ -167,10 +136,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // Update invitation status
       await prisma.teamInvitation.update({
         where: { id: invitation.id },
-        data: { status: "accepted", acceptedAt: new Date() },
+        data: { status: "ACCEPTED", acceptedAt: new Date() },
       });
 
-      return NextResponse.json({
+      return ok({
         success: true,
         message: "You are already a member of this team",
         team: {
@@ -190,7 +159,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }),
       prisma.teamInvitation.update({
         where: { id: invitation.id },
-        data: { status: "accepted", acceptedAt: new Date() },
+        data: { status: "ACCEPTED", acceptedAt: new Date() },
       }),
     ]);
 
@@ -223,7 +192,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const owners = await prisma.teamMember.findMany({
       where: {
         teamId: invitation.teamId,
-        role: "owner",
+        role: "OWNER",
       },
       include: {
         user: {
@@ -248,7 +217,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    return NextResponse.json({
+    return ok({
       success: true,
       team: {
         slug: invitation.team.slug,
@@ -258,10 +227,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to accept invitation", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to accept invitation" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to accept invitation", 500);
   }
 }
 
@@ -275,30 +241,21 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!invitation) {
-      return NextResponse.json(
-        { error: "Invitation not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Invitation not found", 404);
     }
 
-    if (invitation.status !== "pending") {
-      return NextResponse.json(
-        { error: "Invitation already processed" },
-        { status: 400 }
-      );
+    if (invitation.status !== "PENDING") {
+      return fail("BAD_REQUEST", "Invitation already processed", 400);
     }
 
     await prisma.teamInvitation.update({
       where: { id: invitation.id },
-      data: { status: "declined" },
+      data: { status: "DECLINED" },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to decline invitation", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to decline invitation" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to decline invitation", 500);
   }
 }

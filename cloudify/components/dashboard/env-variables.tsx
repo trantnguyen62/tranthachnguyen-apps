@@ -131,10 +131,10 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">
             Environment Variables
           </h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--text-secondary)]">
             Configure environment variables for your deployments
           </p>
         </div>
@@ -145,7 +145,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
               Save Changes
             </Button>
           )}
-          <Button variant="outline" onClick={() => setIsAdding(true)}>
+          <Button variant="secondary" onClick={() => setIsAdding(true)}>
             <Plus className="h-4 w-4" />
             Add Variable
           </Button>
@@ -153,11 +153,11 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
       </div>
 
       {/* Info box */}
-      <div className="p-4 rounded-lg bg-secondary border border-border flex items-start gap-3">
-        <Info className="h-5 w-5 text-foreground shrink-0 mt-0.5" />
-        <div className="text-sm text-foreground">
+      <div className="p-4 rounded-lg bg-[var(--surface-secondary)] border border-[var(--border-primary)] flex items-start gap-3">
+        <Info className="h-5 w-5 text-[var(--text-primary)] shrink-0 mt-0.5" />
+        <div className="text-sm text-[var(--text-primary)]">
           <p className="font-medium">Environment Variable Tips</p>
-          <ul className="mt-1 list-disc list-inside space-y-1 text-foreground">
+          <ul className="mt-1 list-disc list-inside space-y-1 text-[var(--text-primary)]">
             <li>Variables starting with NEXT_PUBLIC_ are exposed to the browser</li>
             <li>Sensitive values are encrypted at rest</li>
             <li>Changes require a new deployment to take effect</li>
@@ -172,11 +172,11 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="p-4 rounded-lg border border-border bg-secondary"
+            className="p-4 rounded-lg border border-[var(--border-primary)] bg-[var(--surface-secondary)]"
           >
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">
+                <label className="text-sm font-medium text-[var(--text-primary)] mb-1 block">
                   Key
                 </label>
                 <Input
@@ -187,7 +187,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">
+                <label className="text-sm font-medium text-[var(--text-primary)] mb-1 block">
                   Value
                 </label>
                 <Input
@@ -213,13 +213,13 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
       {/* Variables list */}
       <div className="space-y-3">
         {variables.length === 0 ? (
-          <div className="text-center py-12 border border-dashed border-border rounded-lg">
-            <Key className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">
+          <div className="text-center py-12 border border-dashed border-[var(--border-primary)] rounded-lg">
+            <Key className="h-12 w-12 text-[var(--text-secondary)] mx-auto mb-4" />
+            <p className="text-[var(--text-secondary)]">
               No environment variables configured
             </p>
             <Button
-              variant="outline"
+              variant="secondary"
               className="mt-4"
               onClick={() => setIsAdding(true)}
             >
@@ -232,12 +232,12 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
             <motion.div
               key={variable.id}
               layout
-              className="p-4 rounded-lg border border-border bg-card"
+              className="p-4 rounded-lg border border-[var(--border-primary)] bg-card"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="font-mono font-medium text-foreground">
+                    <span className="font-mono font-medium text-[var(--text-primary)]">
                       {variable.key}
                     </span>
                     {variable.encrypted && (
@@ -256,7 +256,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 font-mono text-sm text-muted-foreground bg-background rounded px-3 py-2 overflow-hidden">
+                    <div className="flex-1 font-mono text-sm text-[var(--text-secondary)] bg-[var(--surface-primary)] rounded px-3 py-2 overflow-hidden">
                       {showValues[variable.id] ? (
                         variable.value
                       ) : (
@@ -267,7 +267,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                     </div>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm" 
                       onClick={() => toggleShowValue(variable.id)}
                     >
                       {showValues[variable.id] ? (
@@ -278,7 +278,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                     </Button>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm" 
                       onClick={() => copyValue(variable.value)}
                     >
                       <Copy className="h-4 w-4" />
@@ -287,7 +287,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                 </div>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="sm" 
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                   onClick={() => deleteVariable(variable.id)}
                 >
@@ -296,8 +296,8 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
               </div>
 
               {/* Target environments */}
-              <div className="mt-4 pt-4 border-t border-border">
-                <span className="text-xs font-medium text-muted-foreground mb-2 block">
+              <div className="mt-4 pt-4 border-t border-[var(--border-primary)]">
+                <span className="text-xs font-medium text-[var(--text-secondary)] mb-2 block">
                   Apply to environments:
                 </span>
                 <div className="flex items-center gap-4">
@@ -310,7 +310,7 @@ export function EnvVariables({ projectId, initialVariables, onSave }: EnvVariabl
                         checked={variable.target.includes(target)}
                         onCheckedChange={() => toggleTarget(variable.id, target)}
                       />
-                      <span className="text-sm capitalize text-foreground">
+                      <span className="text-sm capitalize text-[var(--text-primary)]">
                         {target}
                       </span>
                     </label>

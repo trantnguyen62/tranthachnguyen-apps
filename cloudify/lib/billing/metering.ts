@@ -14,12 +14,12 @@ import {
 } from "./pricing";
 
 export type UsageType =
-  | "build_minutes"
-  | "bandwidth"
-  | "requests"
-  | "function_invocations"
-  | "blob_storage"
-  | "deployments";
+  | "BUILD_MINUTES"
+  | "BANDWIDTH"
+  | "REQUESTS"
+  | "FUNCTION_INVOCATIONS"
+  | "BLOB_STORAGE"
+  | "DEPLOYMENTS";
 
 export interface UsageRecord {
   type: UsageType;
@@ -96,7 +96,7 @@ export async function recordBuildMinutes(
   deploymentId?: string
 ): Promise<void> {
   await recordUsage(userId, {
-    type: "build_minutes",
+    type: "BUILD_MINUTES",
     value: minutes,
     projectId,
     metadata: { deploymentId },
@@ -112,7 +112,7 @@ export async function recordBandwidth(
   bytes: number
 ): Promise<void> {
   await recordUsage(userId, {
-    type: "bandwidth",
+    type: "BANDWIDTH",
     value: bytes,
     projectId,
   });
@@ -127,7 +127,7 @@ export async function recordRequests(
   count: number
 ): Promise<void> {
   await recordUsage(userId, {
-    type: "requests",
+    type: "REQUESTS",
     value: count,
     projectId,
   });
@@ -143,7 +143,7 @@ export async function recordFunctionInvocation(
   durationMs: number
 ): Promise<void> {
   await recordUsage(userId, {
-    type: "function_invocations",
+    type: "FUNCTION_INVOCATIONS",
     value: 1,
     projectId,
     metadata: { functionId, durationMs },
@@ -159,7 +159,7 @@ export async function recordDeployment(
   deploymentId: string
 ): Promise<void> {
   await recordUsage(userId, {
-    type: "deployments",
+    type: "DEPLOYMENTS",
     value: 1,
     projectId,
     metadata: { deploymentId },
@@ -207,22 +207,22 @@ export async function getUsageSummary(
   for (const record of records) {
     const value = record._sum.value || 0;
     switch (record.type) {
-      case "build_minutes":
+      case "BUILD_MINUTES":
         summary.buildMinutes = value;
         break;
-      case "bandwidth":
+      case "BANDWIDTH":
         summary.bandwidthBytes = value;
         break;
-      case "requests":
+      case "REQUESTS":
         summary.requests = value;
         break;
-      case "function_invocations":
+      case "FUNCTION_INVOCATIONS":
         summary.functionInvocations = value;
         break;
-      case "blob_storage":
+      case "BLOB_STORAGE":
         summary.blobStorageBytes = value;
         break;
-      case "deployments":
+      case "DEPLOYMENTS":
         summary.deployments = value;
         break;
     }
@@ -330,22 +330,22 @@ export async function getProjectUsage(
   for (const record of records) {
     const value = record._sum.value || 0;
     switch (record.type) {
-      case "build_minutes":
+      case "BUILD_MINUTES":
         summary.buildMinutes = value;
         break;
-      case "bandwidth":
+      case "BANDWIDTH":
         summary.bandwidthBytes = value;
         break;
-      case "requests":
+      case "REQUESTS":
         summary.requests = value;
         break;
-      case "function_invocations":
+      case "FUNCTION_INVOCATIONS":
         summary.functionInvocations = value;
         break;
-      case "blob_storage":
+      case "BLOB_STORAGE":
         summary.blobStorageBytes = value;
         break;
-      case "deployments":
+      case "DEPLOYMENTS":
         summary.deployments = value;
         break;
     }
@@ -377,27 +377,27 @@ export async function checkLimit(
   let limit: number;
 
   switch (type) {
-    case "build_minutes":
+    case "BUILD_MINUTES":
       current = usage.buildMinutes;
       limit = limits.buildMinutesPerMonth;
       break;
-    case "bandwidth":
+    case "BANDWIDTH":
       current = usage.bandwidthBytes / (1024 * 1024 * 1024);
       limit = limits.bandwidthGB;
       break;
-    case "requests":
+    case "REQUESTS":
       current = usage.requests;
       limit = limits.requestsPerMonth;
       break;
-    case "function_invocations":
+    case "FUNCTION_INVOCATIONS":
       current = usage.functionInvocations;
       limit = limits.functionInvocationsPerMonth;
       break;
-    case "blob_storage":
+    case "BLOB_STORAGE":
       current = usage.blobStorageBytes / (1024 * 1024 * 1024);
       limit = limits.blobStorageGB;
       break;
-    case "deployments":
+    case "DEPLOYMENTS":
       current = usage.deployments;
       limit = limits.deploymentsPerMonth;
       break;
@@ -423,7 +423,7 @@ export async function canDeploy(
   userId: string,
   plan: PlanType
 ): Promise<boolean> {
-  const check = await checkLimit(userId, plan, "deployments");
+  const check = await checkLimit(userId, plan, "DEPLOYMENTS");
   return check.allowed;
 }
 
@@ -435,7 +435,7 @@ export async function canBuild(
   plan: PlanType,
   estimatedMinutes: number = 5
 ): Promise<boolean> {
-  const check = await checkLimit(userId, plan, "build_minutes", estimatedMinutes);
+  const check = await checkLimit(userId, plan, "BUILD_MINUTES", estimatedMinutes);
   return check.allowed;
 }
 

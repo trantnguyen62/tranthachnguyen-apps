@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("notifications");
 
@@ -36,16 +37,13 @@ export async function GET(request: NextRequest) {
       where: { userId: user.id, read: false },
     });
 
-    return NextResponse.json({
+    return ok({
       notifications,
       unreadCount,
     });
   } catch (error) {
     log.error("Failed to fetch notifications", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch notifications" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch notifications", 500);
   }
 }
 
@@ -66,7 +64,7 @@ export async function PATCH(request: NextRequest) {
         where: { userId: user.id, read: false },
         data: { read: true },
       });
-      return NextResponse.json({ success: true });
+      return ok({ success: true });
     }
 
     if (notificationIds && notificationIds.length > 0) {
@@ -77,19 +75,13 @@ export async function PATCH(request: NextRequest) {
         },
         data: { read: true },
       });
-      return NextResponse.json({ success: true });
+      return ok({ success: true });
     }
 
-    return NextResponse.json(
-      { error: "No notifications specified" },
-      { status: 400 }
-    );
+    return fail("BAD_REQUEST", "No notifications specified", 400);
   } catch (error) {
     log.error("Failed to update notifications", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to update notifications" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update notifications", 500);
   }
 }
 

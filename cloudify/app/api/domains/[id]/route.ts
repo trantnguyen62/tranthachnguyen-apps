@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("domains/[id]");
 
@@ -47,16 +48,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!domain) {
-      return NextResponse.json({ error: "Domain not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Domain not found", 404);
     }
 
-    return NextResponse.json(domain);
+    return ok(domain);
   } catch (error) {
     log.error("Failed to fetch domain", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch domain" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch domain", 500);
   }
 }
 
@@ -80,19 +78,16 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!domain) {
-      return NextResponse.json({ error: "Domain not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Domain not found", 404);
     }
 
     await prisma.domain.delete({
       where: { id },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete domain", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete domain" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete domain", 500);
   }
 }

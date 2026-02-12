@@ -9,13 +9,6 @@ export const mockPrisma = {
     update: vi.fn(),
     delete: vi.fn(),
   },
-  session: {
-    create: vi.fn(),
-    findUnique: vi.fn(),
-    findFirst: vi.fn(),
-    delete: vi.fn(),
-    deleteMany: vi.fn(),
-  },
   project: {
     create: vi.fn(),
     findUnique: vi.fn(),
@@ -76,6 +69,14 @@ export const mockPrisma = {
   },
   activity: {
     create: vi.fn(),
+    findMany: vi.fn(),
+  },
+  teamProject: {
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+  },
+  teamMember: {
+    findFirst: vi.fn(),
     findMany: vi.fn(),
   },
 };

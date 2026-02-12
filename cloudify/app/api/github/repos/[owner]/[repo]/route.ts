@@ -3,7 +3,8 @@
  * Get repository info, branches, and suggested settings
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { ok, fail } from "@/lib/api/response";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
 
@@ -42,10 +43,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!account?.access_token) {
-      return NextResponse.json(
-        { error: "GitHub account not connected" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "GitHub account not connected", 400);
     }
 
     const { searchParams } = new URL(request.url);
@@ -56,17 +54,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const repository = await getRepository(account.access_token, owner, repo);
 
     if (!repository) {
-      return NextResponse.json(
-        { error: "Repository not found or not accessible" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Repository not found or not accessible", 404);
     }
 
     // Check if already imported
     const existingProject = await prisma.project.findFirst({
       where: {
         userId: user.id,
-        repoUrl: repository.htmlUrl,
+        repositoryUrl: repository.htmlUrl,
       },
       select: {
         id: true,
@@ -100,12 +95,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       response.suggestedSettings = settings;
     }
 
-    return NextResponse.json(response);
+    return ok(response);
   } catch (error) {
     log.error("Failed to get repository", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to get repository" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get repository", 500);
   }
 }

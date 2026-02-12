@@ -14,34 +14,34 @@ export default function EdgeFunctionsPage() {
       </p>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Globe className="h-8 w-8 text-[#0070f3] mb-4" />
-          <h3 className="font-semibold text-foreground">Global by Default</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Global by Default</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Code runs in 100+ locations worldwide, automatically routed to the nearest edge.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Zap className="h-8 w-8 text-yellow-500 mb-4" />
-          <h3 className="font-semibold text-foreground">Zero Cold Starts</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Zero Cold Starts</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Functions start instantly with no initialization delay. Sub-millisecond startup times.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Clock className="h-8 w-8 text-green-500 mb-4" />
-          <h3 className="font-semibold text-foreground">Ultra-Low Latency</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Ultra-Low Latency</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Respond in under 50ms globally. Perfect for time-sensitive operations.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Shield className="h-8 w-8 text-purple-500 mb-4" />
-          <h3 className="font-semibold text-foreground">Secure Runtime</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Secure Runtime</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Isolated V8 runtime with strong security boundaries. No shared state between requests.
           </p>
         </div>

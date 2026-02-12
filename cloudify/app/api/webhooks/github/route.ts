@@ -4,7 +4,7 @@
  * Includes commit status updates and PR preview comments
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { triggerBuild } from "@/lib/build/worker";
@@ -14,6 +14,7 @@ import {
   postDeploymentComment,
 } from "@/lib/integrations/github-app";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("webhooks/github");
 
@@ -112,10 +113,10 @@ async function findProjectByRepo(repoFullName: string) {
   const project = await prisma.project.findFirst({
     where: {
       OR: [
-        { repoUrl: { contains: repoFullName } },
-        { repoUrl: { contains: `github.com/${repoFullName}` } },
-        { repoUrl: `https://github.com/${repoFullName}` },
-        { repoUrl: `https://github.com/${repoFullName}.git` },
+        { repositoryUrl: { contains: repoFullName } },
+        { repositoryUrl: { contains: `github.com/${repoFullName}` } },
+        { repositoryUrl: `https://github.com/${repoFullName}` },
+        { repositoryUrl: `https://github.com/${repoFullName}.git` },
       ],
     },
     include: {
@@ -150,9 +151,9 @@ async function triggerDeployment(config: {
     config;
 
   // Check if this is the right branch for production deployments
-  if (!isPreview && branch !== project.repoBranch) {
+  if (!isPreview && branch !== project.repositoryBranch) {
     log.info(
-      `Ignoring push to ${branch}, project configured for ${project.repoBranch}`
+      `Ignoring push to ${branch}, project configured for ${project.repositoryBranch}`
     );
     return null;
   }
@@ -164,7 +165,7 @@ async function triggerDeployment(config: {
       status: "QUEUED",
       branch,
       commitSha: commit,
-      commitMsg: commitMessage.substring(0, 200),
+      commitMessage: commitMessage.substring(0, 200),
     },
   });
 
@@ -389,22 +390,19 @@ export async function POST(request: NextRequest) {
     // Webhook secret must be configured - this is a server config issue, not a client error
     if (!webhookSecret) {
       log.error("GITHUB_WEBHOOK_SECRET is not configured");
-      return NextResponse.json(
-        { error: "Webhook service unavailable" },
-        { status: 503 }
-      );
+      return fail("SERVICE_UNAVAILABLE", "Webhook service unavailable", 503);
     }
 
     // Signature header must be present
     if (!signature) {
       log.error("Missing webhook signature");
-      return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+      return fail("AUTH_REQUIRED", "Missing signature", 401);
     }
 
     // Verify the signature
     if (!verifySignature(payload, signature, webhookSecret)) {
       log.error("Invalid webhook signature");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+      return fail("AUTH_REQUIRED", "Invalid signature", 401);
     }
 
     // Parse JSON payload with error handling
@@ -413,7 +411,7 @@ export async function POST(request: NextRequest) {
       data = JSON.parse(payload);
     } catch {
       log.error("Invalid JSON payload");
-      return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+      return fail("BAD_REQUEST", "Invalid JSON payload", 400);
     }
 
     let result;
@@ -448,19 +446,16 @@ export async function POST(request: NextRequest) {
         result = { message: `Unhandled event: ${event}`, triggered: false };
     }
 
-    return NextResponse.json(result);
+    return ok(result);
   } catch (error) {
     log.error("Webhook processing error", error);
-    return NextResponse.json(
-      { error: "Failed to process webhook" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to process webhook", 500);
   }
 }
 
 // Webhook info endpoint
 export async function GET() {
-  return NextResponse.json({
+  return ok({
     message: "Cloudify GitHub Webhook Endpoint",
     status: "active",
     supportedEvents: ["push", "pull_request", "ping"],

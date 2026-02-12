@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// OAuth was removed in favor of credentials-only auth. Skip entire suite.
+test.skip();
+
 test('Full Google OAuth flow - verify redirect to dashboard', async ({ page, context }) => {
   await page.goto('https://cloudify.tranthachnguyen.com/login', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(3000);

@@ -53,7 +53,7 @@ function SupportIcon({ support }: { support: Support }) {
   return (
     <div className="flex items-center justify-center">
       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
-        <X className="h-4 w-4 text-muted-foreground" />
+        <X className="h-4 w-4 text-[var(--text-secondary)]" />
       </div>
     </div>
   );
@@ -70,7 +70,7 @@ export function Comparison() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.3 }}
-            className="text-sm font-semibold text-muted-foreground"
+            className="text-sm font-semibold text-[var(--text-secondary)]"
           >
             WHY CLOUDIFY
           </motion.p>
@@ -79,7 +79,7 @@ export function Comparison() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1, duration: 0.3 }}
-            className="mt-2 text-4xl font-bold tracking-tight text-foreground sm:text-5xl"
+            className="mt-2 text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl"
           >
             The complete platform
           </motion.h2>
@@ -88,7 +88,7 @@ export function Comparison() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.3 }}
-            className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground"
+            className="mx-auto mt-4 max-w-2xl text-lg text-[var(--text-secondary)]"
           >
             Everything you need in one platform. No need to stitch together
             multiple services.
@@ -105,22 +105,22 @@ export function Comparison() {
         >
           <div className="min-w-[640px]">
             {/* Header */}
-            <div className="grid grid-cols-5 gap-4 border-b border-border pb-4">
-              <div className="text-sm font-medium text-muted-foreground">
+            <div className="grid grid-cols-5 gap-4 border-b border-[var(--border-primary)] pb-4">
+              <div className="text-sm font-medium text-[var(--text-secondary)]">
                 Feature
               </div>
               <div className="text-center">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm font-semibold text-foreground">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--surface-secondary)] px-3 py-1 text-sm font-semibold text-[var(--text-primary)]">
                   Cloudify
                 </span>
               </div>
-              <div className="text-center text-sm font-medium text-muted-foreground">
+              <div className="text-center text-sm font-medium text-[var(--text-secondary)]">
                 Vercel
               </div>
-              <div className="text-center text-sm font-medium text-muted-foreground">
+              <div className="text-center text-sm font-medium text-[var(--text-secondary)]">
                 Netlify
               </div>
-              <div className="text-center text-sm font-medium text-muted-foreground">
+              <div className="text-center text-sm font-medium text-[var(--text-secondary)]">
                 AWS Amplify
               </div>
             </div>
@@ -133,9 +133,9 @@ export function Comparison() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.05 * index }}
-                className="grid grid-cols-5 gap-4 py-3 border-b border-border"
+                className="grid grid-cols-5 gap-4 py-3 border-b border-[var(--border-primary)]"
               >
-                <div className="text-sm font-medium text-foreground flex items-center">
+                <div className="text-sm font-medium text-[var(--text-primary)] flex items-center">
                   {row.feature}
                 </div>
                 <SupportIcon support={row.cloudify} />

@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { ok, fail } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { Readable } from "stream";
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!store) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Store not found", 404);
     }
 
     const { searchParams } = new URL(request.url);
@@ -57,16 +58,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     if (info) {
       const blobInfo = await getBlobInfo(storeId, pathname);
       if (!blobInfo) {
-        return NextResponse.json({ error: "Blob not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Blob not found", 404);
       }
-      return NextResponse.json(blobInfo);
+      return ok(blobInfo);
     }
 
     // Redirect to presigned URL
     if (redirect) {
       const result = await getDownloadUrl(storeId, pathname, { expiresIn: 300 });
       if (!result) {
-        return NextResponse.json({ error: "Blob not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Blob not found", 404);
       }
       return NextResponse.redirect(result.url);
     }
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Stream download
     const result = await downloadBlob(storeId, pathname);
     if (!result) {
-      return NextResponse.json({ error: "Blob not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Blob not found", 404);
     }
 
     const headers = new Headers();
@@ -120,10 +121,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return new NextResponse(webStream, { headers });
   } catch (error) {
     log.error("Blob download error", error);
-    return NextResponse.json(
-      { error: "Failed to download blob" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to download blob", 500);
   }
 }
 
@@ -148,7 +146,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!store) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Store not found", 404);
     }
 
     // Get content type from header
@@ -158,10 +156,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     // Check size limit (100MB default)
     const maxSize = 100 * 1024 * 1024;
     if (contentLength && parseInt(contentLength, 10) > maxSize) {
-      return NextResponse.json(
-        { error: `File too large. Maximum size is ${maxSize / 1024 / 1024}MB` },
-        { status: 413 }
-      );
+      return fail("INTERNAL_ERROR", `File too large. Maximum size is ${maxSize / 1024 / 1024}MB`, 413);
     }
 
     // Get custom metadata from headers
@@ -175,7 +170,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     // Read request body as stream
     const body = request.body;
     if (!body) {
-      return NextResponse.json({ error: "No body provided" }, { status: 400 });
+      return fail("BAD_REQUEST", "No body provided", 400);
     }
 
     // Convert Web stream to Node.js Readable
@@ -211,13 +206,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json(blobInfo, { status: 201 });
+    return ok(blobInfo, { status: 201 });
   } catch (error) {
     log.error("Blob upload error", error);
-    return NextResponse.json(
-      { error: "Failed to upload blob" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to upload blob", 500);
   }
 }
 
@@ -242,7 +234,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!store) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Store not found", 404);
     }
 
     const deleted = await deleteBlob(storeId, pathname);
@@ -259,13 +251,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    return NextResponse.json({ success: deleted });
+    return ok({ success: deleted });
   } catch (error) {
     log.error("Blob delete error", error);
-    return NextResponse.json(
-      { error: "Failed to delete blob" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete blob", 500);
   }
 }
 

@@ -40,26 +40,26 @@ export default function RedirectsDocsPage() {
       <h2>Redirect Types</h2>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-2 gap-4 my-8">
-        <div className="p-4 rounded-lg bg-background border border-border">
+        <div className="p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
           <div className="flex items-center gap-2 mb-2">
-            <code className="text-foreground font-semibold">permanent: true</code>
+            <code className="text-[var(--text-primary)] font-semibold">permanent: true</code>
             <span className="text-xs px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
               308
             </span>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--text-secondary)]">
             Permanent redirect. Browsers and search engines cache this redirect.
             Use for content that has permanently moved.
           </p>
         </div>
-        <div className="p-4 rounded-lg bg-background border border-border">
+        <div className="p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
           <div className="flex items-center gap-2 mb-2">
-            <code className="text-foreground font-semibold">permanent: false</code>
+            <code className="text-[var(--text-primary)] font-semibold">permanent: false</code>
             <span className="text-xs px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400">
               307
             </span>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--text-secondary)]">
             Temporary redirect. Not cached by browsers.
             Use for A/B testing or temporary redirects.
           </p>
@@ -300,11 +300,11 @@ export default function RedirectsDocsPage() {
         <li>Dynamic routes</li>
       </ol>
 
-      <div className="not-prose p-6 rounded-xl border border-border bg-secondary my-8">
-        <h3 className="font-semibold text-foreground text-lg mb-2">
+      <div className="not-prose p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-secondary)] my-8">
+        <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
           Performance Tip
         </h3>
-        <p className="text-muted-foreground">
+        <p className="text-[var(--text-secondary)]">
           Redirects are processed at the edge, ensuring minimal latency. However,
           too many redirects can impact performance. Consider consolidating redirect
           rules when possible.

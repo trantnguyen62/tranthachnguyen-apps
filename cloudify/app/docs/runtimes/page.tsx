@@ -25,18 +25,18 @@ export default function RuntimesDocsPage() {
           { name: "Go 1.21", version: "1.21.x", status: "Supported", desc: "Fast compilation and execution" },
           { name: "Ruby 3.3", version: "3.3.x", status: "Supported", desc: "Latest Ruby with YJIT" },
         ].map((runtime) => (
-          <div key={runtime.name} className="flex items-start gap-4 p-4 rounded-lg bg-background border border-border">
+          <div key={runtime.name} className="flex items-start gap-4 p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
             <Check className="h-5 w-5 text-green-500 shrink-0 mt-1" />
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-foreground">{runtime.name}</span>
+                <span className="font-semibold text-[var(--text-primary)]">{runtime.name}</span>
                 {runtime.status === "Recommended" && (
                   <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
                     {runtime.status}
                   </span>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground">{runtime.version} - {runtime.desc}</p>
+              <p className="text-sm text-[var(--text-secondary)]">{runtime.version} - {runtime.desc}</p>
             </div>
           </div>
         ))}
@@ -177,31 +177,31 @@ end`}</code>
       <div className="not-prose my-8">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border">
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Plan</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Max Duration</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Memory</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Payload</th>
+            <tr className="border-b border-[var(--border-primary)]">
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Plan</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Max Duration</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Memory</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Payload</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground">Hobby</td>
-              <td className="py-3 px-4 text-muted-foreground">10 seconds</td>
-              <td className="py-3 px-4 text-muted-foreground">1024 MB</td>
-              <td className="py-3 px-4 text-muted-foreground">4.5 MB</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Hobby</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">10 seconds</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">1024 MB</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">4.5 MB</td>
             </tr>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground">Pro</td>
-              <td className="py-3 px-4 text-muted-foreground">60 seconds</td>
-              <td className="py-3 px-4 text-muted-foreground">3008 MB</td>
-              <td className="py-3 px-4 text-muted-foreground">4.5 MB</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Pro</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">60 seconds</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">3008 MB</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">4.5 MB</td>
             </tr>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground">Enterprise</td>
-              <td className="py-3 px-4 text-muted-foreground">900 seconds</td>
-              <td className="py-3 px-4 text-muted-foreground">3008 MB</td>
-              <td className="py-3 px-4 text-muted-foreground">4.5 MB</td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]">Enterprise</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">900 seconds</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">3008 MB</td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]">4.5 MB</td>
             </tr>
           </tbody>
         </table>
@@ -213,13 +213,13 @@ end`}</code>
         <div className="flex items-start gap-4">
           <Clock className="h-8 w-8 text-yellow-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Minimizing Cold Starts
             </h3>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-[var(--text-secondary)] mb-4">
               Cold starts occur when a function is invoked after being idle. Here are tips to reduce cold start times:
             </p>
-            <ul className="list-disc list-inside text-muted-foreground space-y-1">
+            <ul className="list-disc list-inside text-[var(--text-secondary)] space-y-1">
               <li>Keep your function bundle size small</li>
               <li>Use Node.js for fastest cold starts</li>
               <li>Lazy-load heavy dependencies</li>

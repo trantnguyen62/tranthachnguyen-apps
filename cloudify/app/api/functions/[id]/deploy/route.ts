@@ -2,13 +2,14 @@
  * Function Deploy API - Deploy code to a function
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { deployFunction } from "@/lib/functions/service";
 import { Runtime } from "@/lib/functions/executor";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("functions/[id]/deploy");
 
@@ -38,11 +39,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!func) {
-      return NextResponse.json({ error: "Function not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Function not found", 404);
     }
 
     if (func.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Unauthorized", 403);
     }
 
     // Parse request body
@@ -52,10 +53,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { code, runtime, entrypoint, memory, timeout, envVars } = body;
 
     if (!code || typeof code !== "string") {
-      return NextResponse.json(
-        { error: "Missing required field: code" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing required field: code", 400);
     }
 
     // Validate runtime if provided
@@ -69,26 +67,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     ];
 
     if (runtime && !validRuntimes.includes(runtime)) {
-      return NextResponse.json(
-        { error: `Invalid runtime. Must be one of: ${validRuntimes.join(", ")}` },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", `Invalid runtime. Must be one of: ${validRuntimes.join(", ")}`, 400);
     }
 
     // Validate memory
     if (memory !== undefined && (memory < 128 || memory > 3008)) {
-      return NextResponse.json(
-        { error: "Memory must be between 128 and 3008 MB" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Memory must be between 128 and 3008 MB", 400);
     }
 
     // Validate timeout
     if (timeout !== undefined && (timeout < 1 || timeout > 60)) {
-      return NextResponse.json(
-        { error: "Timeout must be between 1 and 60 seconds" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Timeout must be between 1 and 60 seconds", 400);
     }
 
     // Deploy function
@@ -103,10 +92,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!success) {
-      return NextResponse.json(
-        { error: error || "Deploy failed" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", error || "Deploy failed", 400);
     }
 
     // Log activity
@@ -131,8 +117,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       where: { id },
     });
 
-    return NextResponse.json({
-      success: true,
+    return ok({
       version,
       function: {
         id: updatedFunc?.id,
@@ -146,9 +131,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Function deploy error", error);
-    return NextResponse.json(
-      { error: "Failed to deploy function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to deploy function", 500);
   }
 }

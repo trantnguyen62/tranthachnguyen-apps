@@ -11,6 +11,7 @@ import { getAuthUser } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { revalidateTag } from "@/lib/isr/revalidator";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("revalidate/tag");
 
@@ -44,19 +45,13 @@ export async function POST(request: NextRequest) {
 
     // Validate required parameters
     if (!tag) {
-      return NextResponse.json(
-        { error: "Missing tag parameter" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing tag parameter", 400);
     }
 
     if (!projectId) {
       const authUser = await getAuthUser(request);
       if (!authUser) {
-        return NextResponse.json(
-          { error: "Missing projectId parameter" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_MISSING_FIELD", "Missing projectId parameter", 400);
       }
     }
 
@@ -72,7 +67,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Check secret if configured
@@ -80,23 +75,20 @@ export async function POST(request: NextRequest) {
     if (configuredSecret && secret !== configuredSecret) {
       const headerSecret = request.headers.get("x-revalidate-secret");
       if (headerSecret !== configuredSecret) {
-        return NextResponse.json({ error: "Invalid secret" }, { status: 401 });
+        return fail("AUTH_REQUIRED", "Invalid secret", 401);
       }
     }
 
     // Perform tag revalidation
     const result = await revalidateTag(projectId!, tag, { purgeCloudflare, secret: secret || undefined });
 
-    return NextResponse.json({
+    return ok({
       tag,
       ...result,
       revalidated: result.success,
     });
   } catch (error) {
     log.error("Tag revalidation failed", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Tag revalidation failed", revalidated: false },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Tag revalidation failed", 500);
   }
 }

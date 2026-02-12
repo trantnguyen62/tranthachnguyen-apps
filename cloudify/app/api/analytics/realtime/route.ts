@@ -7,6 +7,7 @@ import { NextRequest } from "next/server";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import { getRouteLogger } from "@/lib/api/logger";
+import { fail } from "@/lib/api/response";
 
 const log = getRouteLogger("analytics/realtime");
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
   const projectId = searchParams.get("projectId");
 
   if (!projectId) {
-    return new Response("Project ID required", { status: 400 });
+    return fail("VALIDATION_MISSING_FIELD", "Project ID required", 400);
   }
 
   // Verify project ownership
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (!project) {
-    return new Response("Project not found", { status: 404 });
+    return fail("NOT_FOUND", "Project not found", 404);
   }
 
   // Create SSE stream

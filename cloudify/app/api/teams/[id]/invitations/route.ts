@@ -5,14 +5,16 @@
  * DELETE - Cancel/revoke an invitation
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { randomBytes } from "crypto";
 import { sendRawEmail } from "@/lib/notifications/email";
 import { createInvitationEmail } from "@/lib/notifications/team-emails";
+import { sendTeamInviteNotification } from "@/lib/notifications";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("teams/[id]/invitations");
 
@@ -36,29 +38,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { email, role = "member" } = body;
 
     if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Email is required", 400);
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid email format", 400);
     }
 
-    // Validate role
-    const validRoles = ["owner", "admin", "member", "developer", "viewer"];
-    if (!validRoles.includes(role)) {
-      return NextResponse.json(
-        { error: "Invalid role" },
-        { status: 400 }
-      );
+    // Validate and normalize role to uppercase enum
+    const roleUpper = (role as string).toUpperCase();
+    const validRoles = ["OWNER", "ADMIN", "MEMBER", "DEVELOPER", "VIEWER"];
+    if (!validRoles.includes(roleUpper)) {
+      return fail("VALIDATION_ERROR", "Invalid role", 400);
     }
+    const prismaRole = roleUpper as "OWNER" | "ADMIN" | "MEMBER" | "DEVELOPER" | "VIEWER";
 
     // Get team and verify user can invite (owner or admin)
     const team = await prisma.team.findUnique({
@@ -67,24 +62,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         members: {
           where: {
             userId: user.id,
-            role: { in: ["owner", "admin"] },
+            role: { in: ["OWNER", "ADMIN"] },
           },
         },
       },
     });
 
     if (!team) {
-      return NextResponse.json(
-        { error: "Team not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Team not found", 404);
     }
 
     if (team.members.length === 0) {
-      return NextResponse.json(
-        { error: "Not authorized to invite members" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Not authorized to invite members", 403);
     }
 
     // Check if user is already a member
@@ -101,10 +90,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       });
 
       if (existingMember) {
-        return NextResponse.json(
-          { error: "User is already a team member" },
-          { status: 400 }
-        );
+        return fail("BAD_REQUEST", "User is already a team member", 400);
       }
     }
 
@@ -113,15 +99,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       where: {
         teamId,
         email: email.toLowerCase(),
-        status: "pending",
+        status: "PENDING",
       },
     });
 
     if (existingInvitation) {
-      return NextResponse.json(
-        { error: "Invitation already sent to this email" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Invitation already sent to this email", 400);
     }
 
     // Generate token and set expiration (7 days)
@@ -140,7 +123,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       data: {
         teamId,
         email: email.toLowerCase(),
-        role,
+        role: prismaRole,
         token,
         invitedBy: user.id,
         expiresAt,
@@ -180,7 +163,22 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({
+    // Send in-app team invite notification if invited user has an account
+    if (existingUser) {
+      try {
+        const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://cloudify.tranthachnguyen.com";
+        await sendTeamInviteNotification({
+          userId: existingUser.id,
+          teamName: team.name,
+          inviterName: inviter?.name || "A team member",
+          inviteUrl: `${APP_URL}/invitations/${token}`,
+        });
+      } catch (notifError) {
+        log.error("Failed to send team invite notification", notifError);
+      }
+    }
+
+    return ok({
       success: true,
       invitation: {
         id: invitation.id,
@@ -193,10 +191,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to send invitation", error);
-    return NextResponse.json(
-      { error: "Failed to send invitation" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to send invitation", 500);
   }
 }
 
@@ -220,16 +215,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!member) {
-      return NextResponse.json(
-        { error: "Not a team member" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Not a team member", 403);
     }
 
     const invitations = await prisma.teamInvitation.findMany({
       where: {
         teamId,
-        status: "pending",
+        status: "PENDING",
       },
       include: {
         inviter: {
@@ -254,13 +246,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       isExpired: inv.expiresAt < now,
     }));
 
-    return NextResponse.json({ invitations: result });
+    return ok({ invitations: result });
   } catch (error) {
     log.error("Failed to fetch invitations", error);
-    return NextResponse.json(
-      { error: "Failed to fetch invitations" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch invitations", 500);
   }
 }
 
@@ -278,10 +267,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const invitationId = searchParams.get("invitationId");
 
     if (!invitationId) {
-      return NextResponse.json(
-        { error: "Invitation ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Invitation ID is required", 400);
     }
 
     // Verify user can cancel (owner or admin)
@@ -289,15 +275,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: {
         teamId,
         userId: user.id,
-        role: { in: ["owner", "admin"] },
+        role: { in: ["OWNER", "ADMIN"] },
       },
     });
 
     if (!member) {
-      return NextResponse.json(
-        { error: "Not authorized to cancel invitations" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Not authorized to cancel invitations", 403);
     }
 
     // Get and delete invitation
@@ -305,27 +288,21 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: {
         id: invitationId,
         teamId,
-        status: "pending",
+        status: "PENDING",
       },
     });
 
     if (!invitation) {
-      return NextResponse.json(
-        { error: "Invitation not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Invitation not found", 404);
     }
 
     await prisma.teamInvitation.delete({
       where: { id: invitationId },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to cancel invitation", error);
-    return NextResponse.json(
-      { error: "Failed to cancel invitation" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to cancel invitation", 500);
   }
 }

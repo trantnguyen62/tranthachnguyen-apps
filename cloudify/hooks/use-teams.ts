@@ -10,7 +10,7 @@ interface TeamMember {
     id: string;
     name: string;
     email: string;
-    avatar: string | null;
+    image: string | null;
   };
 }
 
@@ -18,7 +18,7 @@ interface Team {
   id: string;
   name: string;
   slug: string;
-  avatar: string | null;
+  image: string | null;
   plan: string;
   createdAt: string;
   updatedAt: string;
@@ -72,7 +72,7 @@ export function useTeams() {
 
   const updateTeam = async (
     teamId: string,
-    data: { name?: string; avatar?: string }
+    data: { name?: string; image?: string }
   ): Promise<Team> => {
     const response = await fetch(`/api/teams/${teamId}`, {
       method: "PATCH",

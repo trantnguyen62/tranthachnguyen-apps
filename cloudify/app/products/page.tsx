@@ -103,7 +103,7 @@ export default function ProductsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -113,10 +113,10 @@ export default function ProductsPage() {
               <Badge className="mb-4" variant="secondary">
                 Platform
               </Badge>
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Build with the Best Tools
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Everything you need to build, deploy, and scale your applications.
                 From AI to infrastructure, we've got you covered.
               </p>
@@ -128,7 +128,7 @@ export default function ProductsPage() {
         {productCategories.map((category, categoryIndex) => (
           <section
             key={category.name}
-            className={`py-16 ${categoryIndex % 2 === 1 ? "bg-background" : ""}`}
+            className={`py-16 ${categoryIndex % 2 === 1 ? "bg-[var(--surface-primary)]" : ""}`}
           >
             <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
               <motion.div
@@ -137,10 +137,10 @@ export default function ProductsPage() {
                 viewport={{ once: true }}
                 className="mb-10"
               >
-                <h2 className="text-2xl font-bold text-foreground">
+                <h2 className="text-2xl font-bold text-[var(--text-primary)]">
                   {category.name}
                 </h2>
-                <p className="mt-2 text-muted-foreground">
+                <p className="mt-2 text-[var(--text-secondary)]">
                   {category.description}
                 </p>
               </motion.div>
@@ -156,7 +156,7 @@ export default function ProductsPage() {
                   >
                     <Link
                       href={product.href}
-                      className="group block h-full p-6 rounded-lg border border-border bg-card hover:shadow-xl transition-all hover:border-foreground/20"
+                      className="group block h-full p-6 rounded-lg border border-[var(--border-primary)] bg-card hover:shadow-xl transition-all hover:border-foreground/20"
                     >
                       <div className="flex items-start justify-between">
                         <div
@@ -168,13 +168,13 @@ export default function ProductsPage() {
                           <Badge variant="secondary">{product.badge}</Badge>
                         )}
                       </div>
-                      <h3 className="mt-4 text-xl font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                      <h3 className="mt-4 text-xl font-semibold text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                         {product.name}
                       </h3>
-                      <p className="mt-2 text-muted-foreground">
+                      <p className="mt-2 text-[var(--text-secondary)]">
                         {product.description}
                       </p>
-                      <div className="mt-4 flex items-center text-foreground font-medium">
+                      <div className="mt-4 flex items-center text-[var(--text-primary)] font-medium">
                         Learn more
                         <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </div>
@@ -196,10 +196,10 @@ export default function ProductsPage() {
               Deploy your first project in minutes with our intuitive platform.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" className="bg-background text-foreground" asChild>
+              <Button size="lg" variant="secondary" className="bg-[var(--surface-primary)] text-[var(--text-primary)]" asChild>
                 <Link href="/new">Start Deploying</Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-background/30 text-background hover:bg-background/10" asChild>
+              <Button size="lg" variant="secondary" className="border-[var(--surface-primary)]/30 text-background hover:bg-[var(--surface-primary)]/10" asChild>
                 <Link href="/pricing">View Pricing</Link>
               </Button>
             </div>

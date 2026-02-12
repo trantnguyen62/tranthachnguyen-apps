@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateMinifiedAnalyticsScript } from "@/lib/analytics/sdk-source";
+import { fail } from "@/lib/api/response";
 
 // Cache the script for 1 hour
 const CACHE_MAX_AGE = 3600;
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const { projectId } = await params;
 
   if (!projectId) {
-    return new NextResponse("Project ID required", { status: 400 });
+    return fail("VALIDATION_MISSING_FIELD", "Project ID required", 400);
   }
 
   // Verify project exists

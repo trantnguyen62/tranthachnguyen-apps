@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Static Site - Deployed on Cloudify</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">Cloudify</div>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#about">About</a>
+          <a href="https://cloudify.tranthachnguyen.com" target="_blank" rel="noopener noreferrer">Dashboard</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <span class="badge">Powered by Cloudify</span>
+        <h1>Static Site Template</h1>
+        <p class="subtitle">
+          A clean, minimal static site ready to deploy on Cloudify.
+          No build step required -- just push and deploy.
+        </p>
+        <div class="cta-group">
+          <a href="https://cloudify.tranthachnguyen.com/new" class="btn btn-primary">
+            Deploy Your Own
+          </a>
+          <a href="https://github.com" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+            View Source
+          </a>
+        </div>
+      </section>
+
+      <section id="features" class="features">
+        <h2>Why Cloudify?</h2>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">&#9889;</div>
+            <h3>Instant Deploys</h3>
+            <p>Push to Git and your site is live in seconds. No configuration needed.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#127760;</div>
+            <h3>Global CDN</h3>
+            <p>Your static assets are served from edge locations worldwide.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#128274;</div>
+            <h3>Free SSL</h3>
+            <p>Every deployment gets automatic HTTPS with free SSL certificates.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">&#128640;</div>
+            <h3>Zero Config</h3>
+            <p>Static sites work out of the box. No build commands, no output directories.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="about">
+        <h2>About This Template</h2>
+        <p>
+          This is a pure HTML/CSS static site template. It requires no build step,
+          no Node.js, and no dependencies. Simply push it to a Git repository and
+          deploy it on Cloudify.
+        </p>
+        <div class="deploy-settings">
+          <h3>Deploy Settings</h3>
+          <table>
+            <tr><td>Framework</td><td>Static / HTML</td></tr>
+            <tr><td>Build Command</td><td><em>None</em></td></tr>
+            <tr><td>Output Directory</td><td><code>./</code> (root)</td></tr>
+            <tr><td>Install Command</td><td><em>None</em></td></tr>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Deployed with <strong>Cloudify</strong> &mdash; Self-hosted deployment platform</p>
+    </footer>
+  </div>
+</body>
+</html>

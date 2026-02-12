@@ -3,7 +3,7 @@
  * Processes Stripe events for subscription and payment lifecycle
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import Stripe from "stripe";
 import {
   constructWebhookEvent,
@@ -13,8 +13,13 @@ import {
   handleInvoicePaymentFailed,
 } from "@/lib/billing/stripe";
 import { prisma } from "@/lib/prisma";
-import { sendUpcomingInvoiceNotification } from "@/lib/notifications/service";
+import {
+  sendUpcomingInvoiceNotification,
+  sendPaymentFailedNotification,
+  sendSubscriptionCancelledNotification,
+} from "@/lib/notifications/service";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("webhooks/stripe");
 
@@ -29,10 +34,7 @@ export async function POST(request: NextRequest) {
 
     if (!signature) {
       log.error("No Stripe signature found");
-      return NextResponse.json(
-        { error: "No signature provided" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "No signature provided", 400);
     }
 
     // Verify and construct the event
@@ -40,10 +42,7 @@ export async function POST(request: NextRequest) {
 
     if (!event) {
       log.error("Failed to verify Stripe webhook signature");
-      return NextResponse.json(
-        { error: "Invalid signature" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Invalid signature", 400);
     }
 
     log.info("Processing Stripe event", { type: event.type });
@@ -63,6 +62,28 @@ export async function POST(request: NextRequest) {
         const subscription = event.data.object as Stripe.Subscription;
         await handleSubscriptionDeleted(subscription);
         log.info("Subscription deleted", { subscriptionId: subscription.id });
+
+        // Send subscription cancelled notification
+        try {
+          const userId = subscription.metadata.userId;
+          if (userId) {
+            const planItem = subscription.items?.data?.[0];
+            const planName = (planItem?.price?.nickname || "Pro") as string;
+            const periodEnd = planItem?.current_period_end;
+            const endDate = periodEnd
+              ? new Date(periodEnd * 1000).toLocaleDateString()
+              : "immediately";
+
+            await sendSubscriptionCancelledNotification({
+              userId,
+              planName,
+              endDate,
+            });
+            log.info("Subscription cancelled notification sent", { userId });
+          }
+        } catch (notifError) {
+          log.error("Failed to send subscription cancelled notification", notifError instanceof Error ? notifError : undefined);
+        }
         break;
       }
 
@@ -78,6 +99,31 @@ export async function POST(request: NextRequest) {
         const invoice = event.data.object as Stripe.Invoice;
         await handleInvoicePaymentFailed(invoice);
         log.error("Invoice payment failed", undefined, { invoiceId: invoice.id });
+
+        // Send payment failed notification
+        try {
+          const customerId = typeof invoice.customer === "string"
+            ? invoice.customer
+            : invoice.customer?.id;
+
+          if (customerId) {
+            const user = await prisma.user.findFirst({
+              where: { stripeCustomerId: customerId },
+            });
+
+            if (user) {
+              await sendPaymentFailedNotification({
+                userId: user.id,
+                amount: invoice.amount_due || undefined,
+                currency: invoice.currency || undefined,
+                invoiceId: invoice.id,
+              });
+              log.info("Payment failed notification sent", { userId: user.id });
+            }
+          }
+        } catch (notifError) {
+          log.error("Failed to send payment failed notification", notifError instanceof Error ? notifError : undefined);
+        }
         break;
       }
 
@@ -159,16 +205,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Always return 200 to acknowledge receipt
-    return NextResponse.json({ received: true });
+    return ok({ received: true });
   } catch (error) {
     log.error("Stripe webhook processing error", error instanceof Error ? error : undefined);
     // Return 500 so Stripe retries the webhook for transient failures
     // (e.g., database connection issues). Signature verification errors
     // are already handled above with 400 status.
-    return NextResponse.json(
-      { error: "Webhook handler failed" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Webhook handler failed", 500);
   }
 }
 

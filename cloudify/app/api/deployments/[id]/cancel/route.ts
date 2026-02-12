@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSessionFromRequest } from "@/lib/auth/session";
+import { requireAuth, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("deployments/[id]/cancel");
 
@@ -12,10 +13,9 @@ interface RouteParams {
 // POST /api/deployments/[id]/cancel - Cancel a deployment
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await getSessionFromRequest(request);
-    if (!session?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const authResult = await requireAuth(request);
+    if (isAuthError(authResult)) return authResult;
+    const session = authResult.user;
 
     const { id } = await params;
 
@@ -29,12 +29,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!deployment) {
-      return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
     // Verify ownership - prevent IDOR
     if (deployment.project.userId !== session.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Forbidden", 403);
     }
 
     // Only cancel if in progress
@@ -56,12 +56,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to cancel deployment", error);
-    return NextResponse.json(
-      { error: "Failed to cancel deployment" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to cancel deployment", 500);
   }
 }

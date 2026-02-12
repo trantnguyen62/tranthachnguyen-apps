@@ -1,0 +1,149 @@
+# MySQL Database Template for Cloudify-managed databases
+# Placeholders are replaced at provisioning time:
+#   {{DATABASE_ID}}   - Unique database record ID
+#   {{DB_NAME}}       - Sanitized database name
+#   {{DB_USERNAME}}   - Database username
+#   {{DB_PASSWORD}}   - Database password (base64-encoded in Secret)
+#   {{STORAGE_SIZE}}  - PVC storage size (e.g. 1Gi, 5Gi)
+#   {{MEMORY_LIMIT}}  - Container memory limit (e.g. 256Mi, 512Mi)
+#   {{CPU_LIMIT}}     - Container CPU limit (e.g. 250m, 500m)
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: mysql
+type: Opaque
+stringData:
+  username: "{{DB_USERNAME}}"
+  password: "{{DB_PASSWORD}}"
+  database: "{{DB_NAME}}"
+  root-password: "{{DB_PASSWORD}}"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{STORAGE_SIZE}}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: mysql
+spec:
+  serviceName: cloudify-db-{{DATABASE_ID}}
+  replicas: 1
+  selector:
+    matchLabels:
+      cloudify/database-id: "{{DATABASE_ID}}"
+  template:
+    metadata:
+      labels:
+        app: cloudify-db
+        cloudify/database-id: "{{DATABASE_ID}}"
+        cloudify/database-type: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8
+          ports:
+            - name: mysql
+              containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudify-db-{{DATABASE_ID}}
+                  key: root-password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cloudify-db-{{DATABASE_ID}}
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudify-db-{{DATABASE_ID}}
+                  key: password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: cloudify-db-{{DATABASE_ID}}
+                  key: database
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "{{MEMORY_LIMIT}}"
+              cpu: "{{CPU_LIMIT}}"
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+                - --silent
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+                - --silent
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cloudify-db-{{DATABASE_ID}}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: mysql
+spec:
+  type: ClusterIP
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+  selector:
+    cloudify/database-id: "{{DATABASE_ID}}"

@@ -334,7 +334,7 @@ export default function AuditLogsPage() {
 
   const getTypeColor = (type: string) => {
     const colors: Record<string, string> = {
-      auth: "bg-secondary text-foreground",
+      auth: "bg-[var(--surface-secondary)] text-[var(--text-primary)]",
       project: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
       deployment: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
       domain: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -352,7 +352,7 @@ export default function AuditLogsPage() {
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold text-foreground"
+          className="text-3xl font-bold text-[var(--text-primary)]"
         >
           Audit Logs
         </motion.h1>
@@ -360,7 +360,7 @@ export default function AuditLogsPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mt-2 text-muted-foreground"
+          className="mt-2 text-[var(--text-secondary)]"
         >
           View and manage audit logs for compliance and security monitoring.
         </motion.p>
@@ -397,7 +397,7 @@ export default function AuditLogsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Search */}
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
                     <Input
                       placeholder="Search logs..."
                       className="pl-10"
@@ -456,7 +456,7 @@ export default function AuditLogsPage() {
                 <div className="mt-4 flex items-center justify-between">
                   <div className="flex gap-2">
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
                       onClick={() => handleExport("json")}
                       disabled={isExporting}
@@ -469,7 +469,7 @@ export default function AuditLogsPage() {
                       Export JSON
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
                       onClick={() => handleExport("csv")}
                       disabled={isExporting}
@@ -487,7 +487,7 @@ export default function AuditLogsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={clearFilters}
-                      className="text-muted-foreground hover:text-gray-700"
+                      className="text-[var(--text-secondary)] hover:text-gray-700"
                     >
                       <X className="h-4 w-4 mr-1" />
                       Clear filters
@@ -503,7 +503,7 @@ export default function AuditLogsPage() {
                 <CardTitle className="flex items-center justify-between">
                   <span>Activity Log</span>
                   {pagination && (
-                    <span className="text-sm font-normal text-muted-foreground">
+                    <span className="text-sm font-normal text-[var(--text-secondary)]">
                       Showing {logs.length} of {pagination.total} entries
                     </span>
                   )}
@@ -526,7 +526,7 @@ export default function AuditLogsPage() {
                         ? {
                             label: "Clear filters",
                             onClick: clearFilters,
-                            variant: "outline",
+                            variant: "secondary",
                           }
                         : undefined
                     }
@@ -536,7 +536,7 @@ export default function AuditLogsPage() {
                     {logs.map((log) => (
                       <div
                         key={log.id}
-                        className="p-4 rounded-lg border border-border hover:bg-secondary transition-colors"
+                        className="p-4 rounded-lg border border-[var(--border-primary)] hover:bg-secondary transition-colors"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -544,12 +544,12 @@ export default function AuditLogsPage() {
                               <Badge className={getTypeColor(log.type)}>
                                 {log.type}
                               </Badge>
-                              <Badge variant="outline">{log.action}</Badge>
+                              <Badge variant="secondary">{log.action}</Badge>
                             </div>
-                            <p className="text-foreground font-medium">
+                            <p className="text-[var(--text-primary)] font-medium">
                               {log.description}
                             </p>
-                            <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                            <div className="mt-2 flex flex-wrap gap-4 text-sm text-[var(--text-secondary)]">
                               <span className="flex items-center gap-1">
                                 <User className="h-3 w-3" />
                                 {log.user.name} ({log.user.email})
@@ -582,7 +582,7 @@ export default function AuditLogsPage() {
                 {pagination && pagination.totalPages > 1 && (
                   <div className="mt-6 flex items-center justify-between">
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
@@ -590,11 +590,11 @@ export default function AuditLogsPage() {
                       <ChevronLeft className="h-4 w-4" />
                       Previous
                     </Button>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-[var(--text-secondary)]">
                       Page {currentPage} of {pagination.totalPages}
                     </span>
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
                       onClick={() => setCurrentPage((p) => p + 1)}
                       disabled={!pagination.hasMore}
@@ -651,12 +651,12 @@ export default function AuditLogsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="flex items-center justify-between p-4 rounded-lg border border-border">
+                    <div className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-primary)]">
                       <div>
-                        <div className="font-medium text-foreground">
+                        <div className="font-medium text-[var(--text-primary)]">
                           Enable Retention Policy
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-[var(--text-secondary)]">
                           Automatically manage audit log retention
                         </p>
                       </div>
@@ -681,17 +681,17 @@ export default function AuditLogsPage() {
                               setRetentionDays(parseInt(e.target.value) || 90)
                             }
                           />
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-[var(--text-secondary)]">
                             Logs older than this will be eligible for deletion (7-2555 days)
                           </p>
                         </div>
 
-                        <div className="flex items-center justify-between p-4 rounded-lg border border-border">
+                        <div className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-primary)]">
                           <div>
-                            <div className="font-medium text-foreground">
+                            <div className="font-medium text-[var(--text-primary)]">
                               Auto-Delete Old Logs
                             </div>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-[var(--text-secondary)]">
                               Automatically delete logs older than retention period
                             </p>
                           </div>
@@ -731,33 +731,33 @@ export default function AuditLogsPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="p-4 rounded-lg bg-background text-center">
-                          <div className="text-2xl font-bold text-foreground">
+                        <div className="p-4 rounded-lg bg-[var(--surface-primary)] text-center">
+                          <div className="text-2xl font-bold text-[var(--text-primary)]">
                             {retentionStats.preview.totalLogs.toLocaleString()}
                           </div>
-                          <p className="text-sm text-muted-foreground">Total Logs</p>
+                          <p className="text-sm text-[var(--text-secondary)]">Total Logs</p>
                         </div>
                         <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-center">
                           <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                             {retentionStats.preview.logsToDelete.toLocaleString()}
                           </div>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-[var(--text-secondary)]">
                             Logs to Delete ({retentionDays}+ days old)
                           </p>
                         </div>
-                        <div className="p-4 rounded-lg bg-background text-center">
-                          <div className="text-2xl font-bold text-foreground">
+                        <div className="p-4 rounded-lg bg-[var(--surface-primary)] text-center">
+                          <div className="text-2xl font-bold text-[var(--text-primary)]">
                             {(retentionStats.storageEstimate.currentSizeKB / 1024).toFixed(
                               2
                             )}{" "}
                             MB
                           </div>
-                          <p className="text-sm text-muted-foreground">Estimated Storage</p>
+                          <p className="text-sm text-[var(--text-secondary)]">Estimated Storage</p>
                         </div>
                       </div>
 
                       {retentionStats.preview.oldestLog && (
-                        <p className="mt-4 text-sm text-muted-foreground">
+                        <p className="mt-4 text-sm text-[var(--text-secondary)]">
                           <Calendar className="h-4 w-4 inline mr-1" />
                           Oldest log: {formatDate(retentionStats.preview.oldestLog)}
                         </p>
@@ -769,7 +769,7 @@ export default function AuditLogsPage() {
                             <Trash2 className="h-4 w-4" />
                             Manual Cleanup
                           </h4>
-                          <p className="text-sm text-muted-foreground mt-1">
+                          <p className="text-sm text-[var(--text-secondary)] mt-1">
                             Delete {retentionStats.preview.logsToDelete.toLocaleString()}{" "}
                             logs older than {retentionDays} days. This action cannot be
                             undone.

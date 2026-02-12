@@ -25,19 +25,18 @@ async function getSocket(): Promise<Socket> {
     return connectionPromise;
   }
 
-  connectionPromise = new Promise(async (resolve, reject) => {
-    try {
-      // Get auth token from session
-      const response = await fetch("/api/auth/session");
-      const session = await response.json();
+  connectionPromise = (async () => {
+    // Get auth token from session
+    const response = await fetch("/api/auth/session");
+    const session = await response.json();
 
-      if (!session?.token && !session?.user) {
-        reject(new Error("Not authenticated"));
-        return;
-      }
+    if (!session?.token && !session?.user) {
+      throw new Error("Not authenticated");
+    }
 
-      const token = session.token || session.sessionToken;
+    const token = session.token || session.sessionToken;
 
+    return new Promise<Socket>((resolve, reject) => {
       socket = io(window.location.origin, {
         path: "/api/socket",
         auth: { token },
@@ -60,10 +59,8 @@ async function getSocket(): Promise<Socket> {
       socket.on("disconnect", (reason) => {
         console.log("[Socket] Disconnected:", reason);
       });
-    } catch (error) {
-      reject(error);
-    }
-  });
+    });
+  })();
 
   return connectionPromise;
 }
@@ -124,6 +121,8 @@ export function useProjectPresence(projectId: string | null) {
 
     let mounted = true;
 
+    let cleanup: (() => void) | undefined;
+
     async function subscribe() {
       try {
         const sock = await getSocket();
@@ -167,7 +166,7 @@ export function useProjectPresence(projectId: string | null) {
         sock.on("presence:join", handleJoin);
         sock.on("presence:leave", handleLeave);
 
-        return () => {
+        cleanup = () => {
           sock.off("presence:list", handleList);
           sock.off("presence:join", handleJoin);
           sock.off("presence:leave", handleLeave);
@@ -181,6 +180,7 @@ export function useProjectPresence(projectId: string | null) {
 
     return () => {
       mounted = false;
+      cleanup?.();
       if (socket && joinedRef.current) {
         socket.emit("leave:project", projectId);
         joinedRef.current = false;

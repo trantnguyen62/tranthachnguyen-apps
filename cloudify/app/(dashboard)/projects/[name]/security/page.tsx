@@ -247,7 +247,7 @@ export default function SecuritySettingsPage() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Link href={`/projects/${projectSlug}`}>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="sm" >
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
@@ -256,7 +256,7 @@ export default function SecuritySettingsPage() {
             <Shield className="h-6 w-6" />
             Security Settings
           </h1>
-          <p className="text-muted-foreground">{project.name}</p>
+          <p className="text-[var(--text-secondary)]">{project.name}</p>
         </div>
       </div>
 
@@ -305,7 +305,7 @@ export default function SecuritySettingsPage() {
                   <SelectItem key={level.value} value={level.value}>
                     <div className="flex flex-col">
                       <span className="font-medium">{level.label}</span>
-                      <span className="text-xs text-muted-foreground">{level.description}</span>
+                      <span className="text-xs text-[var(--text-secondary)]">{level.description}</span>
                     </div>
                   </SelectItem>
                 ))}
@@ -444,7 +444,7 @@ export default function SecuritySettingsPage() {
                   {countries.map((country) => (
                     <Button
                       key={country.code}
-                      variant={blockedCountries.includes(country.code) ? "default" : "outline"}
+                      variant={blockedCountries.includes(country.code) ? "default" : "secondary"}
                       size="sm"
                       onClick={() => {
                         if (blockedCountries.includes(country.code)) {
@@ -484,20 +484,20 @@ export default function SecuritySettingsPage() {
                   >
                     <div className="flex items-center gap-3">
                       {rule.paused ? (
-                        <XCircle className="h-4 w-4 text-muted-foreground" />
+                        <XCircle className="h-4 w-4 text-[var(--text-secondary)]" />
                       ) : (
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                       )}
                       <div>
                         <p className="font-medium text-sm">{rule.description}</p>
-                        <Badge variant="outline" className="mt-1">
+                        <Badge variant="secondary" className="mt-1">
                           {rule.action}
                         </Badge>
                       </div>
                     </div>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm" 
                       onClick={() => handleDeleteRule(rule.id)}
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
@@ -511,7 +511,7 @@ export default function SecuritySettingsPage() {
 
         {/* Save Button */}
         <div className="flex justify-end gap-4">
-          <Button variant="outline" onClick={() => router.push(`/projects/${projectSlug}`)}>
+          <Button variant="secondary" onClick={() => router.push(`/projects/${projectSlug}`)}>
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={saving || !settings?.configured}>

@@ -60,13 +60,13 @@ function ResetPasswordContent() {
 
   if (!token) {
     return (
-      <Card className="border-border">
+      <Card className="border-[var(--border-primary)]">
         <CardContent className="p-8 text-center space-y-4">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">
             Invalid Reset Link
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--text-secondary)]">
             This password reset link is invalid or has expired. Please request a new one.
           </p>
           <Link href="/forgot-password">
@@ -80,7 +80,7 @@ function ResetPasswordContent() {
   }
 
   return (
-    <Card className="border-border">
+    <Card className="border-[var(--border-primary)]">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Set new password</CardTitle>
         <CardDescription>
@@ -95,7 +95,7 @@ function ResetPasswordContent() {
             <div className="flex justify-center">
               <CheckCircle2 className="h-12 w-12 text-green-500" />
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--text-secondary)]">
               Your password has been reset successfully. You can now log in with your new password.
             </p>
             <Link href="/login">
@@ -115,12 +115,12 @@ function ResetPasswordContent() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-medium text-foreground"
+                className="text-sm font-medium text-[var(--text-primary)]"
               >
                 New password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
                 <Input
                   id="password"
                   type="password"
@@ -137,12 +137,12 @@ function ResetPasswordContent() {
             <div className="space-y-2">
               <label
                 htmlFor="confirm-password"
-                className="text-sm font-medium text-foreground"
+                className="text-sm font-medium text-[var(--text-primary)]"
               >
                 Confirm password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
                 <Input
                   id="confirm-password"
                   type="password"
@@ -187,7 +187,7 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--surface-primary)] px-4">
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -199,16 +199,16 @@ export default function ResetPasswordPage() {
             <div className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground">
               <Cloud className="h-4 w-4 text-background" />
             </div>
-            <span className="text-sm font-semibold text-foreground">
+            <span className="text-sm font-semibold text-[var(--text-primary)]">
               Cloudify
             </span>
           </Link>
         </div>
 
         <Suspense fallback={
-          <Card className="border-border">
+          <Card className="border-[var(--border-primary)]">
             <CardContent className="p-8 text-center">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-[var(--text-secondary)]" />
             </CardContent>
           </Card>
         }>

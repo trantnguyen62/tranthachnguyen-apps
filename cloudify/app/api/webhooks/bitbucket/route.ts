@@ -6,7 +6,7 @@
  * - Pull request events (preview deployments)
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { triggerBuild } from "@/lib/build/worker";
 import {
@@ -15,6 +15,8 @@ import {
   BitbucketPullRequestEvent,
 } from "@/lib/integrations/bitbucket";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("webhooks/bitbucket");
 
@@ -28,30 +30,26 @@ export async function POST(request: NextRequest) {
     const hookUuid = request.headers.get("x-hook-uuid");
 
     if (!eventKey) {
-      return NextResponse.json(
-        { error: "Missing X-Event-Key header" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Missing X-Event-Key header", 400);
     }
 
     // Parse payload
-    const payload = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const payload = parseResult.data;
 
     // Find project by Bitbucket repository
     const repoFullName = payload.repository?.full_name;
     if (!repoFullName) {
-      return NextResponse.json(
-        { error: "Missing repository in payload" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Missing repository in payload", 400);
     }
 
     // Look up the project by Bitbucket URL
     const project = await prisma.project.findFirst({
       where: {
         OR: [
-          { repoUrl: { contains: `bitbucket.org/${repoFullName}` } },
-          { repoUrl: { contains: repoFullName } },
+          { repositoryUrl: { contains: `bitbucket.org/${repoFullName}` } },
+          { repositoryUrl: { contains: repoFullName } },
         ],
       },
       include: {
@@ -63,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     if (!project) {
       log.info(`No project found for repository: ${repoFullName}`);
-      return NextResponse.json({ message: "Project not found" }, { status: 200 });
+      return ok({ message: "Project not found" });
     }
 
     // Parse the event
@@ -71,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     if (!event) {
       log.info(`Ignoring unsupported event type: ${eventKey}`);
-      return NextResponse.json({ message: "Event type not supported" }, { status: 200 });
+      return ok({ message: "Event type not supported" });
     }
 
     // Handle push events
@@ -80,13 +78,13 @@ export async function POST(request: NextRequest) {
       const changes = pushEvent.push.changes;
 
       if (!changes || changes.length === 0) {
-        return NextResponse.json({ message: "No changes in push" }, { status: 200 });
+        return ok({ message: "No changes in push" });
       }
 
       // Process the most recent change
       const latestChange = changes[0];
       if (!latestChange.new) {
-        return NextResponse.json({ message: "Branch deleted, no action" }, { status: 200 });
+        return ok({ message: "Branch deleted, no action" });
       }
 
       const branch = latestChange.new.name;
@@ -94,7 +92,7 @@ export async function POST(request: NextRequest) {
       const commitMessage = latestChange.new.target.message;
 
       // Check if this is the production branch
-      const isProductionBranch = branch === project.repoBranch;
+      const isProductionBranch = branch === project.repositoryBranch;
 
       log.info(`Push to ${branch} on project ${project.slug}`, {
         commitSha,
@@ -115,7 +113,7 @@ export async function POST(request: NextRequest) {
 
       await triggerBuild(deployment.id);
 
-      return NextResponse.json({
+      return ok({
         message: "Deployment triggered",
         deploymentId: deployment.id,
         branch,
@@ -145,7 +143,7 @@ export async function POST(request: NextRequest) {
             },
           });
 
-          return NextResponse.json({
+          return ok({
             message: "Preview deployment triggered",
             deploymentId: deployment.id,
             branch: pr.source.branch.name,
@@ -154,17 +152,14 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      return NextResponse.json({
+      return ok({
         message: `Pull request ${pr.state.toLowerCase()}, no action taken`,
       });
     }
 
-    return NextResponse.json({ message: "Event processed" });
+    return ok({ message: "Event processed" });
   } catch (error) {
     log.error("Webhook processing failed", error);
-    return NextResponse.json(
-      { error: "Webhook processing failed" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Webhook processing failed", 500);
   }
 }

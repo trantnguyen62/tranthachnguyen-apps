@@ -52,20 +52,25 @@ spec:
             limits:
               cpu: "1000m"
               memory: "2Gi"
-          livenessProbe:
+          startupProbe:
             httpGet:
               path: /api/health
               port: http
-            initialDelaySeconds: 30
-            periodSeconds: 10
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /api/health/live
+              port: http
+            periodSeconds: 30
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /api/health/ready
               port: http
-            initialDelaySeconds: 10
-            periodSeconds: 5
+            periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 3
           volumeMounts:

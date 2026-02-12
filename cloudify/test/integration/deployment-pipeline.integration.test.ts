@@ -148,7 +148,7 @@ describe("Complete Deployment Pipeline", () => {
       const response = await POST(
         createMockRequest("POST", "/api/projects", {
           name: "Pipeline Test Project",
-          repoUrl: "https://github.com/testuser/pipeline-test-repo",
+          repositoryUrl: "https://github.com/testuser/pipeline-test-repo",
           framework: "nextjs",
           buildCmd: "npm run build",
           outputDir: ".next",
@@ -426,7 +426,7 @@ describe("Deployment Error Handling", () => {
         name: "Error Test Project",
         slug: "error-test-project",
         userId: ERROR_TEST_USER.id,
-        repoUrl: "https://github.com/testuser/error-test",
+        repositoryUrl: "https://github.com/testuser/error-test",
       },
     });
     projectId = project.id;
@@ -559,7 +559,7 @@ describe("Deployment State Machine", () => {
         name: "State Test Project",
         slug: "state-test-project",
         userId: STATE_TEST_USER.id,
-        repoUrl: "https://github.com/testuser/state-test",
+        repositoryUrl: "https://github.com/testuser/state-test",
       },
     });
     projectId = project.id;
@@ -750,7 +750,7 @@ describe("Deployment Metrics", () => {
         name: "Metrics Test Project",
         slug: "metrics-test-project",
         userId: METRICS_TEST_USER.id,
-        repoUrl: "https://github.com/testuser/metrics-test",
+        repositoryUrl: "https://github.com/testuser/metrics-test",
       },
     });
     projectId = project.id;

@@ -293,8 +293,8 @@ export async function getFunctionLogs(
   functionId: string,
   options: {
     limit?: number;
-    offset?: number;
     since?: Date;
+    cursorWhere?: Record<string, unknown>;
   } = {}
 ): Promise<Array<{
   id: string;
@@ -304,16 +304,16 @@ export async function getFunctionLogs(
   error: string | null;
   createdAt: Date;
 }>> {
-  const { limit = 50, offset = 0, since } = options;
+  const { limit = 50, since, cursorWhere } = options;
 
   const invocations = await prisma.functionInvocation.findMany({
     where: {
       functionId,
       ...(since && { createdAt: { gte: since } }),
+      ...cursorWhere,
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     take: limit,
-    skip: offset,
     select: {
       id: true,
       status: true,

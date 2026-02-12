@@ -3,7 +3,7 @@
  * Get detailed usage information and history
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/lib/billing/metering";
 import { PlanType } from "@/lib/billing/pricing";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("billing/usage");
 
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return fail("NOT_FOUND", "User not found", 404);
     }
 
     const plan = (user.plan || "free") as PlanType;
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
         totalUsage: p._sum.value || 0,
       }));
 
-    return NextResponse.json({
+    return ok({
       summary: usageWithLimits.usage,
       limits: usageWithLimits.limits,
       percentages: usageWithLimits.percentages,
@@ -109,9 +110,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     log.error("Failed to get usage", error);
-    return NextResponse.json(
-      { error: "Failed to get usage" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get usage", 500);
   }
 }

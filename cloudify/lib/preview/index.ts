@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { deleteArtifacts } from "@/lib/build/artifact-manager";
+import { postOrUpdateDeployPreviewComment } from "@/lib/integrations/github-pr-comment";
 
 /**
  * Create a preview deployment for a pull request
@@ -9,7 +10,7 @@ export async function createPreviewDeployment(
   prNumber: number,
   branch: string,
   commitSha: string,
-  commitMsg?: string
+  commitMessage?: string
 ) {
   // Check if a preview deployment already exists for this PR
   const existingDeployment = await prisma.deployment.findFirst({
@@ -29,27 +30,48 @@ export async function createPreviewDeployment(
     });
   }
 
+  // Get project slug for human-readable preview URLs
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { slug: true },
+  });
+
   // Create new preview deployment
+  const siteSlug = generatePreviewSlug(project?.slug || projectId.substring(0, 8), prNumber);
   const deployment = await prisma.deployment.create({
     data: {
       projectId,
       branch,
       commitSha,
-      commitMsg: commitMsg || `PR #${prNumber}`,
+      commitMessage: commitMessage || `PR #${prNumber}`,
       status: "QUEUED",
-      siteSlug: generatePreviewSlug(projectId, prNumber),
+      siteSlug,
     },
+  });
+
+  // Post a "building" comment on the PR (fire-and-forget)
+  postOrUpdateDeployPreviewComment({
+    projectId,
+    prNumber,
+    deploymentId: deployment.id,
+    previewUrl: getPreviewUrl(siteSlug),
+    status: "building",
+    commitSha,
+    branch,
+  }).catch(() => {
+    // Non-critical — log already handled inside the function
   });
 
   return deployment;
 }
 
 /**
- * Generate a unique slug for preview deployments
+ * Generate a unique slug for preview deployments.
+ * Uses the project slug + PR number for human-readable preview URLs.
+ * e.g., "my-app-pr-42.cloudify.tranthachnguyen.com"
  */
-function generatePreviewSlug(projectId: string, prNumber: number): string {
-  const prefix = projectId.substring(0, 8);
-  return `preview-${prefix}-pr-${prNumber}`;
+function generatePreviewSlug(projectSlug: string, prNumber: number): string {
+  return `${projectSlug}-pr-${prNumber}`;
 }
 
 /**
@@ -69,14 +91,14 @@ export async function handlePullRequestEvent(
   projectId: string,
   branch: string,
   commitSha: string,
-  commitMsg?: string
+  commitMessage?: string
 ) {
   switch (action) {
     case "opened":
     case "synchronize":
     case "reopened":
       // Create or update preview deployment
-      return createPreviewDeployment(projectId, prNumber, branch, commitSha, commitMsg);
+      return createPreviewDeployment(projectId, prNumber, branch, commitSha, commitMessage);
 
     case "closed":
       // Cancel any running preview deployments for this PR
@@ -106,6 +128,40 @@ export async function getPreviewDeployments(projectId: string) {
     },
     orderBy: { createdAt: "desc" },
     take: 20,
+  });
+}
+
+/**
+ * Notify the PR when a preview deployment completes (success or failure).
+ *
+ * Call this from the build pipeline when a preview deployment finishes.
+ * It will update the existing PR comment with the final status, preview
+ * URL, and build time.
+ */
+export async function onPreviewDeployComplete(
+  projectId: string,
+  prNumber: number,
+  deploymentId: string,
+  status: "ready" | "error",
+  buildTimeMs?: number,
+  errorMessage?: string
+) {
+  const deployment = await prisma.deployment.findUnique({
+    where: { id: deploymentId },
+  });
+
+  if (!deployment?.siteSlug) return;
+
+  await postOrUpdateDeployPreviewComment({
+    projectId,
+    prNumber,
+    deploymentId,
+    previewUrl: getPreviewUrl(deployment.siteSlug),
+    status,
+    buildTimeMs,
+    commitSha: deployment.commitSha ?? undefined,
+    branch: deployment.branch ?? undefined,
+    errorMessage,
   });
 }
 

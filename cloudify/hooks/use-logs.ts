@@ -45,16 +45,18 @@ export function useLogs(options: UseLogsOptions = {}) {
           throw new Error("Failed to fetch logs");
         }
 
-        const data = await response.json();
+        const envelope = await response.json();
+        const data = envelope.data ?? envelope;
+        const pagination = envelope.meta?.pagination;
 
         if (cursor) {
-          setLogs((prev) => [...prev, ...data.logs]);
+          setLogs((prev) => [...prev, ...(data.logs ?? [])]);
         } else {
-          setLogs(data.logs);
+          setLogs(data.logs ?? []);
         }
 
-        setNextCursor(data.nextCursor);
-        setHasMore(data.hasMore);
+        setNextCursor(pagination?.cursor ?? data.nextCursor ?? null);
+        setHasMore(pagination?.hasMore ?? data.hasMore ?? false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch logs");
       } finally {

@@ -47,9 +47,9 @@ const toastConfig = {
   },
   info: {
     icon: Info,
-    bg: "bg-secondary",
+    bg: "bg-[var(--surface-secondary)]",
     border: "border-blue-200 dark:border-blue-800",
-    iconColor: "text-foreground",
+    iconColor: "text-[var(--text-primary)]",
     titleColor: "text-blue-800 dark:text-blue-200",
   },
 };
@@ -120,7 +120,7 @@ function ToastContainer({
                   {toast.title}
                 </p>
                 {toast.message && (
-                  <p className="text-sm text-muted-foreground mt-0.5">
+                  <p className="text-sm text-[var(--text-secondary)] mt-0.5">
                     {toast.message}
                   </p>
                 )}
@@ -129,7 +129,7 @@ function ToastContainer({
                 onClick={() => removeToast(toast.id)}
                 className="shrink-0 p-1 rounded hover:bg-black/5 dark:hover:bg-white/5"
               >
-                <X className="h-4 w-4 text-muted-foreground" />
+                <X className="h-4 w-4 text-[var(--text-secondary)]" />
               </button>
             </motion.div>
           );

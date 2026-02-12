@@ -18,6 +18,10 @@ import { logout } from "./commands/logout.js";
 import { dev } from "./commands/dev.js";
 import { rollback } from "./commands/rollback.js";
 import { addDomain, removeDomain, listDomains, domainsVerify } from "./commands/domains.js";
+import { functionsList, functionsDeploy, functionsLogs, functionsInvoke } from "./commands/functions.js";
+import { kvList, kvGet, kvSet, kvDelete, blobList, blobUpload, blobDownload, blobDelete } from "./commands/storage.js";
+import { teamsList, teamsCreate, teamsInvite, teamsMembers } from "./commands/teams.js";
+import { analyticsOverview, analyticsRealtime } from "./commands/analytics.js";
 
 const program = new Command();
 
@@ -150,6 +154,134 @@ domainsCommand
   .command("verify <domain>")
   .description("Verify DNS configuration for a domain")
   .action(domainsVerify);
+
+// Functions
+const functionsCommand = program
+  .command("functions")
+  .description("Manage edge functions");
+
+functionsCommand
+  .command("list")
+  .description("List all edge functions")
+  .action(functionsList);
+
+functionsCommand
+  .command("deploy <name>")
+  .description("Deploy an edge function")
+  .requiredOption("--file <path>", "Path to the function source file")
+  .action(functionsDeploy);
+
+functionsCommand
+  .command("logs <name>")
+  .description("Show recent execution logs for a function")
+  .option("-n, --lines <number>", "Number of log entries to show", "50")
+  .action(functionsLogs);
+
+functionsCommand
+  .command("invoke <name>")
+  .description("Invoke an edge function")
+  .option("-d, --data <json>", "JSON payload to send")
+  .action(functionsInvoke);
+
+// Storage
+const storageCommand = program
+  .command("storage")
+  .description("Manage KV store and blob storage");
+
+// Storage - KV subcommands
+const kvCommand = storageCommand
+  .command("kv")
+  .description("Manage key-value store");
+
+kvCommand
+  .command("list")
+  .description("List all KV entries")
+  .action(kvList);
+
+kvCommand
+  .command("get <key>")
+  .description("Get a value by key")
+  .action(kvGet);
+
+kvCommand
+  .command("set <key> <value>")
+  .description("Set a key-value pair")
+  .action(kvSet);
+
+kvCommand
+  .command("delete <key>")
+  .description("Delete a key")
+  .action(kvDelete);
+
+// Storage - Blob subcommands
+const blobCommand = storageCommand
+  .command("blob")
+  .description("Manage blob storage");
+
+blobCommand
+  .command("list")
+  .description("List all blobs")
+  .action(blobList);
+
+blobCommand
+  .command("upload <file>")
+  .description("Upload a file to blob storage")
+  .action(blobUpload);
+
+blobCommand
+  .command("download <path>")
+  .description("Download a blob to local file")
+  .option("-o, --output <file>", "Output file path")
+  .action(blobDownload);
+
+blobCommand
+  .command("delete <path>")
+  .description("Delete a blob")
+  .action(blobDelete);
+
+// Teams
+const teamsCommand = program
+  .command("teams")
+  .description("Manage teams and members");
+
+teamsCommand
+  .command("list")
+  .description("List your teams")
+  .action(teamsList);
+
+teamsCommand
+  .command("create <name>")
+  .description("Create a new team")
+  .action(teamsCreate);
+
+teamsCommand
+  .command("invite <email>")
+  .description("Invite a member to your team")
+  .option("-r, --role <role>", "Role (owner, admin, member, viewer)", "member")
+  .option("-t, --team <teamId>", "Team ID (defaults to first team)")
+  .action(teamsInvite);
+
+teamsCommand
+  .command("members")
+  .description("List team members")
+  .option("-t, --team <teamId>", "Team ID (defaults to first team)")
+  .action(teamsMembers);
+
+// Analytics
+const analyticsCommand = program
+  .command("analytics")
+  .description("View project analytics");
+
+analyticsCommand
+  .command("overview")
+  .description("Show analytics summary")
+  .option("-p, --period <period>", "Time period (24h, 7d, 30d, 90d)", "7d")
+  .action(analyticsOverview);
+
+analyticsCommand
+  .command("realtime")
+  .description("Show real-time visitor stats")
+  .action(analyticsRealtime);
 
 // Parse arguments
 program.parse();

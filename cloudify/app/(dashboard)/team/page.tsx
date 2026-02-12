@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useTeams } from "@/hooks/use-teams";
+import { EmptyState } from "@/components/ui/empty-state";
+import { useToast } from "@/components/notifications/toast";
 
 type Role = "owner" | "admin" | "member" | "developer" | "viewer";
 
@@ -49,7 +51,7 @@ const roleConfig: Record<string, { label: string; color: string; permissions: st
   },
   admin: {
     label: "Admin",
-    color: "bg-secondary text-foreground",
+    color: "bg-[var(--surface-secondary)] text-[var(--text-primary)]",
     permissions: ["Manage members", "All projects", "Settings"],
   },
   developer: {
@@ -78,6 +80,7 @@ export default function TeamPage() {
   const [copied, setCopied] = useState(false);
   const [isInviting, setIsInviting] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   // Get the first team (personal workspace) or all members across teams
   const currentTeam = teams[0];
@@ -108,6 +111,7 @@ export default function TeamPage() {
     try {
       await inviteMember(currentTeam.id, inviteEmail, inviteRole);
       setInviteDialogOpen(false);
+      addToast({ type: "success", title: "Invite sent", message: `Invitation sent to ${inviteEmail}` });
       setInviteEmail("");
     } catch (err) {
       setInviteError(err instanceof Error ? err.message : "Failed to invite member");
@@ -132,13 +136,14 @@ export default function TeamPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Failed to change role");
+        addToast({ type: "error", title: "Role update failed", message: data.error || "Failed to change role" });
       } else {
         await refetch();
         setRoleDialogOpen(false);
+        addToast({ type: "success", title: "Role updated", message: `${roleDialogMember.name}'s role has been changed` });
       }
     } catch {
-      alert("Network error");
+      addToast({ type: "error", title: "Network error", message: "Could not connect to the server" });
     } finally {
       setIsChangingRole(false);
     }
@@ -150,8 +155,9 @@ export default function TeamPage() {
 
     try {
       await removeMember(currentTeam.id, userId);
+      addToast({ type: "success", title: "Member removed", message: "Team member has been removed" });
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to remove member");
+      addToast({ type: "error", title: "Remove failed", message: err instanceof Error ? err.message : "Failed to remove member" });
     }
   };
 
@@ -163,7 +169,7 @@ export default function TeamPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -172,11 +178,11 @@ export default function TeamPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
           Failed to load team
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <p className="text-[var(--text-secondary)] mb-4">{error}</p>
+        <Button variant="secondary" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
         </Button>
@@ -189,15 +195,15 @@ export default function TeamPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
             Team Members
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-[var(--text-secondary)]">
             Manage your team and their permissions
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="secondary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
@@ -230,13 +236,13 @@ export default function TeamPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="p-4 rounded-xl bg-card border border-border"
+            className="p-4 rounded-xl bg-card border border-[var(--border-primary)]"
           >
-            <stat.icon className="h-5 w-5 text-muted-foreground mb-2" />
-            <p className="text-2xl font-bold text-foreground">
+            <stat.icon className="h-5 w-5 text-[var(--text-secondary)] mb-2" />
+            <p className="text-2xl font-bold text-[var(--text-primary)]">
               {stat.value}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--text-secondary)]">
               {stat.label}
             </p>
           </div>
@@ -245,7 +251,7 @@ export default function TeamPage() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
         <Input
           placeholder="Search members..."
           value={searchQuery}
@@ -256,32 +262,30 @@ export default function TeamPage() {
 
       {/* Members list */}
       {members.length === 0 ? (
-        <div className="text-center py-12 bg-card rounded-xl border border-border">
-          <Users className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            No team members yet
-          </h3>
-          <p className="text-muted-foreground mb-4">
-            Invite team members to collaborate on your projects.
-          </p>
-          <Button variant="default" onClick={() => setInviteDialogOpen(true)}>
-            <UserPlus className="h-4 w-4" />
-            Invite Member
-          </Button>
+        <div className="bg-card rounded-xl border border-[var(--border-primary)]">
+          <EmptyState
+            icon={Users}
+            title="You're flying solo"
+            description="Invite team members to collaborate on your projects. Share access, manage permissions, and ship together."
+            action={{
+              label: "Invite Your First Teammate",
+              onClick: () => setInviteDialogOpen(true),
+            }}
+          />
         </div>
       ) : (
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="bg-card rounded-xl border border-[var(--border-primary)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">
+                <tr className="border-b border-[var(--border-primary)]">
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)]">
                     Member
                   </th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)]">
                     Role
                   </th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground hidden md:table-cell">
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)] hidden md:table-cell">
                     Joined
                   </th>
                   <th className="w-12"></th>
@@ -297,12 +301,12 @@ export default function TeamPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b border-border last:border-0 hover:bg-secondary/50"
+                      className="border-b border-[var(--border-primary)] last:border-0 hover:bg-secondary/50"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <Avatar>
-                            <AvatarImage src={member.user.avatar || undefined} />
+                            <AvatarImage src={member.user.image || undefined} />
                             <AvatarFallback>
                               {member.user.name
                                 ?.split(" ")
@@ -311,13 +315,13 @@ export default function TeamPage() {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium text-foreground flex items-center gap-2">
+                            <p className="font-medium text-[var(--text-primary)] flex items-center gap-2">
                               {member.user.name || "Unknown"}
                               {member.role === "owner" && (
                                 <Crown className="h-4 w-4 text-yellow-500" />
                               )}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-[var(--text-secondary)]">
                               {member.user.email}
                             </p>
                           </div>
@@ -333,7 +337,7 @@ export default function TeamPage() {
                           {role.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground hidden md:table-cell">
+                      <td className="px-6 py-4 text-sm text-[var(--text-secondary)] hidden md:table-cell">
                         {formatDate(member.joinedAt)}
                       </td>
                       <td className="px-6 py-4">
@@ -392,7 +396,7 @@ export default function TeamPage() {
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
+              <label className="text-sm font-medium text-[var(--text-primary)]">
                 Email address
               </label>
               <Input
@@ -404,12 +408,12 @@ export default function TeamPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
+              <label className="text-sm font-medium text-[var(--text-primary)]">
                 Role
               </label>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full justify-between">
+                  <Button variant="secondary" className="w-full justify-between">
                     <span className="flex items-center gap-2">
                       <Shield className="h-4 w-4" />
                       {roleConfig[inviteRole]?.label || "Member"}
@@ -425,7 +429,7 @@ export default function TeamPage() {
                     >
                       <div>
                         <p className="font-medium">{roleConfig[role]?.label}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-[var(--text-secondary)]">
                           {roleConfig[role]?.permissions.join(", ")}
                         </p>
                       </div>
@@ -439,13 +443,13 @@ export default function TeamPage() {
               <p className="text-sm text-red-600 dark:text-red-400">{inviteError}</p>
             )}
 
-            <div className="pt-4 border-t border-border">
-              <label className="text-sm font-medium text-foreground">
+            <div className="pt-4 border-t border-[var(--border-primary)]">
+              <label className="text-sm font-medium text-[var(--text-primary)]">
                 Or share invite link
               </label>
               <div className="flex items-center gap-2 mt-2">
                 <Input value={inviteLink} readOnly className="text-sm" />
-                <Button variant="outline" onClick={handleCopyLink}>
+                <Button variant="secondary" onClick={handleCopyLink}>
                   {copied ? (
                     <Check className="h-4 w-4" />
                   ) : (
@@ -457,7 +461,7 @@ export default function TeamPage() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
+            <Button variant="secondary" onClick={() => setInviteDialogOpen(false)}>
               Cancel
             </Button>
             <Button
@@ -489,12 +493,12 @@ export default function TeamPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
+              <label className="text-sm font-medium text-[var(--text-primary)]">
                 Role
               </label>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full justify-between">
+                  <Button variant="secondary" className="w-full justify-between">
                     <span className="flex items-center gap-2">
                       <Shield className="h-4 w-4" />
                       {roleConfig[selectedRole]?.label || "Member"}
@@ -510,7 +514,7 @@ export default function TeamPage() {
                     >
                       <div>
                         <p className="font-medium">{roleConfig[role]?.label}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-[var(--text-secondary)]">
                           {roleConfig[role]?.permissions.join(", ")}
                         </p>
                       </div>
@@ -521,7 +525,7 @@ export default function TeamPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>
+            <Button variant="secondary" onClick={() => setRoleDialogOpen(false)}>
               Cancel
             </Button>
             <Button

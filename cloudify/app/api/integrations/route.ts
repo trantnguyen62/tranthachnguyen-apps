@@ -1,7 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { ok, fail } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import {
+  badRequest,
+  notFound,
+  conflict,
+  validationError,
+  serverError,
+  handlePrismaError,
+} from "@/lib/api/error-response";
 
 const log = getRouteLogger("integrations");
 
@@ -52,7 +62,7 @@ export async function GET(request: NextRequest) {
 
     // List available integration types
     if (listAvailable) {
-      return NextResponse.json(INTEGRATION_TYPES);
+      return ok(INTEGRATION_TYPES);
     }
 
     // If projectId is provided, verify ownership
@@ -62,7 +72,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        return notFound("Project not found");
       }
     }
 
@@ -97,13 +107,9 @@ export async function GET(request: NextRequest) {
       updatedAt: int.updatedAt,
     }));
 
-    return NextResponse.json(safeIntegrations);
+    return ok(safeIntegrations);
   } catch (error) {
-    log.error("Failed to fetch integrations", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch integrations" },
-      { status: 500 }
-    );
+    return serverError("Failed to fetch integrations", error);
   }
 }
 
@@ -114,14 +120,16 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { projectId, type, name, config, credentials, webhookUrl } = body;
 
     if (!projectId || !type) {
-      return NextResponse.json(
-        { error: "Project ID and type are required" },
-        { status: 400 }
-      );
+      const fields = [];
+      if (!projectId) fields.push({ field: "projectId", message: "Project ID is required" });
+      if (!type) fields.push({ field: "type", message: "Integration type is required" });
+      return validationError(fields);
     }
 
     // Verify project ownership
@@ -130,7 +138,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return notFound("Project not found");
     }
 
     // Check if integration already exists
@@ -139,10 +147,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "Integration already exists for this project" },
-        { status: 400 }
-      );
+      return conflict("Integration already exists for this project");
     }
 
     const integrationName = name || INTEGRATION_TYPES[type as keyof typeof INTEGRATION_TYPES]?.name || type;
@@ -177,13 +182,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(integration);
+    return ok(integration);
   } catch (error) {
-    log.error("Failed to create integration", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to create integration" },
-      { status: 500 }
-    );
+    const prismaResp = handlePrismaError(error, "integration");
+    if (prismaResp) return prismaResp;
+
+    return serverError("Failed to create integration", error);
   }
 }
 
@@ -194,14 +198,13 @@ export async function PATCH(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { id, config, credentials, enabled, webhookUrl } = body;
 
     if (!id) {
-      return NextResponse.json(
-        { error: "Integration ID is required" },
-        { status: 400 }
-      );
+      return badRequest("Integration ID is required");
     }
 
     const integration = await prisma.integration.findFirst({
@@ -212,7 +215,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     if (!integration) {
-      return NextResponse.json({ error: "Integration not found" }, { status: 404 });
+      return notFound("Integration not found");
     }
 
     const updateData: Record<string, unknown> = {};
@@ -234,13 +237,9 @@ export async function PATCH(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(updated);
+    return ok(updated);
   } catch (error) {
-    log.error("Failed to update integration", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to update integration" },
-      { status: 500 }
-    );
+    return serverError("Failed to update integration", error);
   }
 }
 
@@ -255,10 +254,7 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: "Integration ID is required" },
-        { status: 400 }
-      );
+      return badRequest("Integration ID is required");
     }
 
     const integration = await prisma.integration.findFirst({
@@ -269,7 +265,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (!integration) {
-      return NextResponse.json({ error: "Integration not found" }, { status: 404 });
+      return notFound("Integration not found");
     }
 
     await prisma.integration.delete({ where: { id } });
@@ -284,12 +280,8 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
-    log.error("Failed to delete integration", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete integration" },
-      { status: 500 }
-    );
+    return serverError("Failed to delete integration", error);
   }
 }

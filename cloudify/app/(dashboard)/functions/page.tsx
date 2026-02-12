@@ -179,7 +179,7 @@ export default function FunctionsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -188,11 +188,11 @@ export default function FunctionsPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
           Failed to load functions
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <p className="text-[var(--text-secondary)] mb-4">{error}</p>
+        <Button variant="secondary" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
         </Button>
@@ -205,15 +205,15 @@ export default function FunctionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
             Serverless Functions
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-[var(--text-secondary)]">
             Monitor and manage your API routes and serverless functions
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="secondary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
@@ -319,7 +319,7 @@ export default function FunctionsPage() {
                 )}
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                <Button variant="secondary" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </Button>
                 <Button variant="default" onClick={handleCreate} disabled={isCreating}>
@@ -348,13 +348,13 @@ export default function FunctionsPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="p-4 bg-card rounded-xl border border-border"
+            className="p-4 bg-card rounded-xl border border-[var(--border-primary)]"
           >
-            <stat.icon className="h-5 w-5 text-muted-foreground mb-2" />
-            <p className="text-2xl font-bold text-foreground">
+            <stat.icon className="h-5 w-5 text-[var(--text-secondary)] mb-2" />
+            <p className="text-2xl font-bold text-[var(--text-primary)]">
               {stat.value}
             </p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <p className="text-sm text-[var(--text-secondary)]">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -362,7 +362,7 @@ export default function FunctionsPage() {
       {/* Search and Filter */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
           <Input
             placeholder="Search functions..."
             value={searchQuery}
@@ -372,7 +372,7 @@ export default function FunctionsPage() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">
+            <Button variant="secondary">
               <Filter className="h-4 w-4" />
               {statusFilter === "all" ? "All Status" : statusConfig[statusFilter as keyof typeof statusConfig]?.label}
               <ChevronDown className="h-4 w-4" />
@@ -394,12 +394,12 @@ export default function FunctionsPage() {
 
       {/* Functions list */}
       {filteredFunctions.length === 0 ? (
-        <div className="text-center py-12 bg-card rounded-xl border border-border">
+        <div className="text-center py-12 bg-card rounded-xl border border-[var(--border-primary)]">
           <Zap className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
             No functions found
           </h3>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-[var(--text-secondary)] mb-4">
             {functions.length === 0
               ? "Create your first serverless function to get started."
               : "No functions match your search criteria."}
@@ -412,17 +412,17 @@ export default function FunctionsPage() {
           )}
         </div>
       ) : (
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="bg-card rounded-xl border border-[var(--border-primary)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Function</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Invocations</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Avg Duration</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Error Rate</th>
-                  <th className="text-left px-6 py-4 text-sm font-medium text-muted-foreground">Actions</th>
+                <tr className="border-b border-[var(--border-primary)]">
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)]">Function</th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)]">Status</th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)]">Invocations</th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)]">Avg Duration</th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)]">Error Rate</th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-[var(--text-secondary)]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -436,7 +436,7 @@ export default function FunctionsPage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b border-border last:border-0 hover:bg-secondary/50 cursor-pointer"
+                      className="border-b border-[var(--border-primary)] last:border-0 hover:bg-secondary/50 cursor-pointer"
                       onClick={() => setSelectedFunction(fn as FunctionDetail)}
                     >
                       <td className="px-6 py-4">
@@ -445,10 +445,10 @@ export default function FunctionsPage() {
                             <Zap className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                           </div>
                           <div>
-                            <p className="font-medium text-foreground">
+                            <p className="font-medium text-[var(--text-primary)]">
                               {fn.name}
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-[var(--text-secondary)]">
                               {fn.project?.name || "Unknown"} • {runtimes.find(r => r.value === fn.runtime)?.label || fn.runtime}
                             </p>
                           </div>
@@ -462,10 +462,10 @@ export default function FunctionsPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-muted-foreground">
+                      <td className="px-6 py-4 text-[var(--text-secondary)]">
                         {formatNumber(fn.invocations24h || 0)}
                       </td>
-                      <td className="px-6 py-4 text-muted-foreground">
+                      <td className="px-6 py-4 text-[var(--text-secondary)]">
                         {fn.avgDuration || 0}ms
                       </td>
                       <td className="px-6 py-4">
@@ -485,7 +485,7 @@ export default function FunctionsPage() {
                       <td className="px-6 py-4">
                         <Button
                           variant="ghost"
-                          size="icon"
+                          size="sm" 
                           className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -509,7 +509,7 @@ export default function FunctionsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 bg-card rounded-xl border border-border"
+          className="p-6 bg-card rounded-xl border border-[var(--border-primary)]"
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -517,13 +517,13 @@ export default function FunctionsPage() {
                 <Zap className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-foreground">
+                <h3 className="text-lg font-semibold text-[var(--text-primary)]">
                   {selectedFunction.name}
                 </h3>
-                <p className="text-sm text-muted-foreground">{selectedFunction.entrypoint}</p>
+                <p className="text-sm text-[var(--text-secondary)]">{selectedFunction.entrypoint}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => setSelectedFunction(null)}>
+            <Button variant="secondary" onClick={() => setSelectedFunction(null)}>
               Close
             </Button>
           </div>
@@ -539,13 +539,13 @@ export default function FunctionsPage() {
             <TabsContent value="test" className="mt-6">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-2 block">
+                  <label className="text-sm font-medium text-[var(--text-primary)] mb-2 block">
                     Event Payload (JSON)
                   </label>
                   <textarea
                     value={testPayload}
                     onChange={(e) => setTestPayload(e.target.value)}
-                    className="w-full h-40 p-3 rounded-lg border border-border bg-background font-mono text-sm text-foreground resize-y"
+                    className="w-full h-40 p-3 rounded-lg border border-[var(--border-primary)] bg-[var(--surface-primary)] font-mono text-sm text-[var(--text-primary)] resize-y"
                     placeholder='{"key": "value"}'
                     spellCheck={false}
                   />
@@ -613,10 +613,10 @@ export default function FunctionsPage() {
                         {testResult.status || "ERR"}
                       </span>
                       {testResult.duration && (
-                        <span className="text-muted-foreground">{testResult.duration}ms</span>
+                        <span className="text-[var(--text-secondary)]">{testResult.duration}ms</span>
                       )}
                       {testResult.invocationId && (
-                        <span className="text-muted-foreground text-xs font-mono">{testResult.invocationId}</span>
+                        <span className="text-[var(--text-secondary)] text-xs font-mono">{testResult.invocationId}</span>
                       )}
                     </div>
                     <div className="p-4 bg-gray-950 rounded-lg font-mono text-sm text-green-400 overflow-auto max-h-64 whitespace-pre-wrap">
@@ -630,20 +630,20 @@ export default function FunctionsPage() {
             <TabsContent value="metrics" className="mt-6">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Invocations (24h)</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-sm text-[var(--text-secondary)] mb-1">Invocations (24h)</p>
+                  <p className="text-2xl font-bold text-[var(--text-primary)]">
                     {formatNumber(selectedFunction.invocations24h || 0)}
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Avg Duration</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-sm text-[var(--text-secondary)] mb-1">Avg Duration</p>
+                  <p className="text-2xl font-bold text-[var(--text-primary)]">
                     {selectedFunction.avgDuration || 0}ms
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Error Rate</p>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-sm text-[var(--text-secondary)] mb-1">Error Rate</p>
+                  <p className="text-2xl font-bold text-[var(--text-primary)]">
                     {selectedFunction.errorRate || 0}%
                   </p>
                 </div>
@@ -651,8 +651,8 @@ export default function FunctionsPage() {
 
               <div className="mt-6 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-2 mb-4">
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">Invocation Trend (24h)</span>
+                  <Activity className="h-4 w-4 text-[var(--text-secondary)]" />
+                  <span className="text-sm font-medium text-[var(--text-primary)]">Invocation Trend (24h)</span>
                 </div>
                 <div className="flex items-end gap-1 h-20">
                   {Array.from({ length: 24 }, (_, i) => {
@@ -673,7 +673,7 @@ export default function FunctionsPage() {
                     );
                   })}
                 </div>
-                <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                <div className="flex justify-between mt-2 text-xs text-[var(--text-secondary)]">
                   <span>24h ago</span>
                   <span>Now</span>
                 </div>
@@ -682,16 +682,16 @@ export default function FunctionsPage() {
 
             <TabsContent value="logs" className="mt-6">
               <div className="p-4 bg-gray-950 rounded-lg font-mono text-sm min-h-[200px]">
-                <div className="text-muted-foreground flex flex-col items-center justify-center py-8">
+                <div className="text-[var(--text-secondary)] flex flex-col items-center justify-center py-8">
                   <Terminal className="h-8 w-8 mb-3 text-gray-600" />
-                  <p className="text-muted-foreground">No recent invocation logs</p>
+                  <p className="text-[var(--text-secondary)]">No recent invocation logs</p>
                   <p className="text-xs text-gray-600 mt-1">
                     Logs appear here when the function is invoked
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 mt-4">
-                <Button variant="outline" asChild>
+                <Button variant="secondary" asChild>
                   <a href={`/logs?source=${selectedFunction.name}`}>
                     <Terminal className="h-4 w-4" />
                     View in Logs Explorer
@@ -703,27 +703,27 @@ export default function FunctionsPage() {
             <TabsContent value="config" className="mt-6 space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Runtime</p>
-                  <p className="font-medium text-foreground">
+                  <p className="text-sm text-[var(--text-secondary)] mb-1">Runtime</p>
+                  <p className="font-medium text-[var(--text-primary)]">
                     {runtimes.find(r => r.value === selectedFunction.runtime)?.label || selectedFunction.runtime}
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Regions</p>
+                  <p className="text-sm text-[var(--text-secondary)] mb-1">Regions</p>
                   <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium text-foreground">
+                    <Globe className="h-4 w-4 text-[var(--text-secondary)]" />
+                    <span className="font-medium text-[var(--text-primary)]">
                       {selectedFunction.regions?.join(", ") || "Global"}
                     </span>
                   </div>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Memory</p>
-                  <p className="font-medium text-foreground">{selectedFunction.memory} MB</p>
+                  <p className="text-sm text-[var(--text-secondary)] mb-1">Memory</p>
+                  <p className="font-medium text-[var(--text-primary)]">{selectedFunction.memory} MB</p>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Timeout</p>
-                  <p className="font-medium text-foreground">{selectedFunction.timeout} seconds</p>
+                  <p className="text-sm text-[var(--text-secondary)] mb-1">Timeout</p>
+                  <p className="font-medium text-[var(--text-primary)]">{selectedFunction.timeout} seconds</p>
                 </div>
               </div>
             </TabsContent>

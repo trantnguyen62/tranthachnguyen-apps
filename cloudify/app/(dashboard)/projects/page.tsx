@@ -1,28 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import {
   Plus,
   Search,
-  Grid3X3,
-  List,
   GitBranch,
   Globe,
   Clock,
-  CheckCircle2,
   MoreHorizontal,
   ExternalLink,
   Settings,
   Trash2,
   Copy,
   AlertCircle,
+  FolderPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
@@ -31,9 +26,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
 import { getStatusConfig } from "@/lib/utils/status-config";
 import { formatTimeAgo } from "@/lib/utils/format-time";
+import { useToast } from "@/components/notifications/toast";
 
 interface Project {
   id: string;
@@ -41,7 +36,7 @@ interface Project {
   slug: string;
   description?: string;
   framework: string;
-  repoUrl?: string;
+  repositoryUrl?: string;
   deployments: Array<{
     id: string;
     status: string;
@@ -56,59 +51,48 @@ interface Project {
 }
 
 const frameworkIcons: Record<string, string> = {
-  nextjs: "▲",
-  "Next.js": "▲",
-  react: "⚛️",
-  React: "⚛️",
-  vue: "💚",
-  Vue: "💚",
-  astro: "🚀",
-  Astro: "🚀",
-  nodejs: "🟢",
-  "Node.js": "🟢",
-  docusaurus: "🦖",
-  Docusaurus: "🦖",
-  svelte: "🔥",
-  Svelte: "🔥",
-  gatsby: "💜",
-  Gatsby: "💜",
-  nuxt: "💚",
-  Nuxt: "💚",
-  remix: "💿",
-  Remix: "💿",
+  nextjs: "\u25B2",
+  "Next.js": "\u25B2",
+  react: "\u269B\uFE0F",
+  React: "\u269B\uFE0F",
+  vue: "\uD83D\uDC9A",
+  Vue: "\uD83D\uDC9A",
+  astro: "\uD83D\uDE80",
+  Astro: "\uD83D\uDE80",
+  nodejs: "\uD83D\uDFE2",
+  "Node.js": "\uD83D\uDFE2",
+  docusaurus: "\uD83E\uDD96",
+  Docusaurus: "\uD83E\uDD96",
+  svelte: "\uD83D\uDD25",
+  Svelte: "\uD83D\uDD25",
+  gatsby: "\uD83D\uDC9C",
+  Gatsby: "\uD83D\uDC9C",
+  nuxt: "\uD83D\uDC9A",
+  Nuxt: "\uD83D\uDC9A",
+  remix: "\uD83D\uDCBF",
+  Remix: "\uD83D\uDCBF",
 };
 
 function LoadingSkeleton() {
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <Skeleton className="h-9 w-32 mb-2" />
-          <Skeleton className="h-5 w-64" />
-        </div>
-        <Skeleton className="h-10 w-28" />
-      </div>
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <Skeleton className="h-10 w-80" />
-        <div className="flex gap-2">
-          <Skeleton className="h-10 w-10" />
-          <Skeleton className="h-10 w-10" />
+    <div className="px-6 py-8 max-w-[980px]">
+      <div className="flex items-center justify-between mb-6">
+        <Skeleton className="h-8 w-24" />
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-10 w-60" />
+          <Skeleton className="h-10 w-28" />
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Card key={i}>
-            <CardContent className="p-6">
-              <Skeleton className="h-12 w-12 rounded-lg mb-4" />
-              <Skeleton className="h-5 w-32 mb-2" />
-              <Skeleton className="h-4 w-full mb-4" />
-              <Skeleton className="h-4 w-48 mb-4" />
-              <div className="flex justify-between pt-4 border-t">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-4 w-24" />
-              </div>
-            </CardContent>
-          </Card>
+      <div className="border-t border-[var(--separator,theme(colors.border))]">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="flex items-center gap-4 py-3.5 border-b border-[var(--separator,theme(colors.border))]">
+            <Skeleton className="h-8 w-8 rounded-md" />
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-40 flex-1" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-24" />
+          </div>
         ))}
       </div>
     </div>
@@ -119,9 +103,9 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const { addToast } = useToast();
 
   async function fetchProjects() {
     try {
@@ -130,7 +114,6 @@ export default function ProjectsPage() {
         throw new Error("Failed to fetch projects");
       }
       const data = await response.json();
-      // Support both paginated and legacy array responses
       setProjects(Array.isArray(data) ? data : data.projects || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -148,23 +131,22 @@ export default function ProjectsPage() {
       const res = await fetch(`/api/projects?id=${projectId}`, { method: "DELETE" });
       if (res.ok) {
         setProjects((prev) => prev.filter((p) => p.id !== projectId));
-        setActionMessage({ type: "success", text: `Project "${projectName}" deleted` });
+        addToast({ type: "success", title: "Project deleted", message: `"${projectName}" has been removed` });
       } else {
         const data = await res.json();
-        setActionMessage({ type: "error", text: data.error || "Failed to delete project" });
+        addToast({ type: "error", title: "Delete failed", message: data.error || "Failed to delete project" });
       }
     } catch {
-      setActionMessage({ type: "error", text: "Network error" });
+      addToast({ type: "error", title: "Network error", message: "Could not connect to the server" });
     } finally {
       setActionInProgress(null);
     }
-    setTimeout(() => setActionMessage(null), 4000);
   }
 
   async function handleCloneProject(projectId: string, projectName: string) {
     setActionInProgress(projectId);
     try {
-      setActionMessage({ type: "success", text: `Cloning "${projectName}"...` });
+      addToast({ type: "info", title: "Cloning project", message: `Creating a copy of "${projectName}"...` });
       const res = await fetch("/api/projects/clone", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -173,17 +155,16 @@ export default function ProjectsPage() {
       if (res.ok) {
         const cloned = await res.json();
         setProjects((prev) => [cloned, ...prev]);
-        setActionMessage({ type: "success", text: `Project cloned as "${cloned.name}"` });
+        addToast({ type: "success", title: "Project cloned", message: `Created "${cloned.name}" successfully` });
       } else {
         const data = await res.json();
-        setActionMessage({ type: "error", text: data.error || "Failed to clone project" });
+        addToast({ type: "error", title: "Clone failed", message: data.error || "Failed to clone project" });
       }
     } catch {
-      setActionMessage({ type: "error", text: "Network error" });
+      addToast({ type: "error", title: "Network error", message: "Could not connect to the server" });
     } finally {
       setActionInProgress(null);
     }
-    setTimeout(() => setActionMessage(null), 4000);
   }
 
   useEffect(() => {
@@ -196,25 +177,19 @@ export default function ProjectsPage() {
 
   if (error) {
     return (
-      <div className="p-8">
-        <Card className="border-red-200 dark:border-red-900">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
-              <AlertCircle className="h-6 w-6" />
-              <div>
-                <h3 className="font-semibold">Failed to load projects</h3>
-                <p className="text-sm text-red-500">{error}</p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => window.location.reload()}
-            >
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="px-6 py-8 max-w-[980px]">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <AlertCircle className="h-6 w-6 text-[var(--warning,theme(colors.yellow.500))] mb-4" />
+          <h3 className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))] mb-1">
+            Something went wrong
+          </h3>
+          <p className="text-[15px] text-[var(--text-secondary,theme(colors.muted.foreground))] mb-5">
+            We could not load your projects.
+          </p>
+          <Button variant="secondary" onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
@@ -226,320 +201,145 @@ export default function ProjectsPage() {
   );
 
   return (
-    <div className="p-8">
+    <div className="px-6 py-8 max-w-[980px]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-foreground"
-          >
-            Projects
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mt-2 text-muted-foreground"
-          >
-            Manage your deployed projects and applications.
-          </motion.p>
-        </div>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))]">
+          Projects
+        </h1>
+        <div className="flex items-center gap-3">
+          {/* Search - inline in header */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-tertiary,theme(colors.muted.foreground/70))]" />
+            <Input
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
+              className={`pl-9 h-9 transition-all duration-200 ${searchFocused ? "w-80" : "w-60"}`}
+            />
+          </div>
           <Button variant="default" asChild>
             <Link href="/new">
               <Plus className="h-4 w-4" />
-              Add New
+              New Project
             </Link>
           </Button>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Filters and Search */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex items-center justify-between gap-4 mb-6"
-      >
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search projects..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant={viewMode === "grid" ? "secondary" : "ghost"}
-            size="icon"
-            onClick={() => setViewMode("grid")}
-          >
-            <Grid3X3 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={viewMode === "list" ? "secondary" : "ghost"}
-            size="icon"
-            onClick={() => setViewMode("list")}
-          >
-            <List className="h-4 w-4" />
-          </Button>
-        </div>
-      </motion.div>
-
-      {/* Action Message */}
-      {actionMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={cn(
-            "mb-4 flex items-center gap-2 rounded-lg px-4 py-3 text-sm",
-            actionMessage.type === "success"
-              ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-              : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-          )}
-        >
-          {actionMessage.type === "success" ? (
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-          ) : (
-            <AlertCircle className="h-4 w-4 shrink-0" />
-          )}
-          {actionMessage.text}
-        </motion.div>
-      )}
-
-      {/* Projects Grid/List */}
-      {filteredProjects.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className={cn(
-            viewMode === "grid"
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              : "space-y-4"
-          )}
-        >
-          {filteredProjects.map((project, index) => {
+      {/* Project list - default to list view */}
+      {filteredProjects.length > 0 ? (
+        <div className="border-t border-[var(--separator,theme(colors.border))]">
+          {filteredProjects.map((project) => {
             const lastDeployment = project.deployments[0];
-            const projectStatus = lastDeployment?.status?.toLowerCase() || "ready";
-            const status = getStatusConfig(projectStatus);
-            const StatusIcon = status.icon;
             const domain = `${project.slug}.cloudify.tranthachnguyen.com`;
             const branch = lastDeployment?.branch || "main";
             const lastDeploymentTime = lastDeployment
               ? formatTimeAgo(lastDeployment.createdAt)
               : "No deployments";
 
-            if (viewMode === "list") {
-              return (
-                <Card key={project.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-2xl">
-                          {frameworkIcons[project.framework] || "📦"}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <Link
-                              href={`/projects/${project.slug}`}
-                              className="font-semibold text-foreground hover:text-[#0070f3] dark:hover:text-[#0070f3]"
-                            >
-                              {project.name}
-                            </Link>
-                            <Badge variant={projectStatus === "ready" ? "success" : projectStatus === "error" || projectStatus === "failed" ? "error" : "warning"}>
-                              {status.label}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {project.description || `${project.framework} project`}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
-                          <div className="text-sm text-foreground">
-                            {domain}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {project._count.deployments} deployments
-                          </div>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Visit
-                              </a>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link href={`/projects/${project.slug}/settings`}>
-                                <Settings className="h-4 w-4 mr-2" />
-                                Settings
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleCloneProject(project.id, project.name)}
-                            >
-                              <Copy className="h-4 w-4 mr-2" />
-                              Clone
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-red-600 dark:text-red-400"
-                              onClick={() => handleDeleteProject(project.id, project.name)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            }
-
             return (
-              <motion.div
+              <div
                 key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
+                className="flex items-center gap-4 h-14 border-b border-[var(--separator,theme(colors.border))] hover:bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))] transition-colors -mx-3 px-3 group"
               >
-                <Card className="hover:shadow-lg transition-shadow group">
-                  <CardContent className="p-6">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-2xl">
-                        {frameworkIcons[project.framework] || "📦"}
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              Visit
-                            </a>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link href={`/projects/${project.slug}/settings`}>
-                              <Settings className="h-4 w-4 mr-2" />
-                              Settings
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleCloneProject(project.id, project.name)}
-                          >
-                            <Copy className="h-4 w-4 mr-2" />
-                            Clone
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-red-600 dark:text-red-400"
-                            onClick={() => handleDeleteProject(project.id, project.name)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                {/* Framework icon */}
+                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))] text-base shrink-0">
+                  {frameworkIcons[project.framework] || "\uD83D\uDCE6"}
+                </div>
 
-                    {/* Project info */}
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Link
-                          href={`/projects/${project.slug}`}
-                          className="font-semibold text-foreground hover:text-[#0070f3] dark:hover:text-[#0070f3]"
-                        >
-                          {project.name}
-                        </Link>
-                        <div className={`p-1 rounded-full ${status.bg}`}>
-                          <StatusIcon
-                            className={`h-3 w-3 ${status.color} ${
-                              projectStatus === "building" ? "animate-spin" : ""
-                            }`}
-                          />
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {project.description || `${project.framework} project`}
-                      </p>
-                    </div>
+                {/* Project name */}
+                <Link
+                  href={`/projects/${project.slug}`}
+                  className="text-[16px] font-semibold text-[var(--text-primary,theme(colors.foreground))] hover:text-[var(--accent,#0071E3)] transition-colors min-w-[160px]"
+                >
+                  {project.name}
+                </Link>
 
-                    {/* Domain */}
-                    <div className="flex items-center gap-2 mb-4">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <a
-                        href={`https://${domain}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-[#0070f3] hover:underline"
-                      >
-                        {domain}
+                {/* Branch */}
+                <span className="flex items-center gap-1 text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[80px]">
+                  <GitBranch className="h-3 w-3" />
+                  {branch}
+                </span>
+
+                {/* Domain */}
+                <a
+                  href={`https://${domain}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] hover:text-[var(--accent,#0071E3)] transition-colors flex-1 truncate"
+                >
+                  {domain}
+                </a>
+
+                {/* Deployment count */}
+                <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[100px]">
+                  {project._count.deployments} deployments
+                </span>
+
+                {/* Updated time */}
+                <span className="text-[13px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] min-w-[100px] text-right">
+                  Updated {lastDeploymentTime}
+                </span>
+
+                {/* Actions */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm" 
+                      className="h-8 w-8 text-[var(--text-tertiary,theme(colors.muted.foreground/70))] opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Visit
                       </a>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <GitBranch className="h-4 w-4" />
-                        {branch}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        {lastDeploymentTime}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={`/projects/${project.slug}/settings`}>
+                        <Settings className="h-4 w-4 mr-2" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleCloneProject(project.id, project.name)}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Clone
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-[var(--error,#FF3B30)]"
+                      onClick={() => handleDeleteProject(project.id, project.name)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             );
           })}
-        </motion.div>
-      )}
-
-      {/* Empty state */}
-      {filteredProjects.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">📦</div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            No projects found
-          </h3>
-          <p className="text-muted-foreground mb-6">
-            {searchQuery
-              ? "Try adjusting your search query"
-              : "Get started by importing your first project"}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <FolderPlus className="h-12 w-12 text-[var(--text-quaternary,theme(colors.muted.foreground/40))] mb-4" strokeWidth={1.5} />
+          <p className="text-[17px] font-semibold text-[var(--text-primary,theme(colors.foreground))] mb-1">
+            {searchQuery ? "No projects found" : "No projects yet"}
           </p>
-          {!searchQuery && (
-            <Button variant="default" asChild>
-              <Link href="/new">
-                <Plus className="h-4 w-4" />
-                Import Project
-              </Link>
-            </Button>
-          )}
+          <p className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))] mb-5 max-w-[280px]">
+            {searchQuery
+              ? "Try adjusting your search query."
+              : "Create your first project to start deploying."}
+          </p>
+          <Button variant="default" onClick={() => searchQuery ? setSearchQuery("") : window.location.assign("/new")}>
+            {searchQuery ? "Clear Search" : "New Project"}
+          </Button>
         </div>
       )}
     </div>

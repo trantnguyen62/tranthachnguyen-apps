@@ -3,12 +3,13 @@
  * Provides health status for monitoring and load balancers
  */
 
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("health");
 import { redisHealthCheck } from "@/lib/storage/redis-client";
+import { healthCheck as minioHealthCheck } from "@/lib/build/artifact-manager";
 import { promises as fs } from "fs";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -23,6 +24,7 @@ interface HealthStatus {
   checks: {
     database: CheckResult;
     redis: CheckResult;
+    minio: CheckResult;
     buildPipeline: CheckResult;
   };
 }
@@ -46,6 +48,7 @@ export async function GET() {
   const checks: HealthStatus["checks"] = {
     database: { status: "fail" },
     redis: { status: "fail" },
+    minio: { status: "fail" },
     buildPipeline: { status: "fail" },
   };
 
@@ -78,6 +81,22 @@ export async function GET() {
     checks.redis = {
       status: "fail",
       error: "Redis check failed",
+    };
+  }
+
+  // Check MinIO
+  const minioStart = Date.now();
+  try {
+    const minioOk = await minioHealthCheck();
+    checks.minio = {
+      status: minioOk ? "pass" : "fail",
+      latency: Date.now() - minioStart,
+    };
+  } catch (error) {
+    log.error("MinIO check failed", { error: error instanceof Error ? error.message : String(error) });
+    checks.minio = {
+      status: "fail",
+      error: "MinIO check failed",
     };
   }
 
@@ -148,7 +167,7 @@ export async function GET() {
     httpStatus = 503;
   }
 
-  const response: HealthStatus = {
+  const healthData: HealthStatus = {
     status,
     timestamp,
     version,
@@ -156,5 +175,9 @@ export async function GET() {
     checks,
   };
 
-  return NextResponse.json(response, { status: httpStatus });
+  if (httpStatus === 503) {
+    return fail("SERVICE_UNAVAILABLE", "System unhealthy", 503, healthData);
+  }
+
+  return ok(healthData);
 }

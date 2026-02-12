@@ -189,10 +189,10 @@ export default function TemplatesPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Start with a Template
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Deploy production-ready applications in seconds. Choose from our
                 collection of templates built by the community.
               </p>
@@ -206,7 +206,7 @@ export default function TemplatesPage() {
               className="mt-10 flex flex-col sm:flex-row gap-4 max-w-3xl mx-auto"
             >
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
                 <Input
                   placeholder="Search templates..."
                   value={searchQuery}
@@ -216,7 +216,7 @@ export default function TemplatesPage() {
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="h-12 gap-2">
+                  <Button variant="secondary" className="h-12 gap-2">
                     <Filter className="h-4 w-4" />
                     {selectedFramework}
                     <ChevronDown className="h-4 w-4" />
@@ -235,7 +235,7 @@ export default function TemplatesPage() {
               </DropdownMenu>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="h-12 gap-2">
+                  <Button variant="secondary" className="h-12 gap-2">
                     {selectedCategory}
                     <ChevronDown className="h-4 w-4" />
                   </Button>
@@ -259,7 +259,7 @@ export default function TemplatesPage() {
         {featuredTemplates.length > 0 && (
           <section className="py-12">
             <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-              <h2 className="text-2xl font-bold text-foreground mb-8">
+              <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-8">
                 Featured Templates
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -269,7 +269,7 @@ export default function TemplatesPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="group relative rounded-lg border border-border overflow-hidden hover:shadow-xl transition-shadow"
+                    className="group relative rounded-lg border border-[var(--border-primary)] overflow-hidden hover:shadow-xl transition-shadow"
                   >
                     {/* Preview */}
                     <div
@@ -291,14 +291,14 @@ export default function TemplatesPage() {
                     <div className="p-6">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <h3 className="text-xl font-semibold text-foreground">
+                          <h3 className="text-xl font-semibold text-[var(--text-primary)]">
                             {template.name}
                           </h3>
                           <Badge variant="secondary" className="mt-1">
                             {template.framework}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-4 text-sm text-[var(--text-secondary)]">
                           <span className="flex items-center gap-1">
                             <Star className="h-4 w-4" />
                             {template.stars.toLocaleString()}
@@ -309,7 +309,7 @@ export default function TemplatesPage() {
                           </span>
                         </div>
                       </div>
-                      <p className="text-muted-foreground mb-4">
+                      <p className="text-[var(--text-secondary)] mb-4">
                         {template.description}
                       </p>
                       <div className="flex items-center gap-3">
@@ -319,7 +319,7 @@ export default function TemplatesPage() {
                             Deploy
                           </Link>
                         </Button>
-                        <Button variant="outline" asChild>
+                        <Button variant="secondary" asChild>
                           <a
                             href={`https://${template.demo}`}
                             target="_blank"
@@ -348,9 +348,9 @@ export default function TemplatesPage() {
         )}
 
         {/* All Templates */}
-        <section className="py-12 bg-background">
+        <section className="py-12 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-foreground mb-8">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-8">
               All Templates
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -360,7 +360,7 @@ export default function TemplatesPage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="group rounded-xl border border-border bg-card overflow-hidden hover:shadow-lg transition-shadow"
+                  className="group rounded-xl border border-[var(--border-primary)] bg-card overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   <div
                     className={cn(
@@ -374,18 +374,18 @@ export default function TemplatesPage() {
                   </div>
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-foreground">
+                      <h3 className="font-semibold text-[var(--text-primary)]">
                         {template.name}
                       </h3>
                       <Badge variant="secondary" className="text-xs">
                         {template.category}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    <p className="text-sm text-[var(--text-secondary)] mb-4 line-clamp-2">
                       {template.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)]">
                         <span className="flex items-center gap-1">
                           <Star className="h-3 w-3" />
                           {template.stars.toLocaleString()}

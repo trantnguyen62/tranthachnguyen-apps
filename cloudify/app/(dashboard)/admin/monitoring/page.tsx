@@ -125,10 +125,10 @@ const serviceStatusConfig = {
 const deploymentStatusConfig: Record<string, { color: string; bg: string }> = {
   READY: { color: "text-green-600", bg: "bg-green-100 dark:bg-green-900/30" },
   ERROR: { color: "text-red-600", bg: "bg-red-100 dark:bg-red-900/30" },
-  BUILDING: { color: "text-[#0070f3]", bg: "bg-secondary" },
+  BUILDING: { color: "text-[#0070f3]", bg: "bg-[var(--surface-secondary)]" },
   DEPLOYING: { color: "text-purple-600", bg: "bg-purple-100 dark:bg-purple-900/30" },
-  QUEUED: { color: "text-gray-600", bg: "bg-secondary" },
-  CANCELLED: { color: "text-muted-foreground", bg: "bg-secondary" },
+  QUEUED: { color: "text-gray-600", bg: "bg-[var(--surface-secondary)]" },
+  CANCELLED: { color: "text-[var(--text-secondary)]", bg: "bg-[var(--surface-secondary)]" },
 };
 
 function formatUptime(seconds: number): string {
@@ -191,8 +191,8 @@ export default function MonitoringPage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <p className="text-muted-foreground">Loading monitoring data...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
+          <p className="text-[var(--text-secondary)]">Loading monitoring data...</p>
         </div>
       </div>
     );
@@ -204,10 +204,10 @@ export default function MonitoringPage() {
         <div className="flex flex-col items-center gap-4 text-center">
           <XCircle className="h-12 w-12 text-red-500" />
           <div>
-            <p className="font-semibold text-foreground">Failed to load metrics</p>
-            <p className="text-sm text-muted-foreground mt-1">{error}</p>
+            <p className="font-semibold text-[var(--text-primary)]">Failed to load metrics</p>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">{error}</p>
           </div>
-          <Button onClick={fetchMetrics} variant="outline">
+          <Button onClick={fetchMetrics} variant="secondary">
             <RefreshCw className="h-4 w-4 mr-2" />
             Retry
           </Button>
@@ -226,16 +226,16 @@ export default function MonitoringPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
             Platform Monitoring
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-[var(--text-secondary)] mt-1">
             Real-time health status and metrics for Cloudify
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={cn(autoRefresh && "border-green-500 text-green-600")}
@@ -243,7 +243,7 @@ export default function MonitoringPage() {
             <Activity className={cn("h-4 w-4 mr-2", autoRefresh && "animate-pulse")} />
             {autoRefresh ? "Live" : "Paused"}
           </Button>
-          <Button variant="outline" size="sm" onClick={fetchMetrics}>
+          <Button variant="secondary" size="sm" onClick={fetchMetrics}>
             <RefreshCw className={cn("h-4 w-4 mr-2", loading && "animate-spin")} />
             Refresh
           </Button>
@@ -262,21 +262,21 @@ export default function MonitoringPage() {
               <StatusIcon className={cn("h-8 w-8", config.color)} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-foreground">
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">
                 {config.label}
               </h2>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-[var(--text-secondary)]">
                 Version {metrics.version} • {metrics.environment} • Node {metrics.system.nodeVersion}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
               <Clock className="h-4 w-4" />
               Uptime: {formatUptime(metrics.uptime)}
             </div>
             {lastUpdated && (
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-[var(--text-secondary)] mt-1">
                 Updated {formatRelativeTime(lastUpdated.toISOString())}
               </p>
             )}
@@ -303,14 +303,14 @@ export default function MonitoringPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="p-4 bg-card rounded-xl border border-border"
+              className="p-4 bg-card rounded-xl border border-[var(--border-primary)]"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
-                    <ServiceIcon className="h-4 w-4 text-muted-foreground" />
+                    <ServiceIcon className="h-4 w-4 text-[var(--text-secondary)]" />
                   </div>
-                  <span className="font-medium capitalize text-foreground">
+                  <span className="font-medium capitalize text-[var(--text-primary)]">
                     {name}
                   </span>
                 </div>
@@ -318,15 +318,15 @@ export default function MonitoringPage() {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Status</span>
+                  <span className="text-[var(--text-secondary)]">Status</span>
                   <Badge className={cn(sConfig.bg, sConfig.color, "capitalize")}>
                     {service.status}
                   </Badge>
                 </div>
                 {service.latency !== undefined && (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Latency</span>
-                    <span className="text-foreground">{service.latency}ms</span>
+                    <span className="text-[var(--text-secondary)]">Latency</span>
+                    <span className="text-[var(--text-primary)]">{service.latency}ms</span>
                   </div>
                 )}
                 {service.error && (
@@ -342,55 +342,55 @@ export default function MonitoringPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="p-4 bg-card rounded-xl border border-border">
+        <div className="p-4 bg-card rounded-xl border border-[var(--border-primary)]">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-secondary">
+            <div className="p-2 rounded-lg bg-[var(--surface-secondary)]">
               <Rocket className="h-5 w-5 text-[#0070f3]" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-2xl font-bold text-[var(--text-primary)]">
                 {metrics.deployments.total}
               </p>
-              <p className="text-sm text-muted-foreground">Total Deployments</p>
+              <p className="text-sm text-[var(--text-secondary)]">Total Deployments</p>
             </div>
           </div>
         </div>
-        <div className="p-4 bg-card rounded-xl border border-border">
+        <div className="p-4 bg-card rounded-xl border border-[var(--border-primary)]">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
               <ArrowUpRight className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-2xl font-bold text-[var(--text-primary)]">
                 {metrics.deployments.successful}
               </p>
-              <p className="text-sm text-muted-foreground">Successful</p>
+              <p className="text-sm text-[var(--text-secondary)]">Successful</p>
             </div>
           </div>
         </div>
-        <div className="p-4 bg-card rounded-xl border border-border">
+        <div className="p-4 bg-card rounded-xl border border-[var(--border-primary)]">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
               <ArrowDownRight className="h-5 w-5 text-red-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-2xl font-bold text-[var(--text-primary)]">
                 {metrics.deployments.failed}
               </p>
-              <p className="text-sm text-muted-foreground">Failed</p>
+              <p className="text-sm text-[var(--text-secondary)]">Failed</p>
             </div>
           </div>
         </div>
-        <div className="p-4 bg-card rounded-xl border border-border">
+        <div className="p-4 bg-card rounded-xl border border-[var(--border-primary)]">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
               <Loader2 className="h-5 w-5 text-yellow-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-2xl font-bold text-[var(--text-primary)]">
                 {metrics.deployments.pending}
               </p>
-              <p className="text-sm text-muted-foreground">In Progress</p>
+              <p className="text-sm text-[var(--text-secondary)]">In Progress</p>
             </div>
           </div>
         </div>
@@ -398,31 +398,31 @@ export default function MonitoringPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* CI/CD Status */}
-        <div className="p-6 bg-card rounded-xl border border-border">
-          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+        <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
             <GitBranch className="h-5 w-5" />
             Platform CI/CD
           </h3>
           <div className="space-y-4">
-            <div className="flex items-center justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">Branch</span>
-              <Badge variant="outline">{metrics.cicd.branch || "main"}</Badge>
+            <div className="flex items-center justify-between py-2 border-b border-[var(--border-primary)]">
+              <span className="text-[var(--text-secondary)]">Branch</span>
+              <Badge variant="secondary">{metrics.cicd.branch || "main"}</Badge>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">Last Commit</span>
+            <div className="flex items-center justify-between py-2 border-b border-[var(--border-primary)]">
+              <span className="text-[var(--text-secondary)]">Last Commit</span>
               <code className="text-sm bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                 {metrics.cicd.lastCommit?.substring(0, 7) || "N/A"}
               </code>
             </div>
-            <div className="flex items-center justify-between py-2 border-b border-border">
-              <span className="text-muted-foreground">Build Number</span>
-              <span className="text-foreground">
+            <div className="flex items-center justify-between py-2 border-b border-[var(--border-primary)]">
+              <span className="text-[var(--text-secondary)]">Build Number</span>
+              <span className="text-[var(--text-primary)]">
                 {metrics.cicd.buildNumber || "N/A"}
               </span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="text-muted-foreground">Last Deployment</span>
-              <span className="text-foreground">
+              <span className="text-[var(--text-secondary)]">Last Deployment</span>
+              <span className="text-[var(--text-primary)]">
                 {metrics.cicd.lastDeployment
                   ? formatRelativeTime(metrics.cicd.lastDeployment)
                   : "N/A"}
@@ -432,19 +432,19 @@ export default function MonitoringPage() {
         </div>
 
         {/* System Resources */}
-        <div className="p-6 bg-card rounded-xl border border-border">
-          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+        <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
             <Cpu className="h-5 w-5" />
             System Resources
           </h3>
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                <span className="text-sm text-[var(--text-secondary)] flex items-center gap-2">
                   <MemoryStick className="h-4 w-4" />
                   Heap Memory
                 </span>
-                <span className="text-sm text-foreground">
+                <span className="text-sm text-[var(--text-primary)]">
                   {metrics.system.memoryUsage.heapUsed} / {metrics.system.memoryUsage.heapTotal} MB
                 </span>
               </div>
@@ -459,8 +459,8 @@ export default function MonitoringPage() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-muted-foreground">RSS Memory</span>
-                <span className="text-sm text-foreground">
+                <span className="text-sm text-[var(--text-secondary)]">RSS Memory</span>
+                <span className="text-sm text-[var(--text-primary)]">
                   {metrics.system.memoryUsage.rss} MB
                 </span>
               </div>
@@ -471,10 +471,10 @@ export default function MonitoringPage() {
                 />
               </div>
             </div>
-            <div className="pt-2 border-t border-border">
+            <div className="pt-2 border-t border-[var(--border-primary)]">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Platform</span>
-                <span className="text-foreground capitalize">
+                <span className="text-[var(--text-secondary)]">Platform</span>
+                <span className="text-[var(--text-primary)] capitalize">
                   {metrics.system.platform}
                 </span>
               </div>
@@ -484,13 +484,13 @@ export default function MonitoringPage() {
       </div>
 
       {/* Recent Deployments */}
-      <div className="p-6 bg-card rounded-xl border border-border">
-        <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+      <div className="p-6 bg-card rounded-xl border border-[var(--border-primary)]">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
           <Terminal className="h-5 w-5" />
           Recent Deployments
         </h3>
         {metrics.deployments.recent.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-8 text-[var(--text-secondary)]">
             No deployments yet
           </div>
         ) : (
@@ -507,17 +507,17 @@ export default function MonitoringPage() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="flex items-center justify-between p-3 bg-background rounded-lg"
+                    className="flex items-center justify-between p-3 bg-[var(--surface-primary)] rounded-lg"
                   >
                     <div className="flex items-center gap-3">
                       <div className={cn("p-2 rounded-lg", dConfig.bg)}>
                         <GitBranch className={cn("h-4 w-4", dConfig.color)} />
                       </div>
                       <div>
-                        <p className="font-medium text-foreground">
+                        <p className="font-medium text-[var(--text-primary)]">
                           {deployment.projectName}
                         </p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                           {deployment.commit && (
                             <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">
                               {deployment.commit.substring(0, 7)}
@@ -529,7 +529,7 @@ export default function MonitoringPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       {deployment.duration && (
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-[var(--text-secondary)]">
                           {deployment.duration}s
                         </span>
                       )}
@@ -551,7 +551,7 @@ export default function MonitoringPage() {
           href="https://grafana.tranthachnguyen.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-muted-foreground hover:text-gray-700 dark:hover:text-gray-300"
+          className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-gray-700 dark:hover:text-gray-300"
         >
           <Globe className="h-4 w-4" />
           Grafana Dashboard
@@ -561,7 +561,7 @@ export default function MonitoringPage() {
           href="https://prometheus.tranthachnguyen.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-muted-foreground hover:text-gray-700 dark:hover:text-gray-300"
+          className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-gray-700 dark:hover:text-gray-300"
         >
           <Activity className="h-4 w-4" />
           Prometheus Metrics

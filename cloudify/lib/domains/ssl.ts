@@ -138,7 +138,7 @@ async function provisionWithCertbot(domainId: string): Promise<SslProvisionResul
     // Update status to provisioning
     await prisma.domain.update({
       where: { id: domainId },
-      data: { sslStatus: "provisioning" },
+      data: { sslStatus: "PROVISIONING" },
     });
 
     // Ensure webroot directory exists
@@ -164,7 +164,7 @@ async function provisionWithCertbot(domainId: string): Promise<SslProvisionResul
 
       await prisma.domain.update({
         where: { id: domainId },
-        data: { sslStatus: "error" },
+        data: { sslStatus: "ERROR" },
       });
 
       return {
@@ -185,7 +185,7 @@ async function provisionWithCertbot(domainId: string): Promise<SslProvisionResul
     } catch {
       await prisma.domain.update({
         where: { id: domainId },
-        data: { sslStatus: "error" },
+        data: { sslStatus: "ERROR" },
       });
 
       return {
@@ -213,7 +213,7 @@ async function provisionWithCertbot(domainId: string): Promise<SslProvisionResul
     await prisma.domain.update({
       where: { id: domainId },
       data: {
-        sslStatus: "active",
+        sslStatus: "ACTIVE",
         sslCertPath: certPath,
         sslKeyPath: keyPath,
       },
@@ -347,7 +347,7 @@ export async function checkAndRenewExpiring(): Promise<{
   const domains = await prisma.domain.findMany({
     where: {
       verified: true,
-      sslStatus: "active",
+      sslStatus: "ACTIVE",
     },
   });
 
@@ -437,7 +437,7 @@ export async function revokeSslCertificate(domainId: string): Promise<boolean> {
   await prisma.domain.update({
     where: { id: domainId },
     data: {
-      sslStatus: "pending",
+      sslStatus: "PENDING",
       sslCertPath: null,
       sslKeyPath: null,
     },

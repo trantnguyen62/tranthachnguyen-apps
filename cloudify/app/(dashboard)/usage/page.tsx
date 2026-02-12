@@ -29,7 +29,7 @@ export default function UsagePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -38,11 +38,11 @@ export default function UsagePage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
           Failed to load usage data
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <p className="text-[var(--text-secondary)] mb-4">{error}</p>
+        <Button variant="secondary" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
         </Button>
@@ -78,19 +78,19 @@ export default function UsagePage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
             Usage & Billing
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-[var(--text-secondary)]">
             Monitor your resource usage and manage billing
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="secondary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
-          <Button variant="outline">
+          <Button variant="secondary">
             <Download className="h-4 w-4" />
             Export Report
           </Button>
@@ -114,10 +114,10 @@ export default function UsagePage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="secondary" className="bg-background/20 hover:bg-background/30 border-0 text-background">
+            <Button variant="secondary" className="bg-[var(--surface-primary)]/20 hover:bg-[var(--surface-primary)]/30 border-0 text-background">
               View Plan Details
             </Button>
-            <Button className="bg-background text-foreground hover:bg-background/90">
+            <Button className="bg-[var(--surface-primary)] text-[var(--text-primary)] hover:bg-[var(--surface-primary)]/90">
               Upgrade Plan
             </Button>
           </div>
@@ -137,11 +137,11 @@ export default function UsagePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="p-5 bg-card rounded-xl border border-border"
+              className="p-5 bg-card rounded-xl border border-[var(--border-primary)]"
             >
               <div className="flex items-center justify-between mb-3">
-                <div className="p-2 rounded-lg bg-secondary">
-                  <metric.icon className="h-5 w-5 text-muted-foreground" />
+                <div className="p-2 rounded-lg bg-[var(--surface-secondary)]">
+                  <metric.icon className="h-5 w-5 text-[var(--text-secondary)]" />
                 </div>
                 <div
                   className={cn(
@@ -162,14 +162,14 @@ export default function UsagePage() {
                 </div>
               </div>
 
-              <h3 className="text-sm font-medium text-muted-foreground">
+              <h3 className="text-sm font-medium text-[var(--text-secondary)]">
                 {metric.name}
               </h3>
 
               <div className="mt-2">
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-bold text-[var(--text-primary)]">
                   {formatUsage(metric.key)}
-                  <span className="text-sm font-normal text-muted-foreground ml-1">
+                  <span className="text-sm font-normal text-[var(--text-secondary)] ml-1">
                     / {formatLimit(metric.key)}
                   </span>
                 </p>
@@ -199,14 +199,14 @@ export default function UsagePage() {
         </TabsList>
 
         <TabsContent value="breakdown" className="mt-6">
-          <div className="bg-card rounded-xl border border-border">
-            <div className="p-6 border-b border-border">
+          <div className="bg-card rounded-xl border border-[var(--border-primary)]">
+            <div className="p-6 border-b border-[var(--border-primary)]">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-semibold text-[var(--text-primary)]">
                   Usage by Project
                 </h3>
                 <select
-                  className="text-sm border border-border rounded-lg px-3 py-1.5 bg-transparent"
+                  className="text-sm border border-[var(--border-primary)] rounded-lg px-3 py-1.5 bg-transparent"
                   value={period}
                   onChange={(e) => setPeriod(e.target.value)}
                 >
@@ -229,16 +229,16 @@ export default function UsagePage() {
                           {(record.project?.name || "U")[0].toUpperCase()}
                         </div>
                         <div>
-                          <h4 className="font-medium text-foreground">
+                          <h4 className="font-medium text-[var(--text-primary)]">
                             {record.project?.name || "Unknown Project"}
                           </h4>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-[var(--text-secondary)]">
                             {record.type.replace("_", " ")} - {record.amount} {record.unit}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-[var(--text-secondary)]">
                           {new Date(record.recordedAt).toLocaleDateString()}
                         </p>
                       </div>
@@ -246,7 +246,7 @@ export default function UsagePage() {
                   </div>
                 ))
               ) : (
-                <div className="p-12 text-center text-muted-foreground">
+                <div className="p-12 text-center text-[var(--text-secondary)]">
                   No usage records found for this period.
                 </div>
               )}
@@ -255,25 +255,25 @@ export default function UsagePage() {
         </TabsContent>
 
         <TabsContent value="invoices" className="mt-6">
-          <div className="bg-card rounded-xl border border-border overflow-hidden">
-            <div className="p-6 border-b border-border">
-              <h3 className="font-semibold text-foreground">
+          <div className="bg-card rounded-xl border border-[var(--border-primary)] overflow-hidden">
+            <div className="p-6 border-b border-[var(--border-primary)]">
+              <h3 className="font-semibold text-[var(--text-primary)]">
                 Billing History
               </h3>
             </div>
 
-            <div className="p-12 text-center text-muted-foreground">
+            <div className="p-12 text-center text-[var(--text-secondary)]">
               No invoices yet. Your first invoice will appear here after the billing period ends.
             </div>
           </div>
         </TabsContent>
 
         <TabsContent value="spending" className="mt-6">
-          <div className="bg-card rounded-xl border border-border p-6">
-            <h3 className="font-semibold text-foreground mb-4">
+          <div className="bg-card rounded-xl border border-[var(--border-primary)] p-6">
+            <h3 className="font-semibold text-[var(--text-primary)] mb-4">
               Spending Alerts
             </h3>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-[var(--text-secondary)] mb-6">
               Get notified when your usage approaches certain thresholds.
             </p>
 
@@ -289,10 +289,10 @@ export default function UsagePage() {
                   className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
                 >
                   <div>
-                    <p className="font-medium text-foreground">
+                    <p className="font-medium text-[var(--text-primary)]">
                       {alert.threshold}% usage alert
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-[var(--text-secondary)]">
                       Notify when usage reaches {alert.threshold}% of limit
                     </p>
                   </div>
@@ -302,7 +302,7 @@ export default function UsagePage() {
                       defaultChecked={alert.enabled}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-muted-foreground/30 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-muted-foreground/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-background after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-background after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-foreground"></div>
+                    <div className="w-11 h-6 bg-[var(--text-secondary)]/30 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-muted-foreground/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-[var(--surface-primary)] after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-[var(--surface-primary)] after:border-[var(--border-primary)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--text-primary)]"></div>
                   </label>
                 </div>
               ))}

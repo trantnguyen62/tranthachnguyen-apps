@@ -1,5 +1,8 @@
 import { test, expect, Page } from '@playwright/test';
 
+// OAuth was removed in favor of credentials-only auth. Skip entire suite.
+test.skip();
+
 const BASE_URL = 'https://cloudify.tranthachnguyen.com';
 
 test.describe('OAuth Authentication - Complete Test Suite', () => {

@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { captureException } from "@/lib/integrations/sentry";
 import { checkRateLimit } from "@/lib/auth/rate-limit";
+import { ok, fail } from "@/lib/api/response";
 
 /**
  * POST /api/error-report - Client-side error reporting endpoint
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
     windowSeconds: 60,
   });
   if (!rateLimit.success) {
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return ok({ ok: true }, { status: 200 });
   }
 
   try {
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
     const { message, stack, digest } = body;
 
     if (!message || typeof message !== "string") {
-      return NextResponse.json({ ok: true }, { status: 200 });
+      return ok({ ok: true }, { status: 200 });
     }
 
     const error = new Error(message);
@@ -39,8 +40,8 @@ export async function POST(request: NextRequest) {
       },
     }).catch(() => {});
 
-    return NextResponse.json({ ok: true });
+    return ok({ ok: true });
   } catch {
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return ok({ ok: true }, { status: 200 });
   }
 }

@@ -6,9 +6,24 @@
 
 import { describe, it, expect } from "vitest";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
-import { signToken, verifyToken } from "@/lib/auth/jwt";
+import jwt from "jsonwebtoken";
 import { isValidEmail, sanitizeHtml, stripHtml } from "@/lib/security/validation";
 import { generateCsrfToken } from "@/lib/security/csrf";
+
+// Helper JWT functions for testing (mirrors session.ts internals)
+function signToken(payload: Record<string, unknown>, expiresIn: string = "7d"): string {
+  const secret = process.env.JWT_SECRET || "development-secret-change-in-production";
+  return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions);
+}
+
+function verifyToken(token: string): Record<string, unknown> | null {
+  try {
+    const secret = process.env.JWT_SECRET || "development-secret-change-in-production";
+    return jwt.verify(token, secret) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
 
 describe("Password Hashing (hashPassword & verifyPassword)", () => {
   it("correctly hashes and verifies passwords", async () => {

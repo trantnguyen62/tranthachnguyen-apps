@@ -14,8 +14,8 @@ export default function AstroDocsPage() {
           </svg>
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground m-0">Astro on Cloudify</h1>
-          <p className="text-muted-foreground m-0 mt-1">Ship less JavaScript with Astro&apos;s island architecture</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] m-0">Astro on Cloudify</h1>
+          <p className="text-[var(--text-secondary)] m-0 mt-1">Ship less JavaScript with Astro&apos;s island architecture</p>
         </div>
       </div>
 
@@ -28,10 +28,10 @@ export default function AstroDocsPage() {
         <div className="flex items-start gap-4">
           <Zap className="h-8 w-8 text-orange-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Zero JavaScript by Default
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-[var(--text-secondary)]">
               Astro ships zero JavaScript by default, only hydrating interactive components.
               Perfect for content-heavy sites that need to be fast.
             </p>
@@ -52,9 +52,9 @@ export default function AstroDocsPage() {
           "View Transitions",
           "Multiple UI Frameworks",
         ].map((feature) => (
-          <div key={feature} className="flex items-center gap-3 p-3 rounded-lg bg-background">
+          <div key={feature} className="flex items-center gap-3 p-3 rounded-lg bg-[var(--surface-primary)]">
             <Check className="h-5 w-5 text-green-500 shrink-0" />
-            <span className="text-foreground">{feature}</span>
+            <span className="text-[var(--text-primary)]">{feature}</span>
           </div>
         ))}
       </div>

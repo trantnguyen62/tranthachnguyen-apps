@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { handlePrismaError } from "@/lib/api/error-response";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("teams");
 
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
                     id: true,
                     name: true,
                     email: true,
-                    avatar: true,
+                    image: true,
                   },
                 },
               },
@@ -46,13 +48,9 @@ export async function GET(request: NextRequest) {
       projectCount: tm.team._count.teamProjects,
     }));
 
-    return NextResponse.json(teams);
+    return ok(teams);
   } catch (error) {
-    log.error("Failed to fetch teams", error);
-    return NextResponse.json(
-      { error: "Failed to fetch teams" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch teams", 500);
   }
 }
 
@@ -69,17 +67,15 @@ export async function POST(request: NextRequest) {
     const { name } = body;
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json(
-        { error: "Team name is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Team name is required", 422, {
+        fields: [{ field: "name", message: "Team name is required" }],
+      });
     }
 
     if (name.trim().length > 100) {
-      return NextResponse.json(
-        { error: "Team name must be 100 characters or less" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Team name must be 100 characters or less", 422, {
+        fields: [{ field: "name", message: "Team name must be 100 characters or less" }],
+      });
     }
 
     // Generate slug from name
@@ -104,7 +100,7 @@ export async function POST(request: NextRequest) {
         members: {
           create: {
             userId: user.id,
-            role: "owner",
+            role: "OWNER",
           },
         },
       },
@@ -116,7 +112,7 @@ export async function POST(request: NextRequest) {
                 id: true,
                 name: true,
                 email: true,
-                avatar: true,
+                image: true,
               },
             },
           },
@@ -135,12 +131,11 @@ export async function POST(request: NextRequest) {
       },
     }).catch((err: unknown) => log.error("Failed to log activity", err));
 
-    return NextResponse.json(team);
+    return ok(team, { status: 201 });
   } catch (error) {
-    log.error("Failed to create team", error);
-    return NextResponse.json(
-      { error: "Failed to create team" },
-      { status: 500 }
-    );
+    const prismaResp = handlePrismaError(error, "team");
+    if (prismaResp) return prismaResp;
+
+    return fail("INTERNAL_ERROR", "Failed to create team", 500);
   }
 }

@@ -5,26 +5,26 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+  "inline-flex items-center rounded-[var(--radius-sm)] border border-transparent h-[22px] leading-[22px] px-2 py-0 text-[length:var(--text-caption)] font-medium tracking-[var(--tracking-wide)] transition-colors",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground",
+          "bg-[var(--surface-secondary)] text-[var(--text-secondary)]",
+        neutral:
+          "bg-[var(--surface-secondary)] text-[var(--text-secondary)]",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground",
+          "bg-[var(--surface-secondary)] text-[var(--text-secondary)]",
         success:
-          "border-green-200 bg-transparent text-green-700 dark:border-green-800 dark:text-green-400",
+          "bg-[var(--success-subtle)] text-[#1B7A3D] dark:text-[var(--success)]",
         warning:
-          "border-amber-200 bg-transparent text-amber-700 dark:border-amber-800 dark:text-amber-400",
+          "bg-[var(--warning-subtle)] text-[#9A6700] dark:text-[var(--warning)]",
         error:
-          "border-red-200 bg-transparent text-red-700 dark:border-red-800 dark:text-red-400",
-        outline:
-          "text-foreground",
+          "bg-[var(--error-subtle)] text-[#CC2E26] dark:text-[var(--error)]",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "neutral",
     },
   }
 );

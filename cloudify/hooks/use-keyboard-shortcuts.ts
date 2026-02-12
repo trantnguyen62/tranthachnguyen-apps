@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface ShortcutConfig {
@@ -81,6 +81,12 @@ export function useNavigationShortcuts() {
       action: () => router.push("/deployments"),
     },
     {
+      key: "d",
+      meta: true,
+      description: "Go to Dashboard",
+      action: () => router.push("/dashboard"),
+    },
+    {
       key: "n",
       meta: true,
       description: "New Project",
@@ -98,7 +104,7 @@ export function useNavigationShortcuts() {
       shift: true,
       description: "Show Keyboard Shortcuts",
       action: () => {
-        // TODO: Open a shortcuts help modal
+        document.dispatchEvent(new CustomEvent("toggle-shortcuts-modal"));
       },
     },
   ];
@@ -106,14 +112,28 @@ export function useNavigationShortcuts() {
   useKeyboardShortcuts(shortcuts);
 }
 
+// Hook for managing the keyboard shortcuts modal
+export function useShortcutsModal() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setIsOpen((prev) => !prev);
+    document.addEventListener("toggle-shortcuts-modal", handler);
+    return () => document.removeEventListener("toggle-shortcuts-modal", handler);
+  }, []);
+
+  return { isOpen, setIsOpen };
+}
+
 // Shortcut context for displaying in UI
 export const keyboardShortcuts = [
-  { keys: ["⌘", "K"], description: "Open command palette" },
+  { keys: ["\u2318", "K"], description: "Open command palette" },
   { keys: ["G"], description: "Go to Dashboard" },
   { keys: ["P"], description: "Go to Projects" },
   { keys: ["D"], description: "Go to Deployments" },
-  { keys: ["⌘", "N"], description: "Create new project" },
-  { keys: ["⌘", "⇧", "S"], description: "Go to Settings" },
+  { keys: ["\u2318", "D"], description: "Go to Dashboard" },
+  { keys: ["\u2318", "N"], description: "Create new project" },
+  { keys: ["\u2318", "\u21E7", "S"], description: "Go to Settings" },
   { keys: ["?"], description: "Show keyboard shortcuts" },
   { keys: ["Esc"], description: "Close dialog / Cancel" },
 ];

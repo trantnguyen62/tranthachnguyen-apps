@@ -3,14 +3,16 @@
  * POST - Invoke an edge function directly
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 
 const log = getRouteLogger("edge-functions/invoke");
 import { executeEdgeFunction } from "@/lib/edge/runtime";
 import { getGeoData, getClientIP } from "@/lib/edge/geo";
+import { ok, fail } from "@/lib/api/response";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -38,22 +40,18 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!edgeFunction) {
-      return NextResponse.json(
-        { error: "Edge function not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Edge function not found", 404);
     }
 
     // Verify ownership
     if (edgeFunction.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
     // Get request body for execution
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { url, method = "GET", headers = {}, requestBody } = body;
 
     // Get geo data from the current request
@@ -78,7 +76,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       envVars: edgeFunction.envVars as Record<string, string> | undefined,
     });
 
-    return NextResponse.json({
+    return ok({
       status: result.status,
       response: result.response,
       logs: result.logs,
@@ -88,9 +86,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to invoke edge function", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to invoke edge function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to invoke edge function", 500);
   }
 }

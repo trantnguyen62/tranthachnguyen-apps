@@ -3,10 +3,11 @@
  * Get invoice history and upcoming invoice
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getInvoices, getUpcomingInvoice } from "@/lib/billing/stripe";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("billing/invoices");
 
@@ -71,15 +72,12 @@ export async function GET(request: NextRequest) {
         }
       : null;
 
-    return NextResponse.json({
+    return ok({
       invoices: formattedInvoices,
       upcoming: formattedUpcoming,
     });
   } catch (error) {
     log.error("Failed to get invoices", error);
-    return NextResponse.json(
-      { error: "Failed to get invoices" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get invoices", 500);
   }
 }

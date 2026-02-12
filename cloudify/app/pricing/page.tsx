@@ -138,13 +138,13 @@ export default function PricingPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero Section */}
-        <section className="py-20 bg-background">
+        <section className="py-20 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 text-center">
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="text-4xl sm:text-5xl font-bold text-foreground"
+              className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]"
             >
               Simple, transparent pricing
             </motion.h1>
@@ -152,7 +152,7 @@ export default function PricingPage() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.3 }}
-              className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto"
+              className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto"
             >
               Start for free, scale as you grow. No hidden fees, no surprises.
             </motion.p>
@@ -167,7 +167,7 @@ export default function PricingPage() {
               <span
                 className={cn(
                   "text-sm font-medium",
-                  !isYearly ? "text-foreground" : "text-muted-foreground"
+                  !isYearly ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
                 )}
               >
                 Monthly
@@ -176,7 +176,7 @@ export default function PricingPage() {
               <span
                 className={cn(
                   "text-sm font-medium",
-                  isYearly ? "text-foreground" : "text-muted-foreground"
+                  isYearly ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
                 )}
               >
                 Yearly{" "}
@@ -229,7 +229,7 @@ export default function PricingPage() {
                         )}
                         <CardTitle>{plan.name}</CardTitle>
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[var(--text-secondary)]">
                         {plan.description}
                       </p>
                     </CardHeader>
@@ -238,15 +238,15 @@ export default function PricingPage() {
                       <div className="mb-6">
                         {plan.monthlyPrice !== null ? (
                           <div className="flex items-baseline">
-                            <span className="text-4xl font-bold text-foreground">
+                            <span className="text-4xl font-bold text-[var(--text-primary)]">
                               ${isYearly ? plan.yearlyPrice : plan.monthlyPrice}
                             </span>
-                            <span className="ml-2 text-muted-foreground">
+                            <span className="ml-2 text-[var(--text-secondary)]">
                               /{isYearly ? "year" : "month"}
                             </span>
                           </div>
                         ) : (
-                          <div className="text-4xl font-bold text-foreground">
+                          <div className="text-4xl font-bold text-[var(--text-primary)]">
                             Custom
                           </div>
                         )}
@@ -262,19 +262,19 @@ export default function PricingPage() {
                             {feature.included ? (
                               <Check className="h-5 w-5 text-green-500 shrink-0" />
                             ) : (
-                              <X className="h-5 w-5 text-muted-foreground shrink-0" />
+                              <X className="h-5 w-5 text-[var(--text-secondary)] shrink-0" />
                             )}
                             <span
                               className={cn(
                                 "text-sm",
                                 feature.included
-                                  ? "text-foreground"
-                                  : "text-muted-foreground"
+                                  ? "text-[var(--text-primary)]"
+                                  : "text-[var(--text-secondary)]"
                               )}
                             >
                               {feature.name}
                               {feature.limit && (
-                                <span className="text-muted-foreground">
+                                <span className="text-[var(--text-secondary)]">
                                   {" "}
                                   ({feature.limit})
                                 </span>
@@ -288,7 +288,7 @@ export default function PricingPage() {
                       <div className="mt-8">
                         <Button
                           className="w-full"
-                          variant={plan.popular ? "default" : "outline"}
+                          variant={plan.popular ? "default" : "secondary"}
                           asChild
                         >
                           <Link href={plan.ctaLink}>
@@ -306,14 +306,14 @@ export default function PricingPage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-20 bg-background">
+        <section className="py-20 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <motion.h2
               initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.3 }}
-              className="text-3xl font-bold text-center text-foreground mb-12"
+              className="text-3xl font-bold text-center text-[var(--text-primary)] mb-12"
             >
               Frequently Asked Questions
             </motion.h2>
@@ -325,13 +325,13 @@ export default function PricingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.1 * index, duration: 0.3 }}
-                  className="p-6 rounded-lg bg-card border border-border"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)]"
                 >
-                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
                     <HelpCircle className="h-5 w-5 text-[#0070f3]" />
                     {faq.question}
                   </h3>
-                  <p className="mt-2 text-muted-foreground">
+                  <p className="mt-2 text-[var(--text-secondary)]">
                     {faq.answer}
                   </p>
                 </motion.div>

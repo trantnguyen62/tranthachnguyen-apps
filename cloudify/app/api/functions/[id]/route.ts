@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("functions/[id]");
 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!fn) {
-      return NextResponse.json({ error: "Function not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Function not found", 404);
     }
 
     // Calculate stats
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           recentInvocations.length
         : 0;
 
-    return NextResponse.json({
+    return ok({
       ...fn,
       stats: {
         totalInvocations: fn._count.invocations,
@@ -67,10 +68,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to fetch function", error);
-    return NextResponse.json(
-      { error: "Failed to fetch function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch function", 500);
   }
 }
 
@@ -91,7 +89,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!fn) {
-      return NextResponse.json({ error: "Function not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Function not found", 404);
     }
 
     const parseResult = await parseJsonBody(request);
@@ -112,13 +110,10 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       data: updateData,
     });
 
-    return NextResponse.json(updated);
+    return ok(updated);
   } catch (error) {
     log.error("Failed to update function", error);
-    return NextResponse.json(
-      { error: "Failed to update function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update function", 500);
   }
 }
 
@@ -139,7 +134,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!fn) {
-      return NextResponse.json({ error: "Function not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Function not found", 404);
     }
 
     await prisma.serverlessFunction.delete({ where: { id } });
@@ -155,12 +150,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete function", error);
-    return NextResponse.json(
-      { error: "Failed to delete function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete function", 500);
   }
 }

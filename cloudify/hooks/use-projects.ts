@@ -6,13 +6,13 @@ interface Project {
   id: string;
   name: string;
   slug: string;
-  repoUrl: string | null;
-  repoBranch: string;
+  repositoryUrl: string | null;
+  repositoryBranch: string;
   framework: string;
-  buildCmd: string;
-  outputDir: string;
-  installCmd: string;
-  rootDir: string;
+  buildCommand: string;
+  outputDirectory: string;
+  installCommand: string;
+  rootDirectory: string;
   nodeVersion: string;
   createdAt: string;
   updatedAt: string;
@@ -24,7 +24,7 @@ interface Deployment {
   id: string;
   status: string;
   commitSha: string | null;
-  commitMsg: string | null;
+  commitMessage: string | null;
   branch: string;
   url: string | null;
   buildTime: number | null;
@@ -68,8 +68,8 @@ export function useProjects() {
       if (!response.ok) {
         throw new Error("Failed to fetch projects");
       }
-      const data = await response.json();
-      setProjects(data);
+      const envelope = await response.json();
+      setProjects(envelope.data ?? envelope);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -89,11 +89,12 @@ export function useProjects() {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to create project");
+      const envelope = await response.json();
+      throw new Error(envelope.error?.message || "Failed to create project");
     }
 
-    const project = await response.json();
+    const envelope = await response.json();
+    const project = envelope.data ?? envelope;
     setProjects((prev) => [project, ...prev]);
     return project;
   };
@@ -106,11 +107,12 @@ export function useProjects() {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to update project");
+      const envelope = await response.json();
+      throw new Error(envelope.error?.message || "Failed to update project");
     }
 
-    const project = await response.json();
+    const envelope = await response.json();
+    const project = envelope.data ?? envelope;
     setProjects((prev) => prev.map((p) => (p.id === id ? { ...p, ...project } : p)));
     return project;
   };
@@ -121,8 +123,8 @@ export function useProjects() {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to delete project");
+      const envelope = await response.json();
+      throw new Error(envelope.error?.message || "Failed to delete project");
     }
 
     setProjects((prev) => prev.filter((p) => p.id !== id));
@@ -153,8 +155,8 @@ export function useProject(id: string) {
       if (!response.ok) {
         throw new Error("Failed to fetch project");
       }
-      const data = await response.json();
-      setProject(data);
+      const envelope = await response.json();
+      setProject(envelope.data ?? envelope);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {

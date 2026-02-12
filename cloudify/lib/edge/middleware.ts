@@ -6,8 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { executeEdgeFunction, matchEdgeFunction } from "./runtime";
-import { getGeoData, getClientIP, getDeviceType, getBrowser } from "./geo";
-import { assignVariants } from "./ab-testing";
+import { getGeoData } from "./geo";
 
 export interface MiddlewareConfig {
   projectId: string;
@@ -18,10 +17,6 @@ export interface MiddlewareResult {
   response?: NextResponse;
   proceed: boolean;
   rewriteUrl?: string;
-  abTests?: Array<{
-    testId: string;
-    variant: string;
-  }>;
 }
 
 /**
@@ -43,7 +38,6 @@ export async function runEdgeMiddleware(
 
   // Get geo data
   const geo = getGeoData(request.headers);
-  const clientIP = getClientIP(request.headers);
 
   // Build execution context
   const headers: Record<string, string> = {};
@@ -120,112 +114,25 @@ export async function runEdgeMiddleware(
 }
 
 /**
- * Handle A/B test assignment middleware
- */
-export async function handleABTestMiddleware(
-  request: NextRequest,
-  projectId: string
-): Promise<{
-  assignments: Array<{ testId: string; testSlug: string; variant: string }>;
-  cookies: Array<{ name: string; value: string; options: any }>;
-}> {
-  // Get or create visitor ID
-  let visitorId = request.cookies.get("cloudify_visitor_id")?.value;
-  const cookies: Array<{ name: string; value: string; options: any }> = [];
-
-  if (!visitorId) {
-    visitorId = crypto.randomUUID();
-    cookies.push({
-      name: "cloudify_visitor_id",
-      value: visitorId,
-      options: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 365 * 24 * 60 * 60, // 1 year
-      },
-    });
-  }
-
-  // Get context
-  const geo = getGeoData(request.headers);
-  const userAgent = request.headers.get("user-agent");
-
-  // Assign variants
-  const assignments = await assignVariants(projectId, visitorId, {
-    country: geo.country,
-    device: getDeviceType(userAgent),
-    browser: getBrowser(userAgent),
-    url: request.url,
-  });
-
-  // Set assignment cookies for client access
-  for (const assignment of assignments) {
-    cookies.push({
-      name: `cloudify_ab_${assignment.testSlug}`,
-      value: assignment.variant,
-      options: {
-        httpOnly: false, // Allow JS access
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-      },
-    });
-  }
-
-  return { assignments, cookies };
-}
-
-/**
  * Create middleware handler for a project
  */
 export function createProjectMiddleware(config: MiddlewareConfig) {
   return async (request: NextRequest): Promise<NextResponse> => {
-    // Run A/B test middleware
-    const abResult = await handleABTestMiddleware(request, config.projectId);
-
     // Run edge middleware
     const edgeResult = await runEdgeMiddleware(request, config);
 
     // Handle edge function response
     if (edgeResult.response) {
-      // Add A/B test cookies
-      for (const cookie of abResult.cookies) {
-        edgeResult.response.cookies.set(
-          cookie.name,
-          cookie.value,
-          cookie.options
-        );
-      }
       return edgeResult.response;
     }
 
     // Handle rewrite
     if (edgeResult.rewriteUrl) {
-      const response = NextResponse.rewrite(new URL(edgeResult.rewriteUrl, request.url));
-      for (const cookie of abResult.cookies) {
-        response.cookies.set(cookie.name, cookie.value, cookie.options);
-      }
-      return response;
+      return NextResponse.rewrite(new URL(edgeResult.rewriteUrl, request.url));
     }
 
     // Proceed with original request
-    const response = NextResponse.next();
-
-    // Add A/B test cookies
-    for (const cookie of abResult.cookies) {
-      response.cookies.set(cookie.name, cookie.value, cookie.options);
-    }
-
-    // Add A/B test assignments header for logging
-    if (abResult.assignments.length > 0) {
-      response.headers.set(
-        "x-cloudify-ab-assignments",
-        JSON.stringify(abResult.assignments)
-      );
-    }
-
-    return response;
+    return NextResponse.next();
   };
 }
 

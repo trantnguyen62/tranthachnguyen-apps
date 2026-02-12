@@ -243,7 +243,7 @@ export default function CronJobsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
+        <RefreshCw className="w-8 h-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -266,7 +266,7 @@ export default function CronJobsPage() {
   return (
     <div className="min-h-screen bg-black text-white p-6">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+      <nav className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6">
         <Link href="/dashboard" className="hover:text-white">
           Dashboard
         </Link>
@@ -285,13 +285,13 @@ export default function CronJobsPage() {
             <Clock className="w-6 h-6" />
             Cron Jobs
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-[var(--text-secondary)] mt-1">
             Schedule recurring tasks for your project
           </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-background text-foreground rounded-lg hover:bg-secondary transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-[var(--surface-primary)] text-[var(--text-primary)] rounded-lg hover:bg-secondary transition-colors"
         >
           <Plus className="w-4 h-4" />
           Create Job
@@ -303,7 +303,7 @@ export default function CronJobsPage() {
         <div className="border border-gray-800 rounded-lg p-8 text-center">
           <Calendar className="w-12 h-12 text-gray-600 mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">No Cron Jobs</h3>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-[var(--text-secondary)] mb-4">
             Create your first cron job to run scheduled tasks.
           </p>
           <button
@@ -348,7 +348,7 @@ export default function CronJobsPage() {
                       </span>
                     )}
                   </div>
-                  <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="mt-2 flex items-center gap-4 text-sm text-[var(--text-secondary)]">
                     <code className="bg-gray-800 px-2 py-0.5 rounded">
                       {job.schedule}
                     </code>
@@ -357,7 +357,7 @@ export default function CronJobsPage() {
                     <span>{job.path}</span>
                   </div>
                   {job.nextRunAt && (
-                    <div className="mt-2 text-sm text-muted-foreground">
+                    <div className="mt-2 text-sm text-[var(--text-secondary)]">
                       Next run: {new Date(job.nextRunAt).toLocaleString()}
                     </div>
                   )}
@@ -385,7 +385,7 @@ export default function CronJobsPage() {
                     {job.enabled ? (
                       <Pause className="w-4 h-4 text-yellow-500" />
                     ) : (
-                      <Play className="w-4 h-4 text-muted-foreground" />
+                      <Play className="w-4 h-4 text-[var(--text-secondary)]" />
                     )}
                   </button>
                   <button
@@ -402,11 +402,11 @@ export default function CronJobsPage() {
               {/* Expanded view with execution history */}
               {selectedJob?.id === job.id && (
                 <div className="mt-4 pt-4 border-t border-gray-800">
-                  <h4 className="text-sm font-semibold text-muted-foreground mb-3">
+                  <h4 className="text-sm font-semibold text-[var(--text-secondary)] mb-3">
                     Recent Executions ({job.totalExecutions} total)
                   </h4>
                   {job.recentExecutions.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No executions yet</p>
+                    <p className="text-sm text-[var(--text-secondary)]">No executions yet</p>
                   ) : (
                     <div className="space-y-2">
                       {job.recentExecutions.map((exec) => (
@@ -426,7 +426,7 @@ export default function CronJobsPage() {
                               {new Date(exec.startedAt).toLocaleString()}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4 text-muted-foreground">
+                          <div className="flex items-center gap-4 text-[var(--text-secondary)]">
                             {exec.duration && <span>{exec.duration}ms</span>}
                             {exec.error && (
                               <span className="text-red-400 truncate max-w-xs" title={exec.error}>
@@ -453,7 +453,7 @@ export default function CronJobsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
                   Name
                 </label>
                 <input
@@ -466,7 +466,7 @@ export default function CronJobsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
                   Schedule (Cron Expression)
                 </label>
                 <input
@@ -484,7 +484,7 @@ export default function CronJobsPage() {
                       className={`text-xs px-2 py-1 rounded ${
                         newJob.schedule === preset.value
                           ? "bg-foreground text-background"
-                          : "bg-gray-800 text-muted-foreground hover:bg-gray-700"
+                          : "bg-gray-800 text-[var(--text-secondary)] hover:bg-gray-700"
                       }`}
                     >
                       {preset.label}
@@ -494,7 +494,7 @@ export default function CronJobsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
                   Endpoint Path
                 </label>
                 <input
@@ -504,14 +504,14 @@ export default function CronJobsPage() {
                   placeholder="/api/cron/my-job"
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded focus:border-foreground outline-none font-mono"
                 />
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-[var(--text-secondary)] mt-1">
                   The path to your API route that will be called (POST request)
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
                     Timezone
                   </label>
                   <select
@@ -527,7 +527,7 @@ export default function CronJobsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
                     Timeout (seconds)
                   </label>
                   <input
@@ -551,7 +551,7 @@ export default function CronJobsPage() {
                   onChange={(e) => setNewJob({ ...newJob, enabled: e.target.checked })}
                   className="w-4 h-4"
                 />
-                <label htmlFor="enabled" className="text-sm text-muted-foreground">
+                <label htmlFor="enabled" className="text-sm text-[var(--text-secondary)]">
                   Enable immediately after creation
                 </label>
               </div>
@@ -560,7 +560,7 @@ export default function CronJobsPage() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-muted-foreground hover:text-white transition-colors"
+                className="px-4 py-2 text-[var(--text-secondary)] hover:text-white transition-colors"
               >
                 Cancel
               </button>

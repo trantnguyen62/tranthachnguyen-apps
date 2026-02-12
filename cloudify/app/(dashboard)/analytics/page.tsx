@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
       </div>
     );
   }
@@ -60,11 +60,11 @@ export default function AnalyticsPage() {
     return (
       <div className="p-8 text-center">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
           Failed to load analytics
         </h3>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <p className="text-[var(--text-secondary)] mb-4">{error}</p>
+        <Button variant="secondary" onClick={() => refetch()}>
           <RefreshCw className="h-4 w-4" />
           Retry
         </Button>
@@ -103,7 +103,7 @@ export default function AnalyticsPage() {
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-foreground"
+            className="text-3xl font-bold text-[var(--text-primary)]"
           >
             Analytics
           </motion.h1>
@@ -111,7 +111,7 @@ export default function AnalyticsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mt-2 text-muted-foreground"
+            className="mt-2 text-[var(--text-secondary)]"
           >
             Monitor your project performance and user engagement.
           </motion.p>
@@ -122,13 +122,13 @@ export default function AnalyticsPage() {
           transition={{ delay: 0.2 }}
           className="flex items-center gap-4"
         >
-          <Button variant="outline" onClick={() => refetch()}>
+          <Button variant="secondary" onClick={() => refetch()}>
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
+              <Button variant="secondary" className="gap-2">
                 {selectedProjectId
                   ? projects.find((p) => p.id === selectedProjectId)?.name || "Select Project"
                   : "All Projects"}
@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
+              <Button variant="secondary" className="gap-2">
                 <Calendar className="h-4 w-4" />
                 {timeRange === "24h" ? "Last 24 hours" : timeRange === "7d" ? "Last 7 days" : "Last 30 days"}
                 <ChevronDown className="h-4 w-4" />
@@ -181,12 +181,12 @@ export default function AnalyticsPage() {
           <Card key={stat.name}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <stat.icon className="h-8 w-8 text-foreground" />
+                <stat.icon className="h-8 w-8 text-[var(--text-primary)]" />
               </div>
-              <div className="text-3xl font-bold text-foreground">
+              <div className="text-3xl font-bold text-[var(--text-primary)]">
                 {stat.value}
               </div>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-[var(--text-secondary)]">
                 {stat.name}
               </div>
             </CardContent>
@@ -239,10 +239,10 @@ export default function AnalyticsPage() {
                       return (
                         <div key={page.path}>
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-mono text-sm text-foreground truncate max-w-[60%]">
+                            <span className="font-mono text-sm text-[var(--text-primary)] truncate max-w-[60%]">
                               {page.path}
                             </span>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-sm text-[var(--text-secondary)]">
                               {formatNumber(page.views)} views
                             </span>
                           </div>
@@ -252,7 +252,7 @@ export default function AnalyticsPage() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-[var(--text-secondary)]">
                     No page data available
                   </div>
                 )}
@@ -276,10 +276,10 @@ export default function AnalyticsPage() {
                       return (
                         <div key={referrer.source}>
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm text-foreground">
+                            <span className="text-sm text-[var(--text-primary)]">
                               {referrer.source}
                             </span>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-sm text-[var(--text-secondary)]">
                               {formatNumber(referrer.visits)} visits
                             </span>
                           </div>
@@ -289,7 +289,7 @@ export default function AnalyticsPage() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-[var(--text-secondary)]">
                     No referrer data available
                   </div>
                 )}
@@ -318,30 +318,30 @@ export default function AnalyticsPage() {
                   ].map((vital) => (
                     <div
                       key={vital.name}
-                      className="p-4 rounded-lg border border-border"
+                      className="p-4 rounded-lg border border-[var(--border-primary)]"
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-semibold text-foreground">
+                        <span className="text-sm font-semibold text-[var(--text-primary)]">
                           {vital.name}
                         </span>
-                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-muted-foreground dark:bg-gray-800 dark:text-muted-foreground">
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-[var(--text-secondary)] dark:bg-gray-800 dark:text-[var(--text-secondary)]">
                           Awaiting data
                         </span>
                       </div>
                       <div className="text-2xl font-bold text-gray-300 dark:text-gray-600">
                         --
                       </div>
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <div className="text-xs text-[var(--text-secondary)] mt-1">
                         {vital.label} (target: {vital.target})
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 p-4 bg-secondary rounded-lg border border-border">
-                  <p className="text-sm text-foreground font-medium">
+                <div className="mt-4 p-4 bg-[var(--surface-secondary)] rounded-lg border border-[var(--border-primary)]">
+                  <p className="text-sm text-[var(--text-primary)] font-medium">
                     Add the Cloudify analytics script to your project to track Web Vitals
                   </p>
-                  <code className="block mt-2 text-xs font-mono text-foreground bg-secondary p-2 rounded">
+                  <code className="block mt-2 text-xs font-mono text-[var(--text-primary)] bg-[var(--surface-secondary)] p-2 rounded">
                     {`<Script src="https://cloudify.tranthachnguyen.com/api/analytics/script/{projectId}" />`}
                   </code>
                 </div>
@@ -361,12 +361,12 @@ export default function AnalyticsPage() {
                       return data.devices.map((device) => {
                         const pct = totalDevices > 0 ? (device.count / totalDevices) * 100 : 0;
                         return (
-                          <div key={device.type} className="p-4 rounded-lg border border-border">
+                          <div key={device.type} className="p-4 rounded-lg border border-[var(--border-primary)]">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="font-semibold text-foreground capitalize">
+                              <span className="font-semibold text-[var(--text-primary)] capitalize">
                                 {device.type}
                               </span>
-                              <span className="text-muted-foreground">
+                              <span className="text-[var(--text-secondary)]">
                                 {formatNumber(device.count)} ({pct.toFixed(1)}%)
                               </span>
                             </div>
@@ -377,7 +377,7 @@ export default function AnalyticsPage() {
                     })()}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-[var(--text-secondary)]">
                     No device data available yet. Data appears when your projects receive traffic.
                   </div>
                 )}
@@ -399,10 +399,10 @@ export default function AnalyticsPage() {
                         return (
                           <div key={browser.browser}>
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-foreground">
+                              <span className="text-sm text-[var(--text-primary)]">
                                 {browser.browser}
                               </span>
-                              <span className="text-sm text-muted-foreground">
+                              <span className="text-sm text-[var(--text-secondary)]">
                                 {formatNumber(browser.count)} ({pct.toFixed(1)}%)
                               </span>
                             </div>
@@ -413,7 +413,7 @@ export default function AnalyticsPage() {
                     })()}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-[var(--text-secondary)]">
                     No browser data available
                   </div>
                 )}
@@ -440,10 +440,10 @@ export default function AnalyticsPage() {
                     return (
                       <div key={country.country}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-foreground">
+                          <span className="text-sm text-[var(--text-primary)]">
                             {country.country}
                           </span>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm text-[var(--text-secondary)]">
                             {formatNumber(country.visits)} visitors
                           </span>
                         </div>
@@ -453,7 +453,7 @@ export default function AnalyticsPage() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center py-8 text-[var(--text-secondary)]">
                   No geographic data available
                 </div>
               )}

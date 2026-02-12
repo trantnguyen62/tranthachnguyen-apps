@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("feature-flags");
 
@@ -22,7 +24,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Project not found", 404);
       }
 
       const flags = await prisma.featureFlag.findMany({
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
         include: { project: { select: { id: true, name: true, slug: true } } },
       });
 
-      return NextResponse.json(flags);
+      return ok(flags);
     }
 
     // Get all flags across all user's projects
@@ -48,13 +50,10 @@ export async function GET(request: NextRequest) {
       include: { project: { select: { id: true, name: true, slug: true } } },
     });
 
-    return NextResponse.json(flags);
+    return ok(flags);
   } catch (error) {
     log.error("Failed to fetch feature flags", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch feature flags" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch feature flags", 500);
   }
 }
 
@@ -65,7 +64,9 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const {
       projectId,
       key,
@@ -77,18 +78,12 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!projectId || !key || !name) {
-      return NextResponse.json(
-        { error: "Project ID, key, and name are required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Project ID, key, and name are required", 400);
     }
 
     // Validate key format
     if (!/^[a-z0-9_-]+$/i.test(key)) {
-      return NextResponse.json(
-        { error: "Key must contain only letters, numbers, hyphens, and underscores" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Key must contain only letters, numbers, hyphens, and underscores", 400);
     }
 
     // Verify project ownership
@@ -97,7 +92,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Check for duplicate key
@@ -106,10 +101,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json(
-        { error: "A flag with this key already exists" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "A flag with this key already exists", 400);
     }
 
     const flag = await prisma.featureFlag.create({
@@ -136,12 +128,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(flag);
+    return ok(flag);
   } catch (error) {
     log.error("Failed to create feature flag", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to create feature flag" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create feature flag", 500);
   }
 }

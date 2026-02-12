@@ -1,17 +1,82 @@
-name: Deploy Cloudify (Simple)
+name: Cloudify CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - 'cloudify/**'
+      - '.github/workflows/deploy-cloudify-simple.yml'
+  pull_request:
+    branches: [main]
     paths:
       - 'cloudify/**'
   workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip tests (emergency deploy)'
+        required: false
+        default: false
+        type: boolean
+      no_cache:
+        description: 'Build without Docker cache'
+        required: false
+        default: false
+        type: boolean
+
+defaults:
+  run:
+    working-directory: cloudify
 
 jobs:
+  # ===========================================================================
+  # Stage 1: Quality Gates (lint, type-check, tests)
+  # ===========================================================================
+  quality:
+    name: Lint, Type Check & Tests
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.skip_tests }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: cloudify/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+
+      - name: Run unit tests
+        run: npm run test:run -- --reporter=verbose
+
+  # ===========================================================================
+  # Stage 2: Deploy to Proxmox LXC 203
+  # ===========================================================================
   deploy:
+    name: Deploy to Production
+    needs: [quality]
+    if: |
+      always() &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name != 'pull_request' &&
+      (needs.quality.result == 'success' || needs.quality.result == 'skipped')
     runs-on: ubuntu-latest
     environment: production
+    concurrency:
+      group: cloudify-deploy
+      cancel-in-progress: false
 
     steps:
       - name: Checkout code
@@ -21,15 +86,18 @@ jobs:
         run: |
           curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
           sudo dpkg -i cloudflared.deb
+        working-directory: .
 
       - name: Deploy via SSH through Cloudflare Tunnel
         env:
           PROXMOX_HOST: ${{ secrets.CLOUDFLARE_TUNNEL_HOST }}
           PROXMOX_USER: ${{ secrets.PROXMOX_USER }}
           PROXMOX_PASSWORD: ${{ secrets.PROXMOX_PASSWORD }}
+          NO_CACHE: ${{ inputs.no_cache || 'false' }}
+          COMMIT_SHA: ${{ github.sha }}
         run: |
           # Install sshpass for password auth
-          sudo apt-get update && sudo apt-get install -y sshpass
+          sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
 
           # Create SSH config for cloudflare tunnel
           mkdir -p ~/.ssh
@@ -39,67 +107,143 @@ jobs:
             User $PROXMOX_USER
             ProxyCommand cloudflared access ssh --hostname %h
             StrictHostKeyChecking no
+            ServerAliveInterval 30
+            ServerAliveCountMax 10
           EOF
 
           # Deploy to LXC 203
-          sshpass -p "$PROXMOX_PASSWORD" ssh proxmox '
+          sshpass -p "$PROXMOX_PASSWORD" ssh proxmox "
             set -e
-            echo "=== Deploying Cloudify to LXC 203 ==="
+            echo '=== Deploying Cloudify to LXC 203 ==='
+            echo 'Commit: $COMMIT_SHA'
+            echo 'Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)'
 
-            pct exec 203 -- bash -c '\''
+            pct exec 203 -- bash -c '
               set -e
 
-              # Use a temp directory to clone/update the full repo
               REPO_DIR=/opt/tranthachnguyen-apps
+              DEPLOY_DIR=/opt/cloudify
+              COMPOSE=/usr/local/bin/docker-compose
 
-              if [ -d "$REPO_DIR/.git" ]; then
-                echo "Updating existing repository..."
-                cd $REPO_DIR
+              # ── Pull latest code ──
+              if [ -d \"\$REPO_DIR/.git\" ]; then
+                echo \"Pulling latest code...\"
+                cd \$REPO_DIR
                 git fetch origin main
                 git reset --hard origin/main
               else
-                echo "Cloning repository for the first time..."
-                rm -rf $REPO_DIR
-                git clone https://github.com/trantnguyen62/tranthachnguyen-apps.git $REPO_DIR
+                echo \"Cloning repository...\"
+                rm -rf \$REPO_DIR
+                git clone https://github.com/trantnguyen62/tranthachnguyen-apps.git \$REPO_DIR
               fi
 
-              # Sync cloudify folder to /opt/cloudify (preserve .env.secrets)
-              echo "Syncing cloudify folder..."
-              rsync -av --delete --exclude=".env.secrets" $REPO_DIR/cloudify/ /opt/cloudify/
+              # ── Sync cloudify folder (preserve .env.secrets and volumes) ──
+              echo \"Syncing cloudify folder...\"
+              rsync -av --delete \
+                --exclude .env.secrets \
+                --exclude node_modules \
+                \$REPO_DIR/cloudify/ \$DEPLOY_DIR/
 
-              cd /opt/cloudify
+              cd \$DEPLOY_DIR
 
-              # Ensure .env.secrets exists (empty if not set up yet)
+              # ── Ensure .env.secrets exists ──
               if [ ! -f .env.secrets ]; then
-                echo "Creating empty .env.secrets (set up OAuth credentials on server)"
+                echo \"WARNING: .env.secrets not found. Creating empty file.\"
+                echo \"You must set up secrets on the server before first deploy.\"
                 touch .env.secrets
               fi
 
-              echo "Docker version:"
-              docker --version
+              # ── Ensure docker-compose is available ──
+              if [ ! -x \$COMPOSE ]; then
+                echo \"Installing docker-compose...\"
+                COMPOSE_VERSION=v2.24.5
+                wget -q https://github.com/docker/compose/releases/download/\${COMPOSE_VERSION}/docker-compose-linux-x86_64 -O \$COMPOSE
+                chmod +x \$COMPOSE
+              fi
 
-              # Force install standalone docker-compose binary
-              echo "Installing docker-compose standalone..."
-              COMPOSE_VERSION=v2.24.5
-              wget -q https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-linux-x86_64 -O /usr/local/bin/docker-compose
-              chmod +x /usr/local/bin/docker-compose
+              # ── Tag current image for rollback ──
+              echo \"Tagging current image for rollback...\"
+              docker tag cloudify:latest cloudify:rollback 2>/dev/null || true
 
-              # Use the new binary explicitly
-              echo "Building and restarting container..."
-              /usr/local/bin/docker-compose down --remove-orphans || true
-              # Force remove all cloudify containers
-              docker rm -f cloudify cloudify-redis cloudify-db cloudify-minio cloudify-minio-init cloudify-app 2>/dev/null || true
-              # Also prune any stopped containers
-              docker container prune -f 2>/dev/null || true
-              /usr/local/bin/docker-compose build --no-cache
-              /usr/local/bin/docker-compose up -d
+              # ── Build new image ──
+              echo \"Building Docker image...\"
+              BUILD_ARGS=\"\"
+              if [ \"$NO_CACHE\" = \"true\" ]; then
+                BUILD_ARGS=\"--no-cache\"
+              fi
+              \$COMPOSE build \$BUILD_ARGS
 
-              echo "Waiting for health check..."
-              sleep 15
+              # ── Stop and restart ──
+              echo \"Stopping current containers...\"
+              \$COMPOSE down --remove-orphans || true
 
-              echo "Container status:"
-              /usr/local/bin/docker-compose ps
+              echo \"Starting new containers...\"
+              \$COMPOSE up -d
 
-              echo "=== Deployment complete ==="
-            '\''
-          '
+              # ── Run Prisma migrations ──
+              echo \"Running database migrations...\"
+              docker exec cloudify npx prisma db push --skip-generate 2>/dev/null || echo \"Migration skipped (container may use standalone output)\"
+
+              # ── Health check with retry ──
+              echo \"Waiting for health check...\"
+              HEALTHY=false
+              for i in $(seq 1 30); do
+                if docker exec cloudify curl -sf http://localhost:3000/api/health/live > /dev/null 2>&1; then
+                  HEALTHY=true
+                  echo \"Health check passed after \${i} attempts\"
+                  break
+                fi
+                echo \"Attempt \$i/30 - waiting...\"
+                sleep 3
+              done
+
+              if [ \"\$HEALTHY\" = \"true\" ]; then
+                echo \"\"
+                echo \"=== Deployment Successful ===\"
+                \$COMPOSE ps
+                echo \"\"
+                echo \"URL: https://cloudify.tranthachnguyen.com\"
+
+                # Clean up old images
+                docker image prune -f 2>/dev/null || true
+              else
+                echo \"\"
+                echo \"=== DEPLOYMENT FAILED — Rolling back ===\"
+                echo \"Container logs:\"
+                docker logs cloudify --tail 30 2>/dev/null || true
+
+                # Rollback: stop failed containers, restore previous image
+                \$COMPOSE down || true
+                if docker image inspect cloudify:rollback > /dev/null 2>&1; then
+                  echo \"Restoring rollback image...\"
+                  docker tag cloudify:rollback cloudify:latest
+                  \$COMPOSE up -d
+                  sleep 10
+                  echo \"Rollback container status:\"
+                  \$COMPOSE ps
+                fi
+
+                exit 1
+              fi
+            '
+          "
+        working-directory: .
+
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "## Cloudify Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** https://cloudify.tranthachnguyen.com" >> $GITHUB_STEP_SUMMARY
+          echo "**Health:** https://cloudify.tranthachnguyen.com/api/health" >> $GITHUB_STEP_SUMMARY
+        working-directory: .
+
+      - name: Deployment Failed
+        if: failure()
+        run: |
+          echo "## Cloudify Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Action:** Automatic rollback attempted. Check server logs." >> $GITHUB_STEP_SUMMARY
+        working-directory: .

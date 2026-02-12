@@ -8,8 +8,7 @@ This guide covers deploying Cloudify to a production environment.
 - PostgreSQL database
 - Redis instance
 - MinIO or S3-compatible storage
-- Nginx for reverse proxy
-- Cloudflare tunnel (optional, for HTTPS)
+- Nginx for reverse proxy (or Cloudflare Tunnel)
 
 ## Container Architecture
 
@@ -40,7 +39,8 @@ chown -R 1001:1001 /data
 |----------|-------------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://cloudify:pass@cloudify-db:5432/cloudify` |
 | `REDIS_URL` | Redis connection string | `redis://cloudify-redis:6379` |
-| `AUTH_SECRET` | NextAuth secret (min 32 chars) | `cloudify-auth-secret-change-in-production-min-32` |
+| `JWT_SECRET` | JWT signing secret (min 32 chars) | `openssl rand -base64 32` |
+| `AUTH_SECRET` | NextAuth secret (min 32 chars) | `openssl rand -base64 32` |
 | `AUTH_URL` | Public URL of the application | `https://cloudify.example.com` |
 | `BASE_DOMAIN` | Base domain for deployed sites | `example.com` |
 
@@ -48,20 +48,45 @@ chown -R 1001:1001 /data
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `USE_DOCKER_ISOLATION` | Run builds in Docker containers | `true` |
-| `REPOS_DIR` | Directory for cloning repositories | `/data/repos` |
 | `BUILDS_DIR` | Directory for build artifacts | `/data/builds` |
+| `REPOS_DIR` | Directory for cloning repositories | `/data/repos` |
+| `USE_DOCKER_ISOLATION` | Run builds in Docker containers | `true` |
+| `USE_K3S_BUILDS` | Use K3s cluster for builds | `false` |
 
 > **Note**: Set `USE_DOCKER_ISOLATION=false` when running Cloudify inside a container without Docker-in-Docker support.
 
-### OAuth Variables
+### GitHub Integration Variables
 
 | Variable | Description |
 |----------|-------------|
-| `GITHUB_CLIENT_ID` | GitHub OAuth app client ID |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth app client secret |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `GITHUB_WEBHOOK_SECRET` | Secret for verifying GitHub webhook payloads |
+| `GITHUB_APP_ID` | GitHub App ID (optional, for enhanced integration) |
+| `GITHUB_APP_PRIVATE_KEY` | GitHub App private key (PEM format) |
+| `GITHUB_CLIENT_ID` | GitHub App client ID |
+| `GITHUB_CLIENT_SECRET` | GitHub App client secret |
+| `GITHUB_TOKEN` | Personal access token for repo access |
+
+### Cloudflare Variables
+
+| Variable | Description |
+|----------|-------------|
+| `CLOUDFLARE_API_TOKEN` | API token with Zone:DNS:Edit permissions |
+| `CLOUDFLARE_ZONE_ID` | Zone ID (optional, auto-detected) |
+| `CLOUDFLARE_TUNNEL_ID` | Tunnel ID for routing traffic |
+| `CLOUDFLARE_ACCOUNT_ID` | Account ID for Workers APIs |
+
+### Billing Variables
+
+| Variable | Description |
+|----------|-------------|
+| `STRIPE_SECRET_KEY` | Stripe API secret key |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `STRIPE_PRO_MONTHLY_PRICE_ID` | Stripe price ID for Pro monthly |
+| `STRIPE_PRO_YEARLY_PRICE_ID` | Stripe price ID for Pro yearly |
+| `STRIPE_TEAM_MONTHLY_PRICE_ID` | Stripe price ID for Team monthly |
+| `STRIPE_TEAM_YEARLY_PRICE_ID` | Stripe price ID for Team yearly |
+
+See `.env.example` for the complete list of environment variables.
 
 ## Docker Run Command
 
@@ -74,6 +99,7 @@ docker run -d --name cloudify \
   -e NODE_ENV=production \
   -e DATABASE_URL=postgresql://cloudify:password@cloudify-db:5432/cloudify \
   -e REDIS_URL=redis://cloudify-redis:6379 \
+  -e JWT_SECRET=your-jwt-secret-minimum-32-characters \
   -e AUTH_SECRET=your-auth-secret-minimum-32-characters \
   -e AUTH_URL=https://cloudify.example.com \
   -e BASE_DOMAIN=example.com \
@@ -111,7 +137,7 @@ docker run -d --name cloudify-nginx \
 
 ## Cloudflare Tunnel Configuration
 
-For HTTPS with wildcard subdomains, configure the Cloudflare tunnel:
+For HTTPS with subdomains, configure the Cloudflare tunnel:
 
 ```yaml
 # /etc/cloudflared/config.yml
@@ -125,6 +151,8 @@ ingress:
     service: http://192.168.x.x:3000
   - service: http_status:404
 ```
+
+> **Note**: Cloudify uses non-wildcard CNAME records per project for free Cloudflare SSL. Wildcard SSL requires Cloudflare Advanced Certificate Manager.
 
 ## Health Check
 
@@ -149,8 +177,19 @@ Before deploying:
 - [ ] Set `USE_DOCKER_ISOLATION=false` (if no Docker-in-Docker)
 - [ ] Set `BASE_DOMAIN` for deployment URLs
 - [ ] Configure nginx to serve from `/data/builds`
-- [ ] Configure Cloudflare tunnel for wildcard subdomain
-- [ ] Set up database migrations: `npx prisma migrate deploy`
+- [ ] Configure Cloudflare tunnel for subdomain routing
+- [ ] Run database migrations: `npx prisma db push`
+- [ ] Set `GITHUB_WEBHOOK_SECRET` and configure GitHub webhook
+
+## Database Migrations
+
+After updating Cloudify, push schema changes:
+
+```bash
+docker exec cloudify npx prisma db push
+```
+
+Or rebuild the image which runs migrations on startup.
 
 ## Troubleshooting
 
@@ -180,20 +219,10 @@ The repository may use `master` instead of `main`. Either:
 1. Specify the correct branch when creating the project
 2. Update the project's `repoBranch` field in the database
 
-### OAuth login fails
+### Login fails
 
 Check that:
 1. `AUTH_URL` matches the public URL
-2. OAuth redirect URIs are configured correctly in GitHub/Google
-3. `AUTH_SECRET` is at least 32 characters
-4. Cookies work (HTTPS required for secure cookies)
-
-## Database Migrations
-
-After updating Cloudify, run migrations:
-
-```bash
-docker exec cloudify npx prisma migrate deploy
-```
-
-Or rebuild the image which runs migrations on startup.
+2. `JWT_SECRET` and `AUTH_SECRET` are at least 32 characters
+3. Cookies work (HTTPS required for secure cookies in production)
+4. Database is accessible and schema is up to date

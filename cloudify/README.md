@@ -1,42 +1,60 @@
-# Cloudify - Cloud Platform for Developers
+# Cloudify - Cloud Deployment Platform
 
-Cloudify is a full-featured deployment platform inspired by Vercel. It provides Git-based deployments, serverless functions, a global edge network, and all the tools developers need to build and scale modern web applications.
+Cloudify is a self-hosted deployment platform inspired by Vercel. It provides Git-based deployments, serverless functions, edge functions, storage primitives, and all the tools developers need to build and scale modern web applications.
 
 ## Features
 
 ### Core Platform
-- **Git-based Deployments** - Push to deploy with automatic preview environments
-- **Global Edge Network** - 100+ edge locations for low-latency content delivery
-- **Serverless Functions** - Auto-scaling backend without infrastructure management
-- **Custom Domains** - Connect your own domains with automatic SSL
+- **Git-based Deployments** - Push to deploy with GitHub webhook integration
+- **Build Pipeline** - Docker-isolated builds with framework auto-detection
+- **Custom Domains** - Connect your own domains with automatic SSL via Let's Encrypt
+- **Preview Deployments** - Every PR gets its own URL
+- **Rollback Support** - Instantly roll back to any previous deployment
 
 ### Dashboard
 - **Project Management** - Create, configure, and monitor all your projects
-- **Deployment History** - Track all deployments with detailed build logs
+- **Deployment History** - Track all deployments with real-time streaming build logs
 - **Environment Variables** - Securely manage configuration across environments
-- **Analytics** - Real-time traffic, performance, and function metrics
-
-### Developer Experience
-- **Framework Detection** - Automatic detection and optimization for popular frameworks
-- **Build Logs** - Real-time streaming logs with search and download
-- **Preview Deployments** - Every branch gets its own URL
+- **Analytics** - Real-time traffic, web vitals, and performance metrics
 - **Team Collaboration** - Invite team members with role-based permissions
+
+### Developer Tools
+- **Framework Detection** - Automatic detection and optimization for Next.js, React, Vue, Svelte, and more
+- **Monorepo Support** - Turborepo, Nx, Lerna, pnpm/yarn/npm workspaces
+- **Serverless Functions** - Auto-scaling backend functions with multiple runtimes
+- **Edge Functions** - Low-latency compute at the edge
+- **Blob Storage** - S3-compatible object storage via MinIO
+- **KV Store** - Key-value storage with TTL support
+- **Edge Config** - Low-latency configuration store
+- **Cron Jobs** - Scheduled task execution
+- **Feature Flags** - Gradual rollouts with targeting rules
+
+### Integrations
+- **Stripe Billing** - Subscription plans (Free, Pro, Team)
+- **GitHub Webhooks** - Automatic deployments on push
+- **Cloudflare** - DNS management, SSL, and tunnel routing
+- **Notifications** - Email (Resend/SendGrid), Slack, Discord
+- **Monitoring** - Sentry error tracking, Datadog metrics
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router)
+- **Framework**: Next.js 15 (App Router)
 - **UI Library**: React 19
 - **Styling**: Tailwind CSS v4
 - **Components**: Radix UI + Custom components
 - **Animations**: Framer Motion
+- **Database**: PostgreSQL + Prisma ORM
+- **Storage**: MinIO (S3-compatible)
+- **Cache**: Redis
 - **Icons**: Lucide React
-- **Theming**: next-themes
 - **TypeScript**: Strict mode
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js 20+
+- PostgreSQL 16+
+- Redis (optional, for rate limiting and cron queues)
 - npm or pnpm
 
 ### Installation
@@ -48,6 +66,13 @@ cd cloudify
 
 # Install dependencies
 npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your database URL and secrets
+
+# Push database schema
+npx prisma db push
 
 # Start development server
 npm run dev
@@ -64,17 +89,17 @@ npm start
 
 ```bash
 docker build -t cloudify .
-docker run -p 3000:3000 cloudify
+docker run -p 3000:3000 --env-file .env cloudify
 ```
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full deployment instructions.
 
 ## Project Structure
 
 ```
 cloudify/
 ├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication pages
-│   │   ├── login/
-│   │   └── signup/
+│   ├── (auth)/            # Authentication pages (login, signup)
 │   ├── (dashboard)/       # Dashboard pages
 │   │   ├── analytics/
 │   │   ├── dashboard/
@@ -83,9 +108,12 @@ cloudify/
 │   │   ├── projects/
 │   │   └── settings/
 │   ├── api/               # API routes
-│   │   ├── auth/
-│   │   ├── deploy/
-│   │   └── projects/
+│   │   ├── auth/          # Authentication
+│   │   ├── deploy/        # Build & deploy pipeline
+│   │   ├── projects/      # Project CRUD
+│   │   ├── webhooks/      # GitHub/Stripe webhooks
+│   │   ├── billing/       # Stripe integration
+│   │   └── ...
 │   ├── new/               # New project wizard
 │   └── pricing/           # Pricing page
 ├── components/            # React components
@@ -93,33 +121,26 @@ cloudify/
 │   ├── landing/           # Landing page sections
 │   ├── layout/            # Layout components
 │   └── ui/                # Reusable UI components
-├── lib/                   # Utility functions
-├── types/                 # TypeScript types
-└── public/                # Static assets
+├── lib/                   # Core business logic
+│   ├── auth/              # Session-based authentication
+│   ├── build/             # Build executor (Docker/K8s)
+│   ├── billing/           # Stripe integration
+│   ├── domains/           # DNS, SSL, ACME
+│   ├── storage/           # MinIO + Redis clients
+│   ├── notifications/     # Email, Slack, Discord
+│   └── integrations/      # Cloudflare, Sentry, Datadog
+├── prisma/                # Database schema & migrations
+├── k8s/                   # Kubernetes manifests
+└── packages/              # CLI and SDK packages
 ```
-
-## Pages
-
-| Route | Description |
-|-------|-------------|
-| `/` | Landing page with hero, features, testimonials |
-| `/login` | User authentication |
-| `/signup` | New user registration |
-| `/dashboard` | Main dashboard overview |
-| `/projects` | Project list and management |
-| `/projects/[name]` | Project details and configuration |
-| `/deployments` | Deployment history across all projects |
-| `/domains` | Custom domain management |
-| `/analytics` | Traffic and performance analytics |
-| `/settings` | Account and team settings |
-| `/new` | New project import wizard |
-| `/pricing` | Pricing plans and comparison |
 
 ## API Routes
 
 ### Authentication
-- `POST /api/auth` - Login, signup, logout
-- `GET /api/auth` - Get current user
+- `POST /api/auth/login` - Login with email/password
+- `POST /api/auth/signup` - Register new account
+- `POST /api/auth/logout` - End session
+- `GET /api/auth/me` - Get current user
 
 ### Projects
 - `GET /api/projects` - List all projects
@@ -129,57 +150,17 @@ cloudify/
 
 ### Deployments
 - `GET /api/deploy` - List deployments
-- `POST /api/deploy` - Create new deployment
+- `POST /api/deploy` - Trigger new deployment
+- `POST /api/deploy/rollback` - Rollback to previous deployment
 
-## Components
+### Domains
+- `GET /api/domains` - List domains
+- `POST /api/domains` - Add custom domain
+- `POST /api/ssl/provision` - Provision SSL certificate
 
-### UI Components
-- `Button` - Primary action buttons with variants
-- `Card` - Content container with header/footer
-- `Input` - Form input with validation states
-- `Badge` - Status and label indicators
-- `Dialog` - Modal dialogs
-- `DropdownMenu` - Context menus
-- `Tabs` - Content organization
-- `Progress` - Progress bars
-- `Avatar` - User avatars
-- `Switch` - Toggle switches
-- `Tooltip` - Hover tooltips
-
-### Dashboard Components
-- `BuildLogs` - Real-time build log viewer
-- `EnvVariables` - Environment variable editor
-- `Sidebar` - Navigation sidebar
-
-## Roadmap
-
-### Phase 1 (Current)
-- [x] Landing page
-- [x] Authentication
-- [x] Dashboard UI
-- [x] Project management
-- [x] Deployment tracking
-- [x] Domain management
-- [x] Analytics dashboard
-- [x] Settings pages
-- [x] Pricing page
-- [x] API routes
-
-### Phase 2 (Planned)
-- [ ] Real deployment pipeline
-- [ ] GitHub OAuth integration
-- [ ] Webhook handlers
-- [ ] Database integration
-- [ ] Team invitations
-- [ ] Billing integration
-
-### Phase 3 (Future)
-- [ ] Edge functions runtime
-- [ ] Web Analytics SDK
-- [ ] Speed Insights
-- [ ] Cron jobs
-- [ ] Storage (Blob/KV)
-- [ ] AI features
+### Webhooks
+- `POST /api/webhooks/github` - GitHub push/PR events
+- `POST /api/webhooks/stripe` - Stripe subscription events
 
 ## License
 
@@ -187,4 +168,4 @@ MIT License
 
 ---
 
-Built with Next.js and Tailwind CSS
+Built with Next.js, PostgreSQL, and Tailwind CSS

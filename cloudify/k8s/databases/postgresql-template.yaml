@@ -1,0 +1,149 @@
+# PostgreSQL Database Template for Cloudify-managed databases
+# Placeholders are replaced at provisioning time:
+#   {{DATABASE_ID}}   - Unique database record ID
+#   {{DB_NAME}}       - Sanitized database name
+#   {{DB_USERNAME}}   - Database username
+#   {{DB_PASSWORD}}   - Database password (base64-encoded in Secret)
+#   {{STORAGE_SIZE}}  - PVC storage size (e.g. 1Gi, 5Gi)
+#   {{MEMORY_LIMIT}}  - Container memory limit (e.g. 256Mi, 512Mi)
+#   {{CPU_LIMIT}}     - Container CPU limit (e.g. 250m, 500m)
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: postgresql
+type: Opaque
+stringData:
+  username: "{{DB_USERNAME}}"
+  password: "{{DB_PASSWORD}}"
+  database: "{{DB_NAME}}"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: postgresql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{STORAGE_SIZE}}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: postgresql
+spec:
+  serviceName: cloudify-db-{{DATABASE_ID}}
+  replicas: 1
+  selector:
+    matchLabels:
+      cloudify/database-id: "{{DATABASE_ID}}"
+  template:
+    metadata:
+      labels:
+        app: cloudify-db
+        cloudify/database-id: "{{DATABASE_ID}}"
+        cloudify/database-type: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: postgres:16-alpine
+          command:
+            - postgres
+            - -c
+            - unix_socket_directories=
+          ports:
+            - name: postgresql
+              containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cloudify-db-{{DATABASE_ID}}
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudify-db-{{DATABASE_ID}}
+                  key: password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: cloudify-db-{{DATABASE_ID}}
+                  key: database
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "{{MEMORY_LIMIT}}"
+              cpu: "{{CPU_LIMIT}}"
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -h
+                - localhost
+                - -U
+                - "{{DB_USERNAME}}"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -h
+                - localhost
+                - -U
+                - "{{DB_USERNAME}}"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cloudify-db-{{DATABASE_ID}}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: postgresql
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgresql
+      port: 5432
+      targetPort: 5432
+  selector:
+    cloudify/database-id: "{{DATABASE_ID}}"

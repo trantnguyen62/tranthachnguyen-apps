@@ -17,26 +17,26 @@ export default function ImportingPage() {
       <h2>Import Methods</h2>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
-        <div className="p-6 rounded-xl border border-border bg-background">
-          <Github className="h-8 w-8 text-foreground mb-4" />
-          <h3 className="font-semibold text-foreground">From Git</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
+          <Github className="h-8 w-8 text-[var(--text-primary)] mb-4" />
+          <h3 className="font-semibold text-[var(--text-primary)]">From Git</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Connect GitHub, GitLab, or Bitbucket and import any repository.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <FolderGit2 className="h-8 w-8 text-[#0070f3] mb-4" />
-          <h3 className="font-semibold text-foreground">From Template</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">From Template</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Start with a pre-built template and customize from there.
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)]">
           <Upload className="h-8 w-8 text-green-500 mb-4" />
-          <h3 className="font-semibold text-foreground">From CLI</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">From CLI</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Deploy directly from your local machine using the Cloudify CLI.
           </p>
         </div>
@@ -161,7 +161,7 @@ export default function ImportingPage() {
       </ol>
 
       <div className="not-prose mt-8">
-        <Button variant="outline" asChild>
+        <Button variant="secondary" asChild>
           <Link href="/templates">
             Browse Templates
             <ArrowRight className="h-4 w-4" />

@@ -1,230 +1,169 @@
 "use client";
 
-import { motion } from "framer-motion";
-import {
-  GitBranch,
-  Globe,
-  Zap,
-  Shield,
-  BarChart3,
-  Cpu,
-  Cloud,
-  Lock,
-  Boxes,
-  Sparkles,
-  Terminal,
-  Database,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
 
-const features = [
+interface FeatureSection {
+  label: string;
+  title: string;
+  description: string;
+  visual: "deploy" | "edge" | "rollback";
+}
+
+const features: FeatureSection[] = [
   {
-    icon: GitBranch,
-    title: "Git-based Deployments",
+    label: "INFRASTRUCTURE",
+    title: "Zero-Config Deploys",
     description:
-      "Push to deploy. Every branch gets its own preview deployment automatically.",
-    color: "blue",
+      "Push your code. We detect the framework, install dependencies, build your project, and deploy to production. No configuration files, no build scripts, no DevOps.",
+    visual: "deploy",
   },
   {
-    icon: Globe,
+    label: "PERFORMANCE",
     title: "Global Edge Network",
     description:
-      "Deploy to 100+ edge locations worldwide. Your content is always close to your users.",
-    color: "green",
+      "Your application is served from 100+ edge locations worldwide. Every user gets sub-50ms response times, no matter where they are. Automatic caching and optimization included.",
+    visual: "edge",
   },
   {
-    icon: Cpu,
-    title: "Serverless Functions",
+    label: "RELIABILITY",
+    title: "Instant Rollback",
     description:
-      "Write backend code that scales automatically. No infrastructure to manage.",
-    color: "purple",
-  },
-  {
-    icon: Sparkles,
-    title: "AI-Powered",
-    description:
-      "Built-in AI capabilities with our SDK. Deploy intelligent apps in minutes.",
-    color: "orange",
-  },
-  {
-    icon: Shield,
-    title: "Enterprise Security",
-    description:
-      "SOC 2 Type II certified. DDoS protection and Web Application Firewall included.",
-    color: "red",
-  },
-  {
-    icon: BarChart3,
-    title: "Real-time Analytics",
-    description:
-      "Monitor performance, track visitors, and analyze your deployments in real-time.",
-    color: "cyan",
-  },
-  {
-    icon: Database,
-    title: "Edge Storage",
-    description:
-      "Store and serve assets from the edge. Optimized for speed and scalability.",
-    color: "indigo",
-  },
-  {
-    icon: Terminal,
-    title: "Developer Experience",
-    description:
-      "CLI tools, SDKs, and integrations that make development a breeze.",
-    color: "pink",
+      "Every deployment is immutable. If something goes wrong, roll back to any previous version in one click. Zero downtime, zero data loss, zero stress.",
+    visual: "rollback",
   },
 ];
 
-const colorClasses = {
-  blue: "bg-secondary text-foreground",
-  green: "bg-secondary text-foreground",
-  purple: "bg-secondary text-foreground",
-  orange: "bg-secondary text-foreground",
-  red: "bg-secondary text-foreground",
-  cyan: "bg-secondary text-foreground",
-  indigo: "bg-secondary text-foreground",
-  pink: "bg-secondary text-foreground",
+function DeployVisual() {
+  return (
+    <div className="w-full max-w-[400px] rounded-xl border border-[var(--border-primary,theme(colors.border))] bg-[var(--surface-primary,theme(colors.background))] p-6 shadow-lg">
+      <div className="space-y-3">
+        {["Clone repo", "Install deps", "Build", "Optimize", "Deploy"].map((step, i) => (
+          <div key={step} className="flex items-center gap-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--success,#34C759)]/10">
+              <span className="text-[var(--success,#34C759)] text-[11px]">&#10003;</span>
+            </div>
+            <span className="text-[13px] text-[var(--text-primary,theme(colors.foreground))]">{step}</span>
+            <span className="ml-auto text-[11px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))] tabular-nums">{(0.3 + i * 0.8).toFixed(1)}s</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-4 border-t border-[var(--separator,theme(colors.border))] pt-3">
+        <span className="text-[13px] text-[var(--success,#34C759)] font-medium">Deployed in 4.2s</span>
+      </div>
+    </div>
+  );
+}
+
+function EdgeVisual() {
+  return (
+    <div className="w-full max-w-[400px] rounded-xl border border-[var(--border-primary,theme(colors.border))] bg-[var(--surface-primary,theme(colors.background))] p-6 shadow-lg">
+      <div className="text-center mb-4">
+        <span className="text-[28px] font-bold text-[var(--text-primary,theme(colors.foreground))]">&lt;50ms</span>
+        <p className="text-[13px] text-[var(--text-secondary,theme(colors.muted.foreground))]">Global latency</p>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { region: "US East", ms: "12ms" },
+          { region: "EU West", ms: "24ms" },
+          { region: "Asia", ms: "38ms" },
+          { region: "US West", ms: "8ms" },
+          { region: "SA East", ms: "42ms" },
+          { region: "AU East", ms: "45ms" },
+        ].map((node) => (
+          <div key={node.region} className="text-center p-2 rounded-md bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))]">
+            <div className="text-[13px] font-medium text-[var(--text-primary,theme(colors.foreground))]">{node.ms}</div>
+            <div className="text-[11px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))]">{node.region}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RollbackVisual() {
+  return (
+    <div className="w-full max-w-[400px] rounded-xl border border-[var(--border-primary,theme(colors.border))] bg-[var(--surface-primary,theme(colors.background))] p-6 shadow-lg">
+      <div className="space-y-2">
+        {[
+          { version: "v23", status: "current", time: "2m ago" },
+          { version: "v22", status: "previous", time: "1h ago" },
+          { version: "v21", status: "previous", time: "3h ago" },
+          { version: "v20", status: "previous", time: "1d ago" },
+        ].map((deploy) => (
+          <div key={deploy.version} className="flex items-center gap-3 p-2 rounded-md hover:bg-[var(--surface-secondary,theme(colors.secondary.DEFAULT))]">
+            <div className={`h-2 w-2 rounded-full shrink-0 ${deploy.status === "current" ? "bg-[var(--success,#34C759)]" : "bg-[var(--text-quaternary,theme(colors.muted.foreground/40))]"}`} />
+            <span className="text-[13px] font-medium text-[var(--text-primary,theme(colors.foreground))]">{deploy.version}</span>
+            <span className="text-[11px] text-[var(--text-tertiary,theme(colors.muted.foreground/70))]">{deploy.time}</span>
+            {deploy.status === "previous" && (
+              <button className="ml-auto text-[11px] text-[var(--accent,#0071E3)] font-medium">Rollback</button>
+            )}
+            {deploy.status === "current" && (
+              <span className="ml-auto text-[11px] text-[var(--success,#34C759)] font-medium">Live</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const visuals = {
+  deploy: DeployVisual,
+  edge: EdgeVisual,
+  rollback: RollbackVisual,
 };
+
+function FeatureBlock({ feature, index }: { feature: FeatureSection; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const Visual = visuals[feature.visual];
+  const isReversed = index % 2 === 1;
+
+  return (
+    <div
+      ref={ref}
+      className="min-h-screen flex items-center py-20"
+    >
+      <div className={`mx-auto max-w-[980px] px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center ${isReversed ? "direction-rtl" : ""}`}>
+        <div className={`${isReversed ? "lg:order-2" : ""} transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+          <span className="text-[11px] font-semibold tracking-[0.1em] text-[var(--accent,#0071E3)] uppercase">
+            {feature.label}
+          </span>
+          <h2 className="mt-3 text-[28px] font-bold tracking-tight text-[var(--text-primary,theme(colors.foreground))]">
+            {feature.title}
+          </h2>
+          <p className="mt-4 max-w-[400px] text-[15px] leading-relaxed text-[var(--text-secondary,theme(colors.muted.foreground))]">
+            {feature.description}
+          </p>
+        </div>
+        <div className={`${isReversed ? "lg:order-1" : ""} flex justify-center transition-all duration-500 delay-100 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+          <Visual />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function Features() {
   return (
-    <section className="relative py-24 bg-card">
-      <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3 }}
-            className="text-sm font-semibold text-muted-foreground"
-          >
-            EVERYTHING YOU NEED
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1, duration: 0.3 }}
-            className="mt-2 text-4xl font-bold tracking-tight text-foreground sm:text-5xl"
-          >
-            Deploy once, deliver everywhere
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-            className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground"
-          >
-            A complete platform for building and deploying modern web applications
-            with all the features you need out of the box.
-          </motion.p>
-        </div>
-
-        {/* Features grid */}
-        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
-              className="group relative rounded-lg border border-border bg-card p-6 transition-all duration-300 hover:border-foreground/20"
-            >
-              <div
-                className={cn(
-                  "inline-flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110",
-                  colorClasses[feature.color as keyof typeof colorClasses]
-                )}
-              >
-                <feature.icon className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-foreground">
-                {feature.title}
-              </h3>
-              <p className="mt-2 text-muted-foreground">
-                {feature.description}
-              </p>
-              <div className="mt-4 flex items-center text-sm font-medium text-foreground opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
-                Learn more
-                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Large feature highlight */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.3 }}
-          className="mt-24 relative overflow-hidden rounded-lg border border-border bg-secondary/50 p-8 lg:p-12"
-        >
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-sm font-medium text-foreground">
-                <Zap className="h-4 w-4" />
-                Fluid Compute
-              </div>
-              <h3 className="mt-4 text-3xl font-bold text-foreground">
-                Auto-scaling that just works
-              </h3>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Our serverless infrastructure automatically scales your applications
-                based on demand. Pay only for what you use, scale to millions of users
-                without any configuration.
-              </p>
-              <ul className="mt-8 space-y-4">
-                {[
-                  "Zero cold starts with edge pre-warming",
-                  "Automatic scaling from 0 to 10M+ requests",
-                  "Pay-per-use pricing with no minimum",
-                  "Built-in caching and optimization",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-500/10">
-                      <svg
-                        className="h-4 w-4 text-green-600 dark:text-green-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-foreground">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="relative">
-              <div className="aspect-square rounded-lg bg-foreground p-8">
-                <div className="h-full w-full rounded-xl bg-gray-900/90 backdrop-blur p-6">
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Terminal className="h-4 w-4" />
-                    <span className="text-sm">cloudify deploy</span>
-                  </div>
-                  <div className="mt-4 space-y-2 font-mono text-sm">
-                    <div className="text-green-400">✓ Build completed</div>
-                    <div className="text-green-400">✓ Functions deployed</div>
-                    <div className="text-green-400">✓ Edge network updated</div>
-                    <div className="text-[#0070f3]">→ Live at cloudify.app</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
+    <section className="bg-[var(--surface-primary,theme(colors.background))]">
+      {features.map((feature, index) => (
+        <FeatureBlock key={feature.title} feature={feature} index={index} />
+      ))}
     </section>
   );
 }

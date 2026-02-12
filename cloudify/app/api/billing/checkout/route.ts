@@ -3,11 +3,12 @@
  * Create Stripe checkout sessions for subscription upgrades
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { createCheckoutSession, STRIPE_PRICES } from "@/lib/billing/stripe";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("billing/checkout");
 
@@ -29,18 +30,12 @@ export async function POST(request: NextRequest) {
 
     // Validate plan
     if (!plan || !["pro", "team"].includes(plan)) {
-      return NextResponse.json(
-        { error: "Invalid plan. Must be 'pro' or 'team'" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid plan. Must be 'pro' or 'team'", 400);
     }
 
     // Validate interval
     if (!interval || !["monthly", "yearly"].includes(interval)) {
-      return NextResponse.json(
-        { error: "Invalid interval. Must be 'monthly' or 'yearly'" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid interval. Must be 'monthly' or 'yearly'", 400);
     }
 
     // Get the correct price ID
@@ -48,10 +43,7 @@ export async function POST(request: NextRequest) {
     const priceId = STRIPE_PRICES[priceKey];
 
     if (!priceId) {
-      return NextResponse.json(
-        { error: "Price not configured for this plan" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Price not configured for this plan", 400);
     }
 
     // Build success and cancel URLs
@@ -68,20 +60,12 @@ export async function POST(request: NextRequest) {
     );
 
     if (!checkoutUrl) {
-      return NextResponse.json(
-        { error: "Failed to create checkout session. Stripe may not be configured." },
-        { status: 500 }
-      );
+      return fail("INTERNAL_ERROR", "Failed to create checkout session. Stripe may not be configured.", 500);
     }
 
-    return NextResponse.json({
-      url: checkoutUrl,
-    });
+    return ok({ url: checkoutUrl });
   } catch (error) {
     log.error("Failed to create checkout session", error);
-    return NextResponse.json(
-      { error: "Failed to create checkout session" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create checkout session", 500);
   }
 }

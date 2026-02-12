@@ -472,11 +472,16 @@ export async function getBuildJobStatus(
 }
 
 /**
- * Generate site slug from project slug
- * Uses project slug only (not deployment ID) so each deployment updates the same site
- * This ensures DNS records and K8s resources are properly cleaned up on project deletion
+ * Generate site slug from project slug.
+ *
+ * For production deploys (no deploymentId), returns the bare project slug.
+ * For preview deploys, appends a short deployment ID prefix to create a
+ * unique slug (e.g. "my-project-abc1234").
  */
-export function generateSiteSlug(projectSlug: string, _deploymentId?: string): string {
+export function generateSiteSlug(projectSlug: string, deploymentId?: string): string {
+  if (deploymentId) {
+    return sanitizeSlug(`${projectSlug}-${deploymentId.substring(0, 7)}`);
+  }
   return sanitizeSlug(projectSlug);
 }
 

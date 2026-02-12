@@ -90,10 +90,10 @@ export function UsageDashboard({ projectId, className }: UsageDashboardProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
             Usage Overview
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--text-secondary)]">
             {stats.plan.charAt(0).toUpperCase() + stats.plan.slice(1)} Plan
           </p>
         </div>
@@ -215,12 +215,12 @@ function StatCard({
   icon: string;
 }) {
   return (
-    <div className="bg-card rounded-lg p-4 border border-border">
+    <div className="bg-card rounded-lg p-4 border border-[var(--border-primary)]">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">{icon}</span>
-        <span className="text-sm text-muted-foreground">{title}</span>
+        <span className="text-sm text-[var(--text-secondary)]">{title}</span>
       </div>
-      <div className="text-2xl font-semibold text-foreground">
+      <div className="text-2xl font-semibold text-[var(--text-primary)]">
         {typeof value === "number" ? value.toLocaleString() : value}
       </div>
     </div>
@@ -244,12 +244,12 @@ function UsageMeter({
   const isNearLimit = percentage >= 80;
 
   return (
-    <div className="bg-card rounded-lg p-4 border border-border">
+    <div className="bg-card rounded-lg p-4 border border-[var(--border-primary)]">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </span>
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-[var(--text-secondary)]">
           {formatValue(used, unit)} / {limit === Infinity ? "∞" : formatValue(limit, unit)}
         </span>
       </div>
@@ -273,7 +273,7 @@ function UsageMeter({
               ? "text-red-500"
               : isNearLimit
               ? "text-yellow-500"
-              : "text-muted-foreground"
+              : "text-[var(--text-secondary)]"
           )}
         >
           {percentage.toFixed(1)}%

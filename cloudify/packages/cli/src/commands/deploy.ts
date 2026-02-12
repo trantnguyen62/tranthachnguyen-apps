@@ -8,7 +8,7 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 import ora from "ora";
-import tar from "tar";
+import * as tar from "tar";
 import { requireAuth, apiRequest } from "../config.js";
 
 interface DeployOptions {
@@ -70,7 +70,7 @@ export async function deploy(options: DeployOptions): Promise<void> {
         gzip: true,
         file: tarballPath,
         cwd,
-        filter: (filePath) => {
+        filter: (filePath: string) => {
           return !ignorePatterns.some((pattern) => filePath.includes(pattern));
         },
       },

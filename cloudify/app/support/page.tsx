@@ -113,10 +113,10 @@ export default function SupportPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center"
             >
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 How Can We Help?
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Find answers in our documentation, get help from the community, or contact our support team.
               </p>
             </motion.div>
@@ -129,7 +129,7 @@ export default function SupportPage() {
               className="mt-10 max-w-xl mx-auto"
             >
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
                 <Input
                   placeholder="Search for help..."
                   value={searchQuery}
@@ -165,10 +165,10 @@ export default function SupportPage() {
                         >
                           <channel.icon className="h-7 w-7 text-white" />
                         </div>
-                        <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                        <h3 className="font-semibold text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                           {channel.title}
                         </h3>
-                        <p className="text-sm text-muted-foreground mt-2">
+                        <p className="text-sm text-[var(--text-secondary)] mt-2">
                           {channel.description}
                         </p>
                       </CardContent>
@@ -181,9 +181,9 @@ export default function SupportPage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-16 bg-background">
+        <section className="py-16 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-8 text-center">
               Frequently Asked Questions
             </h2>
             <div className="space-y-4">
@@ -194,23 +194,23 @@ export default function SupportPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
-                  className="rounded-xl border border-border bg-card overflow-hidden"
+                  className="rounded-xl border border-[var(--border-primary)] bg-card overflow-hidden"
                 >
                   <button
                     onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
                     className="w-full flex items-center justify-between p-4 text-left"
                   >
-                    <span className="font-medium text-foreground">
+                    <span className="font-medium text-[var(--text-primary)]">
                       {faq.question}
                     </span>
                     {expandedFaq === index ? (
-                      <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                      <ChevronUp className="h-5 w-5 text-[var(--text-secondary)]" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                      <ChevronDown className="h-5 w-5 text-[var(--text-secondary)]" />
                     )}
                   </button>
                   {expandedFaq === index && (
-                    <div className="px-4 pb-4 text-muted-foreground">
+                    <div className="px-4 pb-4 text-[var(--text-secondary)]">
                       {faq.answer}
                     </div>
                   )}
@@ -223,10 +223,10 @@ export default function SupportPage() {
         {/* Contact Form */}
         <section className="py-16">
           <div className="mx-auto max-w-xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-foreground mb-2 text-center">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2 text-center">
               Still Need Help?
             </h2>
-            <p className="text-muted-foreground text-center mb-8">
+            <p className="text-[var(--text-secondary)] text-center mb-8">
               Submit a support ticket and we'll get back to you within 24 hours.
             </p>
 
@@ -234,10 +234,10 @@ export default function SupportPage() {
               <Card>
                 <CardContent className="p-8 text-center">
                   <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                     Ticket Submitted!
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-[var(--text-secondary)]">
                     We'll get back to you at {ticketForm.email} within 24 hours.
                   </p>
                 </CardContent>
@@ -247,7 +247,7 @@ export default function SupportPage() {
                 <CardContent className="p-6">
                   <form onSubmit={handleTicketSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                         Email
                       </label>
                       <Input
@@ -259,7 +259,7 @@ export default function SupportPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                         Subject
                       </label>
                       <Input
@@ -270,7 +270,7 @@ export default function SupportPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
                         Description
                       </label>
                       <textarea
@@ -279,7 +279,7 @@ export default function SupportPage() {
                         value={ticketForm.description}
                         onChange={(e) => setTicketForm({ ...ticketForm, description: e.target.value })}
                         placeholder="Please describe your issue in detail..."
-                        className="w-full rounded-lg border border-border bg-card px-4 py-2 text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:ring-blue-500"
+                        className="w-full rounded-lg border border-[var(--border-primary)] bg-card px-4 py-2 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:border-blue-500 focus:ring-blue-500"
                       />
                     </div>
                     <Button type="submit" variant="default" className="w-full">

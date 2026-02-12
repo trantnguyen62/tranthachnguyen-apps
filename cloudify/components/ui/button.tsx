@@ -6,29 +6,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-[length:var(--text-body)] font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 outline-none focus-visible:ring-[3px] focus-visible:ring-[var(--accent-subtle)] focus-visible:border-[var(--border-focused)] active:scale-[0.98]",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90",
+          "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] hover:brightness-[1.08] active:bg-[var(--accent-active)] shadow-sm hover:shadow-md",
         destructive:
-          "bg-[#ee0000] text-white hover:bg-[#cc0000]",
-        outline:
-          "border border-border bg-transparent hover:bg-secondary",
+          "bg-[var(--error)] text-white hover:bg-[#E5342B] hover:brightness-[1.08] active:bg-[#CC2E26] shadow-sm hover:shadow-md",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border border-[var(--border-primary)] bg-[var(--surface-secondary)] text-[var(--text-primary)] hover:bg-[var(--surface-tertiary)] active:bg-[var(--surface-tertiary)]",
         ghost:
-          "hover:bg-secondary hover:text-foreground",
-        link:
-          "text-[#0070f3] underline-offset-4 hover:underline",
+          "text-[var(--text-primary)] hover:bg-[var(--surface-secondary)] active:bg-[var(--surface-tertiary)]",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-6 text-base",
-        xl: "h-11 rounded-full px-8 text-base",
-        icon: "h-9 w-9",
+        default: "h-9 px-4 py-2 rounded-[var(--radius-sm)]",
+        sm: "h-8 px-3 text-[length:var(--text-footnote)] rounded-[var(--radius-sm)]",
+        lg: "h-11 px-6 text-[length:var(--text-body)] rounded-[var(--radius-sm)]",
       },
     },
     defaultVariants: {

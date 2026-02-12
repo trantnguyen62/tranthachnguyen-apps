@@ -5,10 +5,12 @@
  * PUT - Update security settings for a project
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { ok, fail } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import {
   getSecuritySettings,
   setSecurityLevel,
@@ -65,12 +67,12 @@ export async function GET(
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Check if Cloudflare is configured
     if (!isCloudflareConfigured()) {
-      return NextResponse.json({
+      return ok({
         configured: false,
         message: "Cloudflare integration not configured. Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ZONE_ID to enable security features.",
         settings: null,
@@ -92,7 +94,7 @@ export async function GET(
       r.description.startsWith("Cloudify Rate Limit:")
     );
 
-    return NextResponse.json({
+    return ok({
       configured: true,
       settings: {
         securityLevel: cloudflareSettings.securityLevel || "medium",
@@ -115,10 +117,7 @@ export async function GET(
     });
   } catch (error) {
     log.error("Failed to get security settings", error);
-    return NextResponse.json(
-      { error: "Failed to get security settings" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get security settings", 500);
   }
 }
 
@@ -135,7 +134,9 @@ export async function PUT(
     const { user } = authResult;
 
     const { id: projectId } = await params;
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
 
     // Verify project ownership
     const project = await prisma.project.findFirst({
@@ -146,15 +147,12 @@ export async function PUT(
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Check if Cloudflare is configured
     if (!isCloudflareConfigured()) {
-      return NextResponse.json(
-        { error: "Cloudflare integration not configured" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Cloudflare integration not configured", 400);
     }
 
     const results: {
@@ -168,10 +166,7 @@ export async function PUT(
     if (body.securityLevel) {
       const validLevels = ["off", "essentially_off", "low", "medium", "high", "under_attack"];
       if (!validLevels.includes(body.securityLevel)) {
-        return NextResponse.json(
-          { error: `Invalid security level. Must be one of: ${validLevels.join(", ")}` },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", `Invalid security level. Must be one of: ${validLevels.join(", ")}`, 400);
       }
       results.securityLevel = await setSecurityLevel(body.securityLevel);
     }
@@ -226,16 +221,13 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json({
+    return ok({
       success: true,
       results,
     });
   } catch (error) {
     log.error("Failed to update security settings", error);
-    return NextResponse.json(
-      { error: "Failed to update security settings" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update security settings", 500);
   }
 }
 
@@ -256,10 +248,7 @@ export async function DELETE(
     const ruleId = searchParams.get("ruleId");
 
     if (!ruleId) {
-      return NextResponse.json(
-        { error: "Rule ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Rule ID is required", 400);
     }
 
     // Verify project ownership
@@ -271,17 +260,14 @@ export async function DELETE(
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Delete the firewall rule
     const result = await deleteFirewallRule(ruleId);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error || "Failed to delete rule" },
-        { status: 500 }
-      );
+      return fail("INTERNAL_ERROR", result.error || "Failed to delete rule", 500);
     }
 
     // Log activity
@@ -296,12 +282,9 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete firewall rule", error);
-    return NextResponse.json(
-      { error: "Failed to delete firewall rule" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete firewall rule", 500);
   }
 }

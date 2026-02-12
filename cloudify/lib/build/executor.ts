@@ -112,9 +112,18 @@ export function validateBuildConfig(config: BuildConfig): {
 } {
   const errors: string[] = [];
 
-  // Validate repository URL
-  if (!isValidGitHubUrl(config.repoUrl) && !isValidUrl(config.repoUrl)) {
-    errors.push("Invalid repository URL - must be a valid GitHub or HTTPS URL");
+  // Validate repository URL — must be HTTPS without embedded credentials
+  if (!isValidGitHubUrl(config.repoUrl)) {
+    try {
+      const parsed = new URL(config.repoUrl);
+      if (parsed.protocol !== "https:") {
+        errors.push("Invalid repository URL - must use HTTPS");
+      } else if (parsed.username || parsed.password) {
+        errors.push("Invalid repository URL - must not contain credentials");
+      }
+    } catch {
+      errors.push("Invalid repository URL - must be a valid GitHub or HTTPS URL");
+    }
   }
 
   // Validate install command
@@ -478,15 +487,21 @@ export async function copyOutput(
   siteSlug: string,
   onLog: LogCallback
 ): Promise<{ success: boolean; artifactPath: string }> {
+  // Normalize outputDir: treat ".", "./", and empty string as root
+  const normalizedOutputDir = outputDir.replace(/^\.?\/?$/, ".") || ".";
+  const isRootDir = normalizedOutputDir === "." || normalizedOutputDir === "./";
+
   // SECURITY: Validate output directory to prevent path traversal
-  const sourcePath = resolveSecurePath(workDir, outputDir);
+  const sourcePath = resolveSecurePath(workDir, normalizedOutputDir);
   if (!sourcePath) {
     await onLog("error", `Invalid output directory: path traversal detected`);
     return { success: false, artifactPath: "" };
   }
 
-  // Ensure source path is within workDir
-  if (!sourcePath.startsWith(path.normalize(workDir))) {
+  // Ensure source path is within workDir (use normalized comparison)
+  const normalizedWork = path.normalize(workDir);
+  const normalizedSource = path.normalize(sourcePath);
+  if (!normalizedSource.startsWith(normalizedWork)) {
     await onLog("error", `Output directory escapes work directory`);
     return { success: false, artifactPath: "" };
   }
@@ -500,7 +515,7 @@ export async function copyOutput(
 
   const destPath = path.join(BUILDS_DIR, sanitizedSlug);
 
-  await onLog("info", `Copying build output from ${outputDir} to ${destPath}...`);
+  await onLog("info", `Copying build output from ${normalizedOutputDir} to ${destPath}...`);
 
   // Ensure builds directory exists
   await ensureDir(BUILDS_DIR);
@@ -516,19 +531,50 @@ export async function copyOutput(
   try {
     const stat = await fs.stat(sourcePath);
     if (!stat.isDirectory()) {
-      await onLog("error", `Output directory ${outputDir} is not a directory`);
+      await onLog("error", `Output directory ${normalizedOutputDir} is not a directory`);
       return { success: false, artifactPath: "" };
     }
   } catch {
-    await onLog("error", `Output directory ${outputDir} does not exist`);
+    await onLog("error", `Output directory ${normalizedOutputDir} does not exist`);
     return { success: false, artifactPath: "" };
   }
 
-  // Copy the output directory
-  const result = await runCommand("cp", ["-r", sourcePath, destPath], {
-    onLog,
-    timeout: 60 * 1000, // 1 min for copy
-  });
+  let result: { success: boolean; code: number | null };
+
+  if (isRootDir) {
+    // When outputDir is root, copy only deployable files (exclude .git, node_modules, etc.)
+    // First create the destination directory
+    await ensureDir(destPath);
+
+    // Use rsync-style copy: cp contents excluding build artifacts
+    // We use a two-step approach: copy everything, then remove unwanted dirs
+    result = await runCommand("cp", ["-r", `${sourcePath}/.`, destPath], {
+      onLog,
+      timeout: 60 * 1000,
+    });
+
+    if (result.success) {
+      // Clean up non-deployable directories from the copied output
+      const excludeDirs = [".git", "node_modules", ".next", ".cache", ".turbo"];
+      for (const dir of excludeDirs) {
+        const excludePath = path.join(destPath, dir);
+        try {
+          await fs.rm(excludePath, { recursive: true, force: true });
+        } catch {
+          // Directory doesn't exist, that's fine
+        }
+      }
+      await onLog("info", "Excluded non-deployable directories (.git, node_modules, etc.)");
+    }
+  } else {
+    // For specific output directories (dist, out, build, .next, etc.),
+    // copy the directory contents directly to destPath
+    await ensureDir(destPath);
+    result = await runCommand("cp", ["-r", `${sourcePath}/.`, destPath], {
+      onLog,
+      timeout: 60 * 1000,
+    });
+  }
 
   if (result.success) {
     await onLog("success", `Build artifacts copied to ${destPath}`);
@@ -547,11 +593,18 @@ export async function cleanupRepo(workDir: string, onLog: LogCallback): Promise<
 }
 
 /**
- * Generate site slug from project slug
- * Uses project slug only (not deployment ID) so each deployment updates the same site
- * This ensures DNS records and K8s resources are properly cleaned up on project deletion
+ * Generate site slug from project slug.
+ *
+ * For production deploys (no deploymentId), returns the bare project slug
+ * so DNS records and K8s resources map 1:1 with the project.
+ *
+ * For preview deploys, appends a short deployment ID prefix to create a
+ * unique slug (e.g. "my-project-abc1234") that won't overwrite production.
  */
-export function generateSiteSlug(projectSlug: string, _deploymentId?: string): string {
+export function generateSiteSlug(projectSlug: string, deploymentId?: string): string {
+  if (deploymentId) {
+    return sanitizeSlug(`${projectSlug}-${deploymentId.substring(0, 7)}`);
+  }
   return sanitizeSlug(projectSlug);
 }
 

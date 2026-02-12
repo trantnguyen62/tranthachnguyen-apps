@@ -114,7 +114,7 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
   );
 
   const levelColors = {
-    info: "text-muted-foreground",
+    info: "text-[var(--text-secondary)]",
     warn: "text-yellow-500",
     error: "text-red-500",
     success: "text-green-500",
@@ -136,12 +136,12 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
   };
 
   return (
-    <div className="rounded-lg border border-border overflow-hidden">
+    <div className="rounded-lg border border-[var(--border-primary)] overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-background border-b border-border">
+      <div className="flex items-center justify-between p-4 bg-[var(--surface-primary)] border-b border-[var(--border-primary)]">
         <div className="flex items-center gap-3">
-          <Terminal className="h-5 w-5 text-muted-foreground" />
-          <span className="font-medium text-foreground">Build Logs</span>
+          <Terminal className="h-5 w-5 text-[var(--text-secondary)]" />
+          <span className="font-medium text-[var(--text-primary)]">Build Logs</span>
           <Badge
             variant={
               status === "ready" ? "success" : status === "error" ? "error" : "warning"
@@ -154,15 +154,15 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
           </Badge>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={copyLogs}>
+          <Button variant="ghost" size="sm"  onClick={copyLogs}>
             <Copy className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={downloadLogs}>
+          <Button variant="ghost" size="sm"  onClick={downloadLogs}>
             <Download className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
+            size="sm" 
             onClick={() => setIsExpanded(!isExpanded)}
           >
             {isExpanded ? (
@@ -184,14 +184,14 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
             className="overflow-hidden"
           >
             {/* Search */}
-            <div className="p-2 border-b border-border">
+            <div className="p-2 border-b border-[var(--border-primary)]">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-secondary)]" />
                 <Input
                   placeholder="Search logs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-8 text-sm bg-transparent border-border"
+                  className="pl-9 h-8 text-sm bg-transparent border-[var(--border-primary)]"
                 />
               </div>
             </div>
@@ -199,7 +199,7 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
             {/* Log entries */}
             <div className="h-[400px] overflow-y-auto bg-gray-950 p-4 font-mono text-sm">
               {filteredLogs.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-muted-foreground">
+                <div className="flex items-center justify-center h-full text-[var(--text-secondary)]">
                   No build logs available
                 </div>
               ) : (
@@ -221,7 +221,7 @@ export function BuildLogs({ deploymentId, status }: BuildLogsProps) {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between p-2 bg-gray-900 border-t border-gray-800 text-xs text-muted-foreground">
+            <div className="flex items-center justify-between p-2 bg-gray-900 border-t border-gray-800 text-xs text-[var(--text-secondary)]">
               <span>{logs.length} lines</span>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input

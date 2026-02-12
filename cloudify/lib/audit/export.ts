@@ -29,13 +29,10 @@ export interface ActivityWithRelations extends Activity {
 /**
  * Fetch audit logs with filters
  */
-export async function fetchAuditLogs(
-  filters: AuditLogFilters,
-  options?: {
-    limit?: number;
-    offset?: number;
-  }
-): Promise<{ logs: ActivityWithRelations[]; total: number }> {
+/**
+ * Build Prisma where clause from audit log filters
+ */
+function buildAuditWhere(filters: AuditLogFilters): Record<string, unknown> {
   const where: Record<string, unknown> = {};
 
   if (filters.userId) {
@@ -76,6 +73,22 @@ export async function fetchAuditLogs(
     ];
   }
 
+  return where;
+}
+
+export async function fetchAuditLogs(
+  filters: AuditLogFilters,
+  options?: {
+    limit?: number;
+    offset?: number;
+    cursorWhere?: Record<string, unknown>;
+  }
+): Promise<{ logs: ActivityWithRelations[]; total: number }> {
+  const baseWhere = buildAuditWhere(filters);
+  const where = options?.cursorWhere
+    ? { ...baseWhere, ...options.cursorWhere }
+    : baseWhere;
+
   const [logs, total] = await Promise.all([
     prisma.activity.findMany({
       where,
@@ -90,11 +103,11 @@ export async function fetchAuditLogs(
           select: { id: true, name: true, slug: true },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       take: options?.limit,
-      skip: options?.offset,
+      skip: options?.cursorWhere ? undefined : options?.offset,
     }),
-    prisma.activity.count({ where }),
+    prisma.activity.count({ where: baseWhere }),
   ]);
 
   return { logs: logs as ActivityWithRelations[], total };

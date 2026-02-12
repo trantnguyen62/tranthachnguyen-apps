@@ -8,11 +8,13 @@ import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 import {
   kvGet,
   kvGetWithMetadata,
   kvSet,
   kvDelete,
+  kvDeleteMany,
   kvList,
   kvMget,
   kvMset,
@@ -48,7 +50,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Project not found", 404);
       }
     }
 
@@ -63,14 +65,14 @@ export async function GET(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       if (withMetadata) {
         const result = await kvGetWithMetadata(storeId, key);
         const ttl = await kvTtl(storeId, key);
 
-        return NextResponse.json({
+        return ok({
           key,
           value: result.value,
           metadata: result.metadata,
@@ -80,7 +82,7 @@ export async function GET(request: NextRequest) {
       }
 
       const value = await kvGet(storeId, key);
-      return NextResponse.json({
+      return ok({
         key,
         value,
         exists: value !== null,
@@ -97,13 +99,13 @@ export async function GET(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       const keyList = keys.split(",").map((k) => k.trim());
       const result = await kvMget(storeId, keyList);
 
-      return NextResponse.json({
+      return ok({
         entries: Object.fromEntries(result),
       });
     }
@@ -118,12 +120,12 @@ export async function GET(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       const result = await kvList(storeId, { prefix: prefix || "", cursor, limit });
 
-      return NextResponse.json({
+      return ok({
         keys: result.keys,
         cursor: result.cursor,
         hasMore: result.hasMore,
@@ -149,13 +151,10 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(stores);
+    return ok(stores);
   } catch (error) {
     log.error("Failed to fetch KV", error);
-    return NextResponse.json(
-      { error: "Failed to fetch KV data" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch KV data", 500);
   }
 }
 
@@ -183,10 +182,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: "Project ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Project ID is required", 400);
     }
 
     // Verify project ownership
@@ -195,7 +191,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Create a new store
@@ -217,7 +213,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json(store);
+      return ok(store);
     }
 
     // Operations on existing store
@@ -231,13 +227,13 @@ export async function POST(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       // Restore from Postgres (cold start recovery)
       if (operation === "restore") {
         const count = await restoreFromPostgres(storeId);
-        return NextResponse.json({
+        return ok({
           success: true,
           restored: count,
         });
@@ -246,7 +242,7 @@ export async function POST(request: NextRequest) {
       // Increment operation
       if (operation === "incr" && key) {
         const newValue = await kvIncr(storeId, key, delta || 1);
-        return NextResponse.json({
+        return ok({
           key,
           value: newValue,
         });
@@ -255,7 +251,7 @@ export async function POST(request: NextRequest) {
       // Expire operation
       if (operation === "expire" && key && expiresIn) {
         const success = await kvExpire(storeId, key, expiresIn);
-        return NextResponse.json({ success });
+        return ok({ success });
       }
 
       // Batch set
@@ -276,7 +272,7 @@ export async function POST(request: NextRequest) {
 
         const success = await kvMset(storeId, batchEntries);
 
-        return NextResponse.json({
+        return ok({
           success,
           count: entries.length,
         });
@@ -294,23 +290,17 @@ export async function POST(request: NextRequest) {
           }
         );
 
-        return NextResponse.json({
+        return ok({
           key,
           success,
         });
       }
     }
 
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
-    );
+    return fail("BAD_REQUEST", "Invalid request", 400);
   } catch (error) {
     log.error("Failed to create KV", error);
-    return NextResponse.json(
-      { error: "Failed to create KV" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create KV", 500);
   }
 }
 
@@ -336,11 +326,11 @@ export async function DELETE(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       const deleted = await kvDelete(storeId, key);
-      return NextResponse.json({ success: deleted });
+      return ok({ success: deleted });
     }
 
     // Delete entire store
@@ -356,13 +346,13 @@ export async function DELETE(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
-      // Delete all keys from Redis
+      // Delete all keys from Redis (batch operation)
       const result = await kvList(storeId, { limit: 10000 });
-      for (const k of result.keys) {
-        await kvDelete(storeId, k);
+      if (result.keys.length > 0) {
+        await kvDeleteMany(storeId, result.keys);
       }
 
       // Delete store from Postgres (cascades to entries)
@@ -378,15 +368,12 @@ export async function DELETE(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true });
+      return ok({ success: true });
     }
 
-    return NextResponse.json({ error: "ID required" }, { status: 400 });
+    return fail("VALIDATION_MISSING_FIELD", "ID required", 400);
   } catch (error) {
     log.error("Failed to delete KV", error);
-    return NextResponse.json(
-      { error: "Failed to delete" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete", 500);
   }
 }

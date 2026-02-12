@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("vitals");
 
@@ -18,10 +20,7 @@ export async function GET(request: NextRequest) {
     const url = searchParams.get("url");
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: "Project ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Project ID is required", 400);
     }
 
     // Verify project ownership
@@ -30,7 +29,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Calculate date range
@@ -116,7 +115,7 @@ export async function GET(request: NextRequest) {
       _count: { id: true },
     });
 
-    return NextResponse.json({
+    return ok({
       range,
       summary,
       slowestPages: slowestPages.map((p) => ({
@@ -131,24 +130,20 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     log.error("Failed to fetch vitals", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch vitals" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch vitals", 500);
   }
 }
 
 // POST /api/vitals - Record a web vital
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { projectId, url, metric, value, rating, device, browser, country } = body;
 
     if (!projectId || !url || !metric || value === undefined) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing required fields", 400);
     }
 
     // Verify project exists
@@ -157,10 +152,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Calculate rating if not provided
@@ -179,13 +171,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to record vital", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to record vital" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to record vital", 500);
   }
 }
 

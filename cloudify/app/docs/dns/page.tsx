@@ -14,14 +14,14 @@ export default function DnsDocsPage() {
         fast, reliable DNS with built-in DDoS protection.
       </p>
 
-      <div className="not-prose p-6 rounded-xl border border-border bg-secondary my-8">
+      <div className="not-prose p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-secondary)] my-8">
         <div className="flex items-start gap-4">
           <Zap className="h-8 w-8 text-[#0070f3] shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Global DNS Network
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-[var(--text-secondary)]">
               Our anycast DNS network resolves queries from the nearest location,
               providing sub-50ms resolution times worldwide.
             </p>
@@ -52,17 +52,17 @@ export default function DnsDocsPage() {
       <div className="not-prose my-6">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border">
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Type</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Name</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Value</th>
+            <tr className="border-b border-[var(--border-primary)]">
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Type</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Name</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Value</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground"><code>A</code></td>
-              <td className="py-3 px-4 text-muted-foreground"><code>@</code></td>
-              <td className="py-3 px-4 text-muted-foreground"><code>76.76.21.21</code></td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>A</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>@</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>76.76.21.21</code></td>
             </tr>
           </tbody>
         </table>
@@ -73,17 +73,17 @@ export default function DnsDocsPage() {
       <div className="not-prose my-6">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border">
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Type</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Name</th>
-              <th className="text-left py-3 px-4 font-semibold text-foreground">Value</th>
+            <tr className="border-b border-[var(--border-primary)]">
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Type</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Name</th>
+              <th className="text-left py-3 px-4 font-semibold text-[var(--text-primary)]">Value</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b border-border">
-              <td className="py-3 px-4 text-muted-foreground"><code>CNAME</code></td>
-              <td className="py-3 px-4 text-muted-foreground"><code>www</code></td>
-              <td className="py-3 px-4 text-muted-foreground"><code>cname.cloudify.app</code></td>
+            <tr className="border-b border-[var(--border-primary)]">
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>CNAME</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>www</code></td>
+              <td className="py-3 px-4 text-[var(--text-secondary)]"><code>cname.cloudify.app</code></td>
             </tr>
           </tbody>
         </table>
@@ -100,9 +100,9 @@ export default function DnsDocsPage() {
           { type: "TXT", desc: "Stores text data, often for verification" },
           { type: "NS", desc: "Specifies authoritative name servers" },
         ].map((record) => (
-          <div key={record.type} className="p-4 rounded-lg bg-background border border-border">
-            <code className="text-foreground font-semibold">{record.type}</code>
-            <p className="text-sm text-muted-foreground mt-1">{record.desc}</p>
+          <div key={record.type} className="p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
+            <code className="text-[var(--text-primary)] font-semibold">{record.type}</code>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">{record.desc}</p>
           </div>
         ))}
       </div>
@@ -119,10 +119,10 @@ ns2.cloudify.app`}</code>
       </pre>
 
       <div className="not-prose p-6 rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/30 my-8">
-        <h3 className="font-semibold text-foreground text-lg mb-2">
+        <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
           Benefits of Cloudify Nameservers
         </h3>
-        <ul className="space-y-2 text-muted-foreground">
+        <ul className="space-y-2 text-[var(--text-secondary)]">
           <li className="flex items-center gap-2">
             <Check className="h-4 w-4 text-green-500" />
             Automatic SSL certificate provisioning
@@ -162,10 +162,10 @@ ns2.cloudify.app`}</code>
         <div className="flex items-start gap-4">
           <Clock className="h-8 w-8 text-yellow-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Propagation Time
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-[var(--text-secondary)]">
               DNS changes can take up to 48 hours to propagate globally, though most
               changes are visible within a few minutes. Use a DNS checker tool to verify
               propagation status.

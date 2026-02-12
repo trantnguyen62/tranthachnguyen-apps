@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("notifications/preferences");
 
@@ -32,17 +34,14 @@ export async function GET(request: NextRequest) {
     });
 
     // Return preferences with available types and channels
-    return NextResponse.json({
+    return ok({
       preferences,
       availableTypes: NOTIFICATION_TYPES,
       availableChannels: NOTIFICATION_CHANNELS,
     });
   } catch (error) {
     log.error("Failed to fetch preferences", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch preferences" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch preferences", 500);
   }
 }
 
@@ -53,28 +52,21 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { channel, type, enabled, destination } = body;
 
     if (!channel || !type) {
-      return NextResponse.json(
-        { error: "Channel and type are required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Channel and type are required", 400);
     }
 
     if (!NOTIFICATION_CHANNELS.includes(channel)) {
-      return NextResponse.json(
-        { error: "Invalid channel" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid channel", 400);
     }
 
     if (!NOTIFICATION_TYPES.includes(type)) {
-      return NextResponse.json(
-        { error: "Invalid notification type" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid notification type", 400);
     }
 
     const preference = await prisma.notificationPreference.upsert({
@@ -98,13 +90,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(preference);
+    return ok(preference);
   } catch (error) {
     log.error("Failed to update preference", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to update preference" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update preference", 500);
   }
 }
 
@@ -119,22 +108,16 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: "Preference ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Preference ID is required", 400);
     }
 
     await prisma.notificationPreference.delete({
       where: { id, userId: user.id },
     });
 
-    return NextResponse.json({ success: true });
+    return ok({ success: true });
   } catch (error) {
     log.error("Failed to delete preference", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete preference" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete preference", 500);
   }
 }

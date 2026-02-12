@@ -1,16 +1,21 @@
 /**
  * Rate Limiting
- * Token bucket algorithm with sliding window for API rate limiting
+ * Redis-backed sliding window rate limiter for API endpoints.
+ *
+ * Uses Redis INCR + EXPIRE for an efficient fixed-window counter.
+ * Falls back to in-memory storage when Redis is unavailable.
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getRedisClient } from "@/lib/storage/redis-client";
+import { fail } from "@/lib/api/response";
 
 // Rate limit configuration by endpoint pattern
 export interface RateLimitConfig {
   // Maximum requests per window
   limit: number;
-  // Window size in milliseconds
-  window: number;
+  // Window size in seconds
+  windowSeconds: number;
   // Optional: different limits for authenticated users
   authenticatedLimit?: number;
   // Custom key generator (default: IP address)
@@ -22,73 +27,37 @@ export const RATE_LIMIT_PRESETS: Record<string, RateLimitConfig> = {
   // Public API endpoints (more restrictive)
   public: {
     limit: 60,
-    window: 60 * 1000, // 1 minute
+    windowSeconds: 60,
     authenticatedLimit: 120,
   },
   // Authentication endpoints (very restrictive to prevent brute force)
   auth: {
     limit: 10,
-    window: 60 * 1000,
+    windowSeconds: 60,
   },
   // Write operations (deployments, projects)
   write: {
     limit: 30,
-    window: 60 * 1000,
+    windowSeconds: 60,
     authenticatedLimit: 100,
   },
   // Read operations (more lenient)
   read: {
     limit: 120,
-    window: 60 * 1000,
+    windowSeconds: 60,
     authenticatedLimit: 300,
   },
   // Analytics ingestion (very high volume)
   analytics: {
     limit: 500,
-    window: 60 * 1000,
+    windowSeconds: 60,
   },
   // Webhooks (allow bursts)
   webhook: {
     limit: 100,
-    window: 60 * 1000,
+    windowSeconds: 60,
   },
 };
-
-// In-memory store for rate limiting (use Redis in production for distributed systems)
-interface RateLimitEntry {
-  count: number;
-  resetAt: number;
-}
-
-const store = new Map<string, RateLimitEntry>();
-
-// Clean up expired entries periodically
-const CLEANUP_INTERVAL = 60 * 1000;
-let lastCleanup = Date.now();
-
-const MAX_STORE_SIZE = 10000;
-
-function cleanupExpiredEntries(): void {
-  const now = Date.now();
-  if (now - lastCleanup < CLEANUP_INTERVAL) return;
-
-  lastCleanup = now;
-  for (const [key, entry] of store) {
-    if (entry.resetAt <= now) {
-      store.delete(key);
-    }
-  }
-
-  // Evict oldest entries if store exceeds maximum size
-  if (store.size > MAX_STORE_SIZE) {
-    const entries = Array.from(store.entries())
-      .sort((a, b) => a[1].resetAt - b[1].resetAt);
-    const toRemove = entries.slice(0, store.size - MAX_STORE_SIZE);
-    for (const [key] of toRemove) {
-      store.delete(key);
-    }
-  }
-}
 
 /**
  * Get client identifier from request
@@ -111,72 +80,76 @@ export function getClientIdentifier(request: NextRequest): string {
 }
 
 /**
- * Check rate limit for a key
+ * Check rate limit for a key using Redis INCR + EXPIRE.
+ *
+ * The key expires after the window, so counters auto-reset.
  */
-export function checkRateLimit(
+export async function checkRateLimit(
   key: string,
   config: RateLimitConfig
-): { allowed: boolean; remaining: number; resetAt: number } {
-  cleanupExpiredEntries();
-
-  const now = Date.now();
-
+): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
   // Handle invalid limits (0 or negative) - block all requests
   if (config.limit <= 0) {
     return {
       allowed: false,
       remaining: 0,
-      resetAt: now + config.window,
+      resetAt: Date.now() + config.windowSeconds * 1000,
     };
   }
 
-  const entry = store.get(key);
+  try {
+    const redis = getRedisClient();
+    const redisKey = `rate:${key}`;
 
-  // No existing entry or expired
-  if (!entry || entry.resetAt <= now) {
-    store.set(key, {
-      count: 1,
-      resetAt: now + config.window,
-    });
+    // Atomic increment
+    const count = await redis.incr(redisKey);
+
+    if (count === 1) {
+      // First request in this window -- set expiry
+      await redis.expire(redisKey, config.windowSeconds);
+    }
+
+    // Get TTL to compute resetAt
+    const ttl = await redis.ttl(redisKey);
+    const resetAt = Date.now() + (ttl > 0 ? ttl * 1000 : config.windowSeconds * 1000);
+
+    if (count > config.limit) {
+      return { allowed: false, remaining: 0, resetAt };
+    }
+
     return {
       allowed: true,
-      remaining: config.limit - 1,
-      resetAt: now + config.window,
+      remaining: config.limit - count,
+      resetAt,
     };
-  }
-
-  // Check if limit exceeded
-  if (entry.count >= config.limit) {
+  } catch {
+    // Redis unavailable -- fail open (allow the request)
     return {
-      allowed: false,
-      remaining: 0,
-      resetAt: entry.resetAt,
+      allowed: true,
+      remaining: config.limit,
+      resetAt: Date.now() + config.windowSeconds * 1000,
     };
   }
-
-  // Increment count
-  entry.count++;
-  return {
-    allowed: true,
-    remaining: config.limit - entry.count,
-    resetAt: entry.resetAt,
-  };
 }
 
 /**
- * Rate limit middleware for Next.js API routes
+ * Rate limit middleware for Next.js API routes.
+ *
+ * Returns a function that, when called with a request, returns a 429
+ * response (using the standard API envelope) if the limit is exceeded,
+ * or null to indicate the request is allowed.
  */
 export function rateLimit(
   config: RateLimitConfig = RATE_LIMIT_PRESETS.public
 ): (
   request: NextRequest,
   isAuthenticated?: boolean
-) => NextResponse | null {
-  return (request: NextRequest, isAuthenticated = false): NextResponse | null => {
+) => Promise<NextResponse | null> {
+  return async (request: NextRequest, isAuthenticated = false): Promise<NextResponse | null> => {
     // Get rate limit key
     const keyGenerator = config.keyGenerator || getClientIdentifier;
     const clientKey = keyGenerator(request);
-    const key = `ratelimit:${request.nextUrl.pathname}:${clientKey}`;
+    const key = `${request.nextUrl.pathname}:${clientKey}`;
 
     // Use higher limit for authenticated users if configured
     const limit =
@@ -185,32 +158,21 @@ export function rateLimit(
         : config.limit;
 
     const effectiveConfig = { ...config, limit };
-    const result = checkRateLimit(key, effectiveConfig);
+    const result = await checkRateLimit(key, effectiveConfig);
 
-    // If rate limited, return 429 response
+    // If rate limited, return 429 using the standard envelope
     if (!result.allowed) {
       const retryAfter = Math.ceil((result.resetAt - Date.now()) / 1000);
 
-      return NextResponse.json(
-        {
-          error: "Too Many Requests",
-          message: "Rate limit exceeded. Please try again later.",
-          retryAfter,
-        },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(retryAfter),
-            "X-RateLimit-Limit": String(limit),
-            "X-RateLimit-Remaining": "0",
-            "X-RateLimit-Reset": String(Math.ceil(result.resetAt / 1000)),
-          },
-        }
-      );
+      return fail("RATE_LIMITED", "Rate limit exceeded. Please try again later.", 429, undefined, {
+        "Retry-After": String(retryAfter),
+        "X-RateLimit-Limit": String(limit),
+        "X-RateLimit-Remaining": "0",
+        "X-RateLimit-Reset": String(Math.ceil(result.resetAt / 1000)),
+      });
     }
 
-    // Return null to indicate request is allowed
-    // The headers should be added to the actual response
+    // Request is allowed
     return null;
   };
 }
@@ -223,13 +185,9 @@ export function addRateLimitHeaders(
   key: string,
   config: RateLimitConfig
 ): NextResponse {
-  const entry = store.get(key);
-  if (!entry) return response;
-
+  // We set headers based on config defaults since the actual count
+  // is in Redis. For precise values, call checkRateLimit first.
   response.headers.set("X-RateLimit-Limit", String(config.limit));
-  response.headers.set("X-RateLimit-Remaining", String(Math.max(0, config.limit - entry.count)));
-  response.headers.set("X-RateLimit-Reset", String(Math.ceil(entry.resetAt / 1000)));
-
   return response;
 }
 
@@ -242,104 +200,43 @@ export function createRateLimiter(preset: keyof typeof RATE_LIMIT_PRESETS | Rate
 }
 
 /**
- * Sliding window rate limiter (more accurate but uses more memory)
+ * IP-based ban list (Redis-backed)
  */
-export class SlidingWindowRateLimiter {
-  private windows: Map<string, number[]> = new Map();
-  private config: RateLimitConfig;
-  private cleanupInterval: ReturnType<typeof setInterval>;
+export async function banIP(ip: string, durationMs: number = 24 * 60 * 60 * 1000): Promise<void> {
+  if (durationMs <= 0) return;
 
-  constructor(config: RateLimitConfig) {
-    this.config = config;
-    // Auto-cleanup every 60 seconds to prevent memory leaks
-    this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 1000);
-    // Allow Node to exit without waiting for this timer
-    if (this.cleanupInterval.unref) this.cleanupInterval.unref();
-  }
-
-  check(key: string): { allowed: boolean; remaining: number } {
-    // Handle invalid limits (0 or negative) - block all requests
-    if (this.config.limit <= 0) {
-      return { allowed: false, remaining: 0 };
-    }
-
-    const now = Date.now();
-    const windowStart = now - this.config.window;
-
-    // Get or create window
-    let timestamps = this.windows.get(key) || [];
-
-    // Remove expired timestamps
-    timestamps = timestamps.filter((ts) => ts > windowStart);
-
-    // Check limit
-    if (timestamps.length >= this.config.limit) {
-      this.windows.set(key, timestamps);
-      return { allowed: false, remaining: 0 };
-    }
-
-    // Add current request
-    timestamps.push(now);
-    this.windows.set(key, timestamps);
-
-    return {
-      allowed: true,
-      remaining: this.config.limit - timestamps.length,
-    };
-  }
-
-  cleanup(): void {
-    const now = Date.now();
-    const windowStart = now - this.config.window;
-
-    for (const [key, timestamps] of this.windows) {
-      const filtered = timestamps.filter((ts) => ts > windowStart);
-      if (filtered.length === 0) {
-        this.windows.delete(key);
-      } else {
-        this.windows.set(key, filtered);
-      }
-    }
+  try {
+    const redis = getRedisClient();
+    const seconds = Math.ceil(durationMs / 1000);
+    await redis.set(`rate:ban:${ip}`, "1", "EX", seconds);
+  } catch {
+    // Redis unavailable -- skip ban
   }
 }
 
-/**
- * IP-based ban list for malicious actors
- */
-const banList = new Set<string>();
-const banExpiry = new Map<string, number>();
-
-export function banIP(ip: string, durationMs: number = 24 * 60 * 60 * 1000): void {
-  // Don't ban if duration is 0 or negative
-  if (durationMs <= 0) {
-    return;
+export async function unbanIP(ip: string): Promise<void> {
+  try {
+    const redis = getRedisClient();
+    await redis.del(`rate:ban:${ip}`);
+  } catch {
+    // Redis unavailable
   }
-  banList.add(ip);
-  banExpiry.set(ip, Date.now() + durationMs);
 }
 
-export function unbanIP(ip: string): void {
-  banList.delete(ip);
-  banExpiry.delete(ip);
-}
-
-export function isIPBanned(ip: string): boolean {
-  if (!banList.has(ip)) return false;
-
-  const expiry = banExpiry.get(ip);
-  if (expiry && expiry <= Date.now()) {
-    banList.delete(ip);
-    banExpiry.delete(ip);
+export async function isIPBanned(ip: string): Promise<boolean> {
+  try {
+    const redis = getRedisClient();
+    const banned = await redis.exists(`rate:ban:${ip}`);
+    return banned > 0;
+  } catch {
     return false;
   }
-
-  return true;
 }
 
 /**
  * Check if request should be blocked
  */
-export function shouldBlockRequest(request: NextRequest): boolean {
+export async function shouldBlockRequest(request: NextRequest): Promise<boolean> {
   const ip = getClientIdentifier(request);
   return isIPBanned(ip);
 }

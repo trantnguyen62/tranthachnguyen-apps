@@ -3,11 +3,12 @@
  * Cancel or resume subscription
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { cancelSubscription, resumeSubscription } from "@/lib/billing/stripe";
 import { prisma } from "@/lib/prisma";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("billing/cancel");
 
@@ -23,10 +24,7 @@ export async function POST(request: NextRequest) {
     const success = await cancelSubscription(user.id);
 
     if (!success) {
-      return NextResponse.json(
-        { error: "Failed to cancel subscription. You may not have an active subscription." },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Failed to cancel subscription. You may not have an active subscription.", 400);
     }
 
     // Log activity
@@ -40,16 +38,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       success: true,
       message: "Subscription will be canceled at the end of the current billing period",
     });
   } catch (error) {
     log.error("Failed to cancel subscription", error);
-    return NextResponse.json(
-      { error: "Failed to cancel subscription" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to cancel subscription", 500);
   }
 }
 
@@ -65,10 +60,7 @@ export async function DELETE(request: NextRequest) {
     const success = await resumeSubscription(user.id);
 
     if (!success) {
-      return NextResponse.json(
-        { error: "Failed to resume subscription" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Failed to resume subscription", 400);
     }
 
     // Log activity
@@ -82,15 +74,12 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       success: true,
       message: "Subscription has been resumed",
     });
   } catch (error) {
     log.error("Failed to resume subscription", error);
-    return NextResponse.json(
-      { error: "Failed to resume subscription" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to resume subscription", 500);
   }
 }

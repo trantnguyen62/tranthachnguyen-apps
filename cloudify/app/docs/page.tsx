@@ -40,8 +40,8 @@ const docSections = [
   {
     title: "Deployments",
     icon: GitBranch,
-    color: "text-foreground",
-    bg: "bg-secondary",
+    color: "text-[var(--text-primary)]",
+    bg: "bg-[var(--surface-secondary)]",
     items: [
       { title: "Git Integration", href: "/docs/git" },
       { title: "Build Configuration", href: "/docs/build-config" },
@@ -88,7 +88,7 @@ const docSections = [
   {
     title: "Configuration",
     icon: Settings,
-    color: "text-muted-foreground",
+    color: "text-[var(--text-secondary)]",
     bg: "bg-gray-100 dark:bg-card",
     items: [
       { title: "Environment Variables", href: "/docs/environment-variables" },
@@ -116,7 +116,7 @@ const quickLinks = [
     title: "API Documentation",
     description: "Integrate with the Cloudify REST API",
     icon: FileCode,
-    href: "/docs/api",
+    href: "/docs/api-reference",
   },
   {
     title: "Security Best Practices",
@@ -140,13 +140,13 @@ export default function DocsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-secondary mb-6">
-                <Book className="h-8 w-8 text-foreground" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-lg bg-[var(--surface-secondary)] mb-6">
+                <Book className="h-8 w-8 text-[var(--text-primary)]" />
               </div>
-              <h1 className="text-4xl sm:text-5xl font-bold text-foreground">
+              <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
                 Documentation
               </h1>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Learn how to deploy and scale your applications with Cloudify.
               </p>
             </motion.div>
@@ -159,7 +159,7 @@ export default function DocsPage() {
               className="mt-10 max-w-xl mx-auto"
             >
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
                 <Input
                   placeholder="Search documentation..."
                   value={searchQuery}
@@ -172,7 +172,7 @@ export default function DocsPage() {
         </section>
 
         {/* Quick Links */}
-        <section className="py-12 border-b border-border">
+        <section className="py-12 border-b border-[var(--border-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {quickLinks.map((link, index) => (
@@ -185,11 +185,11 @@ export default function DocsPage() {
                   <Link href={link.href}>
                     <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer group">
                       <CardContent className="p-6">
-                        <link.icon className="h-8 w-8 text-foreground mb-4" />
-                        <h3 className="font-semibold text-foreground group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
+                        <link.icon className="h-8 w-8 text-[var(--text-primary)] mb-4" />
+                        <h3 className="font-semibold text-[var(--text-primary)] group-hover:text-[#0070f3] dark:group-hover:text-[#0070f3] transition-colors">
                           {link.title}
                         </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-sm text-[var(--text-secondary)] mt-1">
                           {link.description}
                         </p>
                       </CardContent>
@@ -218,7 +218,7 @@ export default function DocsPage() {
                         <div className={`p-2 rounded-lg ${section.bg}`}>
                           <section.icon className={`h-5 w-5 ${section.color}`} />
                         </div>
-                        <h2 className="text-lg font-semibold text-foreground">
+                        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
                           {section.title}
                         </h2>
                       </div>
@@ -229,10 +229,10 @@ export default function DocsPage() {
                               href={item.href}
                               className="flex items-center justify-between p-2 -mx-2 rounded-lg hover:bg-secondary transition-colors group"
                             >
-                              <span className="text-muted-foreground group-hover:text-foreground dark:group-hover:text-white transition-colors">
+                              <span className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] dark:group-hover:text-white transition-colors">
                                 {item.title}
                               </span>
-                              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-muted-foreground dark:group-hover:text-gray-300 transition-colors" />
+                              <ChevronRight className="h-4 w-4 text-[var(--text-secondary)] group-hover:text-[var(--text-secondary)] dark:group-hover:text-gray-300 transition-colors" />
                             </Link>
                           </li>
                         ))}
@@ -246,12 +246,12 @@ export default function DocsPage() {
         </section>
 
         {/* Help CTA */}
-        <section className="py-16 bg-background">
+        <section className="py-16 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-2xl font-bold text-foreground mb-4">
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4">
               Need help?
             </h2>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-[var(--text-secondary)] mb-8">
               Can&apos;t find what you&apos;re looking for? Our support team is here to help.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -260,7 +260,7 @@ export default function DocsPage() {
                   Contact Support
                 </Link>
               </Button>
-              <Button variant="outline" asChild>
+              <Button variant="secondary" asChild>
                 <a
                   href="https://github.com/cloudify/cloudify/discussions"
                   target="_blank"

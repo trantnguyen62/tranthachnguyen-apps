@@ -128,11 +128,11 @@ export async function updateCommitStatus(
       where: { id: projectId },
     });
 
-    if (!project?.repoUrl) {
+    if (!project?.repositoryUrl) {
       return false;
     }
 
-    const repoInfo = parseRepoInfo(project.repoUrl);
+    const repoInfo = parseRepoInfo(project.repositoryUrl);
     if (!repoInfo) {
       return false;
     }
@@ -224,11 +224,11 @@ export async function postPRComment(
       where: { id: projectId },
     });
 
-    if (!project?.repoUrl) {
+    if (!project?.repositoryUrl) {
       return false;
     }
 
-    const repoInfo = parseRepoInfo(project.repoUrl);
+    const repoInfo = parseRepoInfo(project.repositoryUrl);
     if (!repoInfo) {
       return false;
     }
@@ -310,11 +310,11 @@ export async function updatePRComment(
       where: { id: projectId },
     });
 
-    if (!project?.repoUrl) {
+    if (!project?.repositoryUrl) {
       return false;
     }
 
-    const repoInfo = parseRepoInfo(project.repoUrl);
+    const repoInfo = parseRepoInfo(project.repositoryUrl);
     if (!repoInfo) {
       return false;
     }

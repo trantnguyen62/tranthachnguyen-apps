@@ -70,7 +70,7 @@ export function CommandPalette({ open, onOpenChange, groups }: CommandPalettePro
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl p-0 overflow-hidden">
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 border-b border-border">
+        <div className="flex items-center gap-3 px-4 border-b border-[var(--border-primary)]">
           <Search className="h-5 w-5 text-gray-400" />
           <input
             ref={inputRef}
@@ -78,7 +78,7 @@ export function CommandPalette({ open, onOpenChange, groups }: CommandPalettePro
             placeholder="Search commands..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 h-14 bg-transparent border-0 focus:outline-none text-foreground placeholder:text-gray-400"
+            className="flex-1 h-14 bg-transparent border-0 focus:outline-none text-[var(--text-primary)] placeholder:text-gray-400"
           />
           <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 bg-gray-100 dark:bg-gray-800 rounded">
             <CommandIcon className="h-3 w-3" />K
@@ -94,7 +94,7 @@ export function CommandPalette({ open, onOpenChange, groups }: CommandPalettePro
           ) : (
             filteredGroups.map((group) => (
               <div key={group.heading} className="mb-4">
-                <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                <div className="px-2 py-1.5 text-xs font-medium text-[var(--text-secondary)]">
                   {group.heading}
                 </div>
                 {group.items.map((item) => (
@@ -109,11 +109,11 @@ export function CommandPalette({ open, onOpenChange, groups }: CommandPalettePro
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-foreground">
+                      <div className="font-medium text-[var(--text-primary)]">
                         {item.title}
                       </div>
                       {item.description && (
-                        <div className="text-sm text-muted-foreground truncate">
+                        <div className="text-sm text-[var(--text-secondary)] truncate">
                           {item.description}
                         </div>
                       )}

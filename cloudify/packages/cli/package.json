@@ -1,7 +1,7 @@
 {
   "name": "@cloudify/cli",
   "version": "1.0.0",
-  "description": "Cloudify CLI - Deploy and manage your projects from the command line",
+  "description": "Cloudify CLI - Deploy and manage your projects from the command line. A production-ready deployment platform alternative to Vercel.",
   "main": "dist/index.js",
   "bin": {
     "cloudify": "./dist/index.js"
@@ -11,16 +11,32 @@
     "build": "tsup src/index.ts --format esm --dts",
     "dev": "tsup src/index.ts --format esm --watch",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "cloudify",
     "deployment",
     "cli",
-    "vercel-alternative"
+    "vercel-alternative",
+    "hosting",
+    "serverless",
+    "edge-functions",
+    "kv-store",
+    "blob-storage",
+    "deploy"
   ],
   "author": "Cloudify",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tranthachnguyen/cloudify",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://cloudify.tranthachnguyen.com",
+  "bugs": {
+    "url": "https://github.com/tranthachnguyen/cloudify/issues"
+  },
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^12.0.0",
@@ -43,6 +59,10 @@
     "node": ">=18.0.0"
   },
   "files": [
-    "dist"
-  ]
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

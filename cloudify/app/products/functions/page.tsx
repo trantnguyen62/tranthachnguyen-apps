@@ -86,7 +86,7 @@ export default function FunctionsPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -97,12 +97,12 @@ export default function FunctionsPage() {
                 <Terminal className="h-4 w-4" />
                 <span className="text-sm font-medium">Serverless Functions</span>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-[var(--text-primary)] leading-tight">
                 Backend logic,
                 <br />
                 <span className="text-green-600 dark:text-green-400">no servers</span>
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Write backend code without managing infrastructure. Functions deploy alongside
                 your frontend with zero configuration.
               </p>
@@ -130,10 +130,10 @@ export default function FunctionsPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Write functions, not infrastructure
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-lg text-[var(--text-secondary)]">
                 Create powerful APIs with just a few lines of code.
               </p>
             </motion.div>
@@ -146,10 +146,10 @@ export default function FunctionsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="rounded-xl overflow-hidden border border-border"
+                  className="rounded-xl overflow-hidden border border-[var(--border-primary)]"
                 >
-                  <div className="px-4 py-3 bg-secondary dark:bg-card border-b border-border">
-                    <span className="text-sm font-medium text-foreground">
+                  <div className="px-4 py-3 bg-[var(--surface-secondary)] dark:bg-card border-b border-[var(--border-primary)]">
+                    <span className="text-sm font-medium text-[var(--text-primary)]">
                       {example.title}
                     </span>
                   </div>
@@ -163,7 +163,7 @@ export default function FunctionsPage() {
         </section>
 
         {/* Features Grid */}
-        <section className="py-20 bg-secondary/50">
+        <section className="py-20 bg-[var(--surface-secondary)]/50">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -171,10 +171,10 @@ export default function FunctionsPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Production-ready from day one
               </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
+              <p className="mt-4 text-lg text-[var(--text-secondary)]">
                 All the features you need to build and scale backend services.
               </p>
             </motion.div>
@@ -187,15 +187,15 @@ export default function FunctionsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-card border border-border"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)]"
                 >
                   <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-green-600 dark:text-green-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-[var(--text-secondary)]">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -213,10 +213,10 @@ export default function FunctionsPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-6">
                   Your language, your runtime
                 </h2>
-                <p className="text-lg text-muted-foreground mb-8">
+                <p className="text-lg text-[var(--text-secondary)] mb-8">
                   Write functions in the language you know best. We handle the rest.
                 </p>
                 <div className="space-y-4">
@@ -226,13 +226,13 @@ export default function FunctionsPage() {
                     { name: "Go 1.21", desc: "Fast compilation and execution" },
                     { name: "Ruby 3.3", desc: "With Bundler and gem support" },
                   ].map((runtime) => (
-                    <div key={runtime.name} className="flex items-start gap-4 p-4 rounded-lg bg-background">
+                    <div key={runtime.name} className="flex items-start gap-4 p-4 rounded-lg bg-[var(--surface-primary)]">
                       <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-semibold text-foreground">
+                        <h4 className="font-semibold text-[var(--text-primary)]">
                           {runtime.name}
                         </h4>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-[var(--text-secondary)]">
                           {runtime.desc}
                         </p>
                       </div>
@@ -247,8 +247,8 @@ export default function FunctionsPage() {
                 viewport={{ once: true }}
                 className="space-y-6"
               >
-                <div className="p-6 rounded-lg bg-card border border-border">
-                  <h3 className="font-semibold text-foreground mb-4">
+                <div className="p-6 rounded-lg bg-card border border-[var(--border-primary)]">
+                  <h3 className="font-semibold text-[var(--text-primary)] mb-4">
                     Function Limits
                   </h3>
                   <div className="space-y-4">
@@ -258,14 +258,14 @@ export default function FunctionsPage() {
                       { label: "Payload Size", hobby: "4.5 MB", pro: "4.5 MB", enterprise: "4.5 MB" },
                     ].map((limit) => (
                       <div key={limit.label} className="grid grid-cols-4 gap-4 text-sm">
-                        <span className="text-muted-foreground">{limit.label}</span>
-                        <span className="text-foreground">{limit.hobby}</span>
-                        <span className="text-foreground">{limit.pro}</span>
-                        <span className="text-foreground">{limit.enterprise}</span>
+                        <span className="text-[var(--text-secondary)]">{limit.label}</span>
+                        <span className="text-[var(--text-primary)]">{limit.hobby}</span>
+                        <span className="text-[var(--text-primary)]">{limit.pro}</span>
+                        <span className="text-[var(--text-primary)]">{limit.enterprise}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="grid grid-cols-4 gap-4 text-xs text-muted-foreground mt-4 pt-4 border-t border-border">
+                  <div className="grid grid-cols-4 gap-4 text-xs text-[var(--text-secondary)] mt-4 pt-4 border-t border-[var(--border-primary)]">
                     <span></span>
                     <span>Hobby</span>
                     <span>Pro</span>

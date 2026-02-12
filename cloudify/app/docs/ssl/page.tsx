@@ -18,10 +18,10 @@ export default function SslDocsPage() {
         <div className="flex items-start gap-4">
           <Shield className="h-8 w-8 text-green-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Automatic SSL
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-[var(--text-secondary)]">
               SSL certificates are automatically provisioned within minutes of adding
               a domain. No configuration required.
             </p>
@@ -58,13 +58,13 @@ export default function SslDocsPage() {
             included: "Enterprise",
           },
         ].map((cert) => (
-          <div key={cert.title} className="p-4 rounded-lg bg-background border border-border">
+          <div key={cert.title} className="p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
             <div className="flex items-start gap-4">
               <Lock className="h-6 w-6 text-[#0070f3] shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-foreground">{cert.title}</h4>
-                <p className="text-sm text-muted-foreground mt-1">{cert.desc}</p>
-                <span className="inline-block mt-2 text-xs px-2 py-1 rounded bg-secondary text-foreground">
+                <h4 className="font-semibold text-[var(--text-primary)]">{cert.title}</h4>
+                <p className="text-sm text-[var(--text-secondary)] mt-1">{cert.desc}</p>
+                <span className="inline-block mt-2 text-xs px-2 py-1 rounded bg-[var(--surface-secondary)] text-[var(--text-primary)]">
                   {cert.included}
                 </span>
               </div>
@@ -164,10 +164,10 @@ export default function SslDocsPage() {
         <div className="flex items-start gap-4">
           <AlertTriangle className="h-8 w-8 text-yellow-500 shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] text-lg mb-2">
               Common Issues
             </h3>
-            <ul className="space-y-3 text-muted-foreground">
+            <ul className="space-y-3 text-[var(--text-secondary)]">
               <li>
                 <strong>Certificate pending:</strong> Ensure DNS is correctly configured and propagated.
               </li>
@@ -206,11 +206,11 @@ echo | openssl s_client -connect example.com:443 2>/dev/null | \\
           { icon: RefreshCw, title: "Monitor Expiration", desc: "Set up alerts for certificate expiration" },
           { icon: Check, title: "Verify Chain", desc: "Ensure complete certificate chain is served" },
         ].map((item) => (
-          <div key={item.title} className="flex items-start gap-4 p-4 rounded-lg bg-background border border-border">
+          <div key={item.title} className="flex items-start gap-4 p-4 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)]">
             <item.icon className="h-6 w-6 text-[#0070f3] shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-foreground">{item.title}</h4>
-              <p className="text-sm text-muted-foreground">{item.desc}</p>
+              <h4 className="font-semibold text-[var(--text-primary)]">{item.title}</h4>
+              <p className="text-sm text-[var(--text-secondary)]">{item.desc}</p>
             </div>
           </div>
         ))}

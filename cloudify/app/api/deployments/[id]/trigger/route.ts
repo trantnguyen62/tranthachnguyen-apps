@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { triggerBuild } from "@/lib/build/worker";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("deployments/[id]/trigger");
 
@@ -30,30 +31,24 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!deployment) {
-      return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
     if (deployment.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return fail("AUTH_REQUIRED", "Unauthorized", 401);
     }
 
     // Only trigger if queued
     if (deployment.status !== "QUEUED") {
-      return NextResponse.json(
-        { error: "Deployment is not in queued state" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Deployment is not in queued state", 400);
     }
 
     // Trigger the build
     await triggerBuild(id);
 
-    return NextResponse.json({ success: true, message: "Build triggered" });
+    return ok({ success: true, message: "Build triggered" });
   } catch (error) {
     log.error("Failed to trigger build", error);
-    return NextResponse.json(
-      { error: "Failed to trigger build" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to trigger build", 500);
   }
 }

@@ -42,8 +42,8 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:-cloudify}
-      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:-cloudify-minio-secret-key}
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:?MINIO_ACCESS_KEY is required}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:?MINIO_SECRET_KEY is required}
     volumes:
       - minio_data:/data
     healthcheck:
@@ -61,7 +61,7 @@ services:
         condition: service_healthy
     entrypoint: >
       /bin/sh -c "
-      mc alias set cloudify http://minio:9000 $${MINIO_ACCESS_KEY:-cloudify} $${MINIO_SECRET_KEY:-cloudify-minio-secret-key} &&
+      mc alias set cloudify http://minio:9000 $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY} &&
       mc mb --ignore-existing cloudify/cloudify-blobs &&
       mc mb --ignore-existing cloudify/cloudify-artifacts &&
       mc mb --ignore-existing cloudify/cloudify-functions &&

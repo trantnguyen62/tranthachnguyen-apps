@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--surface-primary)] px-4">
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -55,13 +55,13 @@ export default function ForgotPasswordPage() {
             <div className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground">
               <Cloud className="h-4 w-4 text-background" />
             </div>
-            <span className="text-sm font-semibold text-foreground">
+            <span className="text-sm font-semibold text-[var(--text-primary)]">
               Cloudify
             </span>
           </Link>
         </div>
 
-        <Card className="border-border">
+        <Card className="border-[var(--border-primary)]">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Reset your password</CardTitle>
             <CardDescription>
@@ -76,12 +76,12 @@ export default function ForgotPasswordPage() {
                 <div className="flex justify-center">
                   <CheckCircle2 className="h-12 w-12 text-green-500" />
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-[var(--text-secondary)]">
                   If an account exists with <strong>{email}</strong>, you will
                   receive a password reset email shortly.
                 </p>
                 <Link href="/login">
-                  <Button variant="outline" className="w-full mt-4">
+                  <Button variant="secondary" className="w-full mt-4">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to login
                   </Button>
@@ -98,12 +98,12 @@ export default function ForgotPasswordPage() {
                 <div className="space-y-2">
                   <label
                     htmlFor="email"
-                    className="text-sm font-medium text-foreground"
+                    className="text-sm font-medium text-[var(--text-primary)]"
                   >
                     Email address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--text-secondary)]" />
                     <Input
                       id="email"
                       type="email"

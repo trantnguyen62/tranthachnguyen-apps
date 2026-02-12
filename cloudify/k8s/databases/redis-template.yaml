@@ -1,0 +1,153 @@
+# Redis Database Template for Cloudify-managed databases
+# Placeholders are replaced at provisioning time:
+#   {{DATABASE_ID}}   - Unique database record ID
+#   {{DB_PASSWORD}}   - Redis AUTH password (base64-encoded in Secret)
+#   {{STORAGE_SIZE}}  - PVC storage size (e.g. 1Gi, 5Gi)
+#   {{MEMORY_LIMIT}}  - Container memory limit (e.g. 128Mi, 256Mi)
+#   {{CPU_LIMIT}}     - Container CPU limit (e.g. 100m, 250m)
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: redis
+type: Opaque
+stringData:
+  password: "{{DB_PASSWORD}}"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}-config
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: redis
+data:
+  redis.conf: |
+    # Persistence
+    appendonly yes
+    appendfsync everysec
+
+    # Memory management
+    maxmemory {{MEMORY_LIMIT}}
+    maxmemory-policy allkeys-lru
+
+    # Security
+    requirepass {{DB_PASSWORD}}
+
+    # Performance
+    tcp-keepalive 300
+    timeout 0
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{STORAGE_SIZE}}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: redis
+spec:
+  serviceName: cloudify-db-{{DATABASE_ID}}
+  replicas: 1
+  selector:
+    matchLabels:
+      cloudify/database-id: "{{DATABASE_ID}}"
+  template:
+    metadata:
+      labels:
+        app: cloudify-db
+        cloudify/database-id: "{{DATABASE_ID}}"
+        cloudify/database-type: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          command:
+            - redis-server
+            - /etc/redis/redis.conf
+          ports:
+            - name: redis
+              containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /etc/redis
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "{{MEMORY_LIMIT}}"
+              cpu: "{{CPU_LIMIT}}"
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - -a
+                - "{{DB_PASSWORD}}"
+                - ping
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - -a
+                - "{{DB_PASSWORD}}"
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cloudify-db-{{DATABASE_ID}}
+        - name: config
+          configMap:
+            name: cloudify-db-{{DATABASE_ID}}-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudify-db-{{DATABASE_ID}}
+  namespace: cloudify-databases
+  labels:
+    app: cloudify-db
+    cloudify/database-id: "{{DATABASE_ID}}"
+    cloudify/database-type: redis
+spec:
+  type: ClusterIP
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+  selector:
+    cloudify/database-id: "{{DATABASE_ID}}"

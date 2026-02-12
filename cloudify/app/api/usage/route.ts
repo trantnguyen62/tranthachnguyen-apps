@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("usage");
 
@@ -26,10 +27,7 @@ export async function GET(request: NextRequest) {
     // Parse and validate period (format: YYYY-MM)
     const periodMatch = periodParam.match(/^(\d{4})-(\d{2})$/);
     if (!periodMatch) {
-      return NextResponse.json(
-        { error: "Invalid period format. Expected YYYY-MM, 'current', or 'last'" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid period format. Expected YYYY-MM, 'current', or 'last'", 400);
     }
 
     const year = parseInt(periodMatch[1], 10);
@@ -37,10 +35,7 @@ export async function GET(request: NextRequest) {
 
     // Validate month range
     if (month < 1 || month > 12) {
-      return NextResponse.json(
-        { error: "Invalid month. Must be between 01 and 12" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid month. Must be between 01 and 12", 400);
     }
 
     const periodStart = new Date(year, month - 1, 1);
@@ -105,7 +100,7 @@ export async function GET(request: NextRequest) {
       deployments: { limit: 100, unit: "count" },
     };
 
-    return NextResponse.json({
+    return ok({
       period: periodParam,
       usage: {
         build_minutes: usage.build_minutes || 0,
@@ -126,10 +121,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     log.error("Failed to fetch usage", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch usage" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch usage", 500);
   }
 }
 
@@ -156,7 +148,7 @@ export async function recordUsage(
     data: {
       userId,
       projectId,
-      type,
+      type: type as "BUILD_MINUTES" | "BANDWIDTH" | "REQUESTS" | "FUNCTION_INVOCATIONS" | "BLOB_STORAGE" | "DEPLOYMENTS",
       value,
       metadata: metadata as object,
       recordedAt: new Date(),

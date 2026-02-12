@@ -66,7 +66,7 @@ export default function AIGatewayPage() {
       <Header />
       <main className="flex-1 pt-16">
         {/* Hero */}
-        <section className="py-20 bg-secondary/30">
+        <section className="py-20 bg-[var(--surface-secondary)]/30">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -78,14 +78,14 @@ export default function AIGatewayPage() {
                 <span className="text-sm font-medium">AI Gateway</span>
                 <Badge variant="secondary" className="ml-2">Beta</Badge>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-bold text-foreground leading-tight">
+              <h1 className="text-4xl sm:text-6xl font-bold text-[var(--text-primary)] leading-tight">
                 One API for
                 <br />
                 <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
                   all AI models
                 </span>
               </h1>
-              <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-6 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 AI Gateway provides unified access to multiple AI providers with intelligent routing,
                 cost optimization, and enterprise-grade security.
               </p>
@@ -113,10 +113,10 @@ export default function AIGatewayPage() {
               viewport={{ once: true }}
               className="text-center mb-12"
             >
-              <h2 className="text-3xl font-bold text-foreground">
+              <h2 className="text-3xl font-bold text-[var(--text-primary)]">
                 Supported Providers
               </h2>
-              <p className="mt-4 text-muted-foreground">
+              <p className="mt-4 text-[var(--text-secondary)]">
                 Access leading AI models through a single, unified API
               </p>
             </motion.div>
@@ -129,12 +129,12 @@ export default function AIGatewayPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
-                  className="p-4 rounded-xl border border-border bg-card"
+                  className="p-4 rounded-xl border border-[var(--border-primary)] bg-card"
                 >
-                  <h3 className="font-semibold text-foreground">
+                  <h3 className="font-semibold text-[var(--text-primary)]">
                     {provider.name}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-[var(--text-secondary)] mt-1">
                     {provider.models}
                   </p>
                 </motion.div>
@@ -144,7 +144,7 @@ export default function AIGatewayPage() {
         </section>
 
         {/* Code Example */}
-        <section className="py-20 bg-background">
+        <section className="py-20 bg-[var(--surface-primary)]">
           <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <motion.div
@@ -152,10 +152,10 @@ export default function AIGatewayPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-6">
+                <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-6">
                   Simple, unified API
                 </h2>
-                <p className="text-lg text-muted-foreground mb-8">
+                <p className="text-lg text-[var(--text-secondary)] mb-8">
                   Switch between AI providers with a single configuration change.
                   No code changes required.
                 </p>
@@ -166,7 +166,7 @@ export default function AIGatewayPage() {
                     "Real-time usage monitoring",
                     "Request caching and deduplication",
                   ].map((item) => (
-                    <div key={item} className="flex items-center gap-3 text-muted-foreground">
+                    <div key={item} className="flex items-center gap-3 text-[var(--text-secondary)]">
                       <Check className="h-5 w-5 text-green-500 shrink-0" />
                       {item}
                     </div>
@@ -215,10 +215,10 @@ const claude = await gateway.chat({
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
                 Enterprise-ready features
               </h2>
-              <p className="mt-4 text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="mt-4 text-xl text-[var(--text-secondary)] max-w-2xl mx-auto">
                 Everything you need to build reliable AI applications at scale.
               </p>
             </motion.div>
@@ -231,15 +231,15 @@ const claude = await gateway.chat({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="p-6 rounded-lg bg-card border border-border"
+                  className="p-6 rounded-lg bg-card border border-[var(--border-primary)]"
                 >
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center mb-4">
                     <feature.icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-[var(--text-secondary)]">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -264,7 +264,7 @@ const claude = await gateway.chat({
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10" asChild>
+              <Button size="lg" variant="secondary" className="text-white border-white hover:bg-white/10" asChild>
                 <Link href="/contact">Talk to Sales</Link>
               </Button>
             </div>

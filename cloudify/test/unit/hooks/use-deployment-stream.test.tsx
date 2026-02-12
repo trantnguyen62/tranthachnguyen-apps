@@ -157,7 +157,7 @@ describe("useDeploymentStream hook", () => {
   it("handles EventSource errors gracefully", async () => {
     const onError = vi.fn();
     const { result } = renderHook(() =>
-      useDeploymentStream("deploy-123", { onError })
+      useDeploymentStream("deploy-123", { onError, maxReconnectAttempts: 0 })
     );
 
     act(() => {

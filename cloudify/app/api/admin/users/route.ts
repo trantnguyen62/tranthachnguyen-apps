@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("admin/users");
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     // For session auth, verify user is in ADMIN_EMAILS list
     if (user.authMethod === "session" && !isAdminEmail(user.email)) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return fail("AUTH_FORBIDDEN", "Forbidden", 403);
     }
 
     const users = await prisma.user.findMany({
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
         id: true,
         email: true,
         name: true,
-        avatar: true,
+        image: true,
         plan: true,
         createdAt: true,
         _count: {
@@ -50,12 +51,9 @@ export async function GET(request: NextRequest) {
       isAdmin: isAdminEmail(u.email),
     }));
 
-    return NextResponse.json({ users: usersWithAdminFlag });
+    return ok({ users: usersWithAdminFlag });
   } catch (error) {
     log.error("Failed to fetch users", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch users" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch users", 500);
   }
 }

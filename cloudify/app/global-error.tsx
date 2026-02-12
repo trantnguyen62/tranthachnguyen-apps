@@ -11,6 +11,23 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error("Global error:", error);
+
+    // Report to Sentry if configured
+    import("@/lib/integrations/sentry")
+      .then(({ captureException, isSentryConfigured }) => {
+        if (isSentryConfigured()) {
+          captureException(error, {
+            level: "error",
+            tags: {
+              source: "global-error-boundary",
+              digest: error.digest || "unknown",
+            },
+          });
+        }
+      })
+      .catch(() => {
+        // Sentry import failed; swallow silently to avoid cascading errors
+      });
   }, [error]);
 
   return (

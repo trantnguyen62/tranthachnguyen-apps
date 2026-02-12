@@ -1,21 +1,27 @@
 /**
- * Unified API Authentication
- * Supports both session-based (web UI) and token-based (CLI) authentication
- * Includes team RBAC for project-level access control
+ * Unified API Authentication & Authorization
+ *
+ * Supports session-based (web UI) authentication.
+ * Includes team RBAC for project-level access control.
+ *
+ * RBAC role hierarchy: viewer < member < developer < admin < owner
+ * - requireReadAccess: any authenticated user (viewer+)
+ * - requireWriteAccess: member+ role for project-scoped operations
+ * - requireDeployAccess: developer+ role for deploy operations
+ * - requireAdminAccess: checks ADMIN_EMAILS env var (system-level admin)
+ * - requireProjectAccess: project-scoped check with minimum role
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "./next-auth";
-import { validateApiToken, ApiTokenUser, hasScope } from "./api-token";
-import { getSessionFromRequest } from "./session";
 import { prisma } from "@/lib/prisma";
+import { fail } from "@/lib/api/response";
 
 export interface AuthUser {
   id: string;
   email: string;
   name: string;
-  scopes?: string[];
-  authMethod: "session" | "token";
+  authMethod: "session";
 }
 
 /**
@@ -106,25 +112,11 @@ export function meetsMinimumRole(
 }
 
 /**
- * Get authenticated user from either session or API token
- * Tries: API token -> NextAuth session -> Custom session
+ * Get authenticated user from NextAuth session.
  */
 export async function getAuthUser(
   request: NextRequest
 ): Promise<AuthUser | null> {
-  // First try API token (for CLI and programmatic access)
-  const tokenUser = await validateApiToken(request);
-  if (tokenUser) {
-    return {
-      id: tokenUser.id,
-      email: tokenUser.email,
-      name: tokenUser.name,
-      scopes: tokenUser.scopes,
-      authMethod: "token",
-    };
-  }
-
-  // Try NextAuth session (for web UI with OAuth/credentials)
   try {
     const session = await auth();
     if (session?.user?.id) {
@@ -135,23 +127,8 @@ export async function getAuthUser(
         authMethod: "session",
       };
     }
-  } catch (error) {
+  } catch {
     // Session auth may fail in some contexts, that's OK
-  }
-
-  // Fall back to custom session (for /api/auth endpoint)
-  try {
-    const customSession = await getSessionFromRequest(request);
-    if (customSession) {
-      return {
-        id: customSession.id,
-        email: customSession.email,
-        name: customSession.name,
-        authMethod: "session",
-      };
-    }
-  } catch (error) {
-    // Custom session may fail, that's OK
   }
 
   return null;
@@ -162,23 +139,12 @@ export async function getAuthUser(
  * Returns either the authenticated user or an error response
  */
 export async function requireAuth(
-  request: NextRequest,
-  requiredScope?: string
+  request: NextRequest
 ): Promise<{ user: AuthUser } | NextResponse> {
   const user = await getAuthUser(request);
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // Check scope if required and using token auth
-  if (requiredScope && user.authMethod === "token") {
-    if (!user.scopes?.includes(requiredScope) && !user.scopes?.includes("admin")) {
-      return NextResponse.json(
-        { error: "Insufficient permissions", required: requiredScope },
-        { status: 403 }
-      );
-    }
+    return fail("AUTH_REQUIRED", "Authentication required", 401);
   }
 
   return { user };
@@ -194,37 +160,103 @@ export function isAuthError(
 }
 
 /**
- * Require read scope
+ * Require read access — authenticates the user (viewer role minimum).
+ * For non-project-scoped reads, this just verifies authentication.
+ * For project-scoped reads, use requireProjectAccess instead.
  */
 export async function requireReadAccess(
   request: NextRequest
 ): Promise<{ user: AuthUser } | NextResponse> {
-  return requireAuth(request, "read");
+  return requireAuth(request);
 }
 
 /**
- * Require write scope
+ * Require write access — authenticates the user.
+ * For project-scoped writes, the caller should also use requireProjectAccess
+ * or checkProjectAccess with meetsMinimumRole("member") to verify role.
  */
 export async function requireWriteAccess(
   request: NextRequest
 ): Promise<{ user: AuthUser } | NextResponse> {
-  return requireAuth(request, "write");
+  return requireAuth(request);
 }
 
 /**
- * Require deploy scope
+ * Require deploy access — authenticates the user.
+ * For project-scoped deploys, the caller should also use requireProjectAccess
+ * or checkProjectAccess with meetsMinimumRole("developer") to verify role.
  */
 export async function requireDeployAccess(
   request: NextRequest
 ): Promise<{ user: AuthUser } | NextResponse> {
-  return requireAuth(request, "deploy");
+  return requireAuth(request);
 }
 
 /**
- * Require admin scope
+ * Project-scoped authorization check.
+ *
+ * Verifies:
+ * 1. User is authenticated
+ * 2. User has access to the project (owner or team member)
+ * 3. User's role meets the minimum required role
+ *
+ * Project owners implicitly have all permissions.
+ *
+ * @example
+ *   const result = await requireProjectAccess(request, projectId, "developer");
+ *   if (isAuthError(result)) return result;
+ *   const { user, access } = result;
+ */
+export async function requireProjectAccess(
+  request: NextRequest,
+  projectId: string,
+  minimumRole: TeamRole
+): Promise<{ user: AuthUser; access: ProjectAccess } | NextResponse> {
+  const authResult = await requireAuth(request);
+  if (isAuthError(authResult)) return authResult;
+
+  const { user } = authResult;
+  const access = await checkProjectAccess(user.id, projectId);
+
+  if (!access.hasAccess) {
+    return fail("AUTH_FORBIDDEN", "You do not have access to this project", 403);
+  }
+
+  // Project owners have all permissions
+  if (access.isOwner) {
+    return { user, access };
+  }
+
+  // Check team role meets minimum
+  const role = access.teamRole || "viewer";
+  if (!meetsMinimumRole(role, minimumRole)) {
+    return fail(
+      "AUTH_FORBIDDEN",
+      `This action requires ${minimumRole} role or higher. Your role: ${role}`,
+      403
+    );
+  }
+
+  return { user, access };
+}
+
+/**
+ * Require admin access — checks ADMIN_EMAILS environment variable
  */
 export async function requireAdminAccess(
   request: NextRequest
 ): Promise<{ user: AuthUser } | NextResponse> {
-  return requireAuth(request, "admin");
+  const result = await requireAuth(request);
+  if (isAuthError(result)) return result;
+
+  const adminEmails = (process.env.ADMIN_EMAILS || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (adminEmails.length > 0 && !adminEmails.includes(result.user.email.toLowerCase())) {
+    return fail("AUTH_FORBIDDEN", "Admin access required", 403);
+  }
+
+  return result;
 }

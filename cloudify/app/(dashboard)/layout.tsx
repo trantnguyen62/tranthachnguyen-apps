@@ -1,6 +1,8 @@
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { MobileNav } from "@/components/dashboard/mobile-nav";
+import { DeployFaviconProvider } from "@/components/dashboard/deploy-favicon-provider";
+import { OnboardingRedirect } from "@/components/onboarding/onboarding-redirect";
 
 export default function DashboardLayout({
   children,
@@ -8,7 +10,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-[var(--surface-primary,theme(colors.background))]">
+      {/* Onboarding redirect check (client-side) */}
+      <OnboardingRedirect />
+
+      {/* Deploy status favicon */}
+      <DeployFaviconProvider />
+
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <DashboardSidebar />
@@ -18,9 +26,9 @@ export default function DashboardLayout({
       <MobileNav />
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden lg:ml-0 pt-16 lg:pt-0">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardHeader />
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto pb-[83px] lg:pb-0">
           {children}
         </main>
       </div>

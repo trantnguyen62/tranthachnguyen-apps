@@ -4,10 +4,8 @@ import { createMockUser } from "@/test/factories/user.factory";
 // Use vi.hoisted to define mocks that will be hoisted with vi.mock
 const { mockPrisma, mockCookies } = vi.hoisted(() => ({
   mockPrisma: {
-    session: {
-      create: vi.fn(),
+    user: {
       findUnique: vi.fn(),
-      delete: vi.fn(),
     },
   },
   mockCookies: {
@@ -30,9 +28,14 @@ import {
   createSession,
   getSession,
   clearSession,
-  getSessionFromRequest,
 } from "@/lib/auth/session";
-import { signToken } from "@/lib/auth/jwt";
+import jwt from "jsonwebtoken";
+
+// Helper to create JWT tokens for testing (mirrors the inlined signToken in session.ts)
+function signToken(payload: { userId: string }, expiresIn: string = "7d"): string {
+  const secret = process.env.JWT_SECRET || "development-secret-change-in-production";
+  return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions);
+}
 
 describe("Session management functions", () => {
   const mockUser = createMockUser({ id: "user-123", email: "test@example.com" });
@@ -41,40 +44,19 @@ describe("Session management functions", () => {
     vi.clearAllMocks();
   });
 
-  // Test 16: createSession() creates database session with correct expiry
-  it("creates database session with correct expiry", async () => {
-    const sessionData = {
-      id: "session-123",
-      userId: mockUser.id,
-      token: "random-token",
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    };
+  // Test 16: createSession() signs a JWT (no DB session)
+  it("creates a JWT token", async () => {
+    const jwtToken = await createSession(mockUser.id);
 
-    mockPrisma.session.create.mockResolvedValue(sessionData);
-
-    const jwt = await createSession(mockUser.id);
-
-    expect(mockPrisma.session.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        userId: mockUser.id,
-        expiresAt: expect.any(Date),
-      }),
-    });
-    expect(jwt).toBeDefined();
-    expect(typeof jwt).toBe("string");
+    expect(jwtToken).toBeDefined();
+    expect(typeof jwtToken).toBe("string");
+    // Verify the token is a valid JWT containing userId
+    const decoded = jwt.decode(jwtToken) as { userId: string };
+    expect(decoded.userId).toBe(mockUser.id);
   });
 
   // Test 17: createSession() sets httpOnly secure cookie
   it("sets httpOnly secure cookie", async () => {
-    const sessionData = {
-      id: "session-123",
-      userId: mockUser.id,
-      token: "random-token",
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    };
-
-    mockPrisma.session.create.mockResolvedValue(sessionData);
-
     await createSession(mockUser.id);
 
     expect(mockCookies.set).toHaveBeenCalledWith(
@@ -88,38 +70,22 @@ describe("Session management functions", () => {
     );
   });
 
-  // Test 18: createSession() stores user agent when provided
-  it("stores user agent when provided", async () => {
+  // Test 18: createSession() accepts userAgent parameter (unused but signature preserved)
+  it("accepts userAgent parameter", async () => {
     const userAgent = "Mozilla/5.0 Test Browser";
-    const sessionData = {
-      id: "session-123",
-      userId: mockUser.id,
-      token: "random-token",
-      expiresAt: new Date(),
-      userAgent,
-    };
 
-    mockPrisma.session.create.mockResolvedValue(sessionData);
+    const jwtToken = await createSession(mockUser.id, userAgent);
 
-    await createSession(mockUser.id, userAgent);
-
-    expect(mockPrisma.session.create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        userAgent,
-      }),
-    });
+    expect(jwtToken).toBeDefined();
+    expect(typeof jwtToken).toBe("string");
   });
 
-  // Test 19: getSession() returns user data for valid session
+  // Test 19: getSession() returns user data for valid JWT
   it("returns user data for valid session", async () => {
-    const jwt = signToken({ userId: mockUser.id, sessionId: "session-123" });
-    mockCookies.get.mockReturnValue({ value: jwt });
+    const jwtToken = signToken({ userId: mockUser.id });
+    mockCookies.get.mockReturnValue({ value: jwtToken });
 
-    mockPrisma.session.findUnique.mockResolvedValue({
-      id: "session-123",
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      user: mockUser,
-    });
+    mockPrisma.user.findUnique.mockResolvedValue(mockUser);
 
     const result = await getSession();
 
@@ -137,53 +103,33 @@ describe("Session management functions", () => {
     expect(result).toBeNull();
   });
 
-  // Test 21: getSession() returns null for expired session
-  it("returns null for expired session", async () => {
-    const jwt = signToken({ userId: mockUser.id, sessionId: "session-123" });
-    mockCookies.get.mockReturnValue({ value: jwt });
-    mockPrisma.session.delete.mockResolvedValue({});
+  // Test 21: getSession() returns null when user not found
+  it("returns null when user not found", async () => {
+    const jwtToken = signToken({ userId: "nonexistent-user" });
+    mockCookies.get.mockReturnValue({ value: jwtToken });
 
-    mockPrisma.session.findUnique.mockResolvedValue({
-      id: "session-123",
-      expiresAt: new Date(Date.now() - 1000),
-      user: mockUser,
-    });
+    mockPrisma.user.findUnique.mockResolvedValue(null);
 
     const result = await getSession();
 
     expect(result).toBeNull();
-  });
-
-  // Test 22: clearSession() deletes database session and cookie
-  it("deletes database session and cookie", async () => {
-    const jwt = signToken({ userId: mockUser.id, sessionId: "session-123" });
-    mockCookies.get.mockReturnValue({ value: jwt });
-    mockPrisma.session.delete.mockResolvedValue({});
-
-    await clearSession();
-
-    expect(mockPrisma.session.delete).toHaveBeenCalledWith({
-      where: { id: "session-123" },
-    });
+    // Should clear the stale cookie
     expect(mockCookies.delete).toHaveBeenCalledWith("cloudify_session");
   });
 
-  // Test 23: getSessionFromRequest() extracts session from request headers
-  it("extracts session from request headers", async () => {
-    const jwt = signToken({ userId: mockUser.id, sessionId: "session-123" });
-    const request = new Request("http://localhost", {
-      headers: { cookie: `cloudify_session=${jwt}` },
-    });
+  // Test 22: clearSession() deletes cookie
+  it("deletes session cookie", async () => {
+    await clearSession();
 
-    mockPrisma.session.findUnique.mockResolvedValue({
-      id: "session-123",
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      user: mockUser,
-    });
+    expect(mockCookies.delete).toHaveBeenCalledWith("cloudify_session");
+  });
 
-    const result = await getSessionFromRequest(request);
+  // Test: getSession() returns null for invalid JWT
+  it("returns null for invalid JWT", async () => {
+    mockCookies.get.mockReturnValue({ value: "invalid-jwt-token" });
 
-    expect(result).not.toBeNull();
-    expect(result?.id).toBe(mockUser.id);
+    const result = await getSession();
+
+    expect(result).toBeNull();
   });
 });

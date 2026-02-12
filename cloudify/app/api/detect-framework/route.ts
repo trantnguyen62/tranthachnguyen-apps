@@ -7,7 +7,7 @@
  * Automatically detects the framework from a repository or file list.
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import {
   detectFramework,
@@ -15,6 +15,8 @@ import {
   parseBuildConfig,
 } from "@/lib/build/framework-detector";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("detect-framework");
 
@@ -24,7 +26,9 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { repoUrl, files, packageJson, vercelJson, cloudifyJson } = body;
 
     // Option 1: Detect from GitHub repo URL
@@ -32,10 +36,7 @@ export async function POST(request: NextRequest) {
       // Parse GitHub URL
       const match = repoUrl.match(/github\.com[\/:]([^\/]+)\/([^\/\.]+)/);
       if (!match) {
-        return NextResponse.json(
-          { error: "Invalid GitHub URL" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Invalid GitHub URL", 400);
       }
 
       const [, owner, repo] = match;
@@ -54,10 +55,7 @@ export async function POST(request: NextRequest) {
       );
 
       if (!repoResponse.ok) {
-        return NextResponse.json(
-          { error: "Failed to fetch repository contents" },
-          { status: 400 }
-        );
+        return fail("BAD_REQUEST", "Failed to fetch repository contents", 400);
       }
 
       const contents = await repoResponse.json();
@@ -79,7 +77,7 @@ export async function POST(request: NextRequest) {
       // Detect framework
       const result = await detectFramework(fileNames, pkgJsonContent);
 
-      return NextResponse.json({
+      return ok({
         detected: result,
         repoInfo: { owner, repo },
       });
@@ -102,24 +100,18 @@ export async function POST(request: NextRequest) {
         result.detectedBy.push("config file overrides");
       }
 
-      return NextResponse.json({ detected: result });
+      return ok({ detected: result });
     }
 
-    return NextResponse.json(
-      { error: "Provide either repoUrl or files array" },
-      { status: 400 }
-    );
+    return fail("BAD_REQUEST", "Provide either repoUrl or files array", 400);
   } catch (error) {
     log.error("Framework detection error", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Internal server error", 500);
   }
 }
 
 // GET - List supported frameworks
 export async function GET() {
   const frameworks = getSupportedFrameworks();
-  return NextResponse.json({ frameworks });
+  return ok({ frameworks });
 }

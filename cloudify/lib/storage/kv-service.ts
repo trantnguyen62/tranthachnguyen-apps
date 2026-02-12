@@ -120,7 +120,13 @@ export async function kvSet(
     result = await redis.set(redisKey, value);
   }
 
-  if (result !== "OK" && result !== null) {
+  // When NX or XX is used, Redis returns null on failure (key exists for NX, or
+  // key doesn't exist for XX). For regular SET, null means an error.
+  if (options.nx || options.xx) {
+    if (result === null) {
+      return false;
+    }
+  } else if (result !== "OK" && result !== null) {
     return false;
   }
 
@@ -163,6 +169,34 @@ export async function kvDelete(storeId: string, key: string): Promise<boolean> {
   }
 
   return deleted > 0;
+}
+
+/**
+ * Delete multiple keys from KV store using Redis pipeline for efficiency.
+ * Used when clearing an entire store to avoid sequential deletions.
+ */
+export async function kvDeleteMany(storeId: string, keys: string[]): Promise<number> {
+  if (keys.length === 0) return 0;
+
+  const redis = getRedisClient();
+  const pipeline = redis.pipeline();
+
+  for (const key of keys) {
+    pipeline.del(kvKey(storeId, key));
+    pipeline.del(kvMetaKey(storeId, key));
+  }
+
+  const results = await pipeline.exec();
+
+  // Batch delete from Postgres
+  await prisma.kVEntry.deleteMany({
+    where: {
+      storeId,
+      key: { in: keys },
+    },
+  });
+
+  return results ? results.filter(([err, result]) => !err && result).length : 0;
 }
 
 /**

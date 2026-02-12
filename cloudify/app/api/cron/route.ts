@@ -14,6 +14,8 @@ import {
   parseNextRun,
 } from "@/lib/cron/scheduler";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("cron");
 
@@ -57,13 +59,10 @@ export async function GET(request: NextRequest) {
       scheduleDescription: describeCronSchedule(job.schedule),
     }));
 
-    return NextResponse.json({ cronJobs: jobsWithDescriptions });
+    return ok({ cronJobs: jobsWithDescriptions });
   } catch (error) {
     log.error("Error fetching cron jobs", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Internal server error", 500);
   }
 }
 
@@ -73,15 +72,14 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { projectId, name, schedule, path, timezone = "UTC", timeout = 60 } = body;
 
     // Validate required fields
     if (!projectId || !name || !schedule || !path) {
-      return NextResponse.json(
-        { error: "Missing required fields: projectId, name, schedule, path" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing required fields: projectId, name, schedule, path", 400);
     }
 
     // Verify project ownership
@@ -93,27 +91,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found or you don't have access" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Project not found or you don't have access", 404);
     }
 
     // Validate cron expression
     const validation = validateCronExpression(schedule);
     if (!validation.valid) {
-      return NextResponse.json(
-        { error: validation.error },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", validation.error || "Invalid cron expression", 400);
     }
 
     // Validate path
     if (!path.startsWith("/")) {
-      return NextResponse.json(
-        { error: "Path must start with /" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Path must start with /", 400);
     }
 
     // Calculate next run time
@@ -138,7 +127,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       cronJob: {
         ...cronJob,
         scheduleDescription: describeCronSchedule(schedule),
@@ -146,9 +135,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     log.error("Error creating cron job", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Internal server error", 500);
   }
 }

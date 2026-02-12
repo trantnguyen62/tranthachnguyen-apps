@@ -10,6 +10,7 @@ import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { decryptConnectionString, rotateCredentials } from "@/lib/database/provisioner";
 import crypto from "crypto";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("databases/connect");
 
@@ -41,25 +42,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!database) {
-      return NextResponse.json(
-        { error: "Database not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Database not found", 404);
     }
 
     // Verify ownership
     if (database.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
-    if (database.status !== "ready") {
-      return NextResponse.json(
-        { error: "Database is not ready", status: database.status },
-        { status: 400 }
-      );
+    if (database.status !== "ACTIVE") {
+      return fail("BAD_REQUEST", "Database is not ready", 400);
     }
 
     // Decrypt and return connection details
@@ -72,13 +64,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { host, port, database: dbName, username } = database;
 
     switch (database.type) {
-      case "postgresql":
+      case "POSTGRESQL":
         connectionString = `postgresql://${username}:${decryptedPassword}@${host}:${port}/${dbName}?sslmode=require`;
         break;
-      case "mysql":
+      case "MYSQL":
         connectionString = `mysql://${username}:${decryptedPassword}@${host}:${port}/${dbName}`;
         break;
-      case "redis":
+      case "REDIS":
         connectionString = decryptedPassword
           ? `redis://:${decryptedPassword}@${host}:${port}`
           : `redis://${host}:${port}`;
@@ -100,7 +92,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       connection: {
         host: database.host,
         port: database.port,
@@ -108,17 +100,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         username: database.username,
         password: decryptedPassword,
         connectionString,
-        sslRequired: database.type !== "redis",
+        sslRequired: database.type !== "REDIS",
       },
       provider: database.provider,
       region: database.region,
     });
   } catch (error) {
     log.error("Failed to get connection details", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to get connection details" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to get connection details", 500);
   }
 }
 
@@ -145,25 +134,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!database) {
-      return NextResponse.json(
-        { error: "Database not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Database not found", 404);
     }
 
     // Verify ownership
     if (database.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
-    if (database.status !== "ready") {
-      return NextResponse.json(
-        { error: "Database is not ready for credential rotation" },
-        { status: 400 }
-      );
+    if (database.status !== "ACTIVE") {
+      return fail("BAD_REQUEST", "Database is not ready for credential rotation", 400);
     }
 
     // Rotate credentials
@@ -183,16 +163,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       success: true,
       message: "Credentials rotated successfully",
       connection: newCredentials,
     });
   } catch (error) {
     log.error("Failed to rotate credentials", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to rotate credentials" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to rotate credentials", 500);
   }
 }

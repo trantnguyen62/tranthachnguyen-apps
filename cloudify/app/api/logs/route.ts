@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { serverError } from "@/lib/api/error-response";
+import { ok, fail, parsePaginationParams } from "@/lib/api/response";
 
 const log = getRouteLogger("logs");
 
@@ -16,8 +18,7 @@ export async function GET(request: NextRequest) {
     const projectId = searchParams.get("projectId");
     const level = searchParams.get("level");
     const search = searchParams.get("search");
-    const limit = Math.min(parseInt(searchParams.get("limit") || "100"), 500);
-    const cursor = searchParams.get("cursor");
+    const { cursor, limit } = parsePaginationParams(searchParams);
 
     // Build query conditions
     const where: {
@@ -100,16 +101,16 @@ export async function GET(request: NextRequest) {
       deploymentId: log.deployment.id,
     }));
 
-    return NextResponse.json({
-      logs: transformedLogs,
-      nextCursor,
-      hasMore,
-    });
-  } catch (error) {
-    log.error("Failed to fetch logs", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch logs" },
-      { status: 500 }
+    return ok(
+      { logs: transformedLogs },
+      {
+        pagination: {
+          cursor: nextCursor || undefined,
+          hasMore,
+        },
+      }
     );
+  } catch (error) {
+    return serverError("Failed to fetch logs", error);
   }
 }

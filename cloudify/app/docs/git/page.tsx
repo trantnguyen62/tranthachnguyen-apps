@@ -29,30 +29,30 @@ export default function GitIntegrationPage() {
       <h2>Supported Git Providers</h2>
 
       <div className="not-prose grid grid-cols-1 md:grid-cols-3 gap-4 my-8">
-        <div className="p-6 rounded-xl border border-border bg-background text-center">
-          <Github className="h-12 w-12 mx-auto mb-4 text-foreground" />
-          <h3 className="font-semibold text-foreground">GitHub</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)] text-center">
+          <Github className="h-12 w-12 mx-auto mb-4 text-[var(--text-primary)]" />
+          <h3 className="font-semibold text-[var(--text-primary)]">GitHub</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Full integration with GitHub Actions, Checks, and Deployments API
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background text-center">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)] text-center">
           <svg className="h-12 w-12 mx-auto mb-4 text-orange-500" viewBox="0 0 24 24" fill="currentColor">
             <path d="M4.845.904c-1.297 0-2.41.753-2.926 1.846l8.08 8.08-8.08 8.08a3.2 3.2 0 002.927 1.846h14.31c1.297 0 2.41-.753 2.926-1.846L13.002 9.83l8.08-8.08A3.2 3.2 0 0019.155.904H4.845z"/>
           </svg>
-          <h3 className="font-semibold text-foreground">GitLab</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">GitLab</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Support for GitLab.com and self-hosted instances
           </p>
         </div>
 
-        <div className="p-6 rounded-xl border border-border bg-background text-center">
+        <div className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-primary)] text-center">
           <svg className="h-12 w-12 mx-auto mb-4 text-[#0070f3]" viewBox="0 0 24 24" fill="currentColor">
             <path d="M.778 1.213a.768.768 0 00-.768.892l3.263 19.81c.084.5.515.868 1.022.873H19.95a.772.772 0 00.77-.646l3.27-20.03a.768.768 0 00-.768-.891H.778zM14.52 15.53H9.522L8.17 8.466h7.561l-1.211 7.064z"/>
           </svg>
-          <h3 className="font-semibold text-foreground">Bitbucket</h3>
-          <p className="text-sm text-muted-foreground mt-2">
+          <h3 className="font-semibold text-[var(--text-primary)]">Bitbucket</h3>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Integration with Bitbucket Cloud and Pipelines
           </p>
         </div>
@@ -73,14 +73,14 @@ export default function GitIntegrationPage() {
 
       <h2>Preview Deployments</h2>
 
-      <div className="not-prose p-6 rounded-xl border border-border bg-secondary my-8">
+      <div className="not-prose p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--surface-secondary)] my-8">
         <div className="flex items-start gap-4">
           <Eye className="h-8 w-8 text-[#0070f3] shrink-0" />
           <div>
-            <h3 className="font-semibold text-foreground mb-2">
+            <h3 className="font-semibold text-[var(--text-primary)] mb-2">
               Preview Every Change
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-[var(--text-secondary)]">
               Every pull request automatically gets a unique preview URL. Share with your team
               to review changes before merging to production.
             </p>

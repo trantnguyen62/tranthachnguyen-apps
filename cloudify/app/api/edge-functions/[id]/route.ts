@@ -5,12 +5,13 @@
  * DELETE - Delete function
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { validateEdgeFunctionCode } from "@/lib/edge/runtime";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("edge-functions/[id]");
 
@@ -52,10 +53,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!edgeFunction) {
-      return NextResponse.json(
-        { error: "Edge function not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Edge function not found", 404);
     }
 
     // Verify ownership through project
@@ -67,10 +65,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
     // Calculate stats
@@ -114,7 +109,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       }),
     ]);
 
-    return NextResponse.json({
+    return ok({
       function: edgeFunction,
       stats: {
         last24h: {
@@ -137,10 +132,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Failed to fetch edge function", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch edge function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch edge function", 500);
   }
 }
 
@@ -165,17 +157,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!edgeFunction) {
-      return NextResponse.json(
-        { error: "Edge function not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Edge function not found", 404);
     }
 
     if (edgeFunction.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
     const parseResult = await parseJsonBody(request);
@@ -187,10 +173,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (code) {
       const validation = validateEdgeFunctionCode(code);
       if (!validation.valid) {
-        return NextResponse.json(
-          { error: "Invalid code", details: validation.errors },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Invalid code", 400, { details: validation.errors });
       }
     }
 
@@ -199,10 +182,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     if (name !== undefined) {
       if (typeof name !== "string" || name.length < 1 || name.length > 100) {
-        return NextResponse.json(
-          { error: "Name must be between 1 and 100 characters" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Name must be between 1 and 100 characters", 400);
       }
       updateData.name = name;
       updateData.slug = name.toLowerCase().replace(/[^a-z0-9-]/g, "-").slice(0, 100);
@@ -236,13 +216,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({ function: updated });
+    return ok({ function: updated });
   } catch (error) {
     log.error("Failed to update edge function", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to update edge function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update edge function", 500);
   }
 }
 
@@ -267,17 +244,11 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!edgeFunction) {
-      return NextResponse.json(
-        { error: "Edge function not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Edge function not found", 404);
     }
 
     if (edgeFunction.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "Access denied", 403);
     }
 
     // Delete invocations first
@@ -304,15 +275,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       success: true,
       message: "Edge function deleted",
     });
   } catch (error) {
     log.error("Failed to delete edge function", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete edge function" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete edge function", 500);
   }
 }

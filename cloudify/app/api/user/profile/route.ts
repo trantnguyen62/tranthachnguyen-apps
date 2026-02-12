@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, isAuthError } from "@/lib/auth/api-auth";
+import { ok, fail } from "@/lib/api/response";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +15,6 @@ export async function GET(request: NextRequest) {
         id: true,
         email: true,
         name: true,
-        avatar: true,
         image: true,
         plan: true,
         createdAt: true,
@@ -36,15 +36,12 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return fail("NOT_FOUND", "User not found", 404);
     }
 
-    return NextResponse.json({ user });
+    return ok({ user });
   } catch {
-    return NextResponse.json(
-      { error: "Failed to fetch profile" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch profile", 500);
   }
 }
 
@@ -58,56 +55,38 @@ export async function PATCH(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", "Invalid request body", 400);
     }
 
-    const allowedFields = ["name", "avatar"];
+    const allowedFields = ["name", "image"];
     const protectedFields = Object.keys(body).filter(
       (key) => !allowedFields.includes(key)
     );
     if (protectedFields.length > 0) {
-      return NextResponse.json(
-        { error: `Cannot update protected fields: ${protectedFields.join(", ")}` },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", `Cannot update protected fields: ${protectedFields.join(", ")}`, 400);
     }
 
-    const { name, avatar } = body;
+    const { name, image } = body;
 
     const updateData: Record<string, string> = {};
     if (name !== undefined) {
       if (typeof name !== "string" || name.trim().length < 1) {
-        return NextResponse.json(
-          { error: "Name must be at least 1 character" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Name must be at least 1 character", 400);
       }
       if (name.trim().length > 100) {
-        return NextResponse.json(
-          { error: "Name must be 100 characters or less" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Name must be 100 characters or less", 400);
       }
       // Sanitize: strip HTML tags to prevent XSS
       updateData.name = name.trim().replace(/<[^>]*>/g, "");
     }
-    if (avatar !== undefined) {
-      if (avatar !== null && typeof avatar !== "string") {
-        return NextResponse.json(
-          { error: "Avatar must be a string URL or null" },
-          { status: 400 }
-        );
+    if (image !== undefined) {
+      if (image !== null && typeof image !== "string") {
+        return fail("VALIDATION_ERROR", "Image must be a string URL or null", 400);
       }
-      if (avatar && avatar.length > 2048) {
-        return NextResponse.json(
-          { error: "Avatar URL must be 2048 characters or less" },
-          { status: 400 }
-        );
+      if (image && image.length > 2048) {
+        return fail("VALIDATION_ERROR", "Image URL must be 2048 characters or less", 400);
       }
-      updateData.avatar = avatar;
+      updateData.image = image;
     }
 
     const user = await prisma.user.update({
@@ -117,17 +96,13 @@ export async function PATCH(request: NextRequest) {
         id: true,
         email: true,
         name: true,
-        avatar: true,
         image: true,
         plan: true,
       },
     });
 
-    return NextResponse.json({ user });
+    return ok({ user });
   } catch {
-    return NextResponse.json(
-      { error: "Failed to update profile" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to update profile", 500);
   }
 }

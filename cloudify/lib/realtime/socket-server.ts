@@ -9,8 +9,7 @@
 import { Server as SocketServer, Socket } from "socket.io";
 import { Server as HttpServer } from "http";
 import { prisma } from "@/lib/prisma";
-import { validateApiToken } from "@/lib/auth/api-token";
-import { verifyToken } from "@/lib/auth/jwt";
+import jwt from "jsonwebtoken";
 
 // Singleton instance
 let io: SocketServer | null = null;
@@ -51,45 +50,22 @@ export function initSocketServer(httpServer: HttpServer): SocketServer {
         return next(new Error("Authentication required"));
       }
 
-      // Try API token first (for CLI)
-      if (token.startsWith("cl_")) {
-        const mockRequest = {
-          headers: {
-            get: (name: string) => (name === "authorization" ? `Bearer ${token}` : null),
-          },
-        } as any;
+      // Verify JWT token and look up user
+      const secret = process.env.JWT_SECRET || "development-secret-change-in-production";
+      const payload = jwt.verify(token, secret) as { userId: string };
 
-        const user = await validateApiToken(mockRequest);
-        if (user) {
-          socket.data.user = {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-          };
-          return next();
-        }
-      }
+      const user = await prisma.user.findUnique({
+        where: { id: payload.userId },
+        select: { id: true, email: true, name: true },
+      });
 
-      // Try JWT session token
-      const payload = verifyToken(token);
-      if (payload) {
-        const session = await prisma.session.findUnique({
-          where: { id: payload.sessionId },
-          include: {
-            user: {
-              select: { id: true, email: true, name: true },
-            },
-          },
-        });
-
-        if (session && session.expiresAt > new Date()) {
-          socket.data.user = {
-            id: session.user.id,
-            email: session.user.email,
-            name: session.user.name,
-          };
-          return next();
-        }
+      if (user) {
+        socket.data.user = {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        };
+        return next();
       }
 
       return next(new Error("Authentication failed"));

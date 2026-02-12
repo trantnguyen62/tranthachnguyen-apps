@@ -1,14 +1,28 @@
 /**
  * Bug-Finding Tests for Rate Limiting
- * Tests that rate limiting actually works with real timing
+ * Tests that rate limiting actually works with Redis-backed storage.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
+
+// Mock Redis client
+const mockRedis = vi.hoisted(() => ({
+  incr: vi.fn(),
+  expire: vi.fn(),
+  ttl: vi.fn(),
+  set: vi.fn(),
+  del: vi.fn(),
+  exists: vi.fn(),
+}));
+
+vi.mock("@/lib/storage/redis-client", () => ({
+  getRedisClient: () => mockRedis,
+}));
+
 import {
   checkRateLimit,
   getClientIdentifier,
   RATE_LIMIT_PRESETS,
-  SlidingWindowRateLimiter,
   banIP,
   unbanIP,
   isIPBanned,
@@ -17,99 +31,114 @@ import { NextRequest } from "next/server";
 
 describe("Rate Limiting - Bug Finding Tests", () => {
   beforeEach(() => {
-    // Clear any cached state between tests
     vi.clearAllMocks();
   });
 
   describe("checkRateLimit()", () => {
-    it("should allow requests under the limit", () => {
-      const config = { limit: 10, window: 60000 };
+    it("should allow requests under the limit", async () => {
+      const config = { limit: 10, windowSeconds: 60 };
 
-      // First request should be allowed
-      const result1 = checkRateLimit("test-key-1", config);
+      // First request
+      mockRedis.incr.mockResolvedValue(1);
+      mockRedis.expire.mockResolvedValue(1);
+      mockRedis.ttl.mockResolvedValue(60);
+
+      const result1 = await checkRateLimit("test-key-1", config);
       expect(result1.allowed).toBe(true);
       expect(result1.remaining).toBe(9);
-
-      // Subsequent requests should also be allowed
-      for (let i = 0; i < 8; i++) {
-        const result = checkRateLimit("test-key-1", config);
-        expect(result.allowed).toBe(true);
-      }
     });
 
-    it("should block requests at the limit", () => {
-      const config = { limit: 5, window: 60000 };
-      const key = "test-key-limit-" + Date.now();
+    it("should block requests at the limit", async () => {
+      const config = { limit: 5, windowSeconds: 60 };
 
-      // Make exactly limit requests
-      for (let i = 0; i < 5; i++) {
-        const result = checkRateLimit(key, config);
-        expect(result.allowed).toBe(true);
-      }
+      // Simulate 6th request (count exceeds limit)
+      mockRedis.incr.mockResolvedValue(6);
+      mockRedis.ttl.mockResolvedValue(55);
 
-      // Next request should be blocked
-      const blockedResult = checkRateLimit(key, config);
+      const blockedResult = await checkRateLimit("test-key-limit", config);
       expect(blockedResult.allowed).toBe(false);
       expect(blockedResult.remaining).toBe(0);
     });
 
-    it("should track different keys independently", () => {
-      const config = { limit: 2, window: 60000 };
-      const key1 = "test-user-a-" + Date.now();
-      const key2 = "test-user-b-" + Date.now();
+    it("should set expiry on first request in window", async () => {
+      const config = { limit: 10, windowSeconds: 60 };
 
-      // Exhaust key1
-      checkRateLimit(key1, config);
-      checkRateLimit(key1, config);
+      mockRedis.incr.mockResolvedValue(1); // count === 1 means first request
+      mockRedis.expire.mockResolvedValue(1);
+      mockRedis.ttl.mockResolvedValue(60);
 
-      // key1 should be blocked
-      expect(checkRateLimit(key1, config).allowed).toBe(false);
+      await checkRateLimit("test-first", config);
 
-      // key2 should still be allowed
-      expect(checkRateLimit(key2, config).allowed).toBe(true);
+      expect(mockRedis.expire).toHaveBeenCalledWith("rate:test-first", 60);
+    });
+
+    it("should not set expiry on subsequent requests", async () => {
+      const config = { limit: 10, windowSeconds: 60 };
+
+      mockRedis.incr.mockResolvedValue(3); // not the first request
+      mockRedis.ttl.mockResolvedValue(45);
+
+      await checkRateLimit("test-subsequent", config);
+
+      expect(mockRedis.expire).not.toHaveBeenCalled();
+    });
+
+    it("should track different keys independently", async () => {
+      const config = { limit: 2, windowSeconds: 60 };
+
+      // key1 is at limit
+      mockRedis.incr.mockResolvedValue(3);
+      mockRedis.ttl.mockResolvedValue(50);
+      const result1 = await checkRateLimit("test-user-a", config);
+      expect(result1.allowed).toBe(false);
+
+      // key2 is fresh
+      mockRedis.incr.mockResolvedValue(1);
+      mockRedis.expire.mockResolvedValue(1);
+      mockRedis.ttl.mockResolvedValue(60);
+      const result2 = await checkRateLimit("test-user-b", config);
+      expect(result2.allowed).toBe(true);
     });
 
     // BUG FINDER: What happens with limit = 0?
-    it("should handle zero limit", () => {
-      const config = { limit: 0, window: 60000 };
-      const key = "test-zero-limit-" + Date.now();
+    it("should handle zero limit", async () => {
+      const config = { limit: 0, windowSeconds: 60 };
 
-      // With limit 0, first request should be blocked
-      const result = checkRateLimit(key, config);
+      // With limit 0, first request should be blocked (no Redis call needed)
+      const result = await checkRateLimit("test-zero-limit", config);
       expect(result.allowed).toBe(false);
     });
 
     // BUG FINDER: What happens with negative limit?
-    it("should handle negative limit", () => {
-      const config = { limit: -1, window: 60000 };
-      const key = "test-negative-limit-" + Date.now();
+    it("should handle negative limit", async () => {
+      const config = { limit: -1, windowSeconds: 60 };
 
-      const result = checkRateLimit(key, config);
-      // Negative limit is ambiguous - should probably be blocked
-      // This test documents actual behavior
+      const result = await checkRateLimit("test-negative-limit", config);
       expect(result.allowed).toBe(false);
     });
 
-    // BUG FINDER: Very short window
-    it("should handle very short window", () => {
-      const config = { limit: 10, window: 1 }; // 1ms window
-      const key = "test-short-window-" + Date.now();
+    // Property: resetAt should be in the future
+    it("should have resetAt in the future", async () => {
+      const config = { limit: 10, windowSeconds: 60 };
 
-      const result1 = checkRateLimit(key, config);
-      expect(result1.allowed).toBe(true);
+      mockRedis.incr.mockResolvedValue(1);
+      mockRedis.expire.mockResolvedValue(1);
+      mockRedis.ttl.mockResolvedValue(60);
 
-      // Wait 2ms, should reset
-      // Note: This is timing sensitive
+      const result = await checkRateLimit("test-reset-time", config);
+      expect(result.resetAt).toBeGreaterThan(Date.now());
+      expect(result.resetAt).toBeLessThanOrEqual(Date.now() + 60000 + 100);
     });
 
-    // Property: resetAt should be in the future
-    it("should have resetAt in the future", () => {
-      const config = { limit: 10, window: 60000 };
-      const key = "test-reset-time-" + Date.now();
+    // Redis failure should fail open
+    it("should fail open when Redis is unavailable", async () => {
+      const config = { limit: 10, windowSeconds: 60 };
 
-      const result = checkRateLimit(key, config);
-      expect(result.resetAt).toBeGreaterThan(Date.now());
-      expect(result.resetAt).toBeLessThanOrEqual(Date.now() + 60000 + 100); // Allow 100ms tolerance
+      mockRedis.incr.mockRejectedValue(new Error("Redis connection failed"));
+
+      const result = await checkRateLimit("test-redis-down", config);
+      expect(result.allowed).toBe(true);
+      expect(result.remaining).toBe(10);
     });
   });
 
@@ -163,15 +192,15 @@ describe("Rate Limiting - Bug Finding Tests", () => {
   describe("RATE_LIMIT_PRESETS", () => {
     // Property: All presets should have positive limits
     it("should have positive limits", () => {
-      for (const [name, config] of Object.entries(RATE_LIMIT_PRESETS)) {
+      for (const [_name, config] of Object.entries(RATE_LIMIT_PRESETS)) {
         expect(config.limit).toBeGreaterThan(0);
-        expect(config.window).toBeGreaterThan(0);
+        expect(config.windowSeconds).toBeGreaterThan(0);
       }
     });
 
     // Property: Authenticated limits >= regular limits
     it("should have higher authenticated limits", () => {
-      for (const [name, config] of Object.entries(RATE_LIMIT_PRESETS)) {
+      for (const [_name, config] of Object.entries(RATE_LIMIT_PRESETS)) {
         if (config.authenticatedLimit) {
           expect(config.authenticatedLimit).toBeGreaterThanOrEqual(config.limit);
         }
@@ -184,131 +213,71 @@ describe("Rate Limiting - Bug Finding Tests", () => {
     });
   });
 
-  describe("SlidingWindowRateLimiter", () => {
-    it("should accurately track requests in sliding window", () => {
-      const limiter = new SlidingWindowRateLimiter({ limit: 5, window: 1000 });
-      const key = "sliding-test-" + Date.now();
-
-      // Make 5 requests
-      for (let i = 0; i < 5; i++) {
-        const result = limiter.check(key);
-        expect(result.allowed).toBe(true);
-        expect(result.remaining).toBe(4 - i);
-      }
-
-      // 6th request should be blocked
-      const blocked = limiter.check(key);
-      expect(blocked.allowed).toBe(false);
-      expect(blocked.remaining).toBe(0);
-    });
-
-    // BUG FINDER: Memory leak in sliding window
-    it("should cleanup old timestamps", () => {
-      const limiter = new SlidingWindowRateLimiter({ limit: 1000, window: 10 });
-      const key = "cleanup-test-" + Date.now();
-
-      // Make many requests
-      for (let i = 0; i < 100; i++) {
-        limiter.check(key);
-      }
-
-      // Cleanup should remove old entries
-      limiter.cleanup();
-
-      // After cleanup with 10ms window, old timestamps should be removed
-      // (This test is timing-sensitive)
-    });
-  });
-
   describe("IP Banning", () => {
-    it("should ban IP", () => {
-      const ip = "ban-test-" + Date.now();
+    it("should ban IP", async () => {
+      mockRedis.exists.mockResolvedValue(0);
+      expect(await isIPBanned("ban-test")).toBe(false);
 
-      expect(isIPBanned(ip)).toBe(false);
+      mockRedis.set.mockResolvedValue("OK");
+      await banIP("ban-test", 60000);
 
-      banIP(ip, 60000);
-      expect(isIPBanned(ip)).toBe(true);
+      expect(mockRedis.set).toHaveBeenCalledWith("rate:ban:ban-test", "1", "EX", 60);
     });
 
-    it("should unban IP", () => {
-      const ip = "unban-test-" + Date.now();
+    it("should unban IP", async () => {
+      mockRedis.del.mockResolvedValue(1);
+      await unbanIP("unban-test");
 
-      banIP(ip, 60000);
-      expect(isIPBanned(ip)).toBe(true);
-
-      unbanIP(ip);
-      expect(isIPBanned(ip)).toBe(false);
+      expect(mockRedis.del).toHaveBeenCalledWith("rate:ban:unban-test");
     });
 
-    it("should auto-expire bans", async () => {
-      const ip = "expire-test-" + Date.now();
+    it("should check if IP is banned", async () => {
+      mockRedis.exists.mockResolvedValue(1);
+      expect(await isIPBanned("check-test")).toBe(true);
 
-      // Ban for 10ms
-      banIP(ip, 10);
-      expect(isIPBanned(ip)).toBe(true);
-
-      // Wait for expiry
-      await new Promise((resolve) => setTimeout(resolve, 20));
-
-      // Should be auto-unbanned
-      expect(isIPBanned(ip)).toBe(false);
+      mockRedis.exists.mockResolvedValue(0);
+      expect(await isIPBanned("check-test")).toBe(false);
     });
 
     // BUG FINDER: What happens with 0 duration?
-    it("should handle zero duration ban", () => {
-      const ip = "zero-ban-" + Date.now();
-
-      banIP(ip, 0);
-      // Should immediately expire
-      expect(isIPBanned(ip)).toBe(false);
+    it("should handle zero duration ban", async () => {
+      await banIP("zero-ban", 0);
+      // With 0 duration, banIP should skip the ban (durationMs <= 0 guard)
+      expect(mockRedis.set).not.toHaveBeenCalled();
     });
 
     // BUG FINDER: What happens with negative duration?
-    it("should handle negative duration ban", () => {
-      const ip = "negative-ban-" + Date.now();
-
-      banIP(ip, -1000);
-      // Negative duration should not ban or should immediately expire
-      expect(isIPBanned(ip)).toBe(false);
+    it("should handle negative duration ban", async () => {
+      await banIP("negative-ban", -1000);
+      // Negative duration should not ban (durationMs <= 0 guard)
+      expect(mockRedis.set).not.toHaveBeenCalled();
     });
   });
 
-  describe("Edge Cases and Race Conditions", () => {
-    // BUG FINDER: Concurrent requests
-    it("should handle concurrent requests correctly", async () => {
-      const config = { limit: 10, window: 60000 };
-      const key = "concurrent-test-" + Date.now();
-
-      // Simulate concurrent requests
-      const results = await Promise.all(
-        Array(15)
-          .fill(null)
-          .map(() => Promise.resolve(checkRateLimit(key, config)))
-      );
-
-      const allowed = results.filter((r) => r.allowed).length;
-      const blocked = results.filter((r) => !r.allowed).length;
-
-      // Exactly 10 should be allowed, 5 blocked
-      expect(allowed).toBe(10);
-      expect(blocked).toBe(5);
-    });
-
+  describe("Edge Cases", () => {
     // BUG FINDER: Very large key
-    it("should handle very long keys", () => {
-      const config = { limit: 10, window: 60000 };
+    it("should handle very long keys", async () => {
+      const config = { limit: 10, windowSeconds: 60 };
       const longKey = "key-" + "x".repeat(10000);
 
-      const result = checkRateLimit(longKey, config);
+      mockRedis.incr.mockResolvedValue(1);
+      mockRedis.expire.mockResolvedValue(1);
+      mockRedis.ttl.mockResolvedValue(60);
+
+      const result = await checkRateLimit(longKey, config);
       expect(result.allowed).toBe(true);
     });
 
     // BUG FINDER: Special characters in key
-    it("should handle special characters in key", () => {
-      const config = { limit: 10, window: 60000 };
+    it("should handle special characters in key", async () => {
+      const config = { limit: 10, windowSeconds: 60 };
       const specialKey = "key:with:colons:and/slashes/and?queries=true";
 
-      const result = checkRateLimit(specialKey, config);
+      mockRedis.incr.mockResolvedValue(1);
+      mockRedis.expire.mockResolvedValue(1);
+      mockRedis.ttl.mockResolvedValue(60);
+
+      const result = await checkRateLimit(specialKey, config);
       expect(result.allowed).toBe(true);
     });
   });

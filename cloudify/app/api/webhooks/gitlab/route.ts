@@ -6,7 +6,7 @@
  * - Merge request events (preview deployments)
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { triggerBuild } from "@/lib/build/worker";
 import {
@@ -16,6 +16,8 @@ import {
   GitLabMergeRequestEvent,
 } from "@/lib/integrations/gitlab";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("webhooks/gitlab");
 
@@ -29,22 +31,18 @@ export async function POST(request: NextRequest) {
     const webhookToken = request.headers.get("x-gitlab-token");
 
     if (!eventType) {
-      return NextResponse.json(
-        { error: "Missing X-GitLab-Event header" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Missing X-GitLab-Event header", 400);
     }
 
     // Parse payload
-    const payload = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const payload = parseResult.data;
 
     // Find project by GitLab project ID
     const gitlabProjectId = payload.project?.id;
     if (!gitlabProjectId) {
-      return NextResponse.json(
-        { error: "Missing project ID in payload" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Missing project ID in payload", 400);
     }
 
     // Look up the project by GitLab URL
@@ -52,8 +50,8 @@ export async function POST(request: NextRequest) {
     const project = await prisma.project.findFirst({
       where: {
         OR: [
-          { repoUrl: gitlabProjectUrl },
-          { repoUrl: { contains: `gitlab.com/${payload.project?.path_with_namespace}` } },
+          { repositoryUrl: gitlabProjectUrl },
+          { repositoryUrl: { contains: `gitlab.com/${payload.project?.path_with_namespace}` } },
         ],
       },
       include: {
@@ -65,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     if (!project) {
       log.info(`No project found for GitLab project: ${gitlabProjectUrl}`);
-      return NextResponse.json({ message: "Project not found" }, { status: 200 });
+      return ok({ message: "Project not found" });
     }
 
     // Verify webhook token - required when configured, reject unsigned webhooks
@@ -74,13 +72,13 @@ export async function POST(request: NextRequest) {
       const config = integration.config as { webhookSecret?: string };
       if (config.webhookSecret) {
         if (!webhookToken || webhookToken !== config.webhookSecret) {
-          return NextResponse.json({ error: "Invalid webhook token" }, { status: 401 });
+          return fail("AUTH_REQUIRED", "Invalid webhook token", 401);
         }
       }
     } else if (!webhookToken) {
       // No integration config and no token - reject unsigned webhooks
       log.warn(`Unsigned webhook for project ${project.slug} - rejecting`);
-      return NextResponse.json({ error: "Webhook token required" }, { status: 401 });
+      return fail("AUTH_REQUIRED", "Webhook token required", 401);
     }
 
     // Parse the event
@@ -88,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     if (!event) {
       log.info(`Ignoring unsupported event type: ${eventType}`);
-      return NextResponse.json({ message: "Event type not supported" }, { status: 200 });
+      return ok({ message: "Event type not supported" });
     }
 
     // Handle push events
@@ -97,7 +95,7 @@ export async function POST(request: NextRequest) {
       const branch = pushEvent.ref.replace("refs/heads/", "");
 
       // Check if this is the production branch
-      const isProductionBranch = branch === project.repoBranch;
+      const isProductionBranch = branch === project.repositoryBranch;
 
       log.info(`Push to ${branch} on project ${project.slug}`, {
         commits: pushEvent.total_commits_count,
@@ -118,7 +116,7 @@ export async function POST(request: NextRequest) {
 
       await triggerBuild(deployment.id);
 
-      return NextResponse.json({
+      return ok({
         message: "Deployment triggered",
         deploymentId: deployment.id,
         branch,
@@ -147,7 +145,7 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        return NextResponse.json({
+        return ok({
           message: "Preview deployment triggered",
           deploymentId: deployment.id,
           branch: mr.source_branch,
@@ -155,17 +153,14 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      return NextResponse.json({
+      return ok({
         message: `Merge request ${mr.state}, no action taken`,
       });
     }
 
-    return NextResponse.json({ message: "Event processed" });
+    return ok({ message: "Event processed" });
   } catch (error) {
     log.error("Webhook processing failed", error);
-    return NextResponse.json(
-      { error: "Webhook processing failed" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Webhook processing failed", 500);
   }
 }

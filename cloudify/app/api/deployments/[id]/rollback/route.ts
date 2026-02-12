@@ -9,6 +9,7 @@ import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/a
 import { prisma } from "@/lib/prisma";
 import { rollbackToDeployment, canRollback } from "@/lib/deployments/rollback";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("deployments/[id]/rollback");
 
@@ -43,26 +44,17 @@ export async function POST(
     });
 
     if (!deployment) {
-      return NextResponse.json(
-        { error: "Deployment not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
     if (deployment.project.userId !== user.id) {
-      return NextResponse.json(
-        { error: "You don't have permission to rollback this deployment" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "You don't have permission to rollback this deployment", 403);
     }
 
     // Check if rollback is possible
     const { canRollback: allowed, reason } = await canRollback(deploymentId);
     if (!allowed) {
-      return NextResponse.json(
-        { error: reason || "Cannot rollback to this deployment" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", reason || "Cannot rollback to this deployment", 400);
     }
 
     // Perform rollback
@@ -73,13 +65,10 @@ export async function POST(
     );
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error || "Rollback failed" },
-        { status: 500 }
-      );
+      return fail("INTERNAL_ERROR", result.error || "Rollback failed", 500);
     }
 
-    return NextResponse.json({
+    return ok({
       success: true,
       message: `Successfully rolled back to deployment ${deploymentId}`,
       rollbackTime: result.rollbackTime,
@@ -88,10 +77,7 @@ export async function POST(
     });
   } catch (error) {
     log.error("Rollback error", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Internal server error", 500);
   }
 }
 
@@ -107,12 +93,9 @@ export async function GET(
 
     const { id } = await params;
     const result = await canRollback(id);
-    return NextResponse.json(result);
+    return ok(result);
   } catch (error) {
     log.error("Rollback check error", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Internal server error", 500);
   }
 }

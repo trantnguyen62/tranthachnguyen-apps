@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createHash } from "crypto";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("feature-flags/evaluate");
 
@@ -9,14 +11,13 @@ const log = getRouteLogger("feature-flags/evaluate");
 // This endpoint is meant to be called from deployed apps
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { projectId, userId, userAttributes = {} } = body;
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: "Project ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Project ID is required", 400);
     }
 
     // Verify project exists
@@ -25,10 +26,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Get all enabled flags for the project
@@ -43,16 +41,13 @@ export async function POST(request: NextRequest) {
       results[flag.key] = evaluateFlag(flag, userId, userAttributes);
     }
 
-    return NextResponse.json({
+    return ok({
       flags: results,
       evaluatedAt: new Date().toISOString(),
     });
   } catch (error) {
     log.error("Failed to evaluate feature flags", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to evaluate feature flags" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to evaluate feature flags", 500);
   }
 }
 

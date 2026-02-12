@@ -7,7 +7,7 @@ interface Deployment {
   projectId: string;
   status: "QUEUED" | "BUILDING" | "DEPLOYING" | "READY" | "ERROR" | "CANCELLED";
   commitSha: string | null;
-  commitMsg: string | null;
+  commitMessage: string | null;
   branch: string;
   url: string | null;
   buildTime: number | null;
@@ -25,7 +25,7 @@ interface DeploymentLog {
 
 interface CreateDeploymentData {
   commitSha?: string;
-  commitMsg?: string;
+  commitMessage?: string;
   branch?: string;
 }
 
@@ -49,16 +49,18 @@ export function useDeployments(projectId: string) {
         throw new Error("Failed to fetch deployments");
       }
 
-      const data = await response.json();
+      const envelope = await response.json();
+      const data = envelope.data ?? envelope;
+      const pagination = envelope.meta?.pagination;
 
       if (cursor) {
-        setDeployments((prev) => [...prev, ...data.deployments]);
+        setDeployments((prev) => [...prev, ...(data.deployments ?? [])]);
       } else {
-        setDeployments(data.deployments);
+        setDeployments(data.deployments ?? []);
       }
 
-      setNextCursor(data.nextCursor);
-      setHasMore(!!data.nextCursor);
+      setNextCursor(pagination?.cursor ?? null);
+      setHasMore(pagination?.hasMore ?? false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -84,11 +86,12 @@ export function useDeployments(projectId: string) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to create deployment");
+      const envelope = await response.json();
+      throw new Error(envelope.error?.message || "Failed to create deployment");
     }
 
-    const deployment = await response.json();
+    const envelope = await response.json();
+    const deployment = envelope.data ?? envelope;
     setDeployments((prev) => [deployment, ...prev]);
 
     // Trigger the build
@@ -105,8 +108,8 @@ export function useDeployments(projectId: string) {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to cancel deployment");
+      const envelope = await response.json();
+      throw new Error(envelope.error?.message || "Failed to cancel deployment");
     }
 
     setDeployments((prev) =>
@@ -140,8 +143,8 @@ export function useDeployment(id: string) {
       if (!response.ok) {
         throw new Error("Failed to fetch deployment");
       }
-      const data = await response.json();
-      setDeployment(data);
+      const envelope = await response.json();
+      setDeployment(envelope.data ?? envelope);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {

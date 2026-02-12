@@ -7,13 +7,15 @@
  * Detects monorepo configuration and lists deployable packages.
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import {
   detectMonorepo,
   getSupportedMonorepoTools,
 } from "@/lib/build/monorepo-detector";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("detect-monorepo");
 
@@ -23,7 +25,9 @@ export async function POST(request: NextRequest) {
     if (isAuthError(authResult)) return authResult;
     const { user } = authResult;
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { repoUrl, files, fileContents } = body;
 
     // Option 1: Detect from GitHub repo URL
@@ -31,10 +35,7 @@ export async function POST(request: NextRequest) {
       // Parse GitHub URL
       const match = repoUrl.match(/github\.com[/:]([^/]+)\/([^/.]+)/);
       if (!match) {
-        return NextResponse.json(
-          { error: "Invalid GitHub URL" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_ERROR", "Invalid GitHub URL", 400);
       }
 
       const [, owner, repo] = match;
@@ -67,10 +68,7 @@ export async function POST(request: NextRequest) {
         );
 
         if (!masterResponse.ok) {
-          return NextResponse.json(
-            { error: "Failed to fetch repository tree" },
-            { status: 400 }
-          );
+          return fail("BAD_REQUEST", "Failed to fetch repository tree", 400);
         }
 
         const masterTree = await masterResponse.json();
@@ -85,7 +83,7 @@ export async function POST(request: NextRequest) {
     if (files && Array.isArray(files)) {
       const result = await detectMonorepo(files, fileContents);
 
-      return NextResponse.json({
+      return ok({
         detected: result.config,
         detectedBy: result.detectedBy,
         suggestions: result.suggestions,
@@ -98,16 +96,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json(
-      { error: "Provide either repoUrl or files array" },
-      { status: 400 }
-    );
+    return fail("BAD_REQUEST", "Provide either repoUrl or files array", 400);
   } catch (error) {
     log.error("Monorepo detection error", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Internal server error", 500);
   }
 }
 
@@ -161,7 +153,7 @@ async function processGitHubTree(
 
   const result = await detectMonorepo(files, fileContents);
 
-  return NextResponse.json({
+  return ok({
     detected: result.config,
     detectedBy: result.detectedBy,
     suggestions: result.suggestions,
@@ -178,5 +170,5 @@ async function processGitHubTree(
 // GET - List supported monorepo tools
 export async function GET() {
   const tools = getSupportedMonorepoTools();
-  return NextResponse.json({ tools });
+  return ok({ tools });
 }

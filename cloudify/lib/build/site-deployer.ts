@@ -84,8 +84,8 @@ server {
     # Health check
     location /health {
         access_log off;
+        default_type text/plain;
         return 200 'OK';
-        add_header Content-Type text/plain;
     }
 }
 `;
@@ -152,6 +152,11 @@ server {
                   `echo "Fetching artifacts for ${siteSlug}..." && ` +
                   `mc alias set minio http://minio.${SYSTEM_NAMESPACE}:9000 $MINIO_ACCESS_KEY $MINIO_SECRET_KEY && ` +
                   `mc cp -r minio/cloudify-builds/${siteSlug}/ /usr/share/nginx/html/ && ` +
+                  `echo "Injecting analytics script..." && ` +
+                  `if [ -f /usr/share/nginx/html/index.html ]; then ` +
+                  `sed -i 's|</head>|<script defer src="${process.env.NEXT_PUBLIC_APP_URL || "https://cloudify.tranthachnguyen.com"}/api/analytics/script/${projectId}"></script></head>|' /usr/share/nginx/html/index.html && ` +
+                  `echo "Analytics script injected"; ` +
+                  `else echo "No index.html found, skipping analytics injection"; fi && ` +
                   `echo "Artifacts fetched successfully"`,
                 ],
                 env: [

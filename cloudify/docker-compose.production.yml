@@ -3,6 +3,12 @@
 #
 # IMPORTANT: Before deploying, copy .env.example to .env and fill in all secrets
 # Never commit .env to version control
+#
+# Base infrastructure services (postgres, redis, minio, minio-init) are defined
+# in docker/base.yml and overridden below with production-tuned settings.
+
+include:
+  - path: docker/base.yml
 
 services:
   cloudify:
@@ -18,8 +24,6 @@ services:
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_URL=${AUTH_URL}
       - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
-      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
       - REDIS_URL=redis://redis:6379
       - REPOS_DIR=/data/repos
@@ -79,9 +83,8 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=256m
 
+  # Production overrides for base services
   postgres:
-    image: postgres:16-alpine
-    container_name: cloudify-db
     restart: always
     command: >
       postgres
@@ -99,8 +102,6 @@ services:
       - POSTGRES_USER=cloudify
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=cloudify
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h localhost -U cloudify -d cloudify"]
       interval: 10s
@@ -121,8 +122,6 @@ services:
       - no-new-privileges:true
 
   redis:
-    image: redis:7-alpine
-    container_name: cloudify-redis
     restart: always
     command: >
       redis-server
@@ -135,8 +134,7 @@ services:
       --save 900 1
       --save 300 10
       --save 60 10000
-    volumes:
-      - redis_data:/data
+    # Note: ports inherited from base.yml (6379); access is restricted by private bridge network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -156,16 +154,12 @@ services:
       - no-new-privileges:true
 
   minio:
-    image: minio/minio:latest
-    container_name: cloudify-minio
-    command: server /data --console-address ":9001"
     restart: always
+    # Note: ports inherited from base.yml (9000, 9001); access is restricted by private bridge network
     environment:
       - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
       - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
       - MINIO_BROWSER_REDIRECT_URL=${MINIO_CONSOLE_URL:-https://minio-console.tranthachnguyen.com}
-    volumes:
-      - minio_data:/data
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 30s
@@ -185,11 +179,6 @@ services:
       - no-new-privileges:true
 
   minio-init:
-    image: minio/mc:latest
-    container_name: cloudify-minio-init
-    depends_on:
-      minio:
-        condition: service_healthy
     entrypoint: >
       /bin/sh -c "
       mc alias set cloudify http://minio:9000 $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY} &&
@@ -199,7 +188,6 @@ services:
       mc anonymous set download cloudify/cloudify-blobs &&
       echo 'MinIO buckets initialized'
       "
-    restart: "no"
 
   # Traefik reverse proxy
   traefik:
@@ -263,12 +251,6 @@ services:
       - "traefik.http.middlewares.security-headers.headers.browserXssFilter=true"
 
 volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  minio_data:
-    driver: local
   cloudify_repos:
     driver: local
   cloudify_builds:

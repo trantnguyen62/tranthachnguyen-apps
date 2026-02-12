@@ -5,11 +5,13 @@
  * POST /api/projects/:id/cron - Create a new cron job
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { validateCronExpression, describeCronSchedule, parseNextRun } from "@/lib/cron/scheduler";
 import { getRouteLogger } from "@/lib/api/logger";
+import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("projects/[id]/cron");
 
@@ -38,7 +40,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Get cron jobs with execution stats
@@ -86,13 +88,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       totalExecutions: job._count.executions,
     }));
 
-    return NextResponse.json({ jobs });
+    return ok({ jobs });
   } catch (error) {
     log.error("Failed to list cron jobs", error);
-    return NextResponse.json(
-      { error: "Failed to list cron jobs" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to list cron jobs", 500);
   }
 }
 
@@ -117,35 +116,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
-    const body = await request.json();
+    const parseResult = await parseJsonBody(request);
+    if (isParseError(parseResult)) return parseResult;
+    const body = parseResult.data;
     const { name, schedule, path, enabled = true, timezone = "UTC", timeout = 60, retryCount = 0 } = body;
 
     // Validate required fields
     if (!name || !schedule || !path) {
-      return NextResponse.json(
-        { error: "Missing required fields: name, schedule, path" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Missing required fields: name, schedule, path", 400);
     }
 
     // Validate cron expression
     const validation = validateCronExpression(schedule);
     if (!validation.valid) {
-      return NextResponse.json(
-        { error: `Invalid cron expression: ${validation.error}` },
-        { status: 400 }
-      );
+      return fail("VALIDATION_ERROR", `Invalid cron expression: ${validation.error}`, 400);
     }
 
     // Validate path starts with /
     if (!path.startsWith("/")) {
-      return NextResponse.json(
-        { error: "Path must start with /" },
-        { status: 400 }
-      );
+      return fail("BAD_REQUEST", "Path must start with /", 400);
     }
 
     // Calculate next run time
@@ -166,7 +158,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({
+    return ok({
       job: {
         id: cronJob.id,
         name: cronJob.name,
@@ -183,9 +175,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }, { status: 201 });
   } catch (error) {
     log.error("Failed to create cron job", error);
-    return NextResponse.json(
-      { error: "Failed to create cron job" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create cron job", 500);
   }
 }

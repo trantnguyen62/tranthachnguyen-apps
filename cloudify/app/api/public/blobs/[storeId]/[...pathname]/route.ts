@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { downloadBlob, getBlobInfo } from "@/lib/storage/blob-service";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 
 const log = getRouteLogger("public/blobs");
 
@@ -32,20 +33,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!store) {
-      return NextResponse.json({ error: "Store not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Store not found", 404);
     }
 
     if (!store.isPublic) {
-      return NextResponse.json(
-        { error: "This blob is not publicly accessible" },
-        { status: 403 }
-      );
+      return fail("AUTH_FORBIDDEN", "This blob is not publicly accessible", 403);
     }
 
     // Download and stream the blob
     const result = await downloadBlob(storeId, pathname);
     if (!result) {
-      return NextResponse.json({ error: "Blob not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Blob not found", 404);
     }
 
     const headers = new Headers();
@@ -77,10 +75,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return new NextResponse(webStream, { headers });
   } catch (error) {
     log.error("Public blob error", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to serve blob" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to serve blob", 500);
   }
 }
 

@@ -2,10 +2,11 @@
  * Deployment Stream - Real-time SSE for deployment progress
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { getRouteLogger } from "@/lib/api/logger";
+import { fail } from "@/lib/api/response";
 
 const log = getRouteLogger("deployments/[id]/stream");
 
@@ -32,11 +33,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!deployment) {
-      return NextResponse.json({ error: "Deployment not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Deployment not found", 404);
     }
 
     if (deployment.project.userId !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return fail("AUTH_FORBIDDEN", "Unauthorized", 403);
     }
 
     const encoder = new TextEncoder();
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             });
 
             if (!currentDeployment) {
-              sendEvent("error", { message: "Deployment not found" });
+              sendEvent("error", { error: "Deployment not found" });
               controller.close();
               return false;
             }
@@ -182,9 +183,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     log.error("Stream error", error);
-    return NextResponse.json(
-      { error: "Failed to create stream" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create stream", 500);
   }
 }

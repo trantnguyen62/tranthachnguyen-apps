@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { requireReadAccess, requireWriteAccess, isAuthError } from "@/lib/auth/api-auth";
 import { parseJsonBody, isParseError } from "@/lib/api/parse-body";
 import { getRouteLogger } from "@/lib/api/logger";
+import { ok, fail } from "@/lib/api/response";
 import {
   uploadBlob,
   downloadBlob,
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Project not found", 404);
       }
     }
 
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       // Get presigned download URL
@@ -72,10 +73,10 @@ export async function GET(request: NextRequest) {
         const result = await getDownloadUrl(storeId, pathname, { expiresIn });
 
         if (!result) {
-          return NextResponse.json({ error: "Blob not found" }, { status: 404 });
+          return fail("NOT_FOUND", "Blob not found", 404);
         }
 
-        return NextResponse.json(result);
+        return ok(result);
       }
 
       // Get blob info only
@@ -83,10 +84,10 @@ export async function GET(request: NextRequest) {
         const blobInfo = await getBlobInfo(storeId, pathname);
 
         if (!blobInfo) {
-          return NextResponse.json({ error: "Blob not found" }, { status: 404 });
+          return fail("NOT_FOUND", "Blob not found", 404);
         }
 
-        return NextResponse.json(blobInfo);
+        return ok(blobInfo);
       }
 
       // Download blob content
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
         const result = await downloadBlob(storeId, pathname);
 
         if (!result) {
-          return NextResponse.json({ error: "Blob not found" }, { status: 404 });
+          return fail("NOT_FOUND", "Blob not found", 404);
         }
 
         // Stream the response
@@ -122,10 +123,10 @@ export async function GET(request: NextRequest) {
       });
 
       if (!blob) {
-        return NextResponse.json({ error: "Blob not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Blob not found", 404);
       }
 
-      return NextResponse.json(blob);
+      return ok(blob);
     }
 
     // List blobs in a store
@@ -138,7 +139,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       const result = await listBlobs(storeId, {
@@ -150,7 +151,7 @@ export async function GET(request: NextRequest) {
       // Get storage usage
       const storageUsed = await getStorageUsed(storeId);
 
-      return NextResponse.json({
+      return ok({
         blobs: result.blobs,
         cursor: result.cursor,
         hasMore: result.hasMore,
@@ -192,13 +193,10 @@ export async function GET(request: NextRequest) {
       totalSize: store.blobs.reduce((sum, blob) => sum + blob.size, 0),
     }));
 
-    return NextResponse.json(storesWithSize);
+    return ok(storesWithSize);
   } catch (error) {
     log.error("Failed to fetch blobs", error);
-    return NextResponse.json(
-      { error: "Failed to fetch blobs" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch blobs", 500);
   }
 }
 
@@ -220,10 +218,7 @@ export async function POST(request: NextRequest) {
       const projectId = formData.get("projectId") as string | null;
 
       if (!file || !storeId || !pathname || !projectId) {
-        return NextResponse.json(
-          { error: "Missing required fields: file, storeId, pathname, projectId" },
-          { status: 400 }
-        );
+        return fail("VALIDATION_MISSING_FIELD", "Missing required fields: file, storeId, pathname, projectId", 400);
       }
 
       // Verify project ownership
@@ -232,7 +227,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Project not found", 404);
       }
 
       // Verify store access
@@ -244,7 +239,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       // Upload to MinIO
@@ -266,7 +261,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json(blobInfo);
+      return ok(blobInfo);
     }
 
     // Handle JSON requests
@@ -288,10 +283,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: "Project ID is required" },
-        { status: 400 }
-      );
+      return fail("VALIDATION_MISSING_FIELD", "Project ID is required", 400);
     }
 
     // Verify project ownership
@@ -300,7 +292,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+      return fail("NOT_FOUND", "Project not found", 404);
     }
 
     // Create a new store
@@ -323,7 +315,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json(store);
+      return ok(store);
     }
 
     // Operations on existing store
@@ -336,7 +328,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       // Get presigned upload URL
@@ -346,7 +338,7 @@ export async function POST(request: NextRequest) {
           contentType: blobContentType,
         });
 
-        return NextResponse.json(result);
+        return ok(result);
       }
 
       // Copy blob
@@ -360,7 +352,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (!sourceStore) {
-          return NextResponse.json({ error: "Source store not found" }, { status: 404 });
+          return fail("NOT_FOUND", "Source store not found", 404);
         }
 
         const blobInfo = await copyBlob(
@@ -371,10 +363,10 @@ export async function POST(request: NextRequest) {
         );
 
         if (!blobInfo) {
-          return NextResponse.json({ error: "Failed to copy blob" }, { status: 500 });
+          return fail("INTERNAL_ERROR", "Failed to copy blob", 500);
         }
 
-        return NextResponse.json(blobInfo);
+        return ok(blobInfo);
       }
 
       // Direct upload with content
@@ -400,20 +392,14 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        return NextResponse.json(blobInfo);
+        return ok(blobInfo);
       }
     }
 
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
-    );
+    return fail("BAD_REQUEST", "Invalid request", 400);
   } catch (error) {
     log.error("Failed to create blob", error);
-    return NextResponse.json(
-      { error: "Failed to create blob" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to create blob", 500);
   }
 }
 
@@ -441,7 +427,7 @@ export async function DELETE(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       const deleted = await deleteBlob(storeId, pathname);
@@ -458,7 +444,7 @@ export async function DELETE(request: NextRequest) {
         });
       }
 
-      return NextResponse.json({ success: deleted });
+      return ok({ success: deleted });
     }
 
     // Delete entire store
@@ -474,7 +460,7 @@ export async function DELETE(request: NextRequest) {
       });
 
       if (!store) {
-        return NextResponse.json({ error: "Store not found" }, { status: 404 });
+        return fail("NOT_FOUND", "Store not found", 404);
       }
 
       // Delete all blobs from MinIO
@@ -493,16 +479,13 @@ export async function DELETE(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, deletedCount });
+      return ok({ success: true, deletedCount });
     }
 
-    return NextResponse.json({ error: "ID required" }, { status: 400 });
+    return fail("VALIDATION_MISSING_FIELD", "ID required", 400);
   } catch (error) {
     log.error("Failed to delete blob", error);
-    return NextResponse.json(
-      { error: "Failed to delete" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to delete", 500);
   }
 }
 

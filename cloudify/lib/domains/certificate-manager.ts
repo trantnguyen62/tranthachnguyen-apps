@@ -166,7 +166,7 @@ export async function provisionCertificate(
   // Update status to provisioning
   await prisma.domain.update({
     where: { id: domainId },
-    data: { sslStatus: "provisioning" },
+    data: { sslStatus: "PROVISIONING" },
   });
 
   try {
@@ -191,7 +191,7 @@ export async function provisionCertificate(
     await prisma.domain.update({
       where: { id: domainId },
       data: {
-        sslStatus: "active",
+        sslStatus: "ACTIVE",
         sslCertPath: certPath,
         sslKeyPath: keyPath,
       },
@@ -231,7 +231,7 @@ export async function provisionCertificate(
     // Update status to error
     await prisma.domain.update({
       where: { id: domainId },
-      data: { sslStatus: "error" },
+      data: { sslStatus: "ERROR" },
     });
 
     // Send error notification
@@ -282,7 +282,7 @@ export async function getCertificateInfo(domainId: string): Promise<CertificateI
   };
 
   // If we have a certificate, get expiry info
-  if (domainRecord.sslCertPath && domainRecord.sslStatus === "active") {
+  if (domainRecord.sslCertPath && domainRecord.sslStatus === "ACTIVE") {
     const expiresAt = await getCertificateExpiry(domainRecord.sslCertPath);
 
     if (expiresAt) {
@@ -325,7 +325,7 @@ export async function checkAndRenewCertificates(): Promise<{
   const domains = await prisma.domain.findMany({
     where: {
       verified: true,
-      sslStatus: { in: ["active", "expiring"] },
+      sslStatus: "ACTIVE",
       sslCertPath: { not: null },
     },
   });
@@ -378,7 +378,7 @@ export async function getExpiringCertificates(
   const domains = await prisma.domain.findMany({
     where: {
       verified: true,
-      sslStatus: "active",
+      sslStatus: "ACTIVE",
       sslCertPath: { not: null },
     },
   });
@@ -448,7 +448,7 @@ export async function revokeCertificate(domainId: string): Promise<boolean> {
   await prisma.domain.update({
     where: { id: domainId },
     data: {
-      sslStatus: "pending",
+      sslStatus: "PENDING",
       sslCertPath: null,
       sslKeyPath: null,
     },
@@ -474,9 +474,9 @@ export async function getCertificateManagerStatus(): Promise<{
 }> {
   const [total, active, pending, error] = await Promise.all([
     prisma.domain.count({ where: { verified: true } }),
-    prisma.domain.count({ where: { sslStatus: "active" } }),
-    prisma.domain.count({ where: { sslStatus: { in: ["pending", "provisioning"] } } }),
-    prisma.domain.count({ where: { sslStatus: "error" } }),
+    prisma.domain.count({ where: { sslStatus: "ACTIVE" } }),
+    prisma.domain.count({ where: { sslStatus: { in: ["PENDING", "PROVISIONING"] } } }),
+    prisma.domain.count({ where: { sslStatus: "ERROR" } }),
   ]);
 
   const expiring = await getExpiringCertificates();

@@ -141,7 +141,7 @@ describe("Auth API Routes", () => {
         id: mockUser.id,
         email: mockUser.email,
         name: mockUser.name,
-        avatar: null,
+        image: null,
       });
 
       const session = await getSession();

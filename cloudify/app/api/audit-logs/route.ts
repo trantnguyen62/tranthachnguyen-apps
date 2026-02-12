@@ -4,10 +4,17 @@
  * GET /api/audit-logs - List/search audit logs with pagination and filters
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { requireReadAccess, isAuthError } from "@/lib/auth/api-auth";
 import { fetchAuditLogs, getFilterOptions, AuditLogFilters } from "@/lib/audit";
 import { getRouteLogger } from "@/lib/api/logger";
+import {
+  ok,
+  fail,
+  encodeCursor,
+  buildCursorWhere,
+  parsePaginationParams,
+} from "@/lib/api/response";
 
 const log = getRouteLogger("audit-logs");
 
@@ -36,12 +43,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
 
     // Pagination
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.min(
-      100,
-      Math.max(1, parseInt(searchParams.get("limit") || "50", 10))
-    );
-    const offset = (page - 1) * limit;
+    const { cursor, limit } = parsePaginationParams(searchParams);
+    const cursorWhere = buildCursorWhere(cursor);
 
     // Build filters
     const filters: AuditLogFilters = {};
@@ -70,20 +73,21 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
     if (search) filters.search = search;
 
-    // For non-admin users, restrict to their own activities or team activities
-    // TODO: Add proper role-based access control
-    // For now, allow access if user is part of the team
+    // Fetch logs with cursor pagination
+    const { logs, total } = await fetchAuditLogs(filters, {
+      limit: limit + 1,
+      cursorWhere: Object.keys(cursorWhere).length > 0 ? cursorWhere : undefined,
+    });
 
-    // Fetch logs
-    const { logs, total } = await fetchAuditLogs(filters, { limit, offset });
-
-    // Calculate pagination info
-    const totalPages = Math.ceil(total / limit);
-    const hasMore = page < totalPages;
+    const hasMore = logs.length > limit;
+    const items = hasMore ? logs.slice(0, limit) : logs;
+    const nextCursor = hasMore && items.length > 0
+      ? encodeCursor(items[items.length - 1])
+      : undefined;
 
     // Build response
     const response: Record<string, unknown> = {
-      logs: logs.map((log) => ({
+      logs: items.map((log) => ({
         id: log.id,
         type: log.type,
         action: log.action,
@@ -112,13 +116,6 @@ export async function GET(request: NextRequest) {
         userAgent: log.userAgent,
         metadata: log.metadata,
       })),
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasMore,
-      },
     };
 
     // Include filter options if requested
@@ -127,12 +124,15 @@ export async function GET(request: NextRequest) {
       response.filterOptions = await getFilterOptions(teamId || undefined);
     }
 
-    return NextResponse.json(response);
+    return ok(response, {
+      pagination: {
+        cursor: nextCursor,
+        hasMore,
+        total,
+      },
+    });
   } catch (error) {
     log.error("Failed to fetch audit logs", { error: error instanceof Error ? error.message : String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch audit logs" },
-      { status: 500 }
-    );
+    return fail("INTERNAL_ERROR", "Failed to fetch audit logs", 500);
   }
 }
