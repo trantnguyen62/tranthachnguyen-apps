@@ -177,7 +177,11 @@ const QUESTIONS = {
         { q: "What does 'docker pull' do?", a: ["Downloads an image from a registry", "Uploads an image", "Creates a container", "Removes a container"], c: 0, fact: "Docker Hub is the default public registry for images." },
         { q: "What is Docker Compose used for?", a: ["Multi-container applications", "Building images", "Network configuration", "Security scanning"], c: 0, fact: "Docker Compose uses YAML to define multi-container apps." },
         { q: "What does the -d flag do in 'docker run -d'?", a: ["Runs container in detached mode", "Enables debugging", "Downloads image", "Deletes after exit"], c: 0, fact: "Detached mode runs the container in the background." },
-        { q: "What is a Docker volume?", a: ["Persistent data storage", "Network interface", "CPU allocation", "Memory limit"], c: 0, fact: "Volumes persist data even when containers are deleted." }
+        { q: "What is a Docker volume?", a: ["Persistent data storage", "Network interface", "CPU allocation", "Memory limit"], c: 0, fact: "Volumes persist data even when containers are deleted." },
+        { q: "What does 'docker images' list?", a: ["All local images", "Running containers", "Network interfaces", "Volume mounts"], c: 0, fact: "Use 'docker images -a' to include intermediate build layers." },
+        { q: "What is the purpose of .dockerignore?", a: ["Exclude files from build context", "Block network access", "Ignore container errors", "Skip health checks"], c: 0, fact: ".dockerignore speeds up builds by reducing the context sent to the daemon." },
+        { q: "What does ENTRYPOINT do in a Dockerfile?", a: ["Sets the container's main process", "Exposes a port", "Sets environment variables", "Copies files into the image"], c: 0, fact: "Unlike CMD, ENTRYPOINT arguments are not overridden by docker run arguments." },
+        { q: "What does 'docker inspect' return?", a: ["Detailed JSON metadata", "Container logs", "Image layers", "Network stats"], c: 0, fact: "docker inspect reveals IP addresses, mounts, env vars, and more." }
     ],
     kubernetes: [
         { q: "What is a Kubernetes Pod?", a: ["Smallest deployable unit", "A cluster", "A service", "A volume"], c: 0, fact: "A Pod can contain one or more containers that share resources." },
@@ -187,7 +191,11 @@ const QUESTIONS = {
         { q: "What is a Kubernetes Namespace?", a: ["Virtual cluster partition", "Physical server", "Container runtime", "Storage class"], c: 0, fact: "Namespaces help organize resources in large clusters." },
         { q: "What does HPA stand for?", a: ["Horizontal Pod Autoscaler", "High Performance Architecture", "Host Port Allocation", "Hybrid Pod Application"], c: 0, fact: "HPA automatically scales pods based on CPU/memory usage." },
         { q: "Which object stores sensitive data?", a: ["Secret", "ConfigMap", "PersistentVolume", "Deployment"], c: 0, fact: "Secrets are base64 encoded (not encrypted by default!)." },
-        { q: "What is an Ingress?", a: ["HTTP route manager", "Container runtime", "Pod scheduler", "Volume provisioner"], c: 0, fact: "Ingress provides SSL termination and virtual hosting." }
+        { q: "What is an Ingress?", a: ["HTTP route manager", "Container runtime", "Pod scheduler", "Volume provisioner"], c: 0, fact: "Ingress provides SSL termination and virtual hosting." },
+        { q: "What is a DaemonSet?", a: ["Runs a pod on every node", "Manages stateful apps", "Schedules batch jobs", "Routes internal traffic"], c: 0, fact: "DaemonSets are ideal for cluster-wide services like log collectors." },
+        { q: "What is a StatefulSet?", a: ["Manages stateful applications", "Balances pod load", "Stores secrets", "Routes external traffic"], c: 0, fact: "StatefulSets give pods stable network identities and persistent storage." },
+        { q: "What is a PersistentVolumeClaim?", a: ["Request for storage by a pod", "A type of Service", "A network policy", "A pod scheduling rule"], c: 0, fact: "PVCs decouple storage requests from the underlying infrastructure." },
+        { q: "What does 'kubectl rollout undo' do?", a: ["Reverts to previous Deployment version", "Pauses a rollout", "Scales down pods", "Deletes a Deployment"], c: 0, fact: "Kubernetes keeps rollout history so you can roll back instantly." }
     ],
     cicd: [
         { q: "What does CI stand for?", a: ["Continuous Integration", "Code Inspection", "Container Instance", "Cloud Infrastructure"], c: 0, fact: "CI automates building and testing code on every commit." },
@@ -197,7 +205,11 @@ const QUESTIONS = {
         { q: "What is blue-green deployment?", a: ["Two identical environments", "Color-coded logs", "Branch naming", "Error highlighting"], c: 0, fact: "Blue-green enables instant rollback by switching traffic." },
         { q: "What is a canary deployment?", a: ["Gradual rollout to subset", "Fast deployment", "Rollback strategy", "Testing approach"], c: 0, fact: "Canary releases test changes on a small user percentage first." },
         { q: "What is GitHub Actions?", a: ["CI/CD platform", "Code review tool", "Issue tracker", "Wiki system"], c: 0, fact: "GitHub Actions uses YAML workflows in .github/workflows/." },
-        { q: "What is GitOps?", a: ["Git as source of truth for infrastructure", "Git hosting service", "Git GUI tool", "Git branching strategy"], c: 0, fact: "GitOps uses pull requests to manage infrastructure changes." }
+        { q: "What is GitOps?", a: ["Git as source of truth for infrastructure", "Git hosting service", "Git GUI tool", "Git branching strategy"], c: 0, fact: "GitOps uses pull requests to manage infrastructure changes." },
+        { q: "What is a Jenkinsfile?", a: ["Pipeline definition checked into source control", "Jenkins config file", "Plugin manifest", "Deployment script"], c: 0, fact: "Storing Jenkinsfiles in the repo enables pipeline-as-code." },
+        { q: "What is ArgoCD?", a: ["GitOps continuous delivery tool for Kubernetes", "A code review platform", "A secrets manager", "A container registry"], c: 0, fact: "ArgoCD continuously syncs cluster state with Git repository state." },
+        { q: "What is a staging environment?", a: ["Pre-production environment for testing", "The production server", "A build server", "A developer's laptop"], c: 0, fact: "Staging mirrors production to catch issues before they reach users." },
+        { q: "What does 'shift-left' mean in CI/CD?", a: ["Testing earlier in the development cycle", "Deploying to the left region", "Shifting traffic gradually", "Moving jobs to earlier pipeline stages"], c: 0, fact: "Shift-left reduces the cost of bugs by catching them sooner." }
     ],
     aws: [
         { q: "What is EC2?", a: ["Elastic Compute Cloud", "Elastic Container Cloud", "Enterprise Cloud Computing", "Easy Cloud Creation"], c: 0, fact: "EC2 provides resizable virtual servers in the cloud." },
@@ -207,7 +219,11 @@ const QUESTIONS = {
         { q: "What is VPC?", a: ["Virtual Private Cloud", "Virtual Public Cloud", "Very Private Container", "Virtual Pod Cluster"], c: 0, fact: "VPC isolates your resources in a virtual network." },
         { q: "What is CloudFormation?", a: ["Infrastructure as Code", "Monitoring service", "Storage service", "Compute service"], c: 0, fact: "CloudFormation templates define AWS resources in YAML/JSON." },
         { q: "What is EKS?", a: ["Elastic Kubernetes Service", "Elastic Key Storage", "Enterprise Kubernetes System", "Easy Kubernetes Setup"], c: 0, fact: "EKS is a managed Kubernetes service by AWS." },
-        { q: "What is CloudWatch?", a: ["Monitoring and logging", "Storage service", "Compute service", "Database service"], c: 0, fact: "CloudWatch collects metrics, logs, and can trigger alarms." }
+        { q: "What is CloudWatch?", a: ["Monitoring and logging", "Storage service", "Compute service", "Database service"], c: 0, fact: "CloudWatch collects metrics, logs, and can trigger alarms." },
+        { q: "What is AWS ECR?", a: ["Elastic Container Registry", "Elastic Compute Runtime", "Enterprise Cloud Router", "Elastic Cache Repository"], c: 0, fact: "ECR integrates natively with ECS and EKS for seamless image pulls." },
+        { q: "What is an AWS Security Group?", a: ["Virtual firewall for resources", "IAM permission set", "VPC subnet rule", "Network load balancer"], c: 0, fact: "Security groups are stateful — return traffic is automatically allowed." },
+        { q: "What is AWS SQS used for?", a: ["Decoupling services via message queues", "Storing objects", "Running serverless code", "Managing DNS records"], c: 0, fact: "SQS can buffer millions of messages to prevent service overload." },
+        { q: "What does AWS Auto Scaling do?", a: ["Adjusts capacity to meet demand", "Balances DNS queries", "Replicates databases", "Manages IAM roles"], c: 0, fact: "Auto Scaling can scale both up and down to optimize cost." }
     ],
     terraform: [
         { q: "What is Terraform?", a: ["Infrastructure as Code tool", "Container runtime", "CI/CD platform", "Monitoring tool"], c: 0, fact: "Terraform works with 1000+ providers (AWS, Azure, GCP, etc)." },
@@ -217,7 +233,11 @@ const QUESTIONS = {
         { q: "What does 'terraform apply' do?", a: ["Applies changes", "Shows plan", "Initializes directory", "Validates config"], c: 0, fact: "Apply creates, updates, or deletes infrastructure." },
         { q: "What is Terraform state?", a: ["Record of managed infrastructure", "Configuration file", "Variable definition", "Provider plugin"], c: 0, fact: "State is critical - store it securely (e.g., S3 + DynamoDB)." },
         { q: "What is a Terraform module?", a: ["Reusable configuration", "State file", "Provider", "Resource type"], c: 0, fact: "Modules promote DRY (Don't Repeat Yourself) principles." },
-        { q: "What does 'terraform destroy' do?", a: ["Removes all resources", "Shows plan", "Applies changes", "Validates config"], c: 0, fact: "Destroy removes all resources managed by the configuration." }
+        { q: "What does 'terraform destroy' do?", a: ["Removes all resources", "Shows plan", "Applies changes", "Validates config"], c: 0, fact: "Destroy removes all resources managed by the configuration." },
+        { q: "What is a Terraform data source?", a: ["Reads existing infrastructure info", "Creates a new resource", "Defines an output value", "Stores the state file"], c: 0, fact: "Data sources let you reference resources not managed by your config." },
+        { q: "What is 'terraform import' used for?", a: ["Brings existing resources under Terraform management", "Imports provider plugins", "Downloads modules", "Loads variable files"], c: 0, fact: "terraform import lets you manage infrastructure created outside Terraform." },
+        { q: "What is a Terraform workspace?", a: ["Isolated state environment", "A module directory", "A provider configuration", "A backend type"], c: 0, fact: "Workspaces let you manage multiple environments (dev/staging/prod) from one config." },
+        { q: "Where should Terraform state be stored in teams?", a: ["Remote backend like S3", "Local filesystem", "Git repository", "Environment variable"], c: 0, fact: "Never commit tfstate to Git — it can contain sensitive values in plaintext." }
     ],
     git: [
         { q: "What does 'git clone' do?", a: ["Copies a repository", "Creates a branch", "Merges branches", "Pushes changes"], c: 0, fact: "Clone copies the entire repository history." },
@@ -227,7 +247,11 @@ const QUESTIONS = {
         { q: "What does 'git merge' do?", a: ["Combines branches", "Creates branch", "Deletes branch", "Shows differences"], c: 0, fact: "Merge integrates changes from one branch into another." },
         { q: "What is a merge conflict?", a: ["Competing changes to same lines", "Network error", "Authentication failure", "File corruption"], c: 0, fact: "Conflicts happen when Git can't auto-merge changes." },
         { q: "What does 'git rebase'?", a: ["Reapplies commits on new base", "Creates backup", "Deletes history", "Merges repositories"], c: 0, fact: "Rebase creates a cleaner, linear commit history." },
-        { q: "What is a pull request?", a: ["Request to merge changes", "Download request", "Access request", "Delete request"], c: 0, fact: "PRs enable code review before merging to main." }
+        { q: "What is a pull request?", a: ["Request to merge changes", "Download request", "Access request", "Delete request"], c: 0, fact: "PRs enable code review before merging to main." },
+        { q: "What does 'git fetch' do?", a: ["Downloads remote changes without merging", "Downloads and merges changes", "Uploads commits", "Creates a branch"], c: 0, fact: "git fetch is safe — it never modifies your working directory." },
+        { q: "What does 'git stash' do?", a: ["Temporarily saves uncommitted work", "Deletes a branch", "Merges two branches", "Creates a tag"], c: 0, fact: "git stash pop restores your stashed changes when you're ready." },
+        { q: "What is 'git cherry-pick'?", a: ["Applies a specific commit to current branch", "Picks files to stage", "Selects a merge strategy", "Chooses a remote"], c: 0, fact: "Cherry-pick is useful for backporting fixes to release branches." },
+        { q: "What does 'git tag' do?", a: ["Marks a specific commit", "Creates a branch", "Stages all files", "Pushes to remote"], c: 0, fact: "Tags are commonly used to mark release versions like v1.0.0." }
     ],
     linux: [
         { q: "What does 'ls' command do?", a: ["Lists directory contents", "Creates file", "Deletes file", "Moves file"], c: 0, fact: "ls -la shows hidden files and detailed info." },
@@ -237,7 +261,11 @@ const QUESTIONS = {
         { q: "What does 'ps' show?", a: ["Running processes", "File permissions", "Network connections", "Disk space"], c: 0, fact: "ps aux shows all processes with detailed info." },
         { q: "What is systemd?", a: ["System and service manager", "File system", "Network manager", "Package manager"], c: 0, fact: "systemd is the init system for most modern Linux distros." },
         { q: "What does 'ssh' do?", a: ["Secure remote connection", "File transfer", "Service start", "System shutdown"], c: 0, fact: "SSH encrypts all traffic between client and server." },
-        { q: "What does 'curl' do?", a: ["Transfers data via URLs", "Creates users", "Compresses files", "Lists processes"], c: 0, fact: "curl supports HTTP, HTTPS, FTP, and many more protocols." }
+        { q: "What does 'curl' do?", a: ["Transfers data via URLs", "Creates users", "Compresses files", "Lists processes"], c: 0, fact: "curl supports HTTP, HTTPS, FTP, and many more protocols." },
+        { q: "What does 'tail -f' do?", a: ["Follows a file as it grows", "Shows last 10 lines", "Deletes a file", "Compresses a file"], c: 0, fact: "tail -f is the go-to tool for watching live log output." },
+        { q: "What does 'df -h' show?", a: ["Disk space usage in human-readable form", "Directory file listing", "Default filesystem", "Daemon file handles"], c: 0, fact: "Use 'df -h' to quickly spot full disks before they cause issues." },
+        { q: "What is cron used for?", a: ["Scheduling recurring tasks", "Compressing files", "Managing users", "Monitoring processes"], c: 0, fact: "Cron expressions have 5 fields: minute, hour, day, month, weekday." },
+        { q: "What does 'top' display?", a: ["Real-time process and resource usage", "Network topology", "File system tree", "Open ports"], c: 0, fact: "Press 'q' to quit top, or try 'htop' for a friendlier interface." }
     ],
     monitoring: [
         { q: "What is Prometheus?", a: ["Monitoring system", "Container runtime", "CI/CD tool", "Load balancer"], c: 0, fact: "Prometheus uses a pull model to scrape metrics." },
@@ -247,7 +275,11 @@ const QUESTIONS = {
         { q: "What does ELK stand for?", a: ["Elasticsearch, Logstash, Kibana", "Easy Linux Kit", "Enterprise Log Keeper", "Elastic Load Kit"], c: 0, fact: "ELK Stack is the most popular log management solution." },
         { q: "What is an SLO?", a: ["Service Level Objective", "System Log Output", "Server Load Optimizer", "Service Launch Order"], c: 0, fact: "SLOs define target reliability levels for services." },
         { q: "What is APM?", a: ["Application Performance Monitoring", "Automated Process Manager", "Advanced Package Manager", "Application Process Memory"], c: 0, fact: "APM tracks response times, errors, and bottlenecks." },
-        { q: "What is tracing?", a: ["Following request paths", "Logging errors", "Measuring latency", "Counting requests"], c: 0, fact: "Distributed tracing follows requests across microservices." }
+        { q: "What is tracing?", a: ["Following request paths", "Logging errors", "Measuring latency", "Counting requests"], c: 0, fact: "Distributed tracing follows requests across microservices." },
+        { q: "What is observability?", a: ["Ability to understand system state from outputs", "A monitoring tool", "A logging format", "A deployment strategy"], c: 0, fact: "Observability is built on three pillars: metrics, logs, and traces." },
+        { q: "What is an error budget?", a: ["Allowed amount of downtime for an SLO", "Cost of fixing bugs", "Number of retries allowed", "Alert threshold setting"], c: 0, fact: "When your error budget is exhausted, new features should pause for reliability work." },
+        { q: "What is Jaeger used for?", a: ["Distributed tracing", "Log aggregation", "Metrics collection", "Alert routing"], c: 0, fact: "Jaeger is a CNCF project for end-to-end distributed transaction monitoring." },
+        { q: "What is a health check endpoint?", a: ["API endpoint reporting service status", "A monitoring dashboard", "A log aggregator", "An alert rule"], c: 0, fact: "Kubernetes uses health checks (liveness/readiness probes) to manage pod lifecycle." }
     ]
 };
 
