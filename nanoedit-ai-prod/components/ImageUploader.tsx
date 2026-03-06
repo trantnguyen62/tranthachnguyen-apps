@@ -59,10 +59,10 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
     reader.readAsDataURL(file);
   }, [onImageSelected]);
 
-  const startCamera = async () => {
+  const startCamera = useCallback(async () => {
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
       });
       setStream(mediaStream);
       setIsCameraOpen(true);
@@ -71,7 +71,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
       console.error("Camera access error:", err);
       setError("Unable to access camera. Please allow camera permissions.");
     }
-  };
+  }, []);
 
   const stopCamera = useCallback(() => {
     if (stream) {

@@ -5,7 +5,6 @@ export interface ProcessedImage {
 
 export enum AppStatus {
   IDLE = 'IDLE',
-  UPLOADING = 'UPLOADING',
   READY_TO_EDIT = 'READY_TO_EDIT',
   PROCESSING = 'PROCESSING',
   COMPLETED = 'COMPLETED',

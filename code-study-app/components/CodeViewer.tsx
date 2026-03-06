@@ -33,7 +33,8 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
         <div className="text-center text-slate-500 space-y-2">
           <Code2 className="w-10 h-10 mx-auto opacity-30" />
           <p className="text-base font-medium text-slate-400">No file selected</p>
-          <p className="text-sm">Pick a file from the tree to view its contents</p>
+          <p className="text-sm">Pick a file from the sidebar to view it here</p>
+          <p className="text-xs text-slate-600">Tip: select any code text to give the AI tutor specific context</p>
         </div>
       </div>
     );

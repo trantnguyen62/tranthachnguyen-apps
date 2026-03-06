@@ -73,9 +73,10 @@ const App: React.FC = () => {
       } else {
         throw new Error("Failed to generate image. Please try again.");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setErrorMsg(err.message || "Something went wrong. Please try a different prompt or image.");
+      const message = err instanceof Error ? err.message : "Something went wrong. Please try a different prompt or image.";
+      setErrorMsg(message);
       setStatus(AppStatus.ERROR);
     }
   }, [currentImage, prompt, history, historyIndex]);
