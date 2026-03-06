@@ -9,7 +9,7 @@ An interactive study application to master DevOps concepts through flashcards, q
 - **Match Game** - Match terms with their definitions under time pressure
 - **Codebase View** - Browse code examples and configuration templates
 - **Commands Cheat Sheet** - Quick reference for essential DevOps commands
-- **Progress Tracking** - Track cards studied and overall progress
+- **Progress Tracking** - Track cards studied and overall progress (persisted in browser storage)
 
 ## 📚 Topics Covered
 
@@ -41,11 +41,19 @@ docker build -t devops-study .
 docker run -p 8080:80 devops-study
 ```
 
+## ⌨️ Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `←` / `→` | Previous / Next flashcard |
+| `Space` / `Enter` | Flip flashcard |
+
 ## 📁 Project Structure
 
 ```
 devops-study/
 ├── index.html          # Main HTML file
+├── privacy.html        # Privacy policy page
 ├── app.js              # Application logic
 ├── app.min.js          # Minified version
 ├── styles.css          # Styling
