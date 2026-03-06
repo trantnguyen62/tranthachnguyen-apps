@@ -1,74 +1,100 @@
-# 📚 Comic News (Comic Reader)
+# Comic News
 
-Browse and read your favorite comics with a beautiful reader interface. Track your progress and bookmark favorites.
+Browse and read daily news stories transformed into comics. Track your reading progress and bookmark favorites.
 
-## 🎯 Features
+## Features
 
-- **Comic Browser** - Browse available comics and chapters
-- **Clean Reader** - Distraction-free reading experience
-- **Progress Tracking** - Remember where you left off
-- **Bookmarks** - Save your favorite chapters
+- **Comic Browser** - Browse available comics with search, filter by genre, and sort by rating
+- **Clean Reader** - Distraction-free panel-by-panel reading experience
+- **Text Mode** - Toggle between comic and text versions of each story
+- **Progress Tracking** - Resume reading where you left off (server-side)
+- **Bookmarks** - Save favorite stories
 - **Responsive Design** - Works on desktop and mobile
 
-## 🚀 Quick Start
+## Quick Start
 
-### Run the Backend
+### Development
 
 ```bash
-# Navigate to backend
+# Start backend (port 5187)
 cd backend
-
-# Install dependencies
 npm install
-
-# Start server
 npm start
-```
 
-### Run the Frontend
-
-```bash
-# Navigate to frontend
+# Start frontend dev server (port 5173)
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
 ```
 
-### Run with Docker
+### Docker
+
+The Dockerfile expects a pre-built frontend. Build locally first, then build the image:
 
 ```bash
+# Build frontend
+cd frontend && npm install && npm run build && cd ..
+
+# Build and run Docker image
 docker build -t comic-news .
 docker run -p 5187:5187 comic-news
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 comic-news/
-├── backend/            # Express.js API server
-│   ├── server.js       # Main server file
-│   └── ...
-├── frontend/           # Vite + React frontend
-│   ├── src/            # React components
-│   └── ...
-├── package.json        # Root package config
-└── Dockerfile          # Docker configuration
+├── backend/
+│   ├── server.js       # Express API server + static file serving
+│   ├── images/         # Comic image assets
+│   └── package.json
+├── frontend/
+│   ├── src/
+│   │   ├── components/ # Navbar, ComicCard
+│   │   ├── pages/      # Home, Library, ComicDetail, Reader, Bookmarks
+│   │   └── App.jsx     # Router setup
+│   ├── public/
+│   └── package.json
+├── Dockerfile
+└── package.json
 ```
 
-## 🛠️ Tech Stack
+## API Endpoints
 
-- **Frontend**: React, Vite
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/comics` | List comics. Query params: `genre`, `search`, `sort` (`rating`\|`title`) |
+| GET | `/api/comics/:id` | Get single comic with pages |
+| GET | `/api/genres` | List available genres |
+| GET | `/api/featured` | Top-rated comics (up to 4) |
+| GET | `/api/bookmarks` | Get bookmarked comics |
+| POST | `/api/bookmarks/:id` | Add bookmark |
+| DELETE | `/api/bookmarks/:id` | Remove bookmark |
+| GET | `/api/bookmarks/check/:id` | Check if comic is bookmarked |
+| GET | `/api/progress/:id` | Get reading progress (page number) |
+| POST | `/api/progress/:id` | Save reading progress (`{ page }`) |
+| GET | `/robots.txt` | SEO robots file |
+| GET | `/sitemap.xml` | SEO sitemap |
+
+> Note: Bookmarks and reading progress are stored in-memory and reset on server restart.
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `5187` | Backend server port |
+| `BASE_URL` | `https://comic-news.tranthachnguyen.com` | Base URL used in sitemap.xml |
+
+## Tech Stack
+
+- **Frontend**: React, Vite, Tailwind CSS, React Router, Lucide React
 - **Backend**: Node.js, Express
-- **Styling**: Custom CSS
+- **Deployment**: Docker (single container, backend serves built frontend)
 
-## 🌐 Live Demo
+## Live Demo
 
 [comicnews.tranthachnguyen.com](https://comicnews.tranthachnguyen.com)
 
-## 📄 License
+## License
 
 © 2025 Tran Thach Nguyen. All rights reserved.
