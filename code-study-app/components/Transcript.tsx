@@ -17,12 +17,16 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center text-slate-500">
-        <p className="text-center">
-          Start a conversation to see the transcript here.
-          <br />
-          <span className="text-sm">Ask questions about your code!</span>
-        </p>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center space-y-4 px-4">
+          <Bot className="w-10 h-10 mx-auto text-emerald-500/30" />
+          <p className="text-slate-400 font-medium">No conversation yet</p>
+          <div className="text-left space-y-2 text-sm text-slate-500">
+            <p className="flex items-start gap-2"><span className="text-emerald-500/60 font-bold">1.</span> Select a project and open a file</p>
+            <p className="flex items-start gap-2"><span className="text-emerald-500/60 font-bold">2.</span> Click <span className="text-emerald-400">Start Voice Session</span></p>
+            <p className="flex items-start gap-2"><span className="text-emerald-500/60 font-bold">3.</span> Ask questions about your code</p>
+          </div>
+        </div>
       </div>
     );
   }

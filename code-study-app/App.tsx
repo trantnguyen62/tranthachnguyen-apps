@@ -278,7 +278,7 @@ function App() {
                   ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                   : isConnecting
                   ? 'bg-slate-700/50 text-slate-400'
-                  : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
+                  : 'bg-emerald-500 text-white hover:bg-emerald-400 shadow-lg shadow-emerald-500/25'
               }`}
             >
               {isConnecting ? (

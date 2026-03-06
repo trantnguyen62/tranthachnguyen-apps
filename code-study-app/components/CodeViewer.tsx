@@ -1,6 +1,6 @@
 import { useState, useCallback, memo, useMemo } from 'react';
 import { FileNode } from '../types';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Code2 } from 'lucide-react';
 
 interface CodeViewerProps {
   file: FileNode | null;
@@ -49,6 +49,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
           <span className="text-xs px-2 py-0.5 bg-slate-600/50 rounded text-slate-400">
             {file.language}
           </span>
+          <span className="text-xs text-slate-500">{lines.length} lines</span>
         </div>
         <button
           onClick={handleCopy}
