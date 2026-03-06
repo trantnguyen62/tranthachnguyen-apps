@@ -112,6 +112,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
         <img src={currentImage.data} alt="Preview" style={{ width: '100%', maxHeight: 400, objectFit: 'contain', display: 'block' }} />
         <button
           onClick={handleClear}
+          aria-label="Remove photo"
           style={{
             position: 'absolute', top: 12, right: 12,
             width: 36, height: 36, borderRadius: 10,
@@ -137,6 +138,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
             autoPlay
             playsInline
             muted
+            aria-label="Camera preview"
             style={{ width: '100%', height: 340, objectFit: 'cover', display: 'block', transform: 'scaleX(-1)' }}
           />
           {/* Face guide overlay */}
@@ -195,7 +197,11 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload photo — click or drag and drop an image here"
         onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
@@ -244,7 +250,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
       </button>
 
       {cameraError && (
-        <p style={{ color: accentPink, fontSize: 12, textAlign: 'center', marginTop: 4 }}>{cameraError}</p>
+        <p role="alert" style={{ color: accentPink, fontSize: 12, textAlign: 'center', marginTop: 4 }}>{cameraError}</p>
       )}
     </div>
   );

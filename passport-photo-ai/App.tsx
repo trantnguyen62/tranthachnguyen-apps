@@ -76,13 +76,13 @@ export default function App() {
         {/* Header */}
         <header style={{ textAlign: 'center', marginBottom: 60 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <div style={{ 
-              width: 48, height: 48, 
+            <div style={{
+              width: 48, height: 48,
               background: `linear-gradient(135deg, ${accentPink}, ${accentGold})`,
               borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 24, boxShadow: `0 8px 32px ${accentPink}44`
             }}>
-              🎨
+              <span aria-hidden="true">🎨</span>
             </div>
             <h1 style={{ 
               fontFamily: "'Syne', sans-serif", 
@@ -124,7 +124,7 @@ export default function App() {
             border: '1px solid rgba(255,255,255,0.08)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-              <span style={{ fontSize: 20 }}>📸</span>
+              <span aria-hidden="true" style={{ fontSize: 20 }}>📸</span>
               <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 600 }}>Your Photo</h2>
               {image && (
                 <span style={{ 
@@ -159,6 +159,7 @@ export default function App() {
               <button
                 onClick={handleCheck}
                 disabled={!image || status === AppStatus.CHECKING}
+                aria-busy={status === AppStatus.CHECKING}
                 style={{
                   padding: '16px 12px', borderRadius: 14,
                   border: 'none', 
@@ -190,10 +191,11 @@ export default function App() {
             minHeight: 450
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-              <span style={{ fontSize: 20 }}>📋</span>
+              <span aria-hidden="true" style={{ fontSize: 20 }}>📋</span>
               <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 600 }}>Analysis</h2>
             </div>
             
+            <div aria-live="polite" aria-atomic="true">
             {result ? (
               <div style={{ animation: 'fadeSlideIn 0.5s ease' }}>
                 {/* Status Card */}
@@ -207,8 +209,8 @@ export default function App() {
                     : `1px solid ${accentPink}44`
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ 
-                      width: 56, height: 56, borderRadius: 16, 
+                    <div aria-hidden="true" style={{
+                      width: 56, height: 56, borderRadius: 16,
                       background: result.compliant ? '#10B981' : accentPink,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 28, boxShadow: `0 8px 24px ${result.compliant ? '#10B98144' : accentPink + '44'}`
@@ -284,14 +286,14 @@ export default function App() {
                 )}
               </div>
             ) : (
-              <div style={{ 
-                height: 350, 
-                display: 'flex', flexDirection: 'column', 
+              <div style={{
+                height: 350,
+                display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
                 color: 'rgba(255,255,255,0.25)',
                 textAlign: 'center'
               }}>
-                <div style={{ 
+                <div aria-hidden="true" style={{
                   fontSize: 64, marginBottom: 16, opacity: 0.3,
                   filter: 'grayscale(100%)'
                 }}>🖼️</div>
@@ -300,6 +302,7 @@ export default function App() {
                 </p>
               </div>
             )}
+            </div>
           </section>
         </main>
 

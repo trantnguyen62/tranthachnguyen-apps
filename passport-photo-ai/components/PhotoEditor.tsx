@@ -10,6 +10,12 @@ interface Props {
 
 // Background color options
 const BG_COLORS = ['#FFFFFF', '#F5F5F5', '#E8E8E8', '#DCE8F0'] as const;
+const BG_COLOR_NAMES: Record<string, string> = {
+  '#FFFFFF': 'White',
+  '#F5F5F5': 'Light gray',
+  '#E8E8E8': 'Gray',
+  '#DCE8F0': 'Light blue',
+};
 
 const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promise<string> =>
   new Promise((resolve) => {
@@ -109,22 +115,22 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   }, []);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+    <div role="dialog" aria-modal="true" aria-labelledby="editor-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
       <div style={{ background: '#111', borderRadius: 16, width: '90%', maxWidth: 700, padding: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2>🎨 AI Photo Studio</h2>
-          <button onClick={onCancel} style={{ background: 'none', border: 'none', color: '#888', fontSize: 20, cursor: 'pointer' }}>×</button>
+          <h2 id="editor-title">🎨 AI Photo Studio</h2>
+          <button onClick={onCancel} aria-label="Close editor" style={{ background: 'none', border: 'none', color: '#888', fontSize: 20, cursor: 'pointer' }}>×</button>
         </div>
 
         <div style={{ display: 'flex', gap: 20, marginBottom: 20 }}>
           <div style={{ flex: 1, textAlign: 'center' }}>
             <p style={{ fontSize: 11, color: '#888', marginBottom: 8 }}>ORIGINAL</p>
-            <img src={image.data} style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 8 }} />
+            <img src={image.data} alt="Original photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 8 }} />
           </div>
           <div style={{ flex: 1, textAlign: 'center' }}>
             <p style={{ fontSize: 11, color: '#10B981', marginBottom: 8 }}>RESULT</p>
             {result ? (
-              <img src={result} style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 8 }} />
+              <img src={result} alt="Processed passport photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 8 }} />
             ) : (
               <div style={{ height: 200, background: '#222', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555' }}>
                 Click "Auto-Fix" to start
@@ -136,7 +142,14 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
         {step === 'processing' && (
           <div style={{ background: 'rgba(0,217,255,0.1)', borderRadius: 8, padding: 12, marginBottom: 16 }}>
             <div style={{ height: 4, background: '#333', borderRadius: 2, overflow: 'hidden', marginBottom: 8 }}>
-              <div style={{ width: `${progress}%`, height: '100%', background: '#00D9FF', transition: 'width 0.3s' }} />
+              <div
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Processing progress"
+                style={{ width: `${progress}%`, height: '100%', background: '#00D9FF', transition: 'width 0.3s' }}
+              />
             </div>
             <p style={{ fontSize: 12, color: '#00D9FF', textAlign: 'center' }}>Processing... {progress}%</p>
           </div>
@@ -151,18 +164,20 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
                   key={c}
                   onClick={() => setBgColor(c)}
                   disabled={step !== 'done'}
+                  aria-label={`Background color: ${BG_COLOR_NAMES[c]}`}
+                  aria-pressed={bgColor === c}
                   style={{ width: 28, height: 28, borderRadius: 6, background: c, border: bgColor === c ? '2px solid #00D9FF' : '2px solid transparent', cursor: 'pointer' }}
                 />
               ))}
             </div>
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Brightness: {brightness}%</p>
-            <input type="range" min="90" max="120" value={brightness} onChange={handleBrightnessChange} disabled={step !== 'done'} style={{ width: '100%' }} />
+            <label htmlFor="brightness-range" style={{ fontSize: 12, color: '#888', marginBottom: 6, display: 'block' }}>Brightness: {brightness}%</label>
+            <input id="brightness-range" type="range" min="90" max="120" value={brightness} onChange={handleBrightnessChange} disabled={step !== 'done'} style={{ width: '100%' }} />
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Contrast: {contrast}%</p>
-            <input type="range" min="90" max="120" value={contrast} onChange={handleContrastChange} disabled={step !== 'done'} style={{ width: '100%' }} />
+            <label htmlFor="contrast-range" style={{ fontSize: 12, color: '#888', marginBottom: 6, display: 'block' }}>Contrast: {contrast}%</label>
+            <input id="contrast-range" type="range" min="90" max="120" value={contrast} onChange={handleContrastChange} disabled={step !== 'done'} style={{ width: '100%' }} />
           </div>
         </div>
 
