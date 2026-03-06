@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="quillGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea"/>
+      <stop offset="100%" style="stop-color:#764ba2"/>
+    </linearGradient>
+  </defs>
+  <!-- Quill feather -->
+  <path d="M75 10 C85 20, 85 35, 70 55 L50 80 L48 78 C55 60, 60 45, 55 30 C50 15, 60 5, 75 10 Z" 
+        fill="url(#quillGradient)" stroke="#4f46e5" stroke-width="2"/>
+  <!-- Quill tip -->
+  <path d="M50 80 L45 95 L48 78 Z" fill="#1a1a1a"/>
+  <!-- Inner detail -->
+  <path d="M70 20 C75 28, 72 40, 60 55" stroke="#fff" stroke-width="2" fill="none" opacity="0.4"/>
+</svg>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Quotidian - Daily Literature Quotes</title>
+    <meta name="description"
+        content="A daily quote for people who wish they had more time to read. Discover literary passages, save favorites, and discuss with AI.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dailyquote.tranthachnguyen.com/">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dailyquote.tranthachnguyen.com/">
+    <meta property="og:title" content="Quotidian - Daily Literature Quotes">
+    <meta property="og:description"
+        content="A daily quote for people who wish they had more time to read. Save and discuss your favorite literary passages.">
+    <meta property="og:image" content="https://dailyquote.tranthachnguyen.com/og-image.png">
+    <meta property="og:site_name" content="Quotidian">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://dailyquote.tranthachnguyen.com/">
+    <meta name="twitter:title" content="Quotidian - Daily Literature">
+    <meta name="twitter:description" content="Beautiful quotes from literature, delivered daily.">
+    <meta name="twitter:image" content="https://dailyquote.tranthachnguyen.com/og-image.png">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Quotidian",
+        "url": "https://dailyquote.tranthachnguyen.com",
+        "description": "Daily literature quotes app with bookmarks, categories, and AI discussion features",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Quotidian">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1a1a2e">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20260107-7">
+</head>
+
+<body>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <div class="splash-logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Stylized Q with open book -->
+                    <circle cx="50" cy="45" r="32" fill="none" stroke="currentColor" stroke-width="6" />
+                    <!-- Book pages inside Q -->
+                    <path d="M35 35 L50 40 L65 35 L65 55 L50 60 L35 55 Z" fill="currentColor" opacity="0.3" />
+                    <line x1="50" y1="40" x2="50" y2="60" stroke="currentColor" stroke-width="2" />
+                    <!-- Q tail with bookmark ribbon -->
+                    <path d="M62 65 Q75 75, 78 88" stroke="currentColor" stroke-width="6" fill="none"
+                        stroke-linecap="round" />
+                    <path d="M75 85 L78 92 L81 85" fill="currentColor" />
+                    <!-- Small star accent -->
+                    <circle cx="25" cy="25" r="3" fill="currentColor" opacity="0.6" />
+                </svg>
+            </div>
+            <h1 class="splash-title">quotidian</h1>
+            <p class="splash-tagline">Words for every sunrise</p>
+        </div>
+    </div>
+
+    <div class="app-container">
+
+        <!-- Main Quote Card -->
+        <main class="quote-section">
+            <div class="quote-card" id="quoteCard">
+                <div class="card-inner">
+                    <div class="date-header">
+                        <button class="day-nav-btn prev-day-btn" id="prevDayBtn" aria-label="Previous day">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6" />
+                            </svg>
+                        </button>
+                        <div class="date-display" id="dateDisplay">
+                            <span class="date-label" id="dateLabel">Today</span>
+                            <span class="date-value" id="currentDate"></span>
+                        </div>
+                        <button class="day-nav-btn next-day-btn" id="nextDayBtn" aria-label="Next day">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <blockquote class="quote-text" id="quoteText">
+                        <!-- Quote will be inserted here -->
+                    </blockquote>
+
+                    <div class="quote-source">
+                        <cite class="book-title" id="bookTitle"></cite>
+                        <span class="author-info" id="authorInfo"></span>
+                    </div>
+
+                    <div class="quote-story" id="quoteStory">
+                        <!-- Story will be inserted here -->
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="action-btn bookmark-btn" id="bookmarkBtn" aria-label="Bookmark this quote">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                            </svg>
+                        </button>
+                        <button class="action-btn share-btn" id="shareBtn" aria-label="Share this quote">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                                <polyline points="16 6 12 2 8 6" />
+                                <line x1="12" y1="2" x2="12" y2="15" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation dots for quote navigation -->
+            <div class="quote-nav">
+                <button class="nav-btn prev-btn" id="prevBtn" aria-label="Previous quote">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                </button>
+                <div class="nav-dots" id="navDots"></div>
+                <button class="nav-btn next-btn" id="nextBtn" aria-label="Next quote">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </button>
+            </div>
+        </main>
+
+        <!-- Footer Navigation -->
+        <nav class="app-nav">
+            <button class="nav-tab active" data-tab="today">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>Today</span>
+            </button>
+            <button class="nav-tab" data-tab="bookmarks">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>Saved</span>
+            </button>
+            <button class="nav-tab" data-tab="ai-partner">
+                <div class="nav-tab-icon-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        <circle cx="9" cy="10" r="1" fill="currentColor" />
+                        <circle cx="15" cy="10" r="1" fill="currentColor" />
+                    </svg>
+                    <span class="ai-active-indicator" id="aiActiveIndicator"></span>
+                </div>
+                <span>Discuss</span>
+            </button>
+            <button class="nav-tab" data-tab="explore">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                </svg>
+                <span>Explore</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Bookmarks Panel (hidden by default) -->
+    <div class="panel bookmarks-panel" id="bookmarksPanel">
+        <div class="panel-header">
+            <h2>bookmarks</h2>
+            <button class="close-panel" id="closeBookmarks">×</button>
+        </div>
+        <div class="panel-content" id="bookmarksList">
+            <!-- Bookmarked quotes will appear here -->
+        </div>
+    </div>
+
+    <!-- Explore Panel (hidden by default) -->
+    <div class="panel explore-panel" id="explorePanel">
+        <div class="panel-header">
+            <h2>explore</h2>
+            <button class="close-panel" id="closeExplore">×</button>
+        </div>
+        <div class="explore-header-image">
+            <div class="explore-title">Explore quotes by<br>emotions, senses...</div>
+        </div>
+        <div class="panel-content" id="categoryGrid">
+            <!-- Categories will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Filtered Quotes Panel (hidden by default) -->
+    <div class="panel filtered-panel" id="filteredPanel">
+        <div class="panel-header">
+            <button class="back-btn" id="backToExplore">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+            <h2 id="filteredTitle">Category</h2>
+            <button class="close-panel" id="closeFiltered">×</button>
+        </div>
+        <div class="panel-content" id="filteredList">
+            <!-- Filtered quotes will appear here -->
+        </div>
+    </div>
+
+    <!-- AI Voice Partner Panel -->
+    <div class="panel chat-panel" id="chatPanel">
+        <div class="panel-header">
+            <div class="chat-header-content">
+                <h2>Voice Discuss</h2>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Disconnected</span>
+                </div>
+            </div>
+            <div class="panel-header-actions">
+                <button class="minimize-panel" id="minimizeChat" aria-label="Minimize">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                </button>
+                <button class="close-panel" id="closeChat">×</button>
+            </div>
+        </div>
+
+        <!-- Quote Preview Card (always visible) -->
+        <div class="discussion-quote-preview" id="discussionQuotePreview">
+            <div class="preview-quote-text" id="previewQuoteText">
+                <!-- Quote will be mirrored here -->
+            </div>
+            <div class="preview-quote-source">
+                <span class="preview-book" id="previewBookTitle"></span>
+                <span class="preview-author" id="previewAuthorInfo"></span>
+            </div>
+        </div>
+
+        <!-- Voice Visualizer Section -->
+        <div class="voice-section" id="voiceSection">
+            <div class="voice-welcome" id="voiceWelcome">
+                <div class="welcome-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path
+                            d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                </div>
+                <h3>Discuss this quote</h3>
+                <p>Tap the microphone to start a voice conversation about this quote.</p>
+            </div>
+
+            <!-- Audio Visualizer -->
+            <div class="voice-visualizer" id="voiceVisualizer">
+                <div class="visualizer-ring ring-1"></div>
+                <div class="visualizer-ring ring-2"></div>
+                <div class="visualizer-ring ring-3"></div>
+                <div class="visualizer-bars" id="visualizerBars">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+
+            <!-- Voice Control -->
+            <div class="voice-control">
+                <button class="mic-btn" id="micBtn" aria-label="Start voice conversation">
+                    <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    <svg class="stop-icon hidden" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="6" width="12" height="12" rx="2" />
+                    </svg>
+                </button>
+                <span class="mic-label" id="micLabel">Tap to start</span>
+            </div>
+        </div>
+
+        <!-- Transcript Section -->
+        <div class="chat-messages transcript-section" id="chatMessages">
+            <div class="transcript-header">
+                <span>Transcript</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="ai-client.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

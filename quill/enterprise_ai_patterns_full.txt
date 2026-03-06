@@ -1,0 +1,413 @@
+--- Page 1 ---
+Engineering Editorial
+
+Al Agent Design Patterns
+
+in Enterprise Practice
+
+Moving from “Demo-
+ware” to Resilient,
+
+Scalable Business ee eee
+Workflows. en ee Recsoning mp |
+
+label
+| Structured Logic & Inference
+_———
+a
+
+veoter Memory
+
+Batabsve
+Integration &
+AG FE N T Contextual Recall & Persistence
+
+The Transformation
+
+ARCHITECTURE
+
+Cvardeait
+implemertation
+
+Tool Use
+
+Soesome=:
+[f API Integration & Action Execution
++
+et ty
+
+=> Governance =>
+v 4
+
+Compliance, Ethics & Aoditing
+
+A PLAYBOOK FOR ARCHITECTS, CTOs,
+AND PRODUCT LEADERS
+
+
+--- Page 2 ---
+Beyond the Chatbot: Engineering Reliability into LLMs
+
+Enterprise adoption of Generative Al is often stalled by hallucinations, latency, and cost. The solution lies not
+in better prompting, but in Agentic Design Patterns. We are moving from asking models to *do* things,
+to designing systems that *accomplish* workflows.
+
+THE OLD WAY: Ad-hoc Interaction THE NEW WAY: Engineered Workflows
+Agent A
+(Q)~ la. ee 2? | @=<=-o-PO
+O
+User Single Model Unpredictable User Router Agent B Verified
+Prompt Output Intent Output
+Agent C
+
+
+--- Page 3 ---
+Customer Service: The Intelligent Triage Model |
+
+Problem: A single bot cannot effectively handle both technical execution and emotional de-escalation.
+
+Intent:
+
+: > Reset Password
+Transactional
+
+> Check Status
+> Update Address
+
+API AGENT
+
+> Sentiment Analysis
+> De-escalation Tone
+
+User Request
+
+TRIAGE AGENT intent:
+(Intent Classification) Emotional/Complaint > Human Handoff Prep
+Pattern: Intent Routing EMPATHY AGENT
+
+
+--- Page 4 ---
+at
+
+-—
+Hyper-Personalization and Safety at Scale
+
+The Agent Brain
+
+== Tl
+AN ti
+
+= —_
+
+ia ak All .
+Short-term ¢ Fy Conversation from Company
+[some Sitter 5 minutes ago Policy
+oy
+
+The “Personal
+Tutor” Pattern
+
+Context drives
+personalization, while
+RAG ensures the bot
+does not hallucinate
+company policy.
+
+Guardrails provide the
+final safety net.
+
+Sensitive Topic
+(e.g. Crisis)
+
+
+
+--- Page 5 ---
+Engineering Editorial
+
+DevOps: The Virtual Engineering Squad
+
+Pattern: Multi-Agent Collaboration & Reflection
+
+MANAGER AGENT
+Inter Tight
+
+Bug detected.
+Sent back to Dev for fix ./
+
+before human review. FEJIE Toe
+
+JetBrains Mono
+
+ECOSYSTEM DIAGRAM
+
+|) DEV AGENT
+‘(} Generates Code
+
+QA AGENT |,
+Reviews Syntax & Logic \'4
+
+ce
+“fc TION Loop eto
+
+
+
+--- Page 6 ---
+Autonomous Planning and Orchestration
+
+Pattern: Reasoning & Planning
+
+User Intent
+Migrate Database toAWS —
+
+p
+
+ep) Step 1: as © Step 2: ry eS) Step 3: 3 4) Step 4: |
+Schema Check Provisioning Execution Validation
+
+Analyze current Create RDS Run migr Verify data
+DB structure. Instance. scripts. integrity.
+
+
+
+--- Page 7 ---
+Content Operations: Industrialized Creativity
+
+Patterns: Prompt Chaining & Parallelization
+
+PATTERN A: CHAINING (The sain Line)
+
+Outline
+e Agent
+
+* Polishing
+
+= pfiffiing
+
+) =f Agent
+
+a elftiqus !
+a: de i __,
+
+jetBrains Mono
+
+tE4: AGGREGATOR
+AGENT
+
+Market
+
+| QB analyze
+
+VY (Synthesis)
+
+
+
+--- Page 8 ---
+Innovation: Algorithmic Inspiration
+
+Pattern: Exploration
+
+Unexpected
+Character
+
+' Reverse °
+
+eal
+\, Chronology /
+CRcetta
+/ Alternate .
+\. Reality
+
+/- Symbolic
+\, Motifs
+
+/ Unreliable * :
+\. Narrator Unreliable
+Narrator
+
+es
+Dilemma ee
+; / Sea
+
+Divergent Idea Generation
+(20 Variations)
+
+Future |
+Tech |
+/
+Hybrid
+Format
+
+Cae
+
+7H
+
+The Problem:
+Writer's Block
+
+ee 9
+ee 9
+(eee)
+(eee)
+
+a |
+\
+\ THE WHITE
+i SPACE:
+Va Interactive \ ! Untapped
+Elements / ' Market
+' Opportunities
+/ Historical \ -
+. Parallels / !
+/
+/
+= = /
+4
+
+-—_——
+
+“Use the Agent not just to write, but to find the angles you missed.”
+
+A) NotebookLM
+
+
+--- Page 9 ---
+: -
+
+Critical Operations: The Human-in-the-Loop
+Pattern: HITL (Human-in-the-Loop)
+
+Context: High-stakes actions (Finance, Security, VIP Comms).
+Rule: Agents prepare. Humans decide.
+
+[ Agent dobReparlation 7 APPROVE
+Drafts email, EXECUTION
+stages
+transaction. J X REJECT a
+
+A) NotebookLM
+
+
+
+--- Page 10 ---
+TE AT
+
+Accuracy: Determinism in a Probabilistic System
+Pattern: Tool Use / Function Calling
+
+Probabilistic Guessina Deterministic Tool Use
+
+245 * 932 =
+...maybe 228,000?
+
+Orchestrator CALCULATOR / PYTHON
+LLM JetBrains Mono JetBrains Mono
+
+Risk of Hallucination
+Crimson Pro
+
+API: STOCK PRICE
+JetBrains Mono
+
+
+--- Page 11 ---
+Tp - aT
+
+The Economics of Intelligence: Resource-Aware Computing
+Pattern: Model Routing
+
+Sorting Station
+
+Low Complexity (Greetings, FAQ)
+LLAMA-3-8B
+
+MODEL
+ROUTER
+
+JetBrains Mono
+
+User Query Low Cost / High Speed
+
+JetBrains Mono
+
+60-80%
+
+Reduction in
+
+High Cost / Operational Costs
+High Intelligence
+
++ 7 +
+
++ Ay NotebookLM
+
+High Complexity
+(Strategic Analysis)
+
+
+
+--- Page 12 ---
+oe Editorial ale lt
+Operational Discipline: Guardrails Against Drift
+
+Pattern: Objective Supervision Drafting Ink Blue Inter Tight
+
+| yo
+Supervisor Eye —
+— |
+
+Path Correction
+
+ae Hotel Booking? a6
+JetBrains Mono
+INTERVENTION: Agent Path
+Redirect to Ticket Search
+PRIMARY OBJECTIVE: Crimson Pro
+‘~ Book Plane Ticket
+: JetBrains Mono
+————— See Semeep ne Went oU0 ied nnn s0lbeasn acd veneddnbesere sieves Lit centesesesisieancdecenuvel cassardvunseod
+Grey
+
+
+--- Page 13 ---
++
+The Enterprise Agent Framework
+
+A visual index of key patterns for architecture.
+
+Routing Memory RAG
+CX (Triage) (Tutor) =- .
+JetBrains Mono JetBrains Mono 7 ela Ane
+Multi-Agent Reflection .
+DevOps Te (Squad) (Self-Heal) ae oe
++ JetBrains Mono JetBrains Mono +
+
+Chaining Parallelization .
+Content (Assembly) (Research) xD Onaga
+
+JetBrains Mono JetBrains Mono
+
+HITL Tool Use
+Governance (Safety) (Accuracy)
+
+JetBrains Mono JetBrains Mono
+
+T © Model Routing = Objective
+
+Ops Bo (Cost) S| Monitoring (Drift)
+
+of ‘“@) JetBrains Mono JetBrains Mono
+($)
+
+
+--- Page 14 ---
+From Prompting to Engineering
+
+Design the workflow first. The intelligence will follow.
+
+RELIABLE
+
+Reflection & HITL
+
+To move from Demo to Production, stop treating Al as a magic chat box
+and start treating it as a component in a structured workflow.
+

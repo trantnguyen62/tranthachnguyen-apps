@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="50%" style="stop-color:#16213e"/>
+      <stop offset="100%" style="stop-color:#0f3460"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="url(#bg)"/>
+  <!-- Crescent Moon -->
+  <path d="M350 256c0-80-65-145-145-145 16 0 32 4 48 12 60 32 96 96 96 172s-36 140-96 172c-16 8-32 12-48 12 80 0 145-65 145-145v-78z" fill="#D4A754" filter="drop-shadow(0 8px 24px rgba(212, 167, 84, 0.5))"/>
+  <!-- Person silhouette on moon -->
+  <circle cx="280" cy="200" r="24" fill="#D4A754"/>
+  <path d="M260 230c0 0 8 32 8 60s-20 32-20 32" stroke="#D4A754" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M248 322c-12 8-32 20-48 20" stroke="#D4A754" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <path d="M268 290c8 0 24 4 32 12" stroke="#D4A754" stroke-width="8" fill="none" stroke-linecap="round"/>
+</svg>

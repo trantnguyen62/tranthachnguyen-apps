@@ -1,0 +1,7 @@
+{
+    "name": "quill",
+    "version": "1.0.0",
+    "description": "A humble blogging platform inspired by Medium",
+    "author": "Tran Thach Nguyen",
+    "license": "MIT"
+}

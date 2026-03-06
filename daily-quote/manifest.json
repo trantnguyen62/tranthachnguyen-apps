@@ -1,0 +1,30 @@
+{
+    "name": "Quotidian: Daily Literature",
+    "short_name": "Quotidian",
+    "description": "Daily quotes from literature for people who wish they had more time to read",
+    "start_url": "/index.html",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "theme_color": "#1a1a2e",
+    "background_color": "#1a1a2e",
+    "icons": [
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "books",
+        "education",
+        "lifestyle"
+    ]
+}
