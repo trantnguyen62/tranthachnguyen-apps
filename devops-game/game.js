@@ -311,6 +311,9 @@ const AssetLoader = {
     }
 };
 
+// Cached DOM references (populated in init)
+const domCache = {};
+
 // Game State
 let game = {
     mode: 'adventure',
@@ -383,13 +386,35 @@ function init() {
         renderTopicGrid();
         resizeCanvas();
 
+        // Cache frequently accessed DOM elements
+        domCache.healthFill    = document.getElementById('healthFill');
+        domCache.healthText    = document.getElementById('healthText');
+        domCache.shieldFill    = document.getElementById('shieldFill');
+        domCache.scoreValue    = document.getElementById('scoreValue');
+        domCache.streakValue   = document.getElementById('streakValue');
+        domCache.multiplier    = document.getElementById('multiplier');
+        domCache.levelLabel    = document.getElementById('levelLabel');
+        domCache.levelName     = document.getElementById('levelName');
+        domCache.waveNumber    = document.getElementById('waveNumber');
+        domCache.timerFill     = document.getElementById('timerFill');
+        domCache.questionPanel = document.getElementById('questionPanel');
+        domCache.questionTopic = document.getElementById('questionTopic');
+        domCache.questionText  = document.getElementById('questionText');
+        domCache.answerGrid    = document.getElementById('answerGrid');
+        domCache.pauseMenu     = document.getElementById('pauseMenu');
+        domCache.gameOver      = document.getElementById('gameOver');
+        domCache.levelComplete = document.getElementById('levelComplete');
+        domCache.globalMenuBtn = document.getElementById('globalMenuBtn');
+        domCache.newHighScore  = document.getElementById('newHighScore');
+        domCache.menuHighScore = document.getElementById('menuHighScore');
+
         window.addEventListener('resize', resizeCanvas);
     });
 }
 
 function loadHighScore() {
     game.highScore = parseInt(localStorage.getItem('devops-defender-highscore') || '0');
-    document.getElementById('menuHighScore').textContent = game.highScore;
+    if (domCache.menuHighScore) domCache.menuHighScore.textContent = game.highScore;
 }
 
 function saveHighScore() {
@@ -434,9 +459,16 @@ function setupEventListeners() {
 }
 
 function resizeCanvas() {
-    const container = document.getElementById('gameScreen');
     game.canvas.width = window.innerWidth;
     game.canvas.height = window.innerHeight;
+
+    // Recompute cached background draw dimensions
+    const bg = AssetLoader.getImage('background');
+    if (bg) {
+        const scale = Math.max(game.canvas.width / bg.width, game.canvas.height / bg.height);
+        game.bgDrawW = bg.width * scale;
+        game.bgDrawH = bg.height * scale;
+    }
 }
 
 function renderTopicGrid() {
@@ -510,7 +542,7 @@ function startGame(mode, topicId = null) {
     updateHUD();
 
     // Show global menu button
-    document.getElementById('globalMenuBtn').style.display = 'flex';
+    domCache.globalMenuBtn.style.display = 'flex';
 
     // Start game loop
     if (game.animationId) cancelAnimationFrame(game.animationId);
@@ -521,10 +553,10 @@ function startGame(mode, topicId = null) {
 }
 
 function hideAllOverlays() {
-    document.getElementById('pauseMenu').classList.add('hidden');
-    document.getElementById('gameOver').classList.add('hidden');
-    document.getElementById('levelComplete').classList.add('hidden');
-    document.getElementById('questionPanel').classList.add('hidden');
+    domCache.pauseMenu.classList.add('hidden');
+    domCache.gameOver.classList.add('hidden');
+    domCache.levelComplete.classList.add('hidden');
+    domCache.questionPanel.classList.add('hidden');
 }
 
 // Main game loop
@@ -677,25 +709,20 @@ function render() {
 
     // Draw Background Asset
     const bg = AssetLoader.getImage('background');
-    if (bg) {
-        // Simple parallax or static cover
-        // Drawing slightly larger to allow for future movement/parallax if needed
-        const scale = Math.max(game.canvas.width / bg.width, game.canvas.height / bg.height);
-        const w = bg.width * scale;
-        const h = bg.height * scale;
-
+    if (bg && game.bgDrawW) {
         ctx.globalAlpha = 0.5; // Dim it slightly so game elements pop
-        ctx.drawImage(bg, (game.canvas.width - w) / 2, (game.canvas.height - h) / 2, w, h);
+        ctx.drawImage(bg, (game.canvas.width - game.bgDrawW) / 2, (game.canvas.height - game.bgDrawH) / 2, game.bgDrawW, game.bgDrawH);
         ctx.globalAlpha = 1.0;
     }
 
     // Draw stars (keep them as they add nice depth over the background)
+    ctx.fillStyle = '#ffffff';
     game.stars.forEach(star => {
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + star.size / 3})`;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.globalAlpha = 0.3 + star.size / 3;
+        const d = star.size * 2;
+        ctx.fillRect(star.x - star.size, star.y - star.size, d, d);
     });
+    ctx.globalAlpha = 1.0;
 
     // Draw particles
     game.particles.forEach(p => {
@@ -718,15 +745,17 @@ function render() {
     });
 
     // Draw projectiles
-    game.projectiles.forEach(p => {
+    if (game.projectiles.length > 0) {
         ctx.fillStyle = '#00d4ff';
         ctx.shadowColor = '#00d4ff';
         ctx.shadowBlur = 10;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-        ctx.fill();
+        game.projectiles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        });
         ctx.shadowBlur = 0;
-    });
+    }
 
     // Draw player
     drawPlayer();
@@ -881,14 +910,12 @@ function showQuestion(enemy) {
     game.selectedAnswer = -1;
 
     // Show question panel
-    const panel = document.getElementById('questionPanel');
-    panel.classList.remove('hidden');
+    domCache.questionPanel.classList.remove('hidden');
 
-    document.getElementById('questionTopic').textContent = topic.name;
-    document.getElementById('questionText').textContent = question.q;
+    domCache.questionTopic.textContent = topic.name;
+    domCache.questionText.textContent = question.q;
 
-    const answerGrid = document.getElementById('answerGrid');
-    answerGrid.innerHTML = '';
+    domCache.answerGrid.innerHTML = '';
 
     answers.forEach((answer, i) => {
         const btn = document.createElement('button');
@@ -898,7 +925,7 @@ function showQuestion(enemy) {
             <span class="answer-text">${answer.text}</span>
         `;
         btn.onclick = () => selectAnswer(i);
-        answerGrid.appendChild(btn);
+        domCache.answerGrid.appendChild(btn);
     });
 }
 
@@ -1001,7 +1028,7 @@ function handleTimeout() {
 function closeQuestion() {
     game.questionActive = false;
     game.currentQuestion = null;
-    document.getElementById('questionPanel').classList.add('hidden');
+    domCache.questionPanel.classList.add('hidden');
 }
 
 function destroyEnemy(enemy) {
@@ -1043,11 +1070,7 @@ function takeDamage(amount) {
 
     game.player.health = Math.max(0, game.player.health - amount);
 
-    // Screen shake effect (CSS + Canvas)
-    game.canvas.style.animation = 'none';
-    game.canvas.offsetHeight; // Trigger reflow
-    game.canvas.style.animation = 'shake 0.3s ease';
-    game.shake = 20; // Canvas shake magnitude
+    game.shake = 20; // Canvas shake magnitude (handled by render loop translate)
 
     // Create damage particles
     for (let i = 0; i < 10; i++) {
@@ -1217,7 +1240,7 @@ function completeWave() {
         completeZone();
     } else {
         // Next wave
-        document.getElementById('waveNumber').textContent = game.currentWave;
+        domCache.waveNumber.textContent = game.currentWave;
         setTimeout(() => spawnWave(), 2000);
     }
 }
@@ -1233,7 +1256,7 @@ function completeZone() {
             ? Math.round(game.correctAnswers / game.questionsAnswered * 100) + '%'
             : '0%';
 
-    document.getElementById('levelComplete').classList.remove('hidden');
+    domCache.levelComplete.classList.remove('hidden');
 }
 
 function nextZone() {
@@ -1246,7 +1269,7 @@ function nextZone() {
     }
 
     game.currentWave = 1;
-    document.getElementById('levelComplete').classList.add('hidden');
+    domCache.levelComplete.classList.add('hidden');
     updateHUD();
 
     setTimeout(() => spawnWave(), 1000);
@@ -1254,33 +1277,32 @@ function nextZone() {
 
 // HUD updates
 function updateHUD() {
-    document.getElementById('healthFill').style.width = `${game.player.health}%`;
-    document.getElementById('healthText').textContent = Math.round(game.player.health);
-    document.getElementById('shieldFill').style.width = `${game.player.shield}%`;
-    document.getElementById('scoreValue').textContent = game.score;
-    document.getElementById('streakValue').textContent = game.streak;
-    document.getElementById('multiplier').textContent = `x${game.multiplier.toFixed(1)}`;
+    domCache.healthFill.style.width = `${game.player.health}%`;
+    domCache.healthText.textContent = Math.round(game.player.health);
+    domCache.shieldFill.style.width = `${game.player.shield}%`;
+    domCache.scoreValue.textContent = game.score;
+    domCache.streakValue.textContent = game.streak;
+    domCache.multiplier.textContent = `x${game.multiplier.toFixed(1)}`;
 
     const topic = TOPICS[game.currentZone];
-    document.getElementById('levelLabel').textContent = `ZONE ${game.currentZone + 1}`;
-    document.getElementById('levelName').textContent = topic.name;
-    document.getElementById('waveNumber').textContent = game.currentWave;
+    domCache.levelLabel.textContent = `ZONE ${game.currentZone + 1}`;
+    domCache.levelName.textContent = topic.name;
+    domCache.waveNumber.textContent = game.currentWave;
 }
 
 function updateTimerDisplay() {
-    const fill = document.getElementById('timerFill');
-    fill.style.width = `${(game.questionTimer / CONFIG.QUESTION_TIME) * 100}%`;
+    domCache.timerFill.style.width = `${(game.questionTimer / CONFIG.QUESTION_TIME) * 100}%`;
 }
 
 // Game state management
 function togglePause() {
     game.paused = !game.paused;
-    document.getElementById('pauseMenu').classList.toggle('hidden', !game.paused);
+    domCache.pauseMenu.classList.toggle('hidden', !game.paused);
 }
 
 function resumeGame() {
     game.paused = false;
-    document.getElementById('pauseMenu').classList.add('hidden');
+    domCache.pauseMenu.classList.add('hidden');
 }
 
 function restartGame() {
@@ -1294,7 +1316,7 @@ function quitToMenu() {
         cancelAnimationFrame(game.animationId);
     }
     hideAllOverlays();
-    document.getElementById('globalMenuBtn').style.display = 'none';
+    domCache.globalMenuBtn.style.display = 'none';
     showScreen('mainMenu');
     loadHighScore();
 }
@@ -1312,7 +1334,7 @@ function gameOver(victory = false) {
             : '0%';
     document.getElementById('bestStreak').textContent = game.bestStreak;
 
-    document.getElementById('newHighScore').classList.toggle('hidden', !isNewHighScore);
+    domCache.newHighScore.classList.toggle('hidden', !isNewHighScore);
 
     if (victory) {
         document.querySelector('.game-over-title').textContent = 'VICTORY!';
@@ -1322,7 +1344,7 @@ function gameOver(victory = false) {
         document.querySelector('.game-over-title').style.color = '#ef4444';
     }
 
-    document.getElementById('gameOver').classList.remove('hidden');
+    domCache.gameOver.classList.remove('hidden');
 }
 
 // Add CSS for shake animation
