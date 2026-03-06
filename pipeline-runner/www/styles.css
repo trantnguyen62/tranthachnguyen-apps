@@ -816,6 +816,25 @@ body {
     outline-offset: 3px;
 }
 
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .icon-preview {
+        animation: none;
+    }
+
+    .watch-ad-btn {
+        animation: none;
+    }
+
+    .tip-banner {
+        animation: none;
+    }
+
+    * {
+        transition-duration: 0.01ms !important;
+    }
+}
+
 /* Responsive - Larger screens */
 @media (min-width: 900px) {
     .game-container {

@@ -347,6 +347,7 @@ function renderTopicButtons() {
     TOPICS.forEach(topic => {
         const btn = document.createElement('button');
         btn.className = `topic-btn ${topic.id === game.selectedTopic ? 'selected' : ''}`;
+        btn.setAttribute('aria-pressed', topic.id === game.selectedTopic ? 'true' : 'false');
         btn.innerHTML = `${topic.icon} ${topic.name}`;
         btn.onclick = () => selectTopic(topic.id);
         container.appendChild(btn);
@@ -820,6 +821,10 @@ function showQuestion() {
 
     document.getElementById('questionModal').classList.remove('hidden');
     startQuestionTimer();
+
+    // Move focus to the first answer button for keyboard/screen reader users
+    const firstAnswer = document.querySelector('#answerGrid .answer-btn');
+    if (firstAnswer) firstAnswer.focus();
 }
 
 function startQuestionTimer() {
@@ -834,7 +839,9 @@ function startQuestionTimer() {
         }
 
         game.questionTimer--;
-        document.getElementById('questionTimer').textContent = game.questionTimer;
+        const timerEl = document.getElementById('questionTimer');
+        timerEl.textContent = game.questionTimer;
+        timerEl.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
 
         if (game.questionTimer <= 0) {
             clearInterval(game.questionTimerInterval);
@@ -956,7 +963,11 @@ function gameOver() {
     }
 
     // Store the timeout so it can be cancelled if user continues with extra life
-    game.gameOverTimeout = setTimeout(() => showScreen('gameOverScreen'), 500);
+    game.gameOverTimeout = setTimeout(() => {
+        showScreen('gameOverScreen');
+        const retryBtn = document.querySelector('.retry-btn');
+        if (retryBtn) retryBtn.focus();
+    }, 500);
 }
 
 // Use a life to respawn
