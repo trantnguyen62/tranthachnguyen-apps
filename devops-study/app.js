@@ -3100,17 +3100,22 @@ let state = {
 function loadProgress() {
     const saved = localStorage.getItem('devops-mastery-progress');
     if (saved) {
-        state.progress = JSON.parse(saved);
-    } else {
-        // Initialize progress for all topics
-        devopsData.topics.forEach(topic => {
+        try {
+            state.progress = JSON.parse(saved);
+        } catch (e) {
+            localStorage.removeItem('devops-mastery-progress');
+        }
+    }
+    // Initialize progress for any missing topics
+    devopsData.topics.forEach(topic => {
+        if (!state.progress[topic.id]) {
             state.progress[topic.id] = {
                 flashcardsViewed: [],
                 quizBestScore: 0,
                 quizAttempts: 0
             };
-        });
-    }
+        }
+    });
 }
 
 // Save progress to localStorage
@@ -3259,6 +3264,12 @@ function updateTabs() {
     codebaseView.classList.toggle('hidden', state.currentTab !== 'codebase');
     quizResults.classList.add('hidden');
 
+    // Stop match timer when leaving match tab
+    if (state.currentTab !== 'match' && matchState.timerInterval) {
+        clearInterval(matchState.timerInterval);
+        matchState.timerInterval = null;
+    }
+
     if (state.currentTab === 'quiz') {
         state.currentQuestionIndex = 0;
         state.quizScore = 0;
@@ -3355,7 +3366,7 @@ function renderCommands() {
         const item = document.createElement('div');
         item.className = 'command-item';
         item.innerHTML = `
-            <button class="command-copy-btn" onclick="copyCommand('${cmd.command.replace(/'/g, "\\'")}')">📋 Copy</button>
+            <button class="command-copy-btn" onclick="copyCommand(event, '${cmd.command.replace(/'/g, "\\'")}')">📋 Copy</button>
             <code class="command-code">${cmd.command}</code>
             <p class="command-description">${cmd.description}</p>
         `;
@@ -3364,7 +3375,7 @@ function renderCommands() {
 }
 
 // Copy command to clipboard
-function copyCommand(command) {
+function copyCommand(event, command) {
     navigator.clipboard.writeText(command).then(() => {
         // Show brief feedback
         const btn = event.target;
