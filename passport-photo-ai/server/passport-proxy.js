@@ -16,7 +16,7 @@ app.use(express.json({ limit: '20mb' }));
 const distPath = join(__dirname, '../dist');
 app.use(express.static(distPath));
 
-const getAI = () => new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 app.post('/api/passport/check', async (req, res) => {
   try {

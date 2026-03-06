@@ -132,10 +132,10 @@ const App: React.FC = () => {
         {history.length === 0 && (
           <div className="text-center mb-12 max-w-2xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
-              Edit images with <span className="text-brand-600">Magic</span>
+              AI Image Editor — Edit Photos with <span className="text-brand-600">Natural Language</span>
             </h2>
             <p className="text-lg text-slate-600 mb-8">
-              Simply upload an image and tell our AI how to change it. Remove backgrounds, add effects, or transform your photos.
+              Upload an image and describe what to change. Remove backgrounds, add effects, create passport photos, or transform your photos — all powered by Google Gemini AI.
             </p>
           </div>
         )}
