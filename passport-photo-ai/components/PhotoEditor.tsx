@@ -11,6 +11,36 @@ interface Props {
 // Background color options
 const BG_COLORS = ['#FFFFFF', '#F5F5F5', '#E8E8E8', '#DCE8F0'] as const;
 
+const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promise<string> =>
+  new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 600;
+      canvas.height = 750;
+      const ctx = canvas.getContext('2d')!;
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 600, 750);
+
+      const ratio = 600 / 750;
+      const imgRatio = img.width / img.height;
+      let sx = 0, sy = 0, sw = img.width, sh = img.height;
+      if (imgRatio > ratio) {
+        sw = img.height * ratio;
+        sx = (img.width - sw) / 2;
+      } else {
+        sh = img.width / ratio;
+        sy = (img.height - sh) * 0.25;
+      }
+
+      ctx.filter = `brightness(${b}%) contrast(${c}%)`;
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 600, 750);
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
+    };
+    img.src = imgUrl;
+  });
+
 export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   const [step, setStep] = useState<'idle' | 'processing' | 'done'>('idle');
   const [progress, setProgress] = useState(0);
@@ -19,37 +49,6 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   const [contrast, setContrast] = useState(108);
   const [bgColor, setBgColor] = useState('#FFFFFF');
   const removedBgRef = useRef<string | null>(null);
-
-  const createPassport = async (imgUrl: string, bg: string, b: number, c: number) => {
-    return new Promise<string>((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 600;
-        canvas.height = 750;
-        const ctx = canvas.getContext('2d')!;
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, 600, 750);
-        
-        const ratio = 600 / 750;
-        const imgRatio = img.width / img.height;
-        let sx = 0, sy = 0, sw = img.width, sh = img.height;
-        if (imgRatio > ratio) {
-          sw = img.height * ratio;
-          sx = (img.width - sw) / 2;
-        } else {
-          sh = img.width / ratio;
-          sy = (img.height - sh) * 0.25;
-        }
-        
-        ctx.filter = `brightness(${b}%) contrast(${c}%)`;
-        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 600, 750);
-        resolve(canvas.toDataURL('image/jpeg', 0.95));
-      };
-      img.src = imgUrl;
-    });
-  };
 
   const process = useCallback(async () => {
     setStep('processing');
@@ -88,7 +87,10 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
 
   useEffect(() => {
     if (step === 'done' && removedBgRef.current) {
-      createPassport(removedBgRef.current, bgColor, brightness, contrast).then(setResult);
+      const id = setTimeout(() => {
+        createPassport(removedBgRef.current!, bgColor, brightness, contrast).then(setResult);
+      }, 150);
+      return () => clearTimeout(id);
     }
   }, [bgColor, brightness, contrast, step]);
 

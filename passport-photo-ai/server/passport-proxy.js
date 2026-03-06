@@ -23,7 +23,6 @@ app.post('/api/passport/check', async (req, res) => {
     const { base64Image } = req.body;
     if (!base64Image) return res.status(400).json({ error: 'No image' });
     
-    const ai = getAI();
     const clean = base64Image.replace(/^data:image\/\w+;base64,/, '');
     
     const response = await ai.models.generateContent({
@@ -57,7 +56,6 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
 app.post('/api/passport/analyze', async (req, res) => {
   try {
     const { base64Image } = req.body;
-    const ai = getAI();
     const clean = base64Image.replace(/^data:image\/\w+;base64,/, '');
     
     const response = await ai.models.generateContent({
