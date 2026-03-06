@@ -9,9 +9,11 @@ import { ProcessedImage, AppStatus } from './types';
 // Static data moved outside component to prevent recreation
 const PRESET_PROMPTS = [
   "Remove the background",
+  "Enhance colors and brightness",
   "Turn this into a sketch",
   "Add a cyberpunk neon filter",
   "Make it look like a vintage photo",
+  "Remove blemishes and smooth skin",
 ] as const;
 
 const PASSPORT_PROMPT = "Convert this into a professional passport photo: solid white background, center the subject, crop to head and shoulders, ensure even lighting, and make it look professional.";
@@ -135,7 +137,7 @@ const App: React.FC = () => {
               AI Image Editor — Edit Photos with <span className="text-brand-600">Natural Language</span>
             </h2>
             <p className="text-lg text-slate-600 mb-8">
-              Upload an image and describe what to change. Remove backgrounds, add effects, create passport photos, or transform your photos — all powered by Google Gemini AI.
+              Upload any photo and describe what you want. Remove backgrounds, enhance colors, create passport photos, retouch portraits, or apply artistic effects — all in seconds with Google Gemini AI.
             </p>
           </div>
         )}
@@ -212,7 +214,7 @@ const App: React.FC = () => {
                   />
                   <div className="px-2 pb-2 flex justify-between items-center gap-2">
                     <span className="text-xs text-slate-400 pl-2 hidden sm:block">
-                      Be descriptive
+                      Tip: Be specific for best results
                     </span>
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
                       <Button
