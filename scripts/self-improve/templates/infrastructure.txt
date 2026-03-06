@@ -1,0 +1,57 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Optimize Docker, build configuration, and infrastructure setup.
+
+STEPS:
+1. Optimize Dockerfile (if present):
+
+   Multi-stage builds:
+   - Use a builder stage for installing dependencies and building
+   - Use a minimal runtime stage (node:alpine or distroless) for the final image
+   - Copy only necessary artifacts from builder to runtime stage
+
+   Layer caching:
+   - Copy package.json and lockfile before source code (cache dependency install)
+   - Order instructions from least to most frequently changing
+   - Use .dockerignore to exclude node_modules, .git, .env, test files
+
+   Image size:
+   - Use alpine-based images where possible
+   - Clean up package manager cache in the same RUN layer
+   - Remove devDependencies in production: npm prune --production
+   - Use standalone output for Next.js apps (output: 'standalone' in next.config)
+
+   Security:
+   - Don't run as root; add USER directive
+   - Don't copy .env or secrets into the image
+   - Pin base image versions (node:20-alpine, not node:latest)
+
+2. Optimize docker-compose.yml (if present):
+   - Add health checks for all services
+   - Set appropriate resource limits (memory, CPU)
+   - Use named volumes for persistent data
+   - Configure restart policies (unless-stopped or on-failure)
+   - Use depends_on with condition: service_healthy
+
+3. Optimize build configuration:
+   - Next.js: Enable standalone output, configure image optimization
+   - TypeScript: Ensure strict mode, optimize tsconfig for build speed
+   - Ensure environment variables are properly separated (build-time vs runtime)
+
+4. Add or improve CI-related configs:
+   - .dockerignore (exclude unnecessary files from build context)
+   - Verify .gitignore covers all generated/temporary files
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Don't change the runtime behavior of the application.
+- Don't modify environment variable names or database connection strings.
+- Test Dockerfile changes by verifying the build command succeeds.
+- Don't remove health check endpoints or monitoring hooks.
+- Keep configuration changes backwards-compatible where possible.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- If Dockerfile was changed, verify it builds: docker build -t {app_name} .
+- Check that docker-compose up starts all services correctly.

@@ -1,0 +1,515 @@
+name: Self-Improvement Pipeline
+
+on:
+  push:
+    branches:
+      - 'auto-improve/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  REGISTRY: ghcr.io
+  REMOTE_PATH: /opt/tranthachnguyen
+
+jobs:
+  # ============================================
+  # Stage 1: Detect which app and improvement type
+  # ============================================
+  detect-app:
+    name: Detect App & Improvement Type
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.parse.outputs.app }}
+      app_dir: ${{ steps.parse.outputs.app_dir }}
+      improve_type: ${{ steps.parse.outputs.improve_type }}
+      has_package_json: ${{ steps.check.outputs.has_package_json }}
+      has_tsconfig: ${{ steps.check.outputs.has_tsconfig }}
+      has_eslint: ${{ steps.check.outputs.has_eslint }}
+      has_tests: ${{ steps.check.outputs.has_tests }}
+      has_dockerfile: ${{ steps.check.outputs.has_dockerfile }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse branch name
+        id: parse
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          echo "Branch: $BRANCH"
+
+          # Expected format: auto-improve/<app>/<type>
+          # or: auto-improve/<app>
+          APP=$(echo "$BRANCH" | cut -d'/' -f2)
+          TYPE=$(echo "$BRANCH" | cut -d'/' -f3-)
+
+          # Fallback: detect app from changed files if branch parse fails
+          if [ -z "$APP" ] || [ "$APP" = "$BRANCH" ]; then
+            APP=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | head -1 | cut -d'/' -f1)
+          fi
+
+          # Default improvement type
+          if [ -z "$TYPE" ]; then
+            TYPE="general"
+          fi
+
+          # Map app name to directory (handle known aliases)
+          APP_DIR="$APP"
+          case "$APP" in
+            nanoedit) APP_DIR="nanoedit-ai-prod" ;;
+            passport) APP_DIR="passport-photo-ai" ;;
+            illinois) APP_DIR="illinois-driver-study" ;;
+            comic)    APP_DIR="comic-news" ;;
+            landing)  APP_DIR="landing-page" ;;
+          esac
+
+          echo "app=$APP" >> "$GITHUB_OUTPUT"
+          echo "app_dir=$APP_DIR" >> "$GITHUB_OUTPUT"
+          echo "improve_type=$TYPE" >> "$GITHUB_OUTPUT"
+
+          echo "Detected app: $APP (dir: $APP_DIR), type: $TYPE"
+
+      - name: Check app capabilities
+        id: check
+        run: |
+          APP_DIR="${{ steps.parse.outputs.app_dir }}"
+
+          if [ -f "$APP_DIR/package.json" ]; then
+            echo "has_package_json=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_package_json=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -f "$APP_DIR/tsconfig.json" ]; then
+            echo "has_tsconfig=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_tsconfig=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Check for eslint config (multiple possible filenames)
+          if [ -f "$APP_DIR/.eslintrc.js" ] || [ -f "$APP_DIR/.eslintrc.json" ] || [ -f "$APP_DIR/.eslintrc.yml" ] || [ -f "$APP_DIR/eslint.config.js" ] || [ -f "$APP_DIR/eslint.config.mjs" ]; then
+            echo "has_eslint=true" >> "$GITHUB_OUTPUT"
+          elif [ -f "$APP_DIR/package.json" ] && grep -q '"eslint"' "$APP_DIR/package.json" 2>/dev/null; then
+            echo "has_eslint=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_eslint=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Check for test scripts
+          if [ -f "$APP_DIR/package.json" ] && grep -qE '"test(:run)?"' "$APP_DIR/package.json" 2>/dev/null; then
+            echo "has_tests=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_tests=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -f "$APP_DIR/Dockerfile" ]; then
+            echo "has_dockerfile=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_dockerfile=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ============================================
+  # Stage 2: Build & Test
+  # ============================================
+  build-test:
+    name: Build & Test
+    needs: detect-app
+    if: needs.detect-app.outputs.has_package_json == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ needs.detect-app.outputs.app_dir }}
+    outputs:
+      result: ${{ steps.summary.outputs.result }}
+      details: ${{ steps.summary.outputs.details }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ${{ needs.detect-app.outputs.app_dir }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Build
+        id: build
+        run: |
+          if grep -q '"build"' package.json; then
+            npm run build
+          else
+            echo "No build script found, skipping."
+          fi
+
+      - name: Run tests
+        id: test
+        if: needs.detect-app.outputs.has_tests == 'true'
+        run: |
+          if grep -q '"test:run"' package.json; then
+            npm run test:run -- --reporter=verbose
+          elif grep -q '"test"' package.json; then
+            npm test -- --passWithNoTests 2>/dev/null || npm test
+          fi
+
+      - name: Summarize results
+        id: summary
+        if: always()
+        run: |
+          BUILD_RESULT="${{ steps.build.outcome }}"
+          TEST_RESULT="${{ steps.test.outcome }}"
+
+          if [ "$BUILD_RESULT" = "success" ] && { [ "$TEST_RESULT" = "success" ] || [ "$TEST_RESULT" = "skipped" ]; }; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+            echo "details=Build: $BUILD_RESULT, Tests: $TEST_RESULT" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+            echo "details=Build: $BUILD_RESULT, Tests: $TEST_RESULT" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ============================================
+  # Stage 3: Lint & Type Check
+  # ============================================
+  lint-typecheck:
+    name: Lint & Type Check
+    needs: detect-app
+    if: needs.detect-app.outputs.has_package_json == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ needs.detect-app.outputs.app_dir }}
+    outputs:
+      result: ${{ steps.summary.outputs.result }}
+      details: ${{ steps.summary.outputs.details }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ${{ needs.detect-app.outputs.app_dir }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Validate Prisma schema
+        if: hashFiles(format('{0}/prisma/schema.prisma', needs.detect-app.outputs.app_dir)) != ''
+        run: npx prisma validate
+        env:
+          DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci"
+
+      - name: Run ESLint
+        id: lint
+        if: needs.detect-app.outputs.has_eslint == 'true'
+        run: |
+          if grep -q '"lint"' package.json; then
+            npm run lint
+          else
+            npx eslint . --ext .ts,.tsx,.js,.jsx
+          fi
+
+      - name: Run TypeScript type check
+        id: typecheck
+        if: needs.detect-app.outputs.has_tsconfig == 'true'
+        run: npx tsc --noEmit
+
+      - name: Summarize results
+        id: summary
+        if: always()
+        run: |
+          LINT_RESULT="${{ steps.lint.outcome }}"
+          TC_RESULT="${{ steps.typecheck.outcome }}"
+
+          if { [ "$LINT_RESULT" = "success" ] || [ "$LINT_RESULT" = "skipped" ]; } && { [ "$TC_RESULT" = "success" ] || [ "$TC_RESULT" = "skipped" ]; }; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+            echo "details=Lint: $LINT_RESULT, TypeCheck: $TC_RESULT" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+            echo "details=Lint: $LINT_RESULT, TypeCheck: $TC_RESULT" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ============================================
+  # Stage 4: Docker Build (if Dockerfile exists)
+  # ============================================
+  docker-build:
+    name: Docker Build
+    needs: detect-app
+    if: needs.detect-app.outputs.has_dockerfile == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.build.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        id: build
+        run: |
+          docker build -t ${{ needs.detect-app.outputs.app }}:test ./${{ needs.detect-app.outputs.app_dir }}
+
+  # ============================================
+  # Stage 5: Auto-merge or Draft PR
+  # ============================================
+  auto-merge:
+    name: Create PR & Auto-Merge
+    needs: [detect-app, build-test, lint-typecheck, docker-build]
+    if: always() && needs.detect-app.result == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      pr_url: ${{ steps.create-pr.outputs.pr_url }}
+      pr_number: ${{ steps.create-pr.outputs.pr_number }}
+      merged: ${{ steps.merge.outputs.merged }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine check results
+        id: checks
+        run: |
+          BUILD_TEST="${{ needs.build-test.result }}"
+          LINT_TC="${{ needs.lint-typecheck.result }}"
+          DOCKER="${{ needs.docker-build.result }}"
+
+          echo "build_test=$BUILD_TEST" >> "$GITHUB_OUTPUT"
+          echo "lint_typecheck=$LINT_TC" >> "$GITHUB_OUTPUT"
+          echo "docker=$DOCKER" >> "$GITHUB_OUTPUT"
+
+          # All checks pass if each is success or skipped (skipped = not applicable)
+          ALL_PASS=true
+          for result in "$BUILD_TEST" "$LINT_TC" "$DOCKER"; do
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              ALL_PASS=false
+              break
+            fi
+          done
+
+          echo "all_pass=$ALL_PASS" >> "$GITHUB_OUTPUT"
+          echo "All checks passed: $ALL_PASS (build=$BUILD_TEST, lint=$LINT_TC, docker=$DOCKER)"
+
+      - name: Generate PR body
+        id: pr-body
+        run: |
+          APP="${{ needs.detect-app.outputs.app }}"
+          TYPE="${{ needs.detect-app.outputs.improve_type }}"
+          ALL_PASS="${{ steps.checks.outputs.all_pass }}"
+          BUILD_TEST="${{ steps.checks.outputs.build_test }}"
+          LINT_TC="${{ steps.checks.outputs.lint_typecheck }}"
+          DOCKER="${{ steps.checks.outputs.docker }}"
+
+          STATUS_ICON() {
+            case "$1" in
+              success) echo "pass" ;;
+              skipped) echo "skip" ;;
+              *) echo "FAIL" ;;
+            esac
+          }
+
+          {
+            echo "body<<PREOF"
+            echo "## Self-Improvement: $APP ($TYPE)"
+            echo ""
+            echo "Automated improvement generated by the self-improvement pipeline."
+            echo ""
+            echo "### Check Results"
+            echo ""
+            echo "| Check | Result |"
+            echo "|-------|--------|"
+            echo "| Build & Test | $(STATUS_ICON "$BUILD_TEST") |"
+            echo "| Lint & TypeCheck | $(STATUS_ICON "$LINT_TC") |"
+            echo "| Docker Build | $(STATUS_ICON "$DOCKER") |"
+            echo ""
+            if [ "$ALL_PASS" = "true" ]; then
+              echo "All checks passed. This PR will be auto-merged."
+            else
+              echo "**Some checks failed.** This PR is created as a draft for manual review."
+            fi
+            echo ""
+            echo "### Changes"
+            echo ""
+            echo '```'
+            git log origin/main..HEAD --oneline 2>/dev/null || echo "Unable to determine changes"
+            echo '```'
+            echo "PREOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create PR
+        id: create-pr
+        run: |
+          APP="${{ needs.detect-app.outputs.app }}"
+          TYPE="${{ needs.detect-app.outputs.improve_type }}"
+          ALL_PASS="${{ steps.checks.outputs.all_pass }}"
+          BRANCH="${GITHUB_REF#refs/heads/}"
+
+          TITLE="Auto-improve: $APP - $TYPE"
+
+          if [ "$ALL_PASS" = "true" ]; then
+            PR_URL=$(gh pr create \
+              --title "$TITLE" \
+              --body "${{ steps.pr-body.outputs.body }}" \
+              --base main \
+              --head "$BRANCH" \
+              2>&1) || true
+          else
+            PR_URL=$(gh pr create \
+              --title "$TITLE" \
+              --body "${{ steps.pr-body.outputs.body }}" \
+              --base main \
+              --head "$BRANCH" \
+              --draft \
+              2>&1) || true
+          fi
+
+          # Extract PR URL and number
+          if echo "$PR_URL" | grep -q "github.com"; then
+            echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+            PR_NUM=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+            echo "pr_number=$PR_NUM" >> "$GITHUB_OUTPUT"
+            echo "Created PR: $PR_URL"
+          else
+            # PR may already exist
+            EXISTING=$(gh pr list --head "$BRANCH" --json url,number --jq '.[0]')
+            if [ -n "$EXISTING" ]; then
+              PR_URL=$(echo "$EXISTING" | jq -r '.url')
+              PR_NUM=$(echo "$EXISTING" | jq -r '.number')
+              echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+              echo "pr_number=$PR_NUM" >> "$GITHUB_OUTPUT"
+              echo "PR already exists: $PR_URL"
+            else
+              echo "Failed to create PR: $PR_URL"
+              echo "pr_url=" >> "$GITHUB_OUTPUT"
+              echo "pr_number=" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Add failure comment
+        if: steps.checks.outputs.all_pass == 'false' && steps.create-pr.outputs.pr_number != ''
+        run: |
+          BUILD_TEST="${{ steps.checks.outputs.build_test }}"
+          LINT_TC="${{ steps.checks.outputs.lint_typecheck }}"
+          DOCKER="${{ steps.checks.outputs.docker }}"
+
+          COMMENT="## Check Failures
+
+          The following checks did not pass:
+
+          | Check | Result |
+          |-------|--------|
+          | Build & Test | $BUILD_TEST |
+          | Lint & TypeCheck | $LINT_TC |
+          | Docker Build | $DOCKER |
+
+          **This PR was created as a draft and will NOT be auto-merged.**
+
+          Please review the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for detailed logs."
+
+          gh pr comment "${{ steps.create-pr.outputs.pr_number }}" --body "$COMMENT"
+
+      - name: Auto-merge PR
+        id: merge
+        if: steps.checks.outputs.all_pass == 'true' && steps.create-pr.outputs.pr_number != ''
+        run: |
+          PR_NUM="${{ steps.create-pr.outputs.pr_number }}"
+
+          echo "Merging PR #$PR_NUM..."
+          if gh pr merge "$PR_NUM" --squash --auto --delete-branch; then
+            echo "merged=true" >> "$GITHUB_OUTPUT"
+            echo "PR #$PR_NUM merged successfully."
+          else
+            # Retry with direct merge if auto-merge is not enabled on repo
+            if gh pr merge "$PR_NUM" --squash --delete-branch; then
+              echo "merged=true" >> "$GITHUB_OUTPUT"
+              echo "PR #$PR_NUM merged (direct squash)."
+            else
+              echo "merged=false" >> "$GITHUB_OUTPUT"
+              echo "Failed to merge PR #$PR_NUM."
+            fi
+          fi
+
+  # ============================================
+  # Stage 6: Trigger Deploy (if merged to main)
+  # ============================================
+  trigger-deploy:
+    name: Trigger Deploy
+    needs: [detect-app, auto-merge]
+    if: needs.auto-merge.outputs.merged == 'true'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Trigger deployment workflow
+        run: |
+          APP="${{ needs.detect-app.outputs.app }}"
+
+          # Cloudify has its own deploy workflow
+          if [ "$APP" = "cloudify" ]; then
+            echo "Cloudify merge to main will trigger deploy-cloudify-simple.yml automatically."
+          else
+            echo "Merge to main will trigger ci.yml deploy job automatically."
+          fi
+
+          echo "## Deployment Triggered" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "PR merged to main. The CI/CD pipeline will handle deployment." >> $GITHUB_STEP_SUMMARY
+
+  # ============================================
+  # Stage 7: Notify with Summary
+  # ============================================
+  notify:
+    name: Pipeline Summary
+    needs: [detect-app, build-test, lint-typecheck, docker-build, auto-merge]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post summary
+        run: |
+          APP="${{ needs.detect-app.outputs.app }}"
+          TYPE="${{ needs.detect-app.outputs.improve_type }}"
+          BUILD="${{ needs.build-test.result }}"
+          LINT="${{ needs.lint-typecheck.result }}"
+          DOCKER="${{ needs.docker-build.result }}"
+          PR_URL="${{ needs.auto-merge.outputs.pr_url }}"
+          MERGED="${{ needs.auto-merge.outputs.merged }}"
+
+          STATUS_ICON() {
+            case "$1" in
+              success) echo "pass" ;;
+              skipped) echo "n/a" ;;
+              *) echo "FAIL" ;;
+            esac
+          }
+
+          {
+            echo "## Self-Improvement Pipeline Summary"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| App | $APP |"
+            echo "| Type | $TYPE |"
+            echo "| Branch | ${{ github.ref_name }} |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo ""
+            echo "### Check Results"
+            echo ""
+            echo "| Check | Result |"
+            echo "|-------|--------|"
+            echo "| Build & Test | $(STATUS_ICON "$BUILD") |"
+            echo "| Lint & TypeCheck | $(STATUS_ICON "$LINT") |"
+            echo "| Docker Build | $(STATUS_ICON "$DOCKER") |"
+            echo ""
+            if [ -n "$PR_URL" ]; then
+              echo "### Pull Request"
+              echo ""
+              echo "- **URL:** $PR_URL"
+              if [ "$MERGED" = "true" ]; then
+                echo "- **Status:** Merged to main (deploy triggered)"
+              else
+                echo "- **Status:** Draft (manual review required)"
+              fi
+            fi
+          } >> $GITHUB_STEP_SUMMARY

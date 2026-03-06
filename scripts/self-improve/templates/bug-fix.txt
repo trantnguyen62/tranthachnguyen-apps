@@ -1,0 +1,39 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Find and fix bugs in the codebase.
+
+STEPS:
+1. Run the build command to identify any existing errors:
+   {build_command}
+
+2. Scan for common bug patterns:
+   - TypeScript type errors and `any` types hiding real bugs
+   - Null/undefined dereferences (missing optional chaining, nullish coalescing)
+   - Unhandled promise rejections (missing try/catch, missing .catch())
+   - Missing React error boundaries around async components
+   - Race conditions in useEffect (missing cleanup, stale closures)
+   - Incorrect dependency arrays in useEffect/useMemo/useCallback
+   - Off-by-one errors in loops and array indexing
+   - Missing key props on mapped JSX elements
+   - Incorrect conditional rendering (falsy 0 rendering, empty string checks)
+
+3. Fix each bug you find. For each fix:
+   - Explain the bug and its potential impact
+   - Show the minimal change needed to fix it
+   - Verify the fix doesn't break other functionality
+
+4. After all fixes, run the build again to verify:
+   {build_command}
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Fix only real bugs, not style preferences or code smell.
+- Do not refactor working code as part of a bug fix.
+- If a fix requires changing a public API or interface, note the downstream impact.
+- Prioritize bugs by severity: crashes > data corruption > incorrect behavior > edge cases.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Ensure no new TypeScript errors are introduced.
+- Confirm the app still starts and renders correctly.

@@ -1,0 +1,423 @@
+name: Pipeline Health Monitor
+
+on:
+  schedule:
+    # Every 3 hours
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+    inputs:
+      force_notification:
+        description: 'Force notification even if all checks pass'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  HEALTH_ISSUE_TITLE: "Pipeline Health Monitor"
+  HEALTH_LABEL: "pipeline-health"
+
+jobs:
+  # ============================================
+  # Job 1: Check all production app URLs
+  # ============================================
+  check-apps:
+    name: Check Production Apps
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      results_json: ${{ steps.check.outputs.results_json }}
+      any_down: ${{ steps.check.outputs.any_down }}
+      summary: ${{ steps.check.outputs.summary }}
+    steps:
+      - name: Check all production URLs
+        id: check
+        run: |
+          declare -A APPS
+          APPS["landing-page"]="https://tranthachnguyen.com"
+          APPS["cloudify"]="https://cloudify.tranthachnguyen.com"
+          APPS["linguaflow"]="https://linguaflow.tranthachnguyen.com"
+          APPS["nanoedit"]="https://photoedit.tranthachnguyen.com"
+          APPS["quill"]="https://quill.tranthachnguyen.com"
+          APPS["passport-photo"]="https://passportphoto.tranthachnguyen.com"
+          APPS["illinois-driver"]="https://illinoisdriverstudy.tranthachnguyen.com"
+          APPS["devops-study"]="https://devopsstudy.tranthachnguyen.com"
+          APPS["devops-game"]="https://devopsgame.tranthachnguyen.com"
+          APPS["comic-news"]="https://comicnews.tranthachnguyen.com"
+          APPS["daily-quote"]="https://dailyquote.tranthachnguyen.com"
+          APPS["pipeline-runner"]="https://pipelinerunner.tranthachnguyen.com"
+          APPS["skokie"]="https://skokiehomebuyers.tranthachnguyen.com"
+
+          ANY_DOWN="false"
+          RESULTS_JSON="["
+          SUMMARY=""
+          FIRST=true
+          TOTAL=0
+          UP_COUNT=0
+          DOWN_COUNT=0
+
+          for APP_NAME in $(echo "${!APPS[@]}" | tr ' ' '\n' | sort); do
+            URL="${APPS[$APP_NAME]}"
+            TOTAL=$((TOTAL + 1))
+
+            # Attempt HTTP request with timeout and follow redirects
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              --max-time 15 \
+              --connect-timeout 10 \
+              -L \
+              -A "GitHubActions-HealthCheck/1.0" \
+              "${URL}" 2>/dev/null || echo "000")
+
+            RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" \
+              --max-time 15 \
+              --connect-timeout 10 \
+              -L \
+              -A "GitHubActions-HealthCheck/1.0" \
+              "${URL}" 2>/dev/null || echo "0")
+
+            if [[ "${HTTP_CODE}" -ge 200 && "${HTTP_CODE}" -lt 400 ]]; then
+              STATUS="up"
+              UP_COUNT=$((UP_COUNT + 1))
+            else
+              STATUS="down"
+              DOWN_COUNT=$((DOWN_COUNT + 1))
+              ANY_DOWN="true"
+            fi
+
+            echo "${APP_NAME}: ${STATUS} (HTTP ${HTTP_CODE}, ${RESPONSE_TIME}s)"
+
+            # Build JSON array
+            if [[ "${FIRST}" == "true" ]]; then
+              FIRST=false
+            else
+              RESULTS_JSON="${RESULTS_JSON},"
+            fi
+            RESULTS_JSON="${RESULTS_JSON}{\"app\":\"${APP_NAME}\",\"url\":\"${URL}\",\"status\":\"${STATUS}\",\"http_code\":\"${HTTP_CODE}\",\"response_time\":\"${RESPONSE_TIME}\"}"
+
+            # Build summary line
+            if [[ "${STATUS}" == "up" ]]; then
+              SUMMARY="${SUMMARY}| ${APP_NAME} | ${URL} | UP | ${HTTP_CODE} | ${RESPONSE_TIME}s |"$'\n'
+            else
+              SUMMARY="${SUMMARY}| ${APP_NAME} | ${URL} | **DOWN** | ${HTTP_CODE} | ${RESPONSE_TIME}s |"$'\n'
+            fi
+          done
+
+          RESULTS_JSON="${RESULTS_JSON}]"
+
+          echo "any_down=${ANY_DOWN}" >> "$GITHUB_OUTPUT"
+
+          # Use heredoc for multiline outputs
+          {
+            echo "results_json<<JSONEOF"
+            echo "${RESULTS_JSON}"
+            echo "JSONEOF"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "summary<<SUMMARYEOF"
+            echo "Apps checked: ${TOTAL} | Up: ${UP_COUNT} | Down: ${DOWN_COUNT}"
+            echo ""
+            echo "| App | URL | Status | HTTP Code | Response Time |"
+            echo "|-----|-----|--------|-----------|---------------|"
+            echo "${SUMMARY}"
+            echo "SUMMARYEOF"
+          } >> "$GITHUB_OUTPUT"
+
+          echo ""
+          echo "=== URL Check Summary ==="
+          echo "Total: ${TOTAL}, Up: ${UP_COUNT}, Down: ${DOWN_COUNT}"
+
+  # ============================================
+  # Job 2: Check self-improvement pipeline commits
+  # ============================================
+  check-pipeline:
+    name: Check Self-Improvement Pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      pipeline_stalled: ${{ steps.check-commits.outputs.pipeline_stalled }}
+      last_commit_age_hours: ${{ steps.check-commits.outputs.last_commit_age_hours }}
+      last_commit_message: ${{ steps.check-commits.outputs.last_commit_message }}
+      last_commit_date: ${{ steps.check-commits.outputs.last_commit_date }}
+      recent_commit_count: ${{ steps.check-commits.outputs.recent_commit_count }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Check for recent self-improvement commits
+        id: check-commits
+        run: |
+          # Look for commits in the last 6 hours
+          SIX_HOURS_AGO=$(date -u -d '6 hours ago' '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -u -v-6H '+%Y-%m-%dT%H:%M:%SZ')
+
+          echo "Checking for commits since: ${SIX_HOURS_AGO}"
+
+          # Count commits in the last 6 hours (any commits, not just auto-improve)
+          RECENT_COMMITS=$(git log --since="${SIX_HOURS_AGO}" --oneline 2>/dev/null | wc -l | tr -d ' ')
+          echo "Total commits in last 6 hours: ${RECENT_COMMITS}"
+
+          # Count self-improvement commits specifically (auto-improve branches merged, or commits with known patterns)
+          SELF_IMPROVE_COMMITS=$(git log --since="${SIX_HOURS_AGO}" --oneline --grep="Auto-improve\|self-improve\|auto-improvement\|Self-Improvement" 2>/dev/null | wc -l | tr -d ' ')
+          echo "Self-improvement commits in last 6 hours: ${SELF_IMPROVE_COMMITS}"
+
+          # Get the most recent commit info
+          LAST_COMMIT_DATE=$(git log -1 --format='%ci' 2>/dev/null || echo "unknown")
+          LAST_COMMIT_MSG=$(git log -1 --format='%s' 2>/dev/null || echo "unknown")
+          LAST_COMMIT_HASH=$(git log -1 --format='%h' 2>/dev/null || echo "unknown")
+
+          echo "Last commit: ${LAST_COMMIT_HASH} - ${LAST_COMMIT_MSG} (${LAST_COMMIT_DATE})"
+
+          # Calculate age of last commit in hours
+          LAST_COMMIT_EPOCH=$(git log -1 --format='%ct' 2>/dev/null || echo "0")
+          NOW_EPOCH=$(date +%s)
+          AGE_SECONDS=$((NOW_EPOCH - LAST_COMMIT_EPOCH))
+          AGE_HOURS=$((AGE_SECONDS / 3600))
+
+          echo "Last commit age: ${AGE_HOURS} hours"
+
+          # Pipeline is stalled if there are zero commits (of any kind) in the last 6 hours
+          # This is a broad check; at minimum the self-improvement pipeline should produce something
+          if [[ "${RECENT_COMMITS}" -lt 1 ]]; then
+            PIPELINE_STALLED="true"
+            echo "WARNING: Pipeline appears stalled. No commits in the last 6 hours."
+          else
+            PIPELINE_STALLED="false"
+            echo "Pipeline is active. ${RECENT_COMMITS} commit(s) in the last 6 hours."
+          fi
+
+          echo "pipeline_stalled=${PIPELINE_STALLED}" >> "$GITHUB_OUTPUT"
+          echo "last_commit_age_hours=${AGE_HOURS}" >> "$GITHUB_OUTPUT"
+          echo "last_commit_date=${LAST_COMMIT_DATE}" >> "$GITHUB_OUTPUT"
+          echo "recent_commit_count=${RECENT_COMMITS}" >> "$GITHUB_OUTPUT"
+
+          # Escape the commit message for GitHub Actions output
+          ESCAPED_MSG=$(echo "${LAST_COMMIT_MSG}" | head -c 200 | tr -d '\n\r')
+          echo "last_commit_message=${ESCAPED_MSG}" >> "$GITHUB_OUTPUT"
+
+  # ============================================
+  # Job 3: Report results and notify if needed
+  # ============================================
+  report:
+    name: Report & Notify
+    needs: [check-apps, check-pipeline]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine overall health status
+        id: status
+        run: |
+          ANY_DOWN="${{ needs.check-apps.outputs.any_down }}"
+          PIPELINE_STALLED="${{ needs.check-pipeline.outputs.pipeline_stalled }}"
+          FORCE="${{ inputs.force_notification }}"
+
+          if [[ "${ANY_DOWN}" == "true" && "${PIPELINE_STALLED}" == "true" ]]; then
+            OVERALL="CRITICAL"
+          elif [[ "${ANY_DOWN}" == "true" ]]; then
+            OVERALL="DEGRADED"
+          elif [[ "${PIPELINE_STALLED}" == "true" ]]; then
+            OVERALL="WARNING"
+          else
+            OVERALL="HEALTHY"
+          fi
+
+          # Determine if we need to notify
+          if [[ "${OVERALL}" != "HEALTHY" || "${FORCE}" == "true" ]]; then
+            NEEDS_NOTIFICATION="true"
+          else
+            NEEDS_NOTIFICATION="false"
+          fi
+
+          echo "overall=${OVERALL}" >> "$GITHUB_OUTPUT"
+          echo "needs_notification=${NEEDS_NOTIFICATION}" >> "$GITHUB_OUTPUT"
+
+          echo "Overall status: ${OVERALL}"
+          echo "Notification needed: ${NEEDS_NOTIFICATION}"
+
+      - name: Generate workflow summary
+        run: |
+          ANY_DOWN="${{ needs.check-apps.outputs.any_down }}"
+          PIPELINE_STALLED="${{ needs.check-pipeline.outputs.pipeline_stalled }}"
+          OVERALL="${{ steps.status.outputs.overall }}"
+          COMMIT_AGE="${{ needs.check-pipeline.outputs.last_commit_age_hours }}"
+          COMMIT_MSG="${{ needs.check-pipeline.outputs.last_commit_message }}"
+          COMMIT_DATE="${{ needs.check-pipeline.outputs.last_commit_date }}"
+          COMMIT_COUNT="${{ needs.check-pipeline.outputs.recent_commit_count }}"
+          NOW=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          {
+            echo "## Pipeline Health Report"
+            echo ""
+            echo "**Checked at:** ${NOW}"
+            echo "**Overall Status:** ${OVERALL}"
+            echo ""
+            echo "---"
+            echo ""
+            echo "### Production App Status"
+            echo ""
+            echo "${{ needs.check-apps.outputs.summary }}"
+            echo ""
+            echo "---"
+            echo ""
+            echo "### Self-Improvement Pipeline"
+            echo ""
+            echo "| Metric | Value |"
+            echo "|--------|-------|"
+            if [[ "${PIPELINE_STALLED}" == "true" ]]; then
+              echo "| Status | **STALLED** |"
+            else
+              echo "| Status | Active |"
+            fi
+            echo "| Commits (last 6h) | ${COMMIT_COUNT} |"
+            echo "| Last commit age | ${COMMIT_AGE} hours |"
+            echo "| Last commit | ${COMMIT_MSG} |"
+            echo "| Last commit date | ${COMMIT_DATE} |"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create or update health issue
+        if: steps.status.outputs.needs_notification == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ANY_DOWN="${{ needs.check-apps.outputs.any_down }}"
+          PIPELINE_STALLED="${{ needs.check-pipeline.outputs.pipeline_stalled }}"
+          OVERALL="${{ steps.status.outputs.overall }}"
+          COMMIT_AGE="${{ needs.check-pipeline.outputs.last_commit_age_hours }}"
+          COMMIT_MSG="${{ needs.check-pipeline.outputs.last_commit_message }}"
+          COMMIT_DATE="${{ needs.check-pipeline.outputs.last_commit_date }}"
+          COMMIT_COUNT="${{ needs.check-pipeline.outputs.recent_commit_count }}"
+          NOW=$(date -u '+%Y-%m-%d %H:%M UTC')
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          # Ensure the pipeline-health label exists
+          gh label create "${HEALTH_LABEL}" --description "Automated pipeline health monitoring" --color "d73a4a" 2>/dev/null || true
+
+          # Build the issue/comment body
+          BODY=$(cat <<'BODYEOF'
+          ## Pipeline Health Report
+
+          BODYEOF
+          )
+
+          # Build body dynamically
+          BODY="## Pipeline Health Report"$'\n'
+          BODY="${BODY}"$'\n'"**Status:** ${OVERALL}"
+          BODY="${BODY}"$'\n'"**Checked at:** ${NOW}"
+          BODY="${BODY}"$'\n'"**Workflow Run:** [View Logs](${RUN_URL})"
+          BODY="${BODY}"$'\n'
+          BODY="${BODY}"$'\n'"---"
+          BODY="${BODY}"$'\n'
+
+          # Add app issues section if any apps are down
+          if [[ "${ANY_DOWN}" == "true" ]]; then
+            BODY="${BODY}"$'\n'"### Apps Down"
+            BODY="${BODY}"$'\n'
+            BODY="${BODY}"$'\n'"The following production apps are not responding:"
+            BODY="${BODY}"$'\n'
+
+            # Parse the results JSON to find down apps
+            RESULTS='${{ needs.check-apps.outputs.results_json }}'
+            DOWN_APPS=$(echo "${RESULTS}" | jq -r '.[] | select(.status == "down") | "- **\(.app)** (\(.url)) - HTTP \(.http_code)"' 2>/dev/null || echo "- Unable to parse results")
+            BODY="${BODY}"$'\n'"${DOWN_APPS}"
+            BODY="${BODY}"$'\n'
+          fi
+
+          # Add pipeline stalled section
+          if [[ "${PIPELINE_STALLED}" == "true" ]]; then
+            BODY="${BODY}"$'\n'"### Self-Improvement Pipeline Stalled"
+            BODY="${BODY}"$'\n'
+            BODY="${BODY}"$'\n'"The self-improvement pipeline has not produced any commits in the last 6 hours."
+            BODY="${BODY}"$'\n'
+            BODY="${BODY}"$'\n'"| Metric | Value |"
+            BODY="${BODY}"$'\n'"|--------|-------|"
+            BODY="${BODY}"$'\n'"| Last commit age | ${COMMIT_AGE} hours |"
+            BODY="${BODY}"$'\n'"| Last commit | ${COMMIT_MSG} |"
+            BODY="${BODY}"$'\n'"| Last commit date | ${COMMIT_DATE} |"
+            BODY="${BODY}"$'\n'"| Recent commits (6h) | ${COMMIT_COUNT} |"
+            BODY="${BODY}"$'\n'
+          fi
+
+          # Add full app status table
+          BODY="${BODY}"$'\n'"### Full App Status"
+          BODY="${BODY}"$'\n'
+          BODY="${BODY}"$'\n'"${{ needs.check-apps.outputs.summary }}"
+          BODY="${BODY}"$'\n'
+          BODY="${BODY}"$'\n'"---"
+          BODY="${BODY}"$'\n'"*Auto-generated by [pipeline-health.yml](${RUN_URL}) - runs every 3 hours*"
+
+          # Find existing open health issue
+          ISSUE_NUMBER=$(gh issue list --state open --label "${HEALTH_LABEL}" --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [[ -n "${ISSUE_NUMBER}" && "${ISSUE_NUMBER}" != "null" ]]; then
+            # Add a comment to the existing issue with the latest status
+            gh issue comment "${ISSUE_NUMBER}" --body "${BODY}"
+            echo "Added comment to existing issue #${ISSUE_NUMBER}"
+
+            # Update the issue title to reflect current status
+            gh issue edit "${ISSUE_NUMBER}" --title "${HEALTH_ISSUE_TITLE} [${OVERALL}]"
+            echo "Updated issue #${ISSUE_NUMBER} title to [${OVERALL}]"
+          else
+            # Create a new issue
+            gh issue create \
+              --title "${HEALTH_ISSUE_TITLE} [${OVERALL}]" \
+              --body "${BODY}" \
+              --label "${HEALTH_LABEL}" || echo "Failed to create issue"
+            echo "Created new health issue"
+          fi
+
+      - name: Close health issue if all healthy
+        if: steps.status.outputs.overall == 'HEALTHY'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # If everything is healthy, close any open health issues
+          ISSUE_NUMBER=$(gh issue list --state open --label "${HEALTH_LABEL}" --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [[ -n "${ISSUE_NUMBER}" && "${ISSUE_NUMBER}" != "null" ]]; then
+            NOW=$(date -u '+%Y-%m-%d %H:%M UTC')
+            gh issue comment "${ISSUE_NUMBER}" --body "## All Clear
+
+            All production apps are responding normally and the self-improvement pipeline is active.
+
+            **Resolved at:** ${NOW}
+
+            Closing this issue automatically."
+
+            gh issue close "${ISSUE_NUMBER}" --reason completed
+            echo "Closed health issue #${ISSUE_NUMBER} - all systems healthy"
+          else
+            echo "No open health issues to close"
+          fi
+
+      - name: Annotate workflow with warnings
+        if: steps.status.outputs.overall != 'HEALTHY'
+        run: |
+          ANY_DOWN="${{ needs.check-apps.outputs.any_down }}"
+          PIPELINE_STALLED="${{ needs.check-pipeline.outputs.pipeline_stalled }}"
+          OVERALL="${{ steps.status.outputs.overall }}"
+
+          if [[ "${ANY_DOWN}" == "true" ]]; then
+            # Parse down apps for annotation
+            RESULTS='${{ needs.check-apps.outputs.results_json }}'
+            DOWN_LIST=$(echo "${RESULTS}" | jq -r '.[] | select(.status == "down") | "\(.app) (\(.url)) - HTTP \(.http_code)"' 2>/dev/null || echo "Unknown apps down")
+            echo "::warning title=Production Apps Down::The following apps are not responding: ${DOWN_LIST}"
+          fi
+
+          if [[ "${PIPELINE_STALLED}" == "true" ]]; then
+            COMMIT_AGE="${{ needs.check-pipeline.outputs.last_commit_age_hours }}"
+            echo "::warning title=Self-Improvement Pipeline Stalled::No commits in the last 6 hours. Last commit was ${COMMIT_AGE} hours ago."
+          fi
+
+          # Set overall error/warning
+          if [[ "${OVERALL}" == "CRITICAL" ]]; then
+            echo "::error title=Pipeline Health CRITICAL::Production apps are down AND the self-improvement pipeline is stalled."
+          fi

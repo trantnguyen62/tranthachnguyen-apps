@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Meta Agent LaunchAgent
+      Runs the autonomous SaaS business machine every 30 minutes on the Mac Mini.
+
+      Install:
+        cp com.meta-agent.plist ~/Library/LaunchAgents/
+        launchctl load ~/Library/LaunchAgents/com.meta-agent.plist
+
+      Uninstall:
+        launchctl unload ~/Library/LaunchAgents/com.meta-agent.plist
+        rm ~/Library/LaunchAgents/com.meta-agent.plist
+
+      Logs:
+        tail -f /Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps/scripts/self-improve/logs/meta-*.log
+
+      Check status:
+        launchctl list | grep meta-agent
+    -->
+
+    <key>Label</key>
+    <string>com.meta-agent</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps/scripts/self-improve/meta-agent.sh</string>
+    </array>
+
+    <!-- Run every 30 minutes (1800 seconds) -->
+    <key>StartInterval</key>
+    <integer>1800</integer>
+
+    <!-- Also run immediately when loaded -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Environment: ensure claude CLI is on PATH -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:/Users/trannguyen/.local/bin:/Users/trannguyen/.claude/local</string>
+        <key>HOME</key>
+        <string>/Users/trannguyen</string>
+        <key>LANG</key>
+        <string>en_US.UTF-8</string>
+    </dict>
+
+    <!-- Working directory -->
+    <key>WorkingDirectory</key>
+    <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps/scripts/self-improve</string>
+
+    <!-- Stdout and stderr logs for launchd-level debugging -->
+    <key>StandardOutPath</key>
+    <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps/scripts/self-improve/logs/meta-agent-stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps/scripts/self-improve/logs/meta-agent-stderr.log</string>
+
+    <!-- Don't let it accumulate if cycles take longer than 30min -->
+    <!-- Coalescing prevents queuing multiple runs -->
+    <key>AbandonProcessGroup</key>
+    <false/>
+
+    <!-- Restart on crash (max 3 retries then back off) -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <!-- Throttle: wait at least 60s between restarts if it crashes -->
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+
+    <!-- Limit resource usage -->
+    <key>Nice</key>
+    <integer>10</integer>
+
+    <!-- Timeout: kill if a single run exceeds 25 minutes -->
+    <!-- This is a safety net; the script has its own timeouts -->
+    <key>TimeOut</key>
+    <integer>1500</integer>
+</dict>
+</plist>

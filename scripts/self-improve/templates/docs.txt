@@ -1,0 +1,50 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Add or improve documentation for developers and users.
+
+STEPS:
+1. Assess current documentation:
+   - Check for existing README.md
+   - Look for inline code comments and JSDoc
+   - Check for any docs/ directory or wiki
+
+2. Create or update README.md with these sections:
+
+   Essential sections:
+   - Project title and one-line description
+   - Features list (bullet points of key capabilities)
+   - Tech stack (frameworks, libraries, key dependencies)
+   - Getting started (prerequisites, install, run)
+   - Environment variables (list all required vars with descriptions, not values)
+   - Project structure (key directories and their purpose)
+
+   Optional sections (if applicable):
+   - API documentation (endpoints, methods, request/response examples)
+   - Deployment instructions
+   - Contributing guidelines
+   - License
+
+3. Add JSDoc comments to key exported functions:
+   - Public API functions and hooks
+   - Utility functions with non-obvious behavior
+   - Complex type definitions
+   - Format: @param, @returns, @example, @throws
+
+4. Add inline comments only where logic is non-obvious:
+   - Complex algorithms or business rules
+   - Workarounds with links to related issues
+   - "Why" comments, not "what" comments
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Don't add comments to self-explanatory code (e.g., "// increment counter" above counter++).
+- Keep README concise; link to external docs for complex topics.
+- Don't document implementation details that change frequently.
+- Use code examples that actually work and match the current API.
+- Don't add @author or @date tags (that's what git blame is for).
+- Don't add license headers to every file unless required by the project.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Read the README from a new developer's perspective; verify setup steps work.

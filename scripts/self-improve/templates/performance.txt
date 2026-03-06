@@ -1,0 +1,51 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Optimize performance for faster load times and smoother interactions.
+
+STEPS:
+1. Analyze the current bundle and rendering performance:
+   - Check for large dependencies that could be lazy-loaded
+   - Look for components that re-render unnecessarily
+   - Identify unoptimized images and assets
+
+2. Apply these optimizations:
+
+   Bundle size:
+   - Use dynamic imports (next/dynamic or React.lazy) for heavy components
+   - Replace large libraries with lighter alternatives where possible
+   - Tree-shake unused exports; check for barrel file imports pulling in entire modules
+   - Move client-only code behind "use client" boundary in Next.js App Router
+
+   Rendering:
+   - Add React.memo to pure components that receive stable props
+   - Use useMemo for expensive computations in render
+   - Use useCallback for event handlers passed as props
+   - Avoid creating new objects/arrays in render (move to useMemo or outside component)
+   - Virtualize long lists with react-window or similar
+
+   Images and assets:
+   - Use next/image with proper width/height and priority on above-fold images
+   - Add lazy loading to below-fold images
+   - Use WebP/AVIF formats where supported
+   - Set explicit dimensions to prevent layout shift (CLS)
+
+   Data fetching:
+   - Add proper caching headers to API responses
+   - Use SWR/React Query deduplication to prevent duplicate requests
+   - Prefetch data for likely navigation targets
+   - Use server components for static data in Next.js App Router
+
+3. Measure improvement where possible (build output size, component count).
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Don't prematurely optimize; focus on the biggest wins first.
+- Don't add memoization to components that render cheaply.
+- Ensure lazy-loaded components have proper loading fallbacks.
+- Don't change the app's behavior or visual output.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Check that the build output doesn't show increased bundle size.
+- Ensure no hydration mismatches in Next.js apps.

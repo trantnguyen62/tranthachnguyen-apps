@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio AI Improvement Pipeline</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-0:#0a0a0b;--bg-1:#111113;--bg-2:#1a1a1e;--bg-3:#232328;
+  --border:#2a2a30;--border-hover:#3a3a42;
+  --text-0:#fafafa;--text-1:#a1a1aa;--text-2:#71717a;
+  --accent:#3b82f6;--accent-dim:#1d4ed8;
+  --green:#22c55e;--green-dim:#16a34a;
+  --red:#ef4444;--red-dim:#dc2626;
+  --yellow:#eab308;--orange:#f97316;
+  --radius:8px;--radius-lg:12px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-0);color:var(--text-0);line-height:1.5;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+
+/* Header */
+.header{background:var(--bg-1);border-bottom:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.header-left h1{font-size:20px;font-weight:600;letter-spacing:-0.3px}
+.header-left p{color:var(--text-2);font-size:13px;margin-top:2px}
+.header-stats{display:flex;gap:24px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-value{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-2);margin-top:2px}
+.stat-value.green{color:var(--green)}.stat-value.red{color:var(--red)}.stat-value.blue{color:var(--accent)}.stat-value.yellow{color:var(--yellow)}
+
+/* Layout */
+.main{max-width:1400px;margin:0 auto;padding:24px 32px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px}
+@media(max-width:1100px){.grid,.grid-3{grid-template-columns:1fr}}
+.full-width{margin-bottom:20px}
+
+/* Cards */
+.card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.card:hover{border-color:var(--border-hover)}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:600;color:var(--text-0)}
+.card-badge{font-size:11px;padding:3px 8px;border-radius:20px;background:var(--bg-3);color:var(--text-1)}
+.card-body{padding:20px}
+
+/* App Grid */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.app-card{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;transition:border-color .15s,background .15s}
+.app-card:hover{border-color:var(--border-hover);background:var(--bg-3)}
+.app-name{font-size:13px;font-weight:600;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.app-status{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:500}
+.app-status.healthy{background:rgba(34,197,94,0.15);color:var(--green)}
+.app-status.warning{background:rgba(234,179,8,0.15);color:var(--yellow)}
+.app-status.critical{background:rgba(239,68,68,0.15);color:var(--red)}
+.app-status.unknown{background:var(--bg-3);color:var(--text-2)}
+.app-score{font-size:12px;color:var(--text-2)}
+.health-bar{height:4px;border-radius:2px;background:var(--bg-0);overflow:hidden;margin-top:6px}
+.health-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.app-last{font-size:11px;color:var(--text-2);margin-top:6px}
+
+/* Activity Feed */
+.feed{max-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg-3) transparent}
+.feed::-webkit-scrollbar{width:6px}.feed::-webkit-scrollbar-track{background:transparent}.feed::-webkit-scrollbar-thumb{background:var(--bg-3);border-radius:3px}
+.feed-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.feed-dot.success{background:var(--green)}.feed-dot.failure{background:var(--red)}
+.feed-content{flex:1;min-width:0}
+.feed-title{font-size:13px;font-weight:500}
+.feed-detail{font-size:12px;color:var(--text-2);margin-top:2px}
+.feed-time{font-size:11px;color:var(--text-2);flex-shrink:0;font-variant-numeric:tabular-nums}
+
+/* Charts */
+.chart-container{margin-bottom:16px}
+.chart-container:last-child{margin-bottom:0}
+.chart-label-row{display:flex;align-items:center;margin-bottom:4px}
+.chart-name{font-size:12px;color:var(--text-1);width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.chart-bar-bg{flex:1;height:20px;background:var(--bg-0);border-radius:4px;overflow:hidden;position:relative}
+.chart-bar{height:100%;border-radius:4px;transition:width .4s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;min-width:fit-content}
+.chart-bar-value{font-size:10px;font-weight:600;color:rgba(255,255,255,0.9)}
+.chart-bar.perf{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.chart-bar.security{background:linear-gradient(90deg,#ef4444,#f87171)}
+.chart-bar.style{background:linear-gradient(90deg,#a855f7,#c084fc)}
+.chart-bar.refactor{background:linear-gradient(90deg,#f97316,#fb923c)}
+.chart-bar.docs{background:linear-gradient(90deg,#22c55e,#4ade80)}
+.chart-bar.test{background:linear-gradient(90deg,#eab308,#facc15)}
+.chart-bar.default{background:linear-gradient(90deg,#6366f1,#818cf8)}
+.chart-bar.success-bar{background:linear-gradient(90deg,#22c55e,#4ade80)}
+.chart-bar.failure-bar{background:linear-gradient(90deg,#ef4444,#f87171)}
+
+/* Log Viewer */
+.log-viewer{background:var(--bg-0);border-radius:var(--radius);padding:12px 16px;max-height:360px;overflow-y:auto;font-family:'SF Mono','Fira Code',monospace;font-size:12px;line-height:1.7;scrollbar-width:thin;scrollbar-color:var(--bg-3) transparent}
+.log-viewer::-webkit-scrollbar{width:6px}.log-viewer::-webkit-scrollbar-track{background:transparent}.log-viewer::-webkit-scrollbar-thumb{background:var(--bg-3);border-radius:3px}
+.log-line{white-space:pre-wrap;word-break:break-all}
+.log-line .ts{color:var(--text-2)}.log-line .app{color:var(--accent)}.log-line .success{color:var(--green)}.log-line .failure{color:var(--red)}.log-line .type{color:var(--orange)}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--text-2)}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:0.4}
+.empty-text{font-size:13px}
+
+/* Refresh indicator */
+.refresh-indicator{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-2)}
+.refresh-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;padding:0 20px;background:var(--bg-1);border-bottom:1px solid var(--border)}
+.tab{padding:10px 14px;font-size:12px;font-weight:500;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.tab:hover{color:var(--text-1)}
+.tab.active{color:var(--text-0);border-bottom-color:var(--accent)}
+.tab-content{display:none}.tab-content.active{display:block}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Portfolio AI Improvement Pipeline</h1>
+    <p>Automated self-improvement monitoring</p>
+  </div>
+  <div class="header-stats">
+    <div class="stat">
+      <div class="stat-value blue" id="total-apps">--</div>
+      <div class="stat-label">Apps</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value green" id="total-cycles">--</div>
+      <div class="stat-label">Cycles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value yellow" id="success-rate">--%</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="files-changed">--</div>
+      <div class="stat-label">Files Changed</div>
+    </div>
+    <div class="refresh-indicator">
+      <div class="refresh-dot"></div>
+      <span id="last-refresh">Refreshing...</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- App Grid -->
+  <div class="full-width">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Application Health</span>
+        <span class="card-badge" id="app-count-badge">0 apps</span>
+      </div>
+      <div class="card-body">
+        <div class="app-grid" id="app-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Activity Feed -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Activity Feed</span>
+        <span class="card-badge" id="feed-count-badge">0 events</span>
+      </div>
+      <div class="card-body">
+        <div class="feed" id="activity-feed"></div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Improvements</span>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-tab="by-app">By App</div>
+        <div class="tab" data-tab="by-type">By Type</div>
+        <div class="tab" data-tab="success-fail">Success / Failure</div>
+      </div>
+      <div class="card-body">
+        <div class="tab-content active" id="tab-by-app"></div>
+        <div class="tab-content" id="tab-by-type"></div>
+        <div class="tab-content" id="tab-success-fail"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Health Scores -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Health Scores</span>
+      </div>
+      <div class="card-body" id="health-scores"></div>
+    </div>
+
+    <!-- Log Viewer -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Recent Logs</span>
+        <span class="card-badge" id="log-date-badge">today</span>
+      </div>
+      <div class="card-body">
+        <div class="log-viewer" id="log-viewer"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Config & State
+// ---------------------------------------------------------------------------
+const BASE = '..';  // Served from dashboard/, data lives in parent
+let state = { config: null, logs: [], reports: [], healthScan: null, logFiles: [] };
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+function $(sel) { return document.querySelector(sel); }
+function $$(sel) { return document.querySelectorAll(sel); }
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function timeAgo(ts) {
+  if (!ts) return 'never';
+  const d = new Date(ts);
+  if (isNaN(d)) return ts;
+  const s = Math.floor((Date.now() - d) / 1000);
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+function healthColor(score) {
+  if (score >= 80) return 'var(--green)';
+  if (score >= 60) return 'var(--yellow)';
+  if (score >= 40) return 'var(--orange)';
+  return 'var(--red)';
+}
+
+function healthStatus(score) {
+  if (score >= 80) return 'healthy';
+  if (score >= 60) return 'warning';
+  if (score >= 40) return 'warning';
+  return 'critical';
+}
+
+function typeBarClass(type) {
+  const map = { perf:'perf', performance:'perf', security:'security', style:'style', refactor:'refactor', docs:'docs', test:'test' };
+  return map[type] || 'default';
+}
+
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+async function fetchText(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    return await r.text();
+  } catch { return null; }
+}
+
+// Try to list files in a directory by fetching the index page (works with python -m http.server)
+async function listDir(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return [];
+    const html = await r.text();
+    const matches = [...html.matchAll(/href="([^"]+)"/g)].map(m => m[1]).filter(f => !f.startsWith('/') && !f.startsWith('?') && !f.startsWith('.'));
+    return matches;
+  } catch { return []; }
+}
+
+// ---------------------------------------------------------------------------
+// Data Loading
+// ---------------------------------------------------------------------------
+async function loadData() {
+  // Load config
+  state.config = await fetchJSON(BASE + '/config.json');
+
+  // Load state.json (overall stats from pipeline)
+  state.pipelineState = await fetchJSON(BASE + '/state.json');
+
+  // Load health scan
+  state.healthScan = await fetchJSON(BASE + '/reports/health-scan.json');
+
+  // Load today's JSONL log
+  const today = todayStr();
+  const logText = await fetchText(BASE + '/logs/' + today + '.jsonl');
+  state.logs = [];
+  if (logText) {
+    logText.trim().split('\n').forEach(line => {
+      try { state.logs.push(JSON.parse(line)); } catch {}
+    });
+  }
+
+  // Also try to discover recent log files
+  const logFiles = await listDir(BASE + '/logs/');
+  state.logFileNames = logFiles.filter(f => f.endsWith('.jsonl') || f.endsWith('.log'));
+
+  // Load all available JSONL logs for aggregate stats (last 7 days)
+  state.allLogs = [...state.logs];
+  const jsonlFiles = logFiles.filter(f => f.endsWith('.jsonl') && f !== today + '.jsonl');
+  // Load last 6 additional days
+  const recentJsonl = jsonlFiles.sort().reverse().slice(0, 6);
+  for (const f of recentJsonl) {
+    const text = await fetchText(BASE + '/logs/' + f);
+    if (text) {
+      text.trim().split('\n').forEach(line => {
+        try { state.allLogs.push({ ...JSON.parse(line), _file: f }); } catch {}
+      });
+    }
+  }
+
+  // Load report files listing
+  const reportFiles = await listDir(BASE + '/reports/');
+  state.reportFiles = reportFiles.filter(f => f.endsWith('.json'));
+
+  // Load individual report JSONs
+  state.reports = [];
+  for (const f of state.reportFiles.slice(0, 50)) {
+    const rpt = await fetchJSON(BASE + '/reports/' + f);
+    if (rpt) state.reports.push({ ...rpt, _file: f });
+  }
+
+  // Load recent .log files for log viewer
+  const plainLogs = logFiles.filter(f => f.endsWith('.log')).sort().reverse().slice(0, 5);
+  state.plainLogContent = '';
+  for (const f of plainLogs) {
+    const txt = await fetchText(BASE + '/logs/' + f);
+    if (txt) state.plainLogContent += '=== ' + f + ' ===\n' + txt + '\n\n';
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rendering
+// ---------------------------------------------------------------------------
+
+function renderHeader() {
+  const apps = state.config ? state.config.apps || [] : [];
+  const allLogs = state.allLogs || [];
+  const todayLogs = state.logs || [];
+  const total = allLogs.length;
+  const success = allLogs.filter(l => l.result === 'success').length;
+  const rate = total > 0 ? ((success / total) * 100).toFixed(1) : '0.0';
+  const filesChanged = allLogs.reduce((s, l) => s + (l.files_changed || 0), 0);
+
+  const ps = state.pipelineState;
+
+  $('#total-apps').textContent = ps ? (ps.total_apps || apps.length) : apps.length;
+  $('#total-cycles').textContent = ps ? (ps.total_cycles || total) : total;
+  $('#success-rate').textContent = ps ? (ps.success_rate || rate + '%') : rate + '%';
+  $('#files-changed').textContent = ps ? (ps.files_changed || filesChanged) : filesChanged;
+
+  const now = new Date();
+  $('#last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
+}
+
+function renderAppGrid() {
+  const apps = state.config ? state.config.apps || [] : [];
+  const container = $('#app-grid');
+  const healthData = state.healthScan || {};
+  const allLogs = state.allLogs || [];
+
+  $('#app-count-badge').textContent = apps.length + ' apps';
+
+  if (apps.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">&#9679;&#9679;&#9679;</div><div class="empty-text">No apps configured. Add apps to config.json.</div></div>';
+    return;
+  }
+
+  // Compute per-app stats from logs
+  const appStats = {};
+  allLogs.forEach(l => {
+    if (!appStats[l.app]) appStats[l.app] = { total: 0, success: 0, lastTs: null, types: new Set() };
+    appStats[l.app].total++;
+    if (l.result === 'success') appStats[l.app].success++;
+    appStats[l.app].types.add(l.type);
+    appStats[l.app].lastTs = l.ts;
+  });
+
+  // Also use report data
+  state.reports.forEach(r => {
+    if (!appStats[r.app]) appStats[r.app] = { total: 0, success: 0, lastTs: null, types: new Set() };
+    if (r.timestamp && (!appStats[r.app].lastTs || r.timestamp > appStats[r.app].lastTs)) {
+      appStats[r.app].lastTs = r.timestamp;
+    }
+  });
+
+  let html = '';
+  apps.forEach(appName => {
+    const hd = healthData[appName];
+    const score = hd ? hd.score : null;
+    const stats = appStats[appName];
+    const statusClass = score !== null ? healthStatus(score) : 'unknown';
+    const statusLabel = score !== null ? statusClass : 'no data';
+    const scoreDisplay = score !== null ? score + '/100' : '--';
+    const barColor = score !== null ? healthColor(score) : 'var(--bg-3)';
+    const barWidth = score !== null ? score : 0;
+    const lastActivity = stats ? (stats.lastTs || 'unknown') : 'no activity';
+    const improvements = stats ? stats.success : 0;
+
+    html += `
+      <div class="app-card">
+        <div class="app-name" title="${appName}">${appName}</div>
+        <div class="app-meta">
+          <span class="app-status ${statusClass}">${statusLabel}</span>
+          <span class="app-score">${scoreDisplay}</span>
+        </div>
+        <div class="health-bar"><div class="health-bar-fill" style="width:${barWidth}%;background:${barColor}"></div></div>
+        <div class="app-last">${improvements} improvements &middot; ${typeof lastActivity === 'string' && lastActivity.includes('-') ? timeAgo(lastActivity) : lastActivity}</div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderActivityFeed() {
+  const container = $('#activity-feed');
+  // Combine JSONL logs and report data, newest first
+  let events = [];
+
+  state.logs.forEach(l => {
+    events.push({
+      time: l.ts || '',
+      app: l.app || '?',
+      type: l.type || '?',
+      result: l.result || '?',
+      duration: l.duration_s,
+      error: l.error,
+      source: 'log'
+    });
+  });
+
+  state.reports.forEach(r => {
+    events.push({
+      time: r.timestamp || '',
+      app: r.app || '?',
+      type: r.type || r.reason || '?',
+      result: r.status === 'success' ? 'success' : 'failure',
+      summary: r.summary || r.commit_message || '',
+      source: 'report'
+    });
+  });
+
+  // Sort by time descending
+  events.sort((a, b) => (b.time || '').localeCompare(a.time || ''));
+  events = events.slice(0, 50);
+
+  $('#feed-count-badge').textContent = events.length + ' events';
+
+  if (events.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">&#9711;</div><div class="empty-text">No activity recorded yet. Run the improvement pipeline to see results.</div></div>';
+    return;
+  }
+
+  let html = '';
+  events.forEach(e => {
+    const dotClass = e.result === 'success' ? 'success' : 'failure';
+    const detail = e.error || e.summary || (e.type + (e.duration ? ' (' + e.duration + 's)' : ''));
+    html += `
+      <div class="feed-item">
+        <div class="feed-dot ${dotClass}"></div>
+        <div class="feed-content">
+          <div class="feed-title">${e.app} &mdash; ${e.type}</div>
+          <div class="feed-detail">${detail}</div>
+        </div>
+        <div class="feed-time">${e.time}</div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderCharts() {
+  const allLogs = state.allLogs || [];
+
+  // By App
+  const byApp = {};
+  allLogs.forEach(l => { byApp[l.app] = (byApp[l.app] || 0) + 1; });
+  renderBarChart('tab-by-app', byApp, 'default');
+
+  // By Type
+  const byType = {};
+  allLogs.forEach(l => { byType[l.type] = (byType[l.type] || 0) + 1; });
+  renderBarChartTyped('tab-by-type', byType);
+
+  // Success / Failure
+  const sf = { success: 0, failure: 0 };
+  allLogs.forEach(l => { if (l.result === 'success') sf.success++; else sf.failure++; });
+  renderBarChartSF('tab-success-fail', sf);
+}
+
+function renderBarChart(containerId, data, barClass) {
+  const container = document.getElementById(containerId);
+  const entries = Object.entries(data).sort((a,b) => b[1] - a[1]);
+  const max = entries.length > 0 ? entries[0][1] : 1;
+
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-text">No data available</div></div>';
+    return;
+  }
+
+  let html = '';
+  entries.forEach(([name, count]) => {
+    const pct = Math.max((count / max) * 100, 8);
+    html += `
+      <div class="chart-container">
+        <div class="chart-label-row">
+          <span class="chart-name" title="${name}">${name}</span>
+          <div class="chart-bar-bg">
+            <div class="chart-bar ${barClass}" style="width:${pct}%">
+              <span class="chart-bar-value">${count}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderBarChartTyped(containerId, data) {
+  const container = document.getElementById(containerId);
+  const entries = Object.entries(data).sort((a,b) => b[1] - a[1]);
+  const max = entries.length > 0 ? entries[0][1] : 1;
+
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-text">No data available</div></div>';
+    return;
+  }
+
+  let html = '';
+  entries.forEach(([name, count]) => {
+    const pct = Math.max((count / max) * 100, 8);
+    html += `
+      <div class="chart-container">
+        <div class="chart-label-row">
+          <span class="chart-name" title="${name}">${name}</span>
+          <div class="chart-bar-bg">
+            <div class="chart-bar ${typeBarClass(name)}" style="width:${pct}%">
+              <span class="chart-bar-value">${count}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderBarChartSF(containerId, data) {
+  const container = document.getElementById(containerId);
+  const total = data.success + data.failure;
+  if (total === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-text">No data available</div></div>';
+    return;
+  }
+  const max = Math.max(data.success, data.failure, 1);
+  let html = '';
+
+  [['Success', data.success, 'success-bar'], ['Failure', data.failure, 'failure-bar']].forEach(([label, count, cls]) => {
+    const pct = Math.max((count / max) * 100, count > 0 ? 8 : 0);
+    html += `
+      <div class="chart-container">
+        <div class="chart-label-row">
+          <span class="chart-name">${label}</span>
+          <div class="chart-bar-bg">
+            <div class="chart-bar ${cls}" style="width:${pct}%">
+              <span class="chart-bar-value">${count}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  // Percentage summary
+  const successPct = ((data.success / total) * 100).toFixed(1);
+  html += `<div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text-1)">${data.success} of ${total} cycles successful (${successPct}%)</div>`;
+  container.innerHTML = html;
+}
+
+function renderHealthScores() {
+  const container = $('#health-scores');
+  const healthData = state.healthScan || {};
+  const apps = state.config ? state.config.apps || [] : [];
+
+  // Build health entries: from health-scan.json or derive from logs
+  const entries = [];
+  apps.forEach(appName => {
+    if (healthData[appName]) {
+      entries.push({ name: appName, score: healthData[appName].score, details: healthData[appName] });
+    } else {
+      // Derive a basic score from log success rate
+      const appLogs = (state.allLogs || []).filter(l => l.app === appName);
+      if (appLogs.length > 0) {
+        const s = appLogs.filter(l => l.result === 'success').length;
+        const score = Math.round((s / appLogs.length) * 100);
+        entries.push({ name: appName, score, details: null });
+      } else {
+        entries.push({ name: appName, score: null, details: null });
+      }
+    }
+  });
+
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="empty"><div class="empty-text">No health data available</div></div>';
+    return;
+  }
+
+  // Sort by score desc, nulls last
+  entries.sort((a, b) => {
+    if (a.score === null && b.score === null) return 0;
+    if (a.score === null) return 1;
+    if (b.score === null) return -1;
+    return b.score - a.score;
+  });
+
+  let html = '';
+  entries.forEach(e => {
+    const score = e.score !== null ? e.score : '--';
+    const color = e.score !== null ? healthColor(e.score) : 'var(--bg-3)';
+    const width = e.score !== null ? e.score : 0;
+    const label = e.score !== null ? e.score + '%' : 'N/A';
+
+    html += `
+      <div class="chart-container">
+        <div class="chart-label-row">
+          <span class="chart-name" title="${e.name}">${e.name}</span>
+          <div class="chart-bar-bg">
+            <div class="chart-bar" style="width:${width}%;background:${color}">
+              <span class="chart-bar-value">${label}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderLogViewer() {
+  const container = $('#log-viewer');
+
+  // Prefer JSONL log content, fall back to plain log files
+  let content = '';
+
+  if (state.logs.length > 0) {
+    const date = todayStr();
+    content += '=== ' + date + '.jsonl ===\n';
+    state.logs.forEach(l => {
+      const ts = l.ts || '';
+      const app = l.app || '?';
+      const type = l.type || '?';
+      const result = l.result || '?';
+      const dur = l.duration_s ? l.duration_s + 's' : '';
+      const err = l.error ? ' | ' + l.error : '';
+      content += `[${ts}] ${app} ${type} ${result} ${dur}${err}\n`;
+    });
+    content += '\n';
+  }
+
+  if (state.plainLogContent) {
+    content += state.plainLogContent;
+  }
+
+  if (!content.trim()) {
+    container.innerHTML = '<div class="empty"><div class="empty-text">No log files found. Logs appear in logs/ after running cycles.</div></div>';
+    return;
+  }
+
+  // Syntax-highlight log lines
+  const lines = content.split('\n');
+  let html = '';
+  lines.forEach(line => {
+    let highlighted = line
+      .replace(/\[([\d:_-]+)\]/g, '<span class="ts">[$1]</span>')
+      .replace(/\b(success)\b/gi, '<span class="success">$1</span>')
+      .replace(/\b(fail(?:ure|ed)?|ERROR)\b/gi, '<span class="failure">$1</span>')
+      .replace(/\b(perf|security|style|refactor|docs|test|performance|improvement|bugfix|tests)\b/gi, '<span class="type">$1</span>');
+
+    // Highlight app names
+    if (state.config && state.config.apps) {
+      state.config.apps.forEach(app => {
+        const re = new RegExp('\\b(' + app.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'g');
+        highlighted = highlighted.replace(re, '<span class="app">$1</span>');
+      });
+    }
+
+    html += '<div class="log-line">' + highlighted + '</div>';
+  });
+  container.innerHTML = html;
+
+  // Scroll to bottom
+  container.scrollTop = container.scrollHeight;
+
+  // Update badge
+  $('#log-date-badge').textContent = todayStr();
+}
+
+// ---------------------------------------------------------------------------
+// Tab Switching
+// ---------------------------------------------------------------------------
+function initTabs() {
+  $$('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const group = tab.parentElement;
+      const body = group.nextElementSibling;
+      group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      body.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      const target = body.querySelector('#tab-' + tab.dataset.tab);
+      if (target) target.classList.add('active');
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+async function refresh() {
+  await loadData();
+  renderHeader();
+  renderAppGrid();
+  renderActivityFeed();
+  renderCharts();
+  renderHealthScores();
+  renderLogViewer();
+}
+
+(async function init() {
+  initTabs();
+  await refresh();
+  // Auto-refresh every 30 seconds
+  setInterval(refresh, 30000);
+})();
+</script>
+</body>
+</html>

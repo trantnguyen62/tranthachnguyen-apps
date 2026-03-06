@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "created": "2026-03-06T00:00:00Z",
+  "total_cycles": 0,
+  "business": {
+    "estimated_mrr": 0,
+    "total_deploys": 0,
+    "total_apps_created": 0,
+    "total_marketing_actions": 0,
+    "total_intel_runs": 0,
+    "total_evolution_runs": 0
+  },
+  "timing": {
+    "last_cycle": null,
+    "last_intel": null,
+    "last_evolve": null,
+    "last_marketing": null,
+    "last_app_create": null,
+    "last_revenue_opt": null
+  },
+  "action_stats": {
+    "improve": { "runs": 0, "successes": 0, "avg_duration_s": 0 },
+    "intel": { "runs": 0, "successes": 0, "avg_duration_s": 0 },
+    "marketing": { "runs": 0, "successes": 0, "avg_duration_s": 0 },
+    "create_app": { "runs": 0, "successes": 0, "avg_duration_s": 0 },
+    "evolve": { "runs": 0, "successes": 0, "avg_duration_s": 0 },
+    "revenue_opt": { "runs": 0, "successes": 0, "avg_duration_s": 0 }
+  },
+  "apps": {},
+  "intel_cache": {
+    "trending_niches": [],
+    "competitor_weaknesses": [],
+    "seo_gaps": [],
+    "feature_ideas": []
+  },
+  "evolution": {
+    "generation": 0,
+    "decisions": [],
+    "prompt_versions": {}
+  },
+  "action_queue": []
+}

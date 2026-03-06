@@ -1,0 +1,49 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Improve code quality, readability, and maintainability.
+
+STEPS:
+1. Scan the codebase for code quality issues:
+
+   Dead code:
+   - Remove unused imports, variables, functions, and components
+   - Remove commented-out code blocks
+   - Remove unused CSS classes or Tailwind utilities in component files
+   - Remove unused dependencies from package.json
+
+   Duplication:
+   - Identify repeated code patterns (3+ occurrences)
+   - Extract shared logic into utility functions or custom hooks
+   - Create shared components for repeated UI patterns
+
+   Naming:
+   - Rename unclear variables (single letters, abbreviations, misleading names)
+   - Use consistent naming conventions (camelCase for functions, PascalCase for components)
+   - Rename boolean variables to start with is/has/should/can
+
+   TypeScript:
+   - Replace `any` types with proper type definitions
+   - Add missing return types to exported functions
+   - Use discriminated unions instead of optional fields where appropriate
+   - Add proper types for API response data
+
+   Complexity:
+   - Break down functions longer than 50 lines
+   - Reduce nesting depth (max 3 levels; use early returns, guard clauses)
+   - Simplify complex conditional logic (extract into named booleans or functions)
+   - Split large components into smaller, focused components
+
+2. Apply fixes methodically, one category at a time.
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Don't change code formatting or style (that's a linter's job).
+- Don't rename public APIs or exported functions without checking all usages.
+- Don't add abstractions for code used only once.
+- Prioritize changes that improve readability over cleverness.
+- Keep refactoring scope small; don't rewrite entire files.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Ensure no functionality has changed (refactoring should be behavior-preserving).

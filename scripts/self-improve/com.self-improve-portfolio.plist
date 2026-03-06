@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.self-improve-portfolio</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps/scripts/self-improve/orchestrator.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>WORKSPACE</key>
+        <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps</string>
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>StartInterval</key>
+    <integer>1800</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/self-improve-portfolio.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/self-improve-portfolio-error.log</string>
+
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>Nice</key>
+    <integer>10</integer>
+</dict>
+</plist>

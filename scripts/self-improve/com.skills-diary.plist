@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Skills Manager & Daily Diary LaunchAgent
+
+      Runs two scheduled tasks:
+        1. Daily diary at 11:55 PM every day
+        2. Full skill audit + diary on Sundays at midnight
+
+      Install:
+        cp com.skills-diary.plist ~/Library/LaunchAgents/
+        launchctl load ~/Library/LaunchAgents/com.skills-diary.plist
+
+      Uninstall:
+        launchctl unload ~/Library/LaunchAgents/com.skills-diary.plist
+        rm ~/Library/LaunchAgents/com.skills-diary.plist
+
+      Logs:
+        tail -f /tmp/skills-diary.log
+
+      Check status:
+        launchctl list | grep skills-diary
+
+      Manual run:
+        launchctl start com.skills-diary
+    -->
+
+    <key>Label</key>
+    <string>com.skills-diary</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps/scripts/self-improve/skills-manager.sh</string>
+        <string>--all</string>
+    </array>
+
+    <!-- Run daily at 11:55 PM -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <!-- Daily diary at 23:55 -->
+        <dict>
+            <key>Hour</key>
+            <integer>23</integer>
+            <key>Minute</key>
+            <integer>55</integer>
+        </dict>
+        <!-- Full audit + weekly on Sundays at 00:05 -->
+        <dict>
+            <key>Weekday</key>
+            <integer>0</integer>
+            <key>Hour</key>
+            <integer>0</integer>
+            <key>Minute</key>
+            <integer>5</integer>
+        </dict>
+    </array>
+
+    <!-- Also run immediately when loaded -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <!-- Environment: ensure claude CLI and tools are on PATH -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:/Users/trannguyen/.local/bin:/Users/trannguyen/.claude/local</string>
+        <key>HOME</key>
+        <string>/Users/trannguyen</string>
+        <key>LANG</key>
+        <string>en_US.UTF-8</string>
+    </dict>
+
+    <!-- Working directory -->
+    <key>WorkingDirectory</key>
+    <string>/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps/scripts/self-improve</string>
+
+    <!-- Stdout and stderr logs -->
+    <key>StandardOutPath</key>
+    <string>/tmp/skills-diary.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/skills-diary-error.log</string>
+
+    <!-- Don't queue multiple runs -->
+    <key>AbandonProcessGroup</key>
+    <false/>
+
+    <!-- Restart on crash -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <!-- Throttle: wait at least 60s between restarts if it crashes -->
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+
+    <!-- Be nice to CPU -->
+    <key>Nice</key>
+    <integer>15</integer>
+
+    <!-- Timeout: kill if a single run exceeds 10 minutes -->
+    <key>TimeOut</key>
+    <integer>600</integer>
+</dict>
+</plist>

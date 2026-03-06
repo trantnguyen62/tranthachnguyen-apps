@@ -1,0 +1,55 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Identify and fix security vulnerabilities.
+
+STEPS:
+1. Run a dependency audit:
+   - Check for known CVEs: npm audit (or pnpm audit / yarn audit)
+   - Review the output and fix critical/high severity issues
+   - Update vulnerable packages to patched versions
+
+2. Scan for common vulnerability patterns:
+
+   Cross-Site Scripting (XSS):
+   - Check for dangerouslySetInnerHTML usage; ensure content is sanitized (DOMPurify)
+   - Verify user input is not rendered as raw HTML
+   - Check for unsanitized URL parameters used in page content
+   - Ensure href attributes don't allow javascript: protocol
+
+   Injection:
+   - Check for raw SQL queries; ensure parameterized queries or ORM usage
+   - Check for command injection via child_process or exec
+   - Verify environment variables are not exposed to the client
+
+   Input validation:
+   - Add server-side validation for all API route inputs (use zod or similar)
+   - Validate and sanitize file uploads (type, size, content)
+   - Rate limit authentication endpoints
+   - Validate redirect URLs to prevent open redirects
+
+   Authentication and authorization:
+   - Verify all protected API routes check authentication
+   - Ensure authorization checks (user can only access their own data)
+   - Check for hardcoded secrets, API keys, or credentials in source code
+   - Verify CSRF protection is in place for state-changing operations
+
+   Data exposure:
+   - Check API responses don't leak sensitive fields (passwords, tokens, internal IDs)
+   - Verify error messages don't expose stack traces or internal details in production
+   - Ensure .env files are in .gitignore
+   - Check for sensitive data in client-side code or localStorage
+
+3. Fix each vulnerability with the minimal necessary change.
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Don't remove functionality to fix security issues; add proper safeguards instead.
+- Don't change authentication flows without careful consideration.
+- Prioritize by severity: RCE > auth bypass > data exposure > XSS > CSRF > info disclosure.
+- When in doubt, err on the side of more restrictive security.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Re-run npm audit to confirm dependency fixes.
+- Verify authentication and authorization still work correctly.

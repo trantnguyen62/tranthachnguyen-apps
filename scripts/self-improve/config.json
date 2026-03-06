@@ -1,0 +1,689 @@
+{
+  "$schema": "App Registry Configuration for Self-Improvement Pipeline",
+  "version": "1.0.0",
+  "generatedAt": "2026-03-06",
+  "workspace": "/Users/trannguyen/Desktop/TranThachnguyen.com/tranthachnguyen-apps",
+
+  "apps": [
+    {
+      "name": "cloudify",
+      "path": "cloudify",
+      "type": "nextjs",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": true,
+      "testCommand": "npm test",
+      "buildCommand": "npm run build",
+      "deployTarget": "lxc203",
+      "priority": 1,
+      "productionUrl": "https://cloudify.tranthachnguyen.com",
+      "description": "Full-stack PaaS platform with auth, billing, deployments, GitHub/GitLab integration",
+      "frameworks": ["next", "react", "prisma"],
+      "testCount": 138
+    },
+    {
+      "name": "landing-page",
+      "path": "landing-page",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc201",
+      "priority": 1,
+      "productionUrl": "https://tranthachnguyen.com",
+      "description": "Main portfolio landing page",
+      "frameworks": []
+    },
+    {
+      "name": "edu-resources",
+      "path": "edu-resources",
+      "type": "nextjs",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": true,
+      "testCommand": "npm run test:e2e",
+      "buildCommand": "npm run build",
+      "deployTarget": "lxc202",
+      "priority": 2,
+      "productionUrl": "https://teachvault.tranthachnguyen.com",
+      "description": "Educational resources marketplace with Prisma, auth, dashboard",
+      "frameworks": ["next", "react", "prisma"]
+    },
+    {
+      "name": "cloudify-docs",
+      "path": "cloudify-docs",
+      "type": "nextjs",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": "npm run build",
+      "deployTarget": "lxc203",
+      "priority": 2,
+      "productionUrl": null,
+      "description": "Documentation site for Cloudify platform",
+      "frameworks": ["next", "react"]
+    },
+    {
+      "name": "linguaflow",
+      "path": "linguaflow",
+      "type": "react",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": true,
+      "testCommand": "npm test",
+      "buildCommand": "npm run build",
+      "deployTarget": "lxc201",
+      "priority": 2,
+      "productionUrl": "https://linguaflow.tranthachnguyen.com",
+      "description": "Language learning app with Vite, Express API, WebSocket proxy, Gemini AI",
+      "frameworks": ["react", "vite", "express"]
+    },
+    {
+      "name": "nanoedit-ai",
+      "path": "nanoedit-ai-prod",
+      "type": "react",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": "npm run build",
+      "deployTarget": "lxc201",
+      "priority": 2,
+      "productionUrl": "https://photoedit.tranthachnguyen.com",
+      "description": "AI-powered photo editor with Vite, Express backend, Gemini AI",
+      "frameworks": ["react", "vite", "express"]
+    },
+    {
+      "name": "passport-photo-ai",
+      "path": "passport-photo-ai",
+      "type": "react",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": "npm run build",
+      "deployTarget": "lxc201",
+      "priority": 2,
+      "productionUrl": "https://passportphoto.tranthachnguyen.com",
+      "description": "AI passport photo generator with Vite, Express backend, Gemini AI",
+      "frameworks": ["react", "vite", "express"]
+    },
+    {
+      "name": "quill",
+      "path": "quill",
+      "type": "react",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": "npm run build",
+      "deployTarget": "lxc201",
+      "priority": 3,
+      "productionUrl": "https://quill.tranthachnguyen.com",
+      "description": "Blog platform with Vite, Express backend, SQLite, file uploads",
+      "frameworks": ["react", "vite", "express"]
+    },
+    {
+      "name": "illinois-driver-study",
+      "path": "illinois-driver-study",
+      "type": "react",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": "npm run build",
+      "deployTarget": "lxc201",
+      "priority": 3,
+      "productionUrl": "https://illinoisdriverstudy.tranthachnguyen.com",
+      "description": "Illinois driver's license study guide with Vite + React",
+      "frameworks": ["react", "vite"]
+    },
+    {
+      "name": "postiz",
+      "path": "postiz",
+      "type": "nextjs",
+      "hasDockerfile": false,
+      "hasPackageJson": true,
+      "hasTests": true,
+      "testCommand": "npm test",
+      "buildCommand": "npm run build",
+      "deployTarget": "none",
+      "priority": 3,
+      "productionUrl": null,
+      "description": "Social media management platform (monorepo with frontend, backend, orchestrator)",
+      "frameworks": ["next", "react", "vite", "prisma"]
+    },
+    {
+      "name": "devops-study",
+      "path": "devops-study",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc201",
+      "priority": 3,
+      "productionUrl": "https://devopsstudy.tranthachnguyen.com",
+      "description": "DevOps certification study guide",
+      "frameworks": []
+    },
+    {
+      "name": "devops-game",
+      "path": "devops-game",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc201",
+      "priority": 3,
+      "productionUrl": "https://devopsgame.tranthachnguyen.com",
+      "description": "Interactive DevOps learning game",
+      "frameworks": []
+    },
+    {
+      "name": "comic-news",
+      "path": "comic-news",
+      "type": "nodejs",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc201",
+      "priority": 3,
+      "productionUrl": "https://comicnews.tranthachnguyen.com",
+      "description": "Comic news aggregator",
+      "frameworks": []
+    },
+    {
+      "name": "code-study-app",
+      "path": "code-study-app",
+      "type": "react",
+      "hasDockerfile": false,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": "npm run build",
+      "deployTarget": "none",
+      "priority": 4,
+      "productionUrl": null,
+      "description": "Code study app with React, Vite, Express server",
+      "frameworks": ["react", "vite", "express"]
+    },
+    {
+      "name": "antigravity-kit",
+      "path": "antigravity-kit/web",
+      "type": "nextjs",
+      "hasDockerfile": false,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": "npm run build",
+      "deployTarget": "none",
+      "priority": 4,
+      "productionUrl": null,
+      "description": "Product site with Next.js, design system, and component library",
+      "frameworks": ["next", "react"]
+    },
+    {
+      "name": "pipeline-runner",
+      "path": "pipeline-runner",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": true,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc201",
+      "priority": 4,
+      "productionUrl": "https://pipelinerunner.tranthachnguyen.com",
+      "description": "Pipeline runner game with Capacitor iOS app",
+      "frameworks": []
+    },
+    {
+      "name": "daily-quote",
+      "path": "daily-quote",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc201",
+      "priority": 4,
+      "productionUrl": "https://dailyquote.tranthachnguyen.com",
+      "description": "Daily quote app with AI client and PWA manifest",
+      "frameworks": []
+    },
+    {
+      "name": "skokie-home-buyers",
+      "path": "skokie-home-buyers",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc201",
+      "priority": 4,
+      "productionUrl": "https://skokiehomebuyers.tranthachnguyen.com",
+      "description": "Real estate site for Skokie home buyers",
+      "frameworks": []
+    },
+    {
+      "name": "aws-study",
+      "path": "aws-study",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 4,
+      "productionUrl": null,
+      "description": "AWS certification study guide",
+      "frameworks": []
+    },
+    {
+      "name": "pet-services",
+      "path": "pet-services",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc202",
+      "priority": 4,
+      "productionUrl": "https://pawconnect.tranthachnguyen.com",
+      "description": "Pet services marketplace",
+      "frameworks": []
+    },
+    {
+      "name": "digital-creators",
+      "path": "digital-creators",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc202",
+      "priority": 4,
+      "productionUrl": "https://pixelvault.tranthachnguyen.com",
+      "description": "Digital creators marketplace",
+      "frameworks": []
+    },
+    {
+      "name": "local-services",
+      "path": "local-services",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc202",
+      "priority": 4,
+      "productionUrl": "https://neighborhands.tranthachnguyen.com",
+      "description": "Local services marketplace",
+      "frameworks": []
+    },
+    {
+      "name": "vintage-collectibles",
+      "path": "vintage-collectibles",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc202",
+      "priority": 4,
+      "productionUrl": "https://retrovault.tranthachnguyen.com",
+      "description": "Vintage collectibles marketplace",
+      "frameworks": []
+    },
+    {
+      "name": "freelance-specialists",
+      "path": "freelance-specialists",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc202",
+      "priority": 4,
+      "productionUrl": "https://talentforge.tranthachnguyen.com",
+      "description": "Freelance specialists marketplace",
+      "frameworks": []
+    },
+    {
+      "name": "eco-products",
+      "path": "eco-products",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc202",
+      "priority": 4,
+      "productionUrl": "https://greenleaf.tranthachnguyen.com",
+      "description": "Eco-friendly products marketplace",
+      "frameworks": []
+    },
+    {
+      "name": "gaming-assets",
+      "path": "gaming-assets",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "lxc202",
+      "priority": 4,
+      "productionUrl": "https://modforge.tranthachnguyen.com",
+      "description": "Gaming assets and mods marketplace",
+      "frameworks": []
+    },
+    {
+      "name": "stock-predictor",
+      "path": "stock-predictor",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 5,
+      "productionUrl": null,
+      "description": "Stock prediction app with JS frontend and Python data fetcher",
+      "frameworks": [],
+      "hasPython": true
+    },
+    {
+      "name": "stock-predictor-v2",
+      "path": "stock-predictor-v2",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 5,
+      "productionUrl": null,
+      "description": "Stock predictor v2 with enhanced analysis",
+      "frameworks": [],
+      "hasPython": true
+    },
+    {
+      "name": "stock-predictor-v3",
+      "path": "stock-predictor-v3",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 5,
+      "productionUrl": null,
+      "description": "Stock predictor v3 with Monte Carlo simulation",
+      "frameworks": [],
+      "hasPython": true
+    },
+    {
+      "name": "stock-predictor-spy",
+      "path": "stock-predictor-spy",
+      "type": "static-html",
+      "hasDockerfile": false,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 5,
+      "productionUrl": null,
+      "description": "SPY-focused stock predictor with Python data fetcher",
+      "frameworks": [],
+      "hasPython": true
+    },
+    {
+      "name": "monte-carlo-options",
+      "path": "monte-carlo-options",
+      "type": "static-html",
+      "hasDockerfile": true,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 5,
+      "productionUrl": null,
+      "description": "Monte Carlo options pricing simulator",
+      "frameworks": []
+    },
+    {
+      "name": "flow-sounds",
+      "path": "flow-sounds",
+      "type": "ios-app",
+      "hasDockerfile": false,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 5,
+      "productionUrl": null,
+      "description": "iOS sound/music app",
+      "frameworks": ["swift"]
+    },
+    {
+      "name": "themify",
+      "path": "themify",
+      "type": "ios-app",
+      "hasDockerfile": false,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 5,
+      "productionUrl": null,
+      "description": "iOS theming/customization app",
+      "frameworks": ["swift"]
+    },
+    {
+      "name": "tinni-relief",
+      "path": "tinni-relief",
+      "type": "ios-app",
+      "hasDockerfile": false,
+      "hasPackageJson": false,
+      "hasTests": false,
+      "testCommand": null,
+      "buildCommand": null,
+      "deployTarget": "none",
+      "priority": 5,
+      "productionUrl": null,
+      "description": "iOS tinnitus relief app",
+      "frameworks": ["swift"]
+    }
+  ],
+
+  "improvementTypes": [
+    {
+      "id": "seo",
+      "name": "SEO Optimization",
+      "description": "Improve meta tags, Open Graph, structured data, sitemaps, robots.txt, canonical URLs, and page load performance for search engine visibility",
+      "applicableTo": ["nextjs", "react", "static-html"]
+    },
+    {
+      "id": "accessibility",
+      "name": "Accessibility (a11y)",
+      "description": "Add ARIA labels, semantic HTML, keyboard navigation, color contrast fixes, alt text, and screen reader compatibility",
+      "applicableTo": ["nextjs", "react", "static-html"]
+    },
+    {
+      "id": "performance",
+      "name": "Performance Optimization",
+      "description": "Optimize bundle size, lazy loading, image compression, caching headers, code splitting, and Core Web Vitals",
+      "applicableTo": ["nextjs", "react", "static-html", "nodejs"]
+    },
+    {
+      "id": "security",
+      "name": "Security Hardening",
+      "description": "Fix XSS, CSRF, SQL injection, add CSP headers, sanitize inputs, update vulnerable dependencies, enforce HTTPS",
+      "applicableTo": ["nextjs", "react", "nodejs", "python"]
+    },
+    {
+      "id": "testing",
+      "name": "Test Coverage",
+      "description": "Add unit tests, integration tests, e2e tests, improve test coverage for critical paths",
+      "applicableTo": ["nextjs", "react", "nodejs"]
+    },
+    {
+      "id": "ux",
+      "name": "UX/UI Enhancement",
+      "description": "Improve responsive design, loading states, error states, empty states, animations, and mobile experience",
+      "applicableTo": ["nextjs", "react", "static-html"]
+    },
+    {
+      "id": "code-quality",
+      "name": "Code Quality",
+      "description": "Refactor duplicate code, fix TypeScript errors, improve naming, reduce complexity, add proper error handling",
+      "applicableTo": ["nextjs", "react", "nodejs", "python"]
+    },
+    {
+      "id": "docker",
+      "name": "Docker Optimization",
+      "description": "Optimize Dockerfile layers, reduce image size, add health checks, improve build caching, multi-stage builds",
+      "applicableTo": ["nextjs", "react", "static-html", "nodejs"]
+    },
+    {
+      "id": "content",
+      "name": "Content Enhancement",
+      "description": "Improve copy, fix typos, enhance descriptions, add missing content sections, update outdated information",
+      "applicableTo": ["nextjs", "react", "static-html"]
+    },
+    {
+      "id": "dependencies",
+      "name": "Dependency Management",
+      "description": "Update outdated packages, remove unused dependencies, fix security vulnerabilities in deps, lock versions",
+      "applicableTo": ["nextjs", "react", "nodejs", "python"]
+    },
+    {
+      "id": "monitoring",
+      "name": "Observability & Monitoring",
+      "description": "Add error tracking, logging, health endpoints, uptime monitoring, performance metrics collection",
+      "applicableTo": ["nextjs", "nodejs", "python"]
+    },
+    {
+      "id": "api",
+      "name": "API Improvement",
+      "description": "Improve API error responses, add validation, rate limiting, documentation, versioning, and proper status codes",
+      "applicableTo": ["nextjs", "nodejs", "python"]
+    }
+  ],
+
+  "schedule": {
+    "priority1": {
+      "frequency": "daily",
+      "maxImprovementsPerCycle": 3,
+      "description": "High-value production apps improved daily"
+    },
+    "priority2": {
+      "frequency": "every-2-days",
+      "maxImprovementsPerCycle": 2,
+      "description": "Important apps with active users improved every 2 days"
+    },
+    "priority3": {
+      "frequency": "weekly",
+      "maxImprovementsPerCycle": 2,
+      "description": "Moderate-value apps improved weekly"
+    },
+    "priority4": {
+      "frequency": "biweekly",
+      "maxImprovementsPerCycle": 1,
+      "description": "Low-priority static sites improved biweekly"
+    },
+    "priority5": {
+      "frequency": "monthly",
+      "maxImprovementsPerCycle": 1,
+      "description": "Experimental or inactive apps improved monthly"
+    }
+  },
+
+  "cooldown": {
+    "afterSuccessMinutes": 0,
+    "afterFailureMinutes": 60,
+    "afterCriticalFailureMinutes": 360,
+    "description": "Minutes to wait before retrying after failure. Critical = build break or test regression."
+  },
+
+  "maxRuntime": {
+    "perAppMinutes": 15,
+    "perCycleMinutes": 90,
+    "description": "Maximum minutes allowed per app improvement and per full cycle"
+  },
+
+  "deployTargets": {
+    "lxc201": {
+      "description": "Main app server - landing page and web apps",
+      "composeFile": "docker-compose.standalone.yml",
+      "ip": "192.168.0.201",
+      "apps": ["landing-page", "nanoedit-ai", "passport-photo-ai", "illinois-driver-study", "linguaflow", "comic-news", "devops-study", "devops-game", "pipeline-runner", "daily-quote", "quill", "skokie-home-buyers"]
+    },
+    "lxc202": {
+      "description": "Marketplace apps server",
+      "composeFile": "docker-compose.lxc202.yml",
+      "ip": "192.168.0.100",
+      "apps": ["pet-services", "digital-creators", "local-services", "vintage-collectibles", "freelance-specialists", "eco-products", "gaming-assets", "edu-resources"]
+    },
+    "lxc203": {
+      "description": "Cloudify PaaS platform",
+      "composeFile": null,
+      "ip": "192.168.0.203",
+      "apps": ["cloudify", "cloudify-docs"],
+      "notes": "Deployed via dedicated script deploy-cloudify-to-lxc203.sh, uses separate Docker network"
+    }
+  },
+
+  "stats": {
+    "totalApps": 34,
+    "byType": {
+      "nextjs": 5,
+      "react": 5,
+      "static-html": 18,
+      "nodejs": 1,
+      "ios-app": 3
+    },
+    "byDeployTarget": {
+      "lxc201": 12,
+      "lxc202": 8,
+      "lxc203": 2,
+      "none": 12
+    },
+    "byPriority": {
+      "1": 2,
+      "2": 5,
+      "3": 6,
+      "4": 13,
+      "5": 8
+    },
+    "withTests": 5,
+    "withDockerfile": 29,
+    "withPackageJson": 16
+  }
+}

@@ -1,0 +1,38 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Improve the visual design and user experience.
+
+STEPS:
+1. Review the current UI by examining page components and layouts.
+
+2. Identify and fix these common UI/UX issues:
+   - Missing or broken responsive design (test mobile, tablet, desktop breakpoints)
+   - Poor color contrast (text on backgrounds should meet WCAG AA: 4.5:1 ratio)
+   - Missing loading states (add skeleton loaders or spinners for async operations)
+   - Abrupt transitions (add smooth animations with framer-motion or CSS transitions)
+   - Poor form UX (missing validation feedback, unclear error messages, no success states)
+   - Inconsistent spacing, typography, or color usage
+   - Missing hover/focus/active states on interactive elements
+   - Poor empty states (show helpful messages when no data is available)
+
+3. Add polish where it has the most impact:
+   - Smooth page transitions using framer-motion AnimatePresence
+   - Micro-interactions on buttons and cards (hover scale, click feedback)
+   - Consistent border-radius, shadows, and spacing tokens
+   - Proper focus rings for keyboard navigation (accessibility)
+   - Toast notifications for user actions (success, error feedback)
+
+4. Ensure all changes are responsive and work across screen sizes.
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Preserve the existing design language and color scheme.
+- Don't add new dependencies unless absolutely necessary (prefer CSS/Tailwind).
+- If using framer-motion, keep animations subtle (200-300ms, ease curves).
+- Don't redesign entire pages; make targeted improvements.
+- Ensure changes are accessible (proper aria labels, keyboard navigation).
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Visually inspect key pages at mobile (375px), tablet (768px), and desktop (1280px) widths.

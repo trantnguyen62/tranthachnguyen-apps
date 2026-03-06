@@ -1,0 +1,54 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Add meaningful tests to improve code reliability and confidence.
+
+STEPS:
+1. Assess the current test setup:
+   - Check for existing test framework (Jest, Vitest, Playwright, etc.)
+   - Look at existing tests for patterns and conventions
+   - If no test setup exists, set up Vitest (or Jest) with React Testing Library
+
+2. Identify what to test (prioritize by impact):
+
+   Unit tests (pure functions, utilities):
+   - Data transformation functions
+   - Validation logic
+   - Business rule calculations
+   - String/date formatting helpers
+   - API response parsers
+
+   Component tests (React Testing Library):
+   - Key user flows (login form, search, data entry)
+   - Conditional rendering logic
+   - Form validation and submission
+   - Error states and loading states
+   - Accessibility (proper roles, labels, keyboard interaction)
+
+   Integration tests (API routes):
+   - Happy path for critical endpoints
+   - Error handling (invalid input, unauthorized access)
+   - Edge cases (empty data, large payloads)
+
+3. Write tests following these principles:
+   - Test behavior, not implementation details
+   - Use descriptive test names: "should display error when email is invalid"
+   - Arrange-Act-Assert pattern
+   - One assertion per concept (multiple expects are fine if testing one behavior)
+   - Use realistic test data, not "foo" and "bar"
+   - Mock external dependencies (API calls, database) but not internal modules
+
+4. Run the test suite and ensure all tests pass.
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Don't rewrite existing tests unless they are broken or test the wrong thing.
+- Focus on tests that catch real bugs, not trivial tests for obvious code.
+- Don't test third-party library behavior.
+- Keep test files next to the code they test (e.g., utils.test.ts next to utils.ts).
+- Aim for 3-5 high-value test files, not 100% coverage.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Run the test suite and confirm all tests pass.
+- Verify tests fail when the behavior they test is broken (sanity check).

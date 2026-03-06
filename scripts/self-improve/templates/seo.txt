@@ -1,0 +1,50 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Improve search engine optimization and social sharing metadata.
+
+STEPS:
+1. Audit current SEO setup:
+   - Check for existing meta tags, Open Graph tags, and structured data
+   - Verify sitemap.xml and robots.txt exist and are correct
+   - Check for canonical URLs on all pages
+   - Look for missing alt text on images
+
+2. Add or fix metadata for each page:
+
+   Meta tags (in layout.tsx or page.tsx metadata export):
+   - title: Descriptive, unique per page, 50-60 characters
+   - description: Compelling summary, 150-160 characters
+   - viewport and charset (usually handled by Next.js)
+
+   Open Graph tags (for social sharing):
+   - og:title, og:description, og:image (1200x630px recommended)
+   - og:type (website, article, etc.)
+   - og:url (canonical URL)
+   - twitter:card (summary_large_image), twitter:title, twitter:description
+
+   Structured data (JSON-LD):
+   - Add appropriate schema.org types (WebSite, WebApplication, Article, etc.)
+   - Include organization/person info, breadcrumbs, FAQ if applicable
+   - Place in a <script type="application/ld+json"> tag
+
+3. Create or update these files:
+   - sitemap.xml (or dynamic sitemap via Next.js generateSitemap)
+   - robots.txt (allow all crawlers, reference sitemap)
+
+4. Fix content issues:
+   - Add alt text to all images (descriptive, not "image of...")
+   - Use semantic HTML (h1-h6 hierarchy, nav, main, article, section)
+   - Add canonical URLs to prevent duplicate content issues
+   - Ensure internal links use descriptive anchor text
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Use Next.js Metadata API (export const metadata or generateMetadata) for App Router apps.
+- Don't add keywords meta tag (search engines ignore it).
+- Keep structured data accurate; don't add claims that aren't true.
+- Don't change visible page content for SEO purposes.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Validate structured data mentally against schema.org specifications.

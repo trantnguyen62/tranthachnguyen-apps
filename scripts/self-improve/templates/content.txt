@@ -1,0 +1,51 @@
+You are improving the {app_name} app located at {app_path}.
+App type: {app_type}
+
+TASK: Improve text content quality, copy, and messaging throughout the app.
+
+STEPS:
+1. Scan all user-facing text in the application:
+   - Page headings and subheadings
+   - Button labels and CTAs
+   - Form labels, placeholders, and validation messages
+   - Empty states and error messages
+   - Tooltips and help text
+   - Navigation items and breadcrumbs
+
+2. Fix content issues:
+
+   Typos and grammar:
+   - Fix spelling errors, grammatical mistakes, and punctuation issues
+   - Fix inconsistent capitalization (Title Case vs sentence case)
+   - Fix inconsistent terminology (use the same word for the same concept)
+
+   Clarity and tone:
+   - Replace vague text with specific, actionable copy
+   - Use active voice over passive voice
+   - Keep sentences short and scannable
+   - Match the tone to the app type (professional, casual, technical)
+
+   Placeholder content:
+   - Replace "Lorem ipsum" or "TODO" text with meaningful content
+   - Add realistic example data in demos and previews
+   - Write helpful empty state messages that guide users to take action
+
+   Microcopy:
+   - Button labels should describe the action ("Save changes" not "Submit")
+   - Error messages should explain what went wrong and how to fix it
+   - Success messages should confirm what happened
+   - Add helpful tooltips for complex or unfamiliar features
+
+3. Ensure content is consistent across the app.
+
+CONSTRAINTS:
+- Make minimal, focused changes. Don't break existing functionality.
+- Preserve the existing tone and voice of the application.
+- Don't rewrite large blocks of content; make targeted improvements.
+- Don't add marketing fluff or unnecessary adjectives.
+- Keep all text concise; users scan, they don't read.
+- Don't change technical terms or domain-specific language without understanding context.
+
+VERIFICATION:
+- After making changes, verify by running: {build_command}
+- Read through changed text to ensure it reads naturally.
