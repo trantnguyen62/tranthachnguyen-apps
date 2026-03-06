@@ -23,9 +23,8 @@ An interactive study guide for the Illinois Driver's License test, powered by AI
 # Install dependencies
 npm install
 
-# Set up environment
-cp .env.example .env
-# Add your GEMINI_API_KEY to .env
+# Set up environment (create .env and add your API key)
+echo "API_KEY=your_gemini_api_key_here" > .env
 
 # Start development server
 npm run dev
@@ -35,21 +34,22 @@ npm run dev
 
 ```bash
 docker build -t illinois-driver-study .
-docker run -p 4000:4000 illinois-driver-study
+docker run -p 80:80 illinois-driver-study
 ```
 
 ## 📁 Project Structure
 
 ```
 illinois-driver-study/
-├── App.tsx             # Main React component
+├── App.tsx             # Main React component with nav and layout
 ├── index.html          # Entry HTML file
 ├── index.tsx           # React entry point
-├── components/         # Reusable UI components
-├── data/               # Question data and content
-├── services/           # API services (Gemini AI)
-├── public/             # Static assets
-└── Dockerfile          # Docker configuration
+├── types.ts            # Shared TypeScript types and enums
+├── components/         # UI components (QuizMode, StudyMode, LivePractice, VoiceTools)
+├── data/               # Question data in English and Vietnamese
+├── services/           # Gemini AI service (speech, transcription, image generation)
+├── public/             # Static assets (road sign SVGs, sitemap, robots.txt)
+└── Dockerfile          # Serves pre-built dist/ with Node serve on port 80
 ```
 
 ## 🛠️ Tech Stack

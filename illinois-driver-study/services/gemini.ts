@@ -25,6 +25,10 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(binary);
 }
 
+/**
+ * Generates spoken audio for the given text using Gemini TTS.
+ * Returns raw PCM audio data as an ArrayBuffer suitable for Web Audio API decoding.
+ */
 export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
   const ai = await getAI(false);
   const response = await ai.models.generateContent({
@@ -53,6 +57,11 @@ export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
   return bytes.buffer;
 };
 
+/**
+ * Generates a study image from a text prompt using Gemini image generation.
+ * Requires the user to select a paid API key via AI Studio.
+ * Returns a base64-encoded data URL (image/png).
+ */
 export const generateStudyImage = async (prompt: string, size: ImageSize): Promise<string> => {
   // Use gemini-3-pro-image-preview for high quality images as requested.
   // This model requires the user to select their own API key.
@@ -85,6 +94,10 @@ export const generateStudyImage = async (prompt: string, size: ImageSize): Promi
   throw new Error("No image generated");
 };
 
+/**
+ * Transcribes an audio Blob to text using Gemini's multimodal content API.
+ * Returns the transcribed string, or an empty string if no text was produced.
+ */
 export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
   const ai = await getAI(false);
   const arrayBuffer = await audioBlob.arrayBuffer();
