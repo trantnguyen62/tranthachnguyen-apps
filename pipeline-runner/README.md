@@ -26,10 +26,13 @@ An endless runner game that teaches DevOps concepts through gameplay. Navigate t
 # Install dependencies
 npm install
 
-# Start development server
-npm run dev
+# Build web assets into www/
+npm run build
 
-# Or just open in browser
+# Serve locally
+npm start
+
+# Or just open in browser directly
 open index.html
 ```
 
