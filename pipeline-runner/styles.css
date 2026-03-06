@@ -790,6 +790,18 @@ body {
     cursor: not-allowed;
 }
 
+/* Focus styles for keyboard navigation */
+.topic-btn:focus-visible,
+.start-btn:focus-visible,
+.answer-btn:focus-visible,
+.retry-btn:focus-visible,
+.menu-btn:focus-visible,
+.watch-ad-btn:focus-visible,
+.skip-ad-btn:focus-visible {
+    outline: 3px solid #60a5fa;
+    outline-offset: 3px;
+}
+
 /* Responsive - Larger screens */
 @media (min-width: 900px) {
     .game-container {

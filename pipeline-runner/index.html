@@ -151,7 +151,7 @@
                     <span class="title-pipeline">Pipeline</span>
                     <span class="title-runner">Runner</span>
                 </h1>
-                <div class="icon-preview">🐳</div>
+                <div class="icon-preview" aria-hidden="true">🐳</div>
                 <p class="tagline">Navigate the CI/CD Pipeline & Learn DevOps!</p>
 
                 <div class="topic-selector">
@@ -161,7 +161,7 @@
                     </div>
                 </div>
 
-                <button class="start-btn" onclick="startGame()">
+                <button type="button" class="start-btn" onclick="startGame()">
                     <span>▶️ DEPLOY</span>
                 </button>
 
@@ -178,7 +178,7 @@
 
         <!-- Game Screen -->
         <div id="gameScreen" class="screen hidden">
-            <canvas id="gameCanvas"></canvas>
+            <canvas id="gameCanvas" aria-label="Pipeline Runner game" role="img"></canvas>
             <div class="game-hud">
                 <div class="hud-left">
                     <div class="topic-badge" id="currentTopicBadge">🐳 Docker</div>
@@ -195,14 +195,14 @@
             </div>
 
             <!-- DevOps Tip Banner -->
-            <div class="tip-banner hidden" id="tipBanner">
+            <div class="tip-banner hidden" id="tipBanner" role="status" aria-live="polite" aria-atomic="true">
                 <span class="tip-icon">💡</span>
                 <span class="tip-text" id="tipText"></span>
             </div>
         </div>
 
         <!-- Question Modal -->
-        <div id="questionModal" class="modal hidden">
+        <div id="questionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="questionTopic" aria-describedby="questionText">
             <div class="modal-content question-panel">
                 <div class="question-header">
                     <span class="question-topic" id="questionTopic">Docker</span>
@@ -244,15 +244,15 @@
                 </div>
 
                 <!-- Watch Ad Button -->
-                <button class="watch-ad-btn" id="watchAdBtn" onclick="AdManager.showRewardedAd()">
+                <button type="button" class="watch-ad-btn" id="watchAdBtn" onclick="AdManager.showRewardedAd()">
                     📺 Watch Ad for Extra Life
                 </button>
 
                 <div class="game-over-buttons">
-                    <button class="retry-btn" onclick="startGame()">
+                    <button type="button" class="retry-btn" onclick="startGame()">
                         🔄 Redeploy
                     </button>
-                    <button class="menu-btn" onclick="showStartScreen()">
+                    <button type="button" class="menu-btn" onclick="showStartScreen()">
                         🏠 Menu
                     </button>
                 </div>
@@ -260,15 +260,15 @@
         </div>
 
         <!-- Rewarded Ad Modal -->
-        <div id="rewardedAdModal" class="rewarded-ad-modal hidden">
+        <div id="rewardedAdModal" class="rewarded-ad-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rewardedAdHeading">
             <div class="rewarded-ad-content">
-                <h3 class="rewarded-ad-title">📺 Watch Ad for Extra Life</h3>
+                <h3 id="rewardedAdHeading" class="rewarded-ad-title">📺 Watch Ad for Extra Life</h3>
                 <div class="rewarded-ad-video">
                     <p>🎬 Video Ad Playing...</p>
                     <p style="font-size: 0.8rem; margin-top: 0.5rem;">(Demo Mode - Real ads coming soon!)</p>
                 </div>
                 <div class="rewarded-ad-timer" id="rewardedAdTimer">5</div>
-                <button class="skip-ad-btn" id="skipAdBtn" disabled onclick="AdManager.skipAd()">
+                <button type="button" class="skip-ad-btn" id="skipAdBtn" disabled onclick="AdManager.skipAd()">
                     Skip in 5s
                 </button>
             </div>

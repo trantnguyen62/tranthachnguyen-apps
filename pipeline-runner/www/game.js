@@ -4,15 +4,15 @@
 
 // Game Configuration
 const CONFIG = {
-    GRAVITY: 0.35,
-    BOOST_FORCE: -7.5,
-    OBSTACLE_SPEED: 3,
-    OBSTACLE_GAP: 180,
-    OBSTACLE_SPAWN_RATE: 2200,
-    PLAYER_SIZE: 50,
-    OBSTACLE_WIDTH: 100,
-    QUESTION_INTERVAL: 5,
-    QUESTION_TIME: 12
+    GRAVITY: 0.35,          // Downward acceleration applied each frame (px/frame²)
+    BOOST_FORCE: -7.5,      // Upward velocity applied on tap/space (negative = up, px/frame)
+    OBSTACLE_SPEED: 3,      // Horizontal scroll speed of obstacles (px/frame)
+    OBSTACLE_GAP: 180,      // Vertical gap between top and bottom obstacle (px)
+    OBSTACLE_SPAWN_RATE: 2200, // Milliseconds between obstacle spawns
+    PLAYER_SIZE: 50,        // Player sprite bounding box (px)
+    OBSTACLE_WIDTH: 100,    // Width of each obstacle column (px)
+    QUESTION_INTERVAL: 5,   // Gates passed before a quiz question is triggered
+    QUESTION_TIME: 12       // Seconds allowed to answer a quiz question
 };
 
 // DevOps Topics with learnable commands/concepts

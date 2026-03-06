@@ -16,7 +16,7 @@ An endless runner game that teaches DevOps concepts through gameplay. Navigate t
 | Input | Action |
 |-------|--------|
 | `Space` / `Click` / `Tap` | Boost upward |
-| `P` | Pause game |
+| `1` / `2` / `3` / `4` | Select quiz answer during question |
 
 ## 🚀 Quick Start
 
