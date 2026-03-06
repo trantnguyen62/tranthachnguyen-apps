@@ -82,11 +82,16 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
 
   const capturePhoto = () => {
     if (videoRef.current) {
+      const { videoWidth, videoHeight } = videoRef.current;
+      if (!videoWidth || !videoHeight) {
+        setError("Camera is not ready yet. Please wait a moment.");
+        return;
+      }
       const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
+      canvas.width = videoWidth;
+      canvas.height = videoHeight;
       const ctx = canvas.getContext('2d');
-      if (ctx) {
+      if (ctx && videoRef.current) {
         ctx.drawImage(videoRef.current, 0, 0);
         const data = canvas.toDataURL('image/png');
         onImageSelected({

@@ -28,8 +28,8 @@ const App: React.FC = () => {
   // Derived state
   const currentImage = history[historyIndex] || null;
   const originalImage = history[0] || null;
-  const canUndo = historyIndex > 0;
-  const canRedo = historyIndex < history.length - 1;
+  const canUndo = historyIndex > 0 && status !== AppStatus.PROCESSING;
+  const canRedo = historyIndex < history.length - 1 && status !== AppStatus.PROCESSING;
 
   const handleImageSelected = useCallback((image: ProcessedImage | null) => {
     if (image) {

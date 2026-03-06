@@ -24,8 +24,14 @@ export const generateEditedImage = async (
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to generate image');
+      let errorMessage = 'Failed to generate image';
+      try {
+        const error = await response.json();
+        errorMessage = error.error || errorMessage;
+      } catch {
+        // response body is not JSON
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
