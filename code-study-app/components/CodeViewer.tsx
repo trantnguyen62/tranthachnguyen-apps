@@ -30,9 +30,10 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   if (!file) {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-800/50 rounded-lg">
-        <div className="text-center text-slate-500">
-          <p className="text-lg mb-2">Select a file to view</p>
-          <p className="text-sm">Browse the file tree on the left</p>
+        <div className="text-center text-slate-500 space-y-2">
+          <Code2 className="w-10 h-10 mx-auto opacity-30" />
+          <p className="text-base font-medium text-slate-400">No file selected</p>
+          <p className="text-sm">Pick a file from the tree to view its contents</p>
         </div>
       </div>
     );

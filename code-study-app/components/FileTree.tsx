@@ -81,8 +81,8 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
   return (
     <button
       onClick={handleSelect}
-      className={`flex items-center gap-2 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm ${
-        isSelected ? 'bg-slate-700/70 text-white' : ''
+      className={`flex items-center gap-2 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm transition-colors ${
+        isSelected ? 'bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500' : 'border-l-2 border-transparent'
       }`}
       style={{ paddingLeft: `${depth * 12 + 24}px` }}
     >
