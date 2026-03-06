@@ -34,8 +34,22 @@ docker run -p 8080:80 landing-page
 landing-page/
 ├── index.html      # Main HTML file with all content
 ├── styles.css      # Additional custom styles
-└── Dockerfile      # Docker configuration
+├── Dockerfile      # Docker configuration
+└── README.md       # This file
 ```
+
+## 🗂️ Showcased Apps
+
+| App | Description |
+|-----|-------------|
+| LinguaFlow | AI-powered language learning partner |
+| Illinois Driver Study | Interactive Illinois driver's license study guide |
+| NanoEdit AI | AI-assisted photo editor |
+| Passport Photo AI | AI photo cropping for passport requirements |
+| Comic News | Comic browser and reader |
+| DevOps Mastery | DevOps flashcards and quizzes |
+| DevOps Defender | DevOps learning game |
+| Resume & Portfolio | Professional resume and portfolio |
 
 ## 🛠️ Tech Stack
 
@@ -56,4 +70,4 @@ landing-page/
 
 ## 📄 License
 
-© 2025 Tran Thach Nguyen. All rights reserved.
+© 2026 Tran Thach Nguyen. All rights reserved.
