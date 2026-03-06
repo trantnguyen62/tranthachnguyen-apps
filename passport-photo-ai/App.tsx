@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ImageUploader } from './components/ImageUploader';
 import { PhotoEditor } from './components/PhotoEditor';
-import { PassportImage, AppStatus } from './types';
+import { PassportImage, PassportCheckResult, AppStatus } from './types';
 
 // Theme constants moved outside component
 const THEME = {
@@ -14,7 +14,7 @@ const THEME = {
 export default function App() {
   const [image, setImage] = useState<PassportImage | null>(null);
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<PassportCheckResult | null>(null);
   const [showEditor, setShowEditor] = useState(false);
 
   const handleImageSelected = useCallback((img: PassportImage | null) => {

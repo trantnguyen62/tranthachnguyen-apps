@@ -18,9 +18,10 @@ const BG_COLOR_NAMES: Record<string, string> = {
 };
 
 const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promise<string> =>
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
+    img.onerror = () => reject(new Error('Failed to load image'));
     img.onload = () => {
       const canvas = document.createElement('canvas');
       canvas.width = 600;
