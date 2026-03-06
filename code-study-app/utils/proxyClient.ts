@@ -136,7 +136,11 @@ export class ProxyLiveSession {
 
   close(): void {
     if (this.ws) {
-      this.ws.send(JSON.stringify({ type: 'disconnect' }));
+      try {
+        this.ws.send(JSON.stringify({ type: 'disconnect' }));
+      } catch (e) {
+        // WebSocket may already be closing
+      }
       this.ws.close();
       this.ws = null;
     }

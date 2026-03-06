@@ -121,6 +121,15 @@ function App() {
     setSelectedCode(code);
   }, []);
 
+  const handleProjectChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const project = projects.find(p => p.path === e.target.value);
+    setSelectedProject(project || null);
+  }, [projects]);
+
+  const handleTabFiles = useCallback(() => setActiveTab('files'), []);
+  const handleTabSearch = useCallback(() => setActiveTab('search'), []);
+  const handleToggleSidebar = useCallback(() => setShowSidebar(s => !s), []);
+
   const isConnected = connectionState === ConnectionState.CONNECTED;
   const isConnecting = connectionState === ConnectionState.CONNECTING;
 
@@ -146,10 +155,7 @@ function App() {
             {/* Project Selector */}
             <select
               value={selectedProject?.path || ''}
-              onChange={useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-                const project = projects.find(p => p.path === e.target.value);
-                setSelectedProject(project || null);
-              }, [projects])}
+              onChange={handleProjectChange}
               className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             >
               <option value="">Select a project...</option>
@@ -164,7 +170,7 @@ function App() {
           {/* Tabs */}
           <div className="flex border-b border-slate-700/50">
             <button
-              onClick={useCallback(() => setActiveTab('files'), [])}
+              onClick={handleTabFiles}
               className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 ${
                 activeTab === 'files' 
                   ? 'text-emerald-400 border-b-2 border-emerald-400' 
@@ -175,7 +181,7 @@ function App() {
               Files
             </button>
             <button
-              onClick={useCallback(() => setActiveTab('search'), [])}
+              onClick={handleTabSearch}
               className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 ${
                 activeTab === 'search' 
                   ? 'text-emerald-400 border-b-2 border-emerald-400' 
@@ -241,7 +247,7 @@ function App() {
         {/* Top Bar */}
         <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center px-4 gap-4">
           <button
-            onClick={useCallback(() => setShowSidebar(s => !s), [])}
+            onClick={handleToggleSidebar}
             className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
           >
             <ChevronLeft className={`w-5 h-5 transition-transform ${showSidebar ? '' : 'rotate-180'}`} />

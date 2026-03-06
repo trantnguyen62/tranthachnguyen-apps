@@ -177,8 +177,8 @@ app.get('/api/file', (req, res) => {
   
   const fullPath = path.join(CODEBASE_PATH, filePath);
   
-  // Security: ensure path is within codebase
-  if (!fullPath.startsWith(CODEBASE_PATH)) {
+  // Security: ensure path is within codebase (append sep to prevent partial-name traversal)
+  if (!fullPath.startsWith(CODEBASE_PATH + path.sep) && fullPath !== CODEBASE_PATH) {
     return res.status(403).json({ error: 'Access denied' });
   }
   
