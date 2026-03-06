@@ -3405,17 +3405,18 @@ function renderCodebase() {
             <div class="codebase-item-header">
                 <div class="codebase-item-title">
                     <span class="file-icon">📄</span>
-                    <span>${item.title}</span>
-                    <span class="file-name">${item.filename}</span>
+                    <span>${escapeHtml(item.title)}</span>
+                    <span class="file-name">${escapeHtml(item.filename)}</span>
                 </div>
-                <span class="codebase-item-badge">${item.language}</span>
+                <span class="codebase-item-badge">${escapeHtml(item.language)}</span>
             </div>
-            <div class="codebase-item-description">${item.description}</div>
+            <div class="codebase-item-description">${escapeHtml(item.description)}</div>
             <div class="codebase-item-code">
-                <button class="codebase-copy-btn" onclick="copyCodebase(${index})">📋 Copy</button>
+                <button class="codebase-copy-btn">📋 Copy</button>
                 <pre><code>${escapeHtml(item.code)}</code></pre>
             </div>
         `;
+        codeItem.querySelector('.codebase-copy-btn').addEventListener('click', () => copyCodebase(index));
         codebaseList.appendChild(codeItem);
     });
 }
@@ -3461,10 +3462,11 @@ function renderCommands() {
         const item = document.createElement('div');
         item.className = 'command-item';
         item.innerHTML = `
-            <button class="command-copy-btn" onclick="copyCommand(event, '${cmd.command.replace(/'/g, "\\'")}')">📋 Copy</button>
-            <code class="command-code">${cmd.command}</code>
-            <p class="command-description">${cmd.description}</p>
+            <button class="command-copy-btn">📋 Copy</button>
+            <code class="command-code">${escapeHtml(cmd.command)}</code>
+            <p class="command-description">${escapeHtml(cmd.description)}</p>
         `;
+        item.querySelector('.command-copy-btn').addEventListener('click', (e) => copyCommand(e, cmd.command));
         commandsList.appendChild(item);
     });
 }
