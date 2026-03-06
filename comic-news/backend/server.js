@@ -191,6 +191,28 @@ app.get('/api/featured', (req, res) => {
   res.json(featured);
 });
 
+// robots.txt
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send('User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: /sitemap.xml\n');
+});
+
+// sitemap.xml
+app.get('/sitemap.xml', (req, res) => {
+  const baseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
+  const comicUrls = comics.map(c =>
+    `  <url><loc>${baseUrl}/comic/${c.id}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`
+  ).join('\n');
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${baseUrl}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>${baseUrl}/library</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+${comicUrls}
+</urlset>`;
+  res.type('application/xml');
+  res.send(xml);
+});
+
 // SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));
