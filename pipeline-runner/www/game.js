@@ -301,6 +301,7 @@ let game = {
     currentQuestion: null,
     questionActive: false,
     questionTimer: 0,
+    questionTimerInterval: null,
 
     width: 0,
     height: 0
@@ -414,7 +415,7 @@ function setupEventListeners() {
             e.preventDefault();
             boost();
         }
-    });
+    }, { passive: false });
 }
 
 function resizeCanvas() {
@@ -472,6 +473,7 @@ function startGame() {
     game.usedContentIndices = [];
     game.questionActive = false;
     game.currentQuestion = null;
+    game.questionTimerInterval = null;
     game.lastLearnedFact = '';
 
     game.player.x = game.width * 0.12;
@@ -747,7 +749,7 @@ function spawnObstacle() {
     if (!game.running || game.questionActive) return;
 
     const minGapY = 120;
-    const maxGapY = game.height - CONFIG.OBSTACLE_GAP - 120;
+    const maxGapY = Math.max(minGapY, game.height - CONFIG.OBSTACLE_GAP - 120);
     const gapY = Math.random() * (maxGapY - minGapY) + minGapY;
 
     const content = getNextLearnableContent();
@@ -821,9 +823,13 @@ function showQuestion() {
 }
 
 function startQuestionTimer() {
-    const timerInterval = setInterval(() => {
+    if (game.questionTimerInterval) {
+        clearInterval(game.questionTimerInterval);
+    }
+    game.questionTimerInterval = setInterval(() => {
         if (!game.questionActive) {
-            clearInterval(timerInterval);
+            clearInterval(game.questionTimerInterval);
+            game.questionTimerInterval = null;
             return;
         }
 
@@ -831,7 +837,8 @@ function startQuestionTimer() {
         document.getElementById('questionTimer').textContent = game.questionTimer;
 
         if (game.questionTimer <= 0) {
-            clearInterval(timerInterval);
+            clearInterval(game.questionTimerInterval);
+            game.questionTimerInterval = null;
             handleTimeout();
         }
     }, 1000);
@@ -900,6 +907,10 @@ function handleTimeout() {
 }
 
 function closeQuestion() {
+    if (game.questionTimerInterval) {
+        clearInterval(game.questionTimerInterval);
+        game.questionTimerInterval = null;
+    }
     game.questionActive = false;
     game.paused = false;
     game.currentQuestion = null;
