@@ -4,9 +4,8 @@ Your local server is now running and accessible via the internet.
 
 ## ✅ Access Your App
 
-Your app is live at both addresses:
-- **[https://tranthachnguyen.com](https://tranthachnguyen.com)**
-- **[https://www.tranthachnguyen.com](https://www.tranthachnguyen.com)**
+Your app is live at:
+- **[https://linguaflow.tranthachnguyen.com](https://linguaflow.tranthachnguyen.com)**
 
 ## 🚀 How to Run Your Server
 

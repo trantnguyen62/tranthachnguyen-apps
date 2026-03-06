@@ -24,11 +24,16 @@ An AI-powered language learning partner that helps you practice conversation wit
 # Install dependencies
 npm install
 
-# Set up environment
-cp .env.example .env.local
-# Add your GEMINI_API_KEY to .env.local
+# Set up environment (create .env.local with your keys)
+cat > .env.local << 'EOF'
+GEMINI_API_KEY=your_api_key_here
+VITE_PROXY_URL=ws://localhost:3001
+EOF
 
-# Start development server
+# Start backend servers (WebSocket proxy + API)
+npm run server
+
+# In a separate terminal, start the frontend
 npm run dev
 ```
 
