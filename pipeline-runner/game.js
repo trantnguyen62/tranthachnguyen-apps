@@ -318,6 +318,7 @@ function init() {
     setupEventListeners();
     resizeCanvas();
     initStars();
+    updateTopicCache();
 
     window.addEventListener('resize', resizeCanvas);
 }
@@ -353,21 +354,22 @@ function renderTopicButtons() {
 
 function selectTopic(topicId) {
     game.selectedTopic = topicId;
+    updateTopicCache();
     renderTopicButtons();
-
-    const topic = TOPICS.find(t => t.id === topicId);
-    document.querySelector('.icon-preview').textContent = topic.icon;
+    document.querySelector('.icon-preview').textContent = game.topicCache.topic.icon;
 }
 
 function initStars() {
     game.stars = [];
     for (let i = 0; i < 100; i++) {
+        const brightness = Math.random() * 0.5 + 0.3;
         game.stars.push({
             x: Math.random() * (game.width || 600),
             y: Math.random() * (game.height || 800),
             size: Math.random() * 2 + 0.5,
             speed: Math.random() * 1.5 + 0.5,
-            brightness: Math.random() * 0.5 + 0.3
+            brightness,
+            fillStyle: `rgba(255, 255, 255, ${brightness})`
         });
     }
 }
@@ -433,6 +435,13 @@ function resizeCanvas() {
     // Scale context to account for DPI
     game.ctx.scale(dpr, dpr);
 
+    // Cache background gradient (re-create on resize since height changed)
+    const bgGrad = game.ctx.createLinearGradient(0, 0, 0, game.height);
+    bgGrad.addColorStop(0, '#0f172a');
+    bgGrad.addColorStop(0.5, '#1e293b');
+    bgGrad.addColorStop(1, '#0f172a');
+    game.cachedBgGradient = bgGrad;
+
     initStars();
 }
 
@@ -470,7 +479,8 @@ function startGame() {
     game.player.velocity = 0;
     game.player.rotation = 0;
 
-    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    updateTopicCache();
+    const topic = game.topicCache.topic;
     document.getElementById('currentTopicBadge').textContent = `${topic.icon} ${topic.name}`;
     document.getElementById('currentScore').textContent = '0';
     document.getElementById('streakCount').textContent = '0';
@@ -574,15 +584,11 @@ function showLearnedContent(content) {
 function render() {
     const ctx = game.ctx;
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, game.height);
-    gradient.addColorStop(0, '#0f172a');
-    gradient.addColorStop(0.5, '#1e293b');
-    gradient.addColorStop(1, '#0f172a');
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = game.cachedBgGradient;
     ctx.fillRect(0, 0, game.width, game.height);
 
     game.stars.forEach(star => {
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+        ctx.fillStyle = star.fillStyle;
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fill();
@@ -630,14 +636,14 @@ function drawPipelineBackground(ctx) {
 }
 
 function drawObstacle(ctx, obs) {
-    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    const { topic, lightColor20 } = game.topicCache;
     const gateWidth = CONFIG.OBSTACLE_WIDTH;
-    const gateColor = topic ? topic.color : '#3b82f6';
+    const gateColor = topic.color;
 
     // Top gate
     const topGradient = ctx.createLinearGradient(obs.x, 0, obs.x + gateWidth, 0);
     topGradient.addColorStop(0, gateColor);
-    topGradient.addColorStop(0.5, lightenColor(gateColor, 20));
+    topGradient.addColorStop(0.5, lightColor20);
     topGradient.addColorStop(1, gateColor);
 
     ctx.fillStyle = topGradient;
@@ -675,7 +681,7 @@ function drawObstacle(ctx, obs) {
 
 function drawPlayer(ctx) {
     const p = game.player;
-    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    const { topic, lightColor30, darkColor20 } = game.topicCache;
 
     ctx.save();
     ctx.translate(p.x, p.y);
@@ -685,9 +691,9 @@ function drawPlayer(ctx) {
     ctx.shadowBlur = 20;
 
     const gradient = ctx.createLinearGradient(-25, -20, 25, 20);
-    gradient.addColorStop(0, lightenColor(topic.color, 30));
+    gradient.addColorStop(0, lightColor30);
     gradient.addColorStop(0.5, topic.color);
-    gradient.addColorStop(1, darkenColor(topic.color, 20));
+    gradient.addColorStop(1, darkColor20);
 
     ctx.fillStyle = gradient;
     ctx.beginPath();
@@ -981,6 +987,16 @@ function darkenColor(hex, percent) {
     const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
     const B = Math.max(0, (num & 0x0000FF) - amt);
     return `rgb(${R}, ${G}, ${B})`;
+}
+
+function updateTopicCache() {
+    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    game.topicCache = {
+        topic,
+        lightColor20: lightenColor(topic.color, 20),
+        lightColor30: lightenColor(topic.color, 30),
+        darkColor20: darkenColor(topic.color, 20)
+    };
 }
 
 /* =====================================================

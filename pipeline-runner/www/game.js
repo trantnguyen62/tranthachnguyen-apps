@@ -318,6 +318,7 @@ function init() {
     setupEventListeners();
     resizeCanvas();
     initStars();
+    updateTopicCache();
 
     window.addEventListener('resize', resizeCanvas);
 }
@@ -353,21 +354,22 @@ function renderTopicButtons() {
 
 function selectTopic(topicId) {
     game.selectedTopic = topicId;
+    updateTopicCache();
     renderTopicButtons();
-
-    const topic = TOPICS.find(t => t.id === topicId);
-    document.querySelector('.icon-preview').textContent = topic.icon;
+    document.querySelector('.icon-preview').textContent = game.topicCache.topic.icon;
 }
 
 function initStars() {
     game.stars = [];
     for (let i = 0; i < 100; i++) {
+        const brightness = Math.random() * 0.5 + 0.3;
         game.stars.push({
             x: Math.random() * (game.width || 600),
             y: Math.random() * (game.height || 800),
             size: Math.random() * 2 + 0.5,
             speed: Math.random() * 1.5 + 0.5,
-            brightness: Math.random() * 0.5 + 0.3
+            brightness,
+            fillStyle: `rgba(255, 255, 255, ${brightness})`
         });
     }
 }
@@ -433,6 +435,13 @@ function resizeCanvas() {
     // Scale context to account for DPI
     game.ctx.scale(dpr, dpr);
 
+    // Cache background gradient (re-create on resize since height changed)
+    const bgGrad = game.ctx.createLinearGradient(0, 0, 0, game.height);
+    bgGrad.addColorStop(0, '#0f172a');
+    bgGrad.addColorStop(0.5, '#1e293b');
+    bgGrad.addColorStop(1, '#0f172a');
+    game.cachedBgGradient = bgGrad;
+
     initStars();
 }
 
@@ -470,7 +479,8 @@ function startGame() {
     game.player.velocity = 0;
     game.player.rotation = 0;
 
-    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    updateTopicCache();
+    const topic = game.topicCache.topic;
     document.getElementById('currentTopicBadge').textContent = `${topic.icon} ${topic.name}`;
     document.getElementById('currentScore').textContent = '0';
     document.getElementById('streakCount').textContent = '0';
@@ -574,15 +584,11 @@ function showLearnedContent(content) {
 function render() {
     const ctx = game.ctx;
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, game.height);
-    gradient.addColorStop(0, '#0f172a');
-    gradient.addColorStop(0.5, '#1e293b');
-    gradient.addColorStop(1, '#0f172a');
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = game.cachedBgGradient;
     ctx.fillRect(0, 0, game.width, game.height);
 
     game.stars.forEach(star => {
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+        ctx.fillStyle = star.fillStyle;
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fill();
@@ -630,14 +636,14 @@ function drawPipelineBackground(ctx) {
 }
 
 function drawObstacle(ctx, obs) {
-    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    const { topic, lightColor20 } = game.topicCache;
     const gateWidth = CONFIG.OBSTACLE_WIDTH;
-    const gateColor = topic ? topic.color : '#3b82f6';
+    const gateColor = topic.color;
 
     // Top gate
     const topGradient = ctx.createLinearGradient(obs.x, 0, obs.x + gateWidth, 0);
     topGradient.addColorStop(0, gateColor);
-    topGradient.addColorStop(0.5, lightenColor(gateColor, 20));
+    topGradient.addColorStop(0.5, lightColor20);
     topGradient.addColorStop(1, gateColor);
 
     ctx.fillStyle = topGradient;
@@ -675,7 +681,7 @@ function drawObstacle(ctx, obs) {
 
 function drawPlayer(ctx) {
     const p = game.player;
-    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    const { topic, lightColor30, darkColor20 } = game.topicCache;
 
     ctx.save();
     ctx.translate(p.x, p.y);
@@ -685,9 +691,9 @@ function drawPlayer(ctx) {
     ctx.shadowBlur = 20;
 
     const gradient = ctx.createLinearGradient(-25, -20, 25, 20);
-    gradient.addColorStop(0, lightenColor(topic.color, 30));
+    gradient.addColorStop(0, lightColor30);
     gradient.addColorStop(0.5, topic.color);
-    gradient.addColorStop(1, darkenColor(topic.color, 20));
+    gradient.addColorStop(1, darkColor20);
 
     ctx.fillStyle = gradient;
     ctx.beginPath();
@@ -938,7 +944,8 @@ function gameOver() {
         document.getElementById('factText').textContent = game.lastLearnedFact || "Keep practicing to learn more DevOps commands!";
     }
 
-    setTimeout(() => showScreen('gameOverScreen'), 500);
+    // Store the timeout so it can be cancelled if user continues with extra life
+    game.gameOverTimeout = setTimeout(() => showScreen('gameOverScreen'), 500);
 }
 
 // Use a life to respawn
@@ -981,3 +988,221 @@ function darkenColor(hex, percent) {
     const B = Math.max(0, (num & 0x0000FF) - amt);
     return `rgb(${R}, ${G}, ${B})`;
 }
+
+function updateTopicCache() {
+    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    game.topicCache = {
+        topic,
+        lightColor20: lightenColor(topic.color, 20),
+        lightColor30: lightenColor(topic.color, 30),
+        darkColor20: darkenColor(topic.color, 20)
+    };
+}
+
+/* =====================================================
+   Ad Manager - Handles Banner & Rewarded Ads
+   ===================================================== */
+
+const AdManager = {
+    // Configuration
+    adWatchedThisSession: false,
+    rewardedAdTimer: null,
+    remainingTime: 5,
+
+    // Show banner ad (on menus only)
+    showBanner: function () {
+        const banner = document.getElementById('adBannerTop');
+        if (banner) {
+            banner.classList.remove('hidden');
+        }
+    },
+
+    // Hide banner ad (during gameplay)
+    hideBanner: function () {
+        const banner = document.getElementById('adBannerTop');
+        if (banner) {
+            banner.classList.add('hidden');
+        }
+    },
+
+    // Show rewarded ad (with countdown)
+    showRewardedAd: function () {
+        // Only allow one rewarded ad per game session
+        if (this.adWatchedThisSession) {
+            return;
+        }
+
+        const modal = document.getElementById('rewardedAdModal');
+        const timerDisplay = document.getElementById('rewardedAdTimer');
+        const skipBtn = document.getElementById('skipAdBtn');
+
+        modal.classList.remove('hidden');
+        this.remainingTime = 5;
+        timerDisplay.textContent = this.remainingTime;
+        skipBtn.disabled = true;
+        skipBtn.textContent = `Skip in ${this.remainingTime}s`;
+
+        // Countdown timer
+        this.rewardedAdTimer = setInterval(() => {
+            this.remainingTime--;
+            timerDisplay.textContent = this.remainingTime;
+            skipBtn.textContent = `Skip in ${this.remainingTime}s`;
+
+            if (this.remainingTime <= 0) {
+                clearInterval(this.rewardedAdTimer);
+                skipBtn.disabled = false;
+                skipBtn.textContent = '✓ Claim Reward';
+            }
+        }, 1000);
+    },
+
+    // Skip/claim reward from ad
+    skipAd: function () {
+        if (this.remainingTime > 0) return;
+
+        clearInterval(this.rewardedAdTimer);
+        const modal = document.getElementById('rewardedAdModal');
+        modal.classList.add('hidden');
+
+        // Mark ad as watched and grant reward
+        this.adWatchedThisSession = true;
+        this.grantExtraLife();
+    },
+
+    // Grant extra life and continue game
+    grantExtraLife: function () {
+        game.lives++;
+        document.getElementById('livesCount').textContent = game.lives;
+
+        // Disable the watch ad button
+        const watchAdBtn = document.getElementById('watchAdBtn');
+        watchAdBtn.classList.add('disabled');
+        watchAdBtn.textContent = '✓ Reward Claimed';
+        watchAdBtn.onclick = null;
+
+        // Continue the game
+        this.continueGame();
+    },
+
+    // Continue game after rewarded ad
+    continueGame: function () {
+        console.log('[AdManager] Continuing game after reward...');
+
+        // Reset player position to center of screen
+        game.player.x = game.width * 0.12;
+        game.player.y = game.height / 2;
+        game.player.velocity = 0;
+        game.player.rotation = 0;
+
+        // Clear ALL obstacles to give player a fresh start
+        game.obstacles = [];
+
+        // CRITICAL: Cancel the pending gameOver screen display
+        if (game.gameOverTimeout) {
+            clearTimeout(game.gameOverTimeout);
+            game.gameOverTimeout = null;
+        }
+
+        // Cancel any existing animation/intervals first
+        if (game.animationId) {
+            cancelAnimationFrame(game.animationId);
+            game.animationId = null;
+        }
+        if (game.obstacleInterval) {
+            clearInterval(game.obstacleInterval);
+            game.obstacleInterval = null;
+        }
+
+        // Set game state - USE PAUSED STATE until player taps
+        game.running = true;
+        game.paused = true;  // PAUSED until player taps
+        game.questionActive = false;
+
+        // EXPLICITLY hide game over screen and rewarded modal
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const rewardedModal = document.getElementById('rewardedAdModal');
+        if (gameOverScreen) gameOverScreen.classList.add('hidden');
+        if (rewardedModal) rewardedModal.classList.add('hidden');
+
+        // Show game screen using the standard function
+        showScreen('gameScreen');
+
+        // Hide the ad banner during gameplay
+        AdManager.hideBanner();
+
+        // Start the render loop (but paused - no physics)
+        gameLoop();
+
+        // Show "Tap to Continue" tip that stays until tap
+        showTip('👆 Tap to continue! You\'ll have 3s of invincibility.');
+
+        // Set up one-time tap handler to resume gameplay
+        const resumeHandler = (e) => {
+            if (!game.running || !game.paused) return;
+
+            console.log('[AdManager] Player tapped to resume');
+
+            // Enable invincibility for 3 seconds (longer to give player time)
+            game.respawnInvincible = true;
+            setTimeout(() => {
+                game.respawnInvincible = false;
+                showTip('⚠️ Invincibility ended - stay alert!');
+            }, 3000);
+
+            // Unpause the game
+            game.paused = false;
+
+            // Give initial boost
+            game.player.velocity = CONFIG.BOOST_FORCE;
+
+            // Start spawning obstacles after a delay
+            setTimeout(() => {
+                if (game.running) {
+                    game.obstacleInterval = setInterval(spawnObstacle, CONFIG.OBSTACLE_SPAWN_RATE);
+                }
+            }, 1500);
+
+            showTip('❤️ Extra life granted! 3s invincibility active!');
+
+            // Remove this handler
+            game.canvas.removeEventListener('click', resumeHandler);
+            game.canvas.removeEventListener('touchstart', resumeHandler);
+        };
+
+        game.canvas.addEventListener('click', resumeHandler);
+        game.canvas.addEventListener('touchstart', resumeHandler);
+
+        console.log('[AdManager] Waiting for player tap to resume...');
+    },
+
+    // Reset for new game
+    reset: function () {
+        this.adWatchedThisSession = false;
+        const watchAdBtn = document.getElementById('watchAdBtn');
+        if (watchAdBtn) {
+            watchAdBtn.classList.remove('disabled');
+            watchAdBtn.textContent = '📺 Watch Ad for Extra Life';
+            watchAdBtn.onclick = () => AdManager.showRewardedAd();
+        }
+    }
+};
+
+// Modify startGame to reset ad state and hide banner during gameplay
+const originalStartGame = startGame;
+startGame = function () {
+    AdManager.reset();
+    AdManager.hideBanner();
+    originalStartGame();
+};
+
+// Modify showStartScreen to show banner
+const originalShowStartScreen = showStartScreen;
+showStartScreen = function () {
+    AdManager.showBanner();
+    originalShowStartScreen();
+};
+
+// Initialize - show banner on load
+document.addEventListener('DOMContentLoaded', () => {
+    AdManager.showBanner();
+});
