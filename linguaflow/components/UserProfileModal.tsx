@@ -94,11 +94,16 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="profile-modal-title"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+    >
       <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
-          <h2 className="text-xl font-bold text-white">
+          <h2 id="profile-modal-title" className="text-xl font-bold text-white">
             {existingProfile ? '👋 Chào mừng trở lại!' : '🎓 Chào bạn!'}
           </h2>
           <p className="text-blue-100 text-sm mt-1">
@@ -190,11 +195,13 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ví dụ: Minh, Lan, Hùng..."
+                  aria-describedby={error ? 'name-error' : undefined}
+                  aria-invalid={!!error}
                   className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   autoFocus
                 />
                 {error && (
-                  <p className="mt-2 text-sm text-red-400">{error}</p>
+                  <p id="name-error" role="alert" className="mt-2 text-sm text-red-400">{error}</p>
                 )}
               </div>
 

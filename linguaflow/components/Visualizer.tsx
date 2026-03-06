@@ -97,11 +97,13 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
 
   return (
     <div className="relative w-64 h-64 flex items-center justify-center">
-      <canvas 
-        ref={canvasRef} 
-        width={300} 
-        height={300} 
+      <canvas
+        ref={canvasRef}
+        width={300}
+        height={300}
         className="w-full h-full"
+        role="img"
+        aria-label={isActive ? 'Audio visualizer — conversation is active' : 'Audio visualizer — idle'}
       />
     </div>
   );

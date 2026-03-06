@@ -110,7 +110,7 @@ function App() {
         {/* Header */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
             </svg>
           </div>
@@ -130,7 +130,7 @@ function App() {
              color={visualizerColor}
            />
            
-           <div className="text-center space-y-2">
+           <div className="text-center space-y-2" aria-live="polite" aria-atomic="true">
              <h2 className="text-2xl font-light">
                {isConnected ? 'Listening...' : 'Ready to practice?'}
              </h2>
@@ -146,8 +146,8 @@ function App() {
         <div className="flex flex-col gap-6 max-w-2xl mx-auto w-full">
            
            {error && (
-             <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm flex items-center gap-2">
-               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+             <div role="alert" className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm flex items-center gap-2">
+               <svg className="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                {error}
              </div>
            )}
@@ -181,7 +181,7 @@ function App() {
                    </span>
                  ) : (
                    <span className="flex items-center gap-2">
-                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                     <svg className="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
                      Start Conversation
                    </span>
                  )}
@@ -197,11 +197,12 @@ function App() {
                        <button
                          onClick={() => adjustDifficulty(-1)}
                          disabled={difficultyLevel <= 1}
+                         aria-label="Giảm độ khó"
                          className="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-bold"
                        >
                          −
                        </button>
-                       <div className="flex gap-1 px-2">
+                       <div className="flex gap-1 px-2" role="img" aria-label={`Độ khó: ${difficultyLevel}/5`}>
                          {[1, 2, 3, 4, 5].map((level) => (
                            <div
                              key={level}
@@ -212,6 +213,7 @@ function App() {
                        <button
                          onClick={() => adjustDifficulty(1)}
                          disabled={difficultyLevel >= 5}
+                         aria-label="Tăng độ khó"
                          className="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-bold"
                        >
                          +
@@ -220,26 +222,28 @@ function App() {
 
                      {/* Language Ratio Control */}
                      <div className="flex items-center gap-2 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700">
-                       <span className="text-xs text-slate-400">🇬🇧</span>
+                       <span className="text-xs text-slate-400" aria-hidden="true">🇬🇧</span>
                        <button
                          onClick={() => adjustLanguageRatio(-10)}
                          disabled={vietnameseRatio <= 10}
+                         aria-label="Giảm tỷ lệ tiếng Việt"
                          className="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-bold"
                        >
                          −
                        </button>
-                       <div className="text-center min-w-[60px]">
+                       <div className="text-center min-w-[60px]" aria-live="polite" aria-atomic="true">
                          <div className="text-sm font-medium">{vietnameseRatio}%</div>
-                         <div className="text-xs text-slate-500">🇻🇳 Việt</div>
+                         <div className="text-xs text-slate-500" aria-hidden="true">🇻🇳 Việt</div>
                        </div>
                        <button
                          onClick={() => adjustLanguageRatio(10)}
                          disabled={vietnameseRatio >= 90}
+                         aria-label="Tăng tỷ lệ tiếng Việt"
                          className="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-bold"
                        >
                          +
                        </button>
-                       <span className="text-xs text-slate-400">🇻🇳</span>
+                       <span className="text-xs text-slate-400" aria-hidden="true">🇻🇳</span>
                      </div>
                    </div>
                  )}
@@ -250,7 +254,7 @@ function App() {
                      onClick={disconnect}
                      className="px-8 py-4 rounded-full font-semibold text-lg bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center gap-2"
                    >
-                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                     <svg className="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                      End Session
                    </button>
                  </div>
@@ -264,7 +268,7 @@ function App() {
       <div className="w-full md:w-96 border-t md:border-t-0 md:border-l border-slate-800 bg-slate-900/50 backdrop-blur-sm flex flex-col h-[50vh] md:h-screen">
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
           <h3 className="font-semibold text-slate-300 flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+            <svg className="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
             Live Transcript
           </h3>
           <span className="text-xs text-slate-500 px-2 py-1 rounded-full bg-slate-800">

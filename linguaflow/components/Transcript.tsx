@@ -15,14 +15,14 @@ const Transcript = memo<Props>(({ messages }) => {
 
   if (messages.length === 0) {
     return (
-      <div className="h-full flex items-center justify-center text-slate-500 italic">
+      <div role="log" aria-live="polite" aria-label="Conversation transcript" className="h-full flex items-center justify-center text-slate-500 italic">
         Conversation transcript will appear here...
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 overflow-y-auto h-full">
+    <div role="log" aria-live="polite" aria-label="Conversation transcript" className="flex flex-col gap-4 p-4 overflow-y-auto h-full">
       {messages.map((msg) => (
         <div
           key={msg.id}
