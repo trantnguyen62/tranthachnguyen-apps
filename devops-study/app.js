@@ -2315,20 +2315,48 @@ scrape_configs:
                 { term: 'Module', definition: 'Reusable scripts that Ansible runs on managed nodes to perform specific tasks like copying files or installing packages.' },
                 { term: 'Handler', definition: 'A special task that only runs when notified by another task, commonly used for service restarts.' },
                 { term: 'Vault', definition: 'Ansible feature for encrypting sensitive data like passwords and keys within playbooks and files.' },
-                { term: 'Galaxy', definition: 'A hub for finding, sharing, and downloading community-created Ansible roles and collections.' }
+                { term: 'Galaxy', definition: 'A hub for finding, sharing, and downloading community-created Ansible roles and collections.' },
+                { term: 'Variables', definition: 'Named values that can be set in inventories, playbooks, roles, or at runtime with --extra-vars to make playbooks reusable and configurable.' },
+                { term: 'Facts', definition: 'Automatically collected information about managed hosts (OS, IP, memory, etc.) gathered at playbook startup via the setup module.' },
+                { term: 'Jinja2 Template', definition: 'A templating engine used in Ansible to generate dynamic configuration files using variables, loops, and conditionals ({{ var }}, {% if %}, {% for %}).' },
+                { term: 'When Conditional', definition: 'A task attribute that runs the task only when a specified condition is true, enabling conditional execution based on facts or variables.' },
+                { term: 'Loop', definition: 'Allows a task to iterate over a list of items using the "loop" keyword, replacing the deprecated "with_items".' },
+                { term: 'Tags', definition: 'Labels applied to tasks or plays allowing selective execution with --tags or --skip-tags, useful for running only parts of a playbook.' },
+                { term: 'Check Mode', definition: 'A dry-run mode (--check) that shows what changes Ansible would make without actually applying them. Useful for testing playbooks safely.' },
+                { term: 'Become', definition: 'Privilege escalation directive (become: yes) that allows Ansible to run tasks as a different user, typically root via sudo.' },
+                { term: 'Ad-hoc Command', definition: 'A one-line Ansible command that runs a single module against hosts without writing a playbook. Good for quick checks and simple tasks.' },
+                { term: 'Collection', definition: 'A packaged format for distributing and consuming Ansible content including roles, modules, plugins, and playbooks. The modern evolution of Galaxy roles.' },
+                { term: 'Dynamic Inventory', definition: 'An inventory script or plugin that queries external sources (AWS, Azure, GCP, etc.) at runtime to build the host list automatically.' },
+                { term: 'Ansible AWX', definition: 'The open-source upstream project for Red Hat Ansible Automation Platform, providing a web UI, REST API, and RBAC for managing Ansible at scale.' }
             ],
             commands: [
                 { command: 'ansible-playbook site.yml', description: 'Run a playbook' },
                 { command: 'ansible all -m ping', description: 'Ping all hosts' },
                 { command: 'ansible-vault encrypt file.yml', description: 'Encrypt a file' },
                 { command: 'ansible-galaxy install role', description: 'Install a role from Galaxy' },
-                { command: 'ansible-inventory --list', description: 'List inventory hosts' }
+                { command: 'ansible-inventory --list', description: 'List inventory hosts' },
+                { command: 'ansible-playbook site.yml --check', description: 'Dry run - show changes without applying' },
+                { command: 'ansible-playbook site.yml --tags deploy', description: 'Run only tasks tagged with "deploy"' },
+                { command: 'ansible-playbook site.yml -e "version=2.0"', description: 'Pass extra variables at runtime' },
+                { command: 'ansible all -m setup -a "filter=ansible_os_family"', description: 'Gather specific facts from all hosts' },
+                { command: 'ansible-vault view secrets.yml', description: 'View encrypted vault file' },
+                { command: 'ansible-galaxy collection install community.general', description: 'Install an Ansible collection' },
+                { command: 'ansible-playbook site.yml -l webservers', description: 'Limit playbook to a host group' },
+                { command: 'ansible all -m shell -a "uptime"', description: 'Run shell command on all hosts' }
             ],
             quiz: [
                 { question: 'What file format does Ansible use for playbooks?', options: ['JSON', 'YAML', 'XML', 'INI'], correct: 1 },
                 { question: 'What is an Ansible role?', options: ['A user account', 'Reusable collection of tasks', 'A network configuration', 'A container'], correct: 1 },
                 { question: 'What is Ansible Vault used for?', options: ['Storage', 'Encrypting sensitive data', 'Container management', 'Load balancing'], correct: 1 },
-                { question: 'How does Ansible connect to managed hosts by default?', options: ['HTTP', 'SSH', 'RDP', 'FTP'], correct: 1 }
+                { question: 'How does Ansible connect to managed hosts by default?', options: ['HTTP', 'SSH', 'RDP', 'FTP'], correct: 1 },
+                { question: 'What are Ansible facts?', options: ['Task results', 'Auto-collected host information', 'Encrypted variables', 'Role dependencies'], correct: 1 },
+                { question: 'What does the --check flag do in ansible-playbook?', options: ['Checks syntax only', 'Runs in dry-run mode without making changes', 'Checks connectivity', 'Validates the vault'], correct: 1 },
+                { question: 'What is the purpose of the "when" keyword in a task?', options: ['Run task at a scheduled time', 'Conditionally run task based on an expression', 'Loop over items', 'Define handlers'], correct: 1 },
+                { question: 'What does "become: yes" enable in Ansible?', options: ['Debug mode', 'Privilege escalation (sudo)', 'Fact gathering', 'Check mode'], correct: 1 },
+                { question: 'What is a dynamic inventory?', options: ['An inventory that updates itself hourly', 'An inventory built at runtime from external sources', 'A YAML inventory file', 'An encrypted inventory'], correct: 1 },
+                { question: 'What replaced Ansible "with_items" in modern versions?', options: ['foreach', 'loop', 'iterate', 'each'], correct: 1 },
+                { question: 'What templating engine does Ansible use?', options: ['Mustache', 'Handlebars', 'Jinja2', 'ERB'], correct: 2 },
+                { question: 'What is Ansible AWX?', options: ['A module for AWS', 'Open-source web UI for managing Ansible at scale', 'An inventory plugin', 'A vault tool'], correct: 1 }
             ],
             codebase: [
                 {
@@ -2498,20 +2526,48 @@ all:
                 { term: 'Azure Blob Storage', definition: 'Object storage solution for storing massive amounts of unstructured data like text or binary data.' },
                 { term: 'Azure Virtual Network', definition: 'A logically isolated network in Azure for securely connecting Azure resources to each other and to on-premises.' },
                 { term: 'Azure Active Directory', definition: 'A cloud-based identity and access management service for signing in and accessing resources.' },
-                { term: 'Azure Container Registry', definition: 'A managed Docker registry service for storing and managing container images.' }
+                { term: 'Azure Container Registry', definition: 'A managed Docker registry service for storing and managing container images.' },
+                { term: 'Azure App Service', definition: 'A fully managed platform for building, deploying, and scaling web apps, REST APIs, and mobile backends. Supports multiple languages and frameworks.' },
+                { term: 'Azure SQL Database', definition: 'A fully managed relational database service based on SQL Server with built-in intelligence, high availability, and auto-scaling.' },
+                { term: 'Azure Monitor', definition: 'A full-stack monitoring service providing metrics, logs, alerts, and dashboards for Azure resources and applications via Log Analytics and Application Insights.' },
+                { term: 'Azure Key Vault', definition: 'A cloud service for securely storing and accessing secrets, certificates, and cryptographic keys, with RBAC-based access control.' },
+                { term: 'Azure Service Bus', definition: 'A fully managed enterprise message broker supporting queues and publish-subscribe topics for decoupling application components.' },
+                { term: 'Azure Cosmos DB', definition: 'A globally distributed, multi-model NoSQL database service with single-digit millisecond latency and automatic scaling.' },
+                { term: 'Azure Load Balancer', definition: 'A Layer 4 (TCP/UDP) load balancer that distributes inbound traffic across multiple VM instances for high availability.' },
+                { term: 'Azure CDN', definition: 'Content Delivery Network that caches static content at edge nodes worldwide to deliver it faster to users.' },
+                { term: 'ARM Template', definition: 'Azure Resource Manager JSON templates that define infrastructure as code, enabling repeatable, declarative deployments of Azure resources.' },
+                { term: 'Azure Policy', definition: 'A governance service that creates, assigns, and manages policies to enforce standards and compliance across Azure resources.' },
+                { term: 'Managed Identity', definition: 'An automatically managed identity in Azure AD that applications can use to authenticate to services without storing credentials in code.' },
+                { term: 'Azure Logic Apps', definition: 'A serverless workflow automation service that integrates apps, data, services, and systems using a visual designer and 400+ pre-built connectors.' }
             ],
             commands: [
                 { command: 'az login', description: 'Login to Azure CLI' },
                 { command: 'az group create -n mygroup -l eastus', description: 'Create a resource group' },
                 { command: 'az aks get-credentials -n cluster -g group', description: 'Get AKS credentials' },
                 { command: 'az vm list -o table', description: 'List VMs in table format' },
-                { command: 'az acr build -t image:tag -r registry .', description: 'Build container in ACR' }
+                { command: 'az acr build -t image:tag -r registry .', description: 'Build container in ACR' },
+                { command: 'az account set --subscription "My Sub"', description: 'Switch active Azure subscription' },
+                { command: 'az deployment group create -g mygroup --template-file main.bicep', description: 'Deploy Bicep/ARM template to resource group' },
+                { command: 'az keyvault secret set --vault-name myVault -n mySecret --value "value"', description: 'Store a secret in Key Vault' },
+                { command: 'az webapp create -g mygroup -p myplan -n myapp --runtime "NODE:20-lts"', description: 'Create an App Service web app' },
+                { command: 'az monitor log-analytics query -w workspace --analytics-query "AzureActivity | limit 10"', description: 'Query Log Analytics workspace' },
+                { command: 'az aks create -g mygroup -n cluster --node-count 3 --enable-addons monitoring', description: 'Create AKS cluster with monitoring' },
+                { command: 'az role assignment create --assignee user@domain.com --role Contributor --scope /subscriptions/sub-id', description: 'Assign RBAC role to a user' },
+                { command: 'az storage account create -n mystorage -g mygroup -l eastus --sku Standard_LRS', description: 'Create a storage account' }
             ],
             quiz: [
                 { question: 'What is Azure Functions?', options: ['Database service', 'Serverless compute', 'Container service', 'Storage service'], correct: 1 },
                 { question: 'What is AKS?', options: ['Azure Key Storage', 'Azure Kubernetes Service', 'Azure Knowledge System', 'Azure Kernel Service'], correct: 1 },
                 { question: 'What is Azure Blob Storage used for?', options: ['Relational data', 'Unstructured data', 'Real-time streams', 'Container images'], correct: 1 },
-                { question: 'What is Azure DevOps?', options: ['A programming language', 'Development tools suite', 'A database', 'A container runtime'], correct: 1 }
+                { question: 'What is Azure DevOps?', options: ['A programming language', 'Development tools suite', 'A database', 'A container runtime'], correct: 1 },
+                { question: 'What is Azure Key Vault used for?', options: ['Virtual machine keys', 'Securely storing secrets, certificates, and keys', 'SSH key generation', 'API gateway keys'], correct: 1 },
+                { question: 'What type of load balancer is Azure Load Balancer?', options: ['Layer 7 (HTTP)', 'Layer 4 (TCP/UDP)', 'DNS-based', 'Application Gateway'], correct: 1 },
+                { question: 'What is a Managed Identity in Azure?', options: ['A user account', 'Auto-managed identity for apps to authenticate without credentials', 'A service principal', 'A directory group'], correct: 1 },
+                { question: 'What is Azure Monitor primarily used for?', options: ['Cost management', 'Full-stack monitoring, metrics, logs, and alerts', 'Container registry', 'Network routing'], correct: 1 },
+                { question: 'What is Azure Cosmos DB?', options: ['SQL relational database', 'Globally distributed multi-model NoSQL database', 'Data warehouse', 'Cache service'], correct: 1 },
+                { question: 'What does an ARM template do?', options: ['Manages access roles', 'Defines Azure infrastructure as declarative JSON code', 'Monitors resources', 'Bills resources'], correct: 1 },
+                { question: 'What is Azure Service Bus?', options: ['A network bus', 'Enterprise message broker for decoupling app components', 'A load balancer', 'A service registry'], correct: 1 },
+                { question: 'What is Azure Policy used for?', options: ['CI/CD pipelines', 'Enforcing governance and compliance standards on resources', 'Cost optimization', 'Identity management'], correct: 1 }
             ],
             codebase: [
                 {
@@ -2873,20 +2929,59 @@ ssl_stapling_verify on;`
                 { term: 'CIDR', definition: 'Classless Inter-Domain Routing - A method for allocating IP addresses and IP routing.' },
                 { term: 'SSL/TLS', definition: 'Cryptographic protocols providing secure communication over a computer network through encryption.' },
                 { term: 'Firewall', definition: 'A network security system that monitors and controls incoming and outgoing network traffic.' },
-                { term: 'NAT', definition: 'Network Address Translation - Maps private IP addresses to public IP addresses for internet access.' }
+                { term: 'NAT', definition: 'Network Address Translation - Maps private IP addresses to public IP addresses for internet access.' },
+                { term: 'UDP', definition: 'User Datagram Protocol - A connectionless transport protocol that sends packets without guaranteed delivery. Faster but less reliable than TCP, used for streaming and DNS.' },
+                { term: 'HTTP/HTTPS', definition: 'HyperText Transfer Protocol (Secure) - The foundation of data communication on the web. HTTPS adds SSL/TLS encryption for security.' },
+                { term: 'OSI Model', definition: 'A conceptual framework with 7 layers (Physical, Data Link, Network, Transport, Session, Presentation, Application) describing how network protocols interact.' },
+                { term: 'VPN', definition: 'Virtual Private Network - Extends a private network across a public network, encrypting traffic and masking IP addresses for secure remote access.' },
+                { term: 'CDN', definition: 'Content Delivery Network - A geographically distributed network of servers that delivers content from the server closest to the user, reducing latency.' },
+                { term: 'BGP', definition: 'Border Gateway Protocol - The routing protocol that manages how packets are routed across the internet between autonomous systems.' },
+                { term: 'VLAN', definition: 'Virtual Local Area Network - Logically segments a physical network into multiple isolated broadcast domains without requiring separate physical infrastructure.' },
+                { term: 'Subnet', definition: 'A logical subdivision of an IP network, defined by a subnet mask, used to organize and isolate groups of devices within a larger network.' },
+                { term: 'mTLS', definition: 'Mutual TLS - Both client and server authenticate each other using certificates, providing bidirectional identity verification. Common in service mesh and zero-trust architectures.' },
+                { term: 'Service Mesh', definition: 'An infrastructure layer that handles service-to-service communication, providing load balancing, mTLS, observability, and traffic management (e.g., Istio, Linkerd).' },
+                { term: 'Ingress', definition: 'In Kubernetes, an API object that manages external HTTP/S access to services. More broadly, inbound network traffic entering a network or cluster.' },
+                { term: 'gRPC', definition: 'Google Remote Procedure Call - A high-performance, open-source RPC framework using HTTP/2 and Protocol Buffers, commonly used for microservice communication.' },
+                { term: 'WebSocket', definition: 'A protocol providing full-duplex communication over a single TCP connection, enabling real-time bidirectional data exchange between client and server.' },
+                { term: 'HTTP/2', definition: 'A major revision of HTTP that adds multiplexing, header compression, server push, and binary framing, significantly improving web performance over HTTP/1.1.' },
+                { term: 'ARP', definition: 'Address Resolution Protocol - Maps IP addresses to MAC addresses on a local network, enabling Layer 2 communication between devices.' },
+                { term: 'MTU', definition: 'Maximum Transmission Unit - The largest packet size (in bytes) that can be transmitted over a network. Ethernet default is 1500 bytes.' },
+                { term: 'Forward Proxy', definition: 'A proxy that sits between clients and the internet, forwarding requests on behalf of clients. Used for caching, filtering, and anonymizing outbound traffic.' },
+                { term: 'DNS Record Types', definition: 'A records map domains to IPv4 addresses; AAAA to IPv6; CNAME creates aliases; MX routes email; TXT stores text data; NS delegates DNS zones.' }
             ],
             commands: [
                 { command: 'curl -v https://example.com', description: 'Make HTTP request with verbose output' },
                 { command: 'nslookup domain.com', description: 'Query DNS for domain' },
                 { command: 'netstat -tulpn', description: 'Show listening ports' },
                 { command: 'traceroute example.com', description: 'Trace packet route to host' },
-                { command: 'ss -tunlp', description: 'Show socket statistics' }
+                { command: 'ss -tunlp', description: 'Show socket statistics' },
+                { command: 'dig @8.8.8.8 example.com A', description: 'Query DNS A record against specific nameserver' },
+                { command: 'ping -c 4 host', description: 'Send 4 ICMP packets to test connectivity' },
+                { command: 'tcpdump -i eth0 port 80', description: 'Capture HTTP traffic on interface' },
+                { command: 'ip addr show', description: 'Show all network interfaces and IPs' },
+                { command: 'ip route show', description: 'Display routing table' },
+                { command: 'arp -n', description: 'Show ARP table (IP to MAC mappings)' },
+                { command: 'openssl s_client -connect host:443', description: 'Inspect TLS certificate of a host' },
+                { command: 'curl -I https://example.com', description: 'Fetch only HTTP response headers' },
+                { command: 'nc -zv host 80', description: 'Test TCP connectivity to a port with netcat' },
+                { command: 'mtr --report example.com', description: 'Network diagnostic combining ping and traceroute' }
             ],
             quiz: [
                 { question: 'What does DNS translate?', options: ['IP to MAC', 'Domain names to IPs', 'Ports to services', 'HTTP to HTTPS'], correct: 1 },
                 { question: 'What is a load balancer used for?', options: ['Encryption', 'Distributing traffic', 'DNS resolution', 'File storage'], correct: 1 },
                 { question: 'What does CIDR stand for?', options: ['Cloud Internet Domain Routing', 'Classless Inter-Domain Routing', 'Central IP Data Registry', 'Cluster IP Distribution Rule'], correct: 1 },
-                { question: 'What does NAT do?', options: ['Encrypts traffic', 'Maps private to public IPs', 'Balances load', 'Resolves DNS'], correct: 1 }
+                { question: 'What does NAT do?', options: ['Encrypts traffic', 'Maps private to public IPs', 'Balances load', 'Resolves DNS'], correct: 1 },
+                { question: 'How many layers does the OSI model have?', options: ['4', '5', '6', '7'], correct: 3 },
+                { question: 'What transport protocol does DNS primarily use?', options: ['TCP', 'UDP', 'HTTP', 'ICMP'], correct: 1 },
+                { question: 'What does mTLS add over standard TLS?', options: ['Faster encryption', 'Client certificate authentication', 'Compression', 'UDP support'], correct: 1 },
+                { question: 'What protocol does gRPC use for transport?', options: ['HTTP/1.1', 'HTTP/2', 'WebSocket', 'TCP raw'], correct: 1 },
+                { question: 'What does ARP resolve?', options: ['Domain names to IPs', 'IP addresses to MAC addresses', 'Ports to services', 'IPs to hostnames'], correct: 1 },
+                { question: 'What is a CDN primarily used for?', options: ['Database replication', 'Reducing latency by serving from nearby servers', 'Container orchestration', 'Log aggregation'], correct: 1 },
+                { question: 'What is the default MTU size for Ethernet?', options: ['512 bytes', '1024 bytes', '1500 bytes', '9000 bytes'], correct: 2 },
+                { question: 'What does a VLAN do?', options: ['Encrypts traffic', 'Logically segments a physical network', 'Resolves DNS', 'Balances load'], correct: 1 },
+                { question: 'What is the difference between a forward proxy and a reverse proxy?', options: ['No difference', 'Forward proxy serves clients; reverse proxy serves backend servers', 'Reverse proxy is for databases only', 'Forward proxy only works with HTTPS'], correct: 1 },
+                { question: 'What key feature does HTTP/2 add over HTTP/1.1?', options: ['Encryption', 'Multiplexing multiple requests over one connection', 'WebSocket support', 'Larger cookies'], correct: 1 },
+                { question: 'Which BGP role manages routing between autonomous systems?', options: ['OSPF', 'eBGP', 'RIP', 'EIGRP'], correct: 1 }
             ],
             codebase: [
                 {
