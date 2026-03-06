@@ -81,28 +81,24 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
     setIsCameraOpen(false);
   }, [stream]);
 
-  const capturePhoto = () => {
-    if (videoRef.current) {
-      const { videoWidth, videoHeight } = videoRef.current;
-      if (!videoWidth || !videoHeight) {
-        setError("Camera is not ready yet. Please wait a moment.");
-        return;
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = videoWidth;
-      canvas.height = videoHeight;
-      const ctx = canvas.getContext('2d');
-      if (ctx && videoRef.current) {
-        ctx.drawImage(videoRef.current, 0, 0);
-        const data = canvas.toDataURL('image/png');
-        onImageSelected({
-          data,
-          mimeType: 'image/png'
-        });
-        stopCamera();
-      }
+  const capturePhoto = useCallback(() => {
+    if (!videoRef.current) return;
+    const { videoWidth, videoHeight } = videoRef.current;
+    if (!videoWidth || !videoHeight) {
+      setError("Camera is not ready yet. Please wait a moment.");
+      return;
     }
-  };
+    const canvas = document.createElement('canvas');
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(videoRef.current, 0, 0);
+      const data = canvas.toDataURL('image/png');
+      onImageSelected({ data, mimeType: 'image/png' });
+      stopCamera();
+    }
+  }, [onImageSelected, stopCamera]);
 
   const onDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -122,18 +118,18 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
     }
   }, [handleFile]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       handleFile(e.target.files[0]);
     }
-  };
+  }, [handleFile]);
 
-  const clearImage = () => {
+  const clearImage = useCallback(() => {
     onImageSelected(null);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
-  };
+  }, [onImageSelected]);
 
   // View: Current Image Loaded
   if (currentImage) {
