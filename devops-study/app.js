@@ -3071,6 +3071,18 @@ echo "Firewall rules applied"`
     ]
 };
 
+// Debounce utility
+function debounce(fn, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+}
+
+// Fast topic lookup map (O(1) vs O(n) find)
+const topicMap = new Map(devopsData.topics.map(t => [t.id, t]));
+
 // Application State
 let state = {
     currentTopic: null,
@@ -3124,7 +3136,7 @@ function calculateOverallProgress() {
 
 // Calculate topic progress
 function calculateTopicProgress(topicId) {
-    const topic = devopsData.topics.find(t => t.id === topicId);
+    const topic = topicMap.get(topicId);
     if (!topic || !state.progress[topicId]) return 0;
 
     const cardProgress = (state.progress[topicId].flashcardsViewed.length / topic.flashcards.length) * 50;
@@ -3828,7 +3840,7 @@ function init() {
     document.getElementById('quizNextBtn').addEventListener('click', nextQuizQuestion);
     document.getElementById('retryQuizBtn').addEventListener('click', retryQuiz);
     document.getElementById('studyCardsBtn').addEventListener('click', studyCards);
-    document.getElementById('searchInput').addEventListener('input', handleSearch);
+    document.getElementById('searchInput').addEventListener('input', debounce(handleSearch, 150));
     document.getElementById('matchRestartBtn').addEventListener('click', restartMatchGame);
     document.getElementById('matchPlayAgainBtn').addEventListener('click', restartMatchGame);
 
