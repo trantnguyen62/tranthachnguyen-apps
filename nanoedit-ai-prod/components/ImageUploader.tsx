@@ -5,9 +5,10 @@ import { ProcessedImage } from '../types';
 interface ImageUploaderProps {
   onImageSelected: (image: ProcessedImage | null) => void;
   currentImage: ProcessedImage | null;
+  isProcessing?: boolean;
 }
 
-export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, currentImage }) => {
+export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, currentImage, isProcessing = false }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -138,20 +139,30 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
   if (currentImage) {
     return (
       <div className="relative w-full h-64 sm:h-80 md:h-96 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 group shadow-inner">
-        <img 
-          src={currentImage.data} 
-          alt="Original upload" 
-          className="w-full h-full object-contain"
+        <img
+          src={currentImage.data}
+          alt="Original upload"
+          className={`w-full h-full object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-40' : 'opacity-100'}`}
         />
-        <div className="absolute top-2 right-2">
-          <button 
-            onClick={clearImage}
-            className="p-1.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm"
-            title="Remove image"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        {isProcessing && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-900/10">
+            <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-medium text-slate-700 bg-white/80 px-3 py-1 rounded-full backdrop-blur-sm">
+              Generating…
+            </span>
+          </div>
+        )}
+        {!isProcessing && (
+          <div className="absolute top-2 right-2">
+            <button
+              onClick={clearImage}
+              className="p-1.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm"
+              title="Remove image"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
         <div className="absolute bottom-2 left-2 px-3 py-1 bg-black/50 backdrop-blur-md rounded-full text-xs text-white font-medium">
           Original Image
         </div>
@@ -206,14 +217,15 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
   return (
     <div className="w-full">
       <div
+        onClick={() => inputRef.current?.click()}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         className={`
-          relative w-full h-64 sm:h-80 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 ease-in-out
-          ${isDragging 
-            ? 'border-brand-500 bg-brand-50' 
-            : 'border-slate-300 bg-white'
+          group relative w-full h-64 sm:h-80 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 ease-in-out cursor-pointer
+          ${isDragging
+            ? 'border-brand-500 bg-brand-50'
+            : 'border-slate-300 bg-white hover:border-brand-400 hover:bg-brand-50/40'
           }
           ${error ? 'border-red-300 bg-red-50' : ''}
         `}
@@ -228,9 +240,8 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
         
         <div className="flex flex-col items-center p-6 text-center space-y-6 z-10">
           <div className="space-y-2">
-            <div 
-              onClick={() => inputRef.current?.click()}
-              className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-colors duration-300 ${isDragging ? 'bg-brand-200 text-brand-600' : 'bg-slate-100 text-slate-400 hover:bg-brand-50 hover:text-brand-500'}`}
+            <div
+              className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${isDragging ? 'bg-brand-200 text-brand-600' : 'bg-slate-100 text-slate-400 group-hover:bg-brand-50 group-hover:text-brand-500'}`}
             >
               <Upload className="w-8 h-8" />
             </div>
@@ -249,7 +260,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
           </div>
 
           <button
-            onClick={startCamera}
+            onClick={(e) => { e.stopPropagation(); startCamera(); }}
             className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors shadow-sm font-medium text-sm"
           >
             <Camera className="w-4 h-4" />

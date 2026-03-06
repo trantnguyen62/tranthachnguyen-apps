@@ -161,6 +161,7 @@ const App: React.FC = () => {
               <ImageUploader
                 onImageSelected={handleImageSelected}
                 currentImage={originalImage}
+                isProcessing={status === AppStatus.PROCESSING}
               />
             </div>
 
@@ -214,7 +215,7 @@ const App: React.FC = () => {
                   />
                   <div className="px-2 pb-2 flex justify-between items-center gap-2">
                     <span className="text-xs text-slate-400 pl-2 hidden sm:block">
-                      Tip: Be specific for best results
+                      <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate · Shift+Enter for new line
                     </span>
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
                       <Button
