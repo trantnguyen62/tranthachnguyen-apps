@@ -43,10 +43,10 @@ open index.html
 npm run build
 
 # Sync with iOS project
-npx cap sync ios
+npm run ios:sync   # or: npx cap sync ios
 
 # Open in Xcode
-npx cap open ios
+npm run ios        # or: npx cap open ios
 ```
 
 ## 📁 Project Structure
@@ -86,6 +86,20 @@ This game is designed for app store deployment using Capacitor:
 
 See [Apple Developer Program](https://developer.apple.com) for app store submission requirements.
 
+## ⚙️ Game Configuration
+
+Key constants in `game.js` (`CONFIG` object) that control gameplay feel:
+
+| Constant | Default | Description |
+|---|---|---|
+| `GRAVITY` | `0.35` | Downward acceleration per frame (px/frame²) |
+| `BOOST_FORCE` | `-7.5` | Upward velocity on tap/space (px/frame) |
+| `OBSTACLE_SPEED` | `3` | Horizontal scroll speed (px/frame) |
+| `OBSTACLE_GAP` | `180` | Vertical gap between obstacles (px) |
+| `OBSTACLE_SPAWN_RATE` | `2200` | Milliseconds between obstacle spawns |
+| `QUESTION_INTERVAL` | `5` | Gates passed before a quiz question triggers |
+| `QUESTION_TIME` | `12` | Seconds to answer each quiz question |
+
 ## 📄 License
 
-© 2025 Tran Thach Nguyen. All rights reserved.
+© 2026 Pipeline Runner. All rights reserved.
