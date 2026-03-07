@@ -81,7 +81,7 @@ const App: React.FC = () => {
       setErrorMsg(message);
       setStatus(AppStatus.ERROR);
     }
-  }, [currentImage, prompt, history, historyIndex]);
+  }, [currentImage, prompt, history, historyIndex, status]);
 
   const handleUndo = useCallback(() => {
     if (canUndo) {
