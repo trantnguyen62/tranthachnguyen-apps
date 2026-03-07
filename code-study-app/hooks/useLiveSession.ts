@@ -20,6 +20,8 @@ export const useLiveSession = (studyContext: StudyContext) => {
   const currentOutputTranscriptionRef = useRef('');
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const volumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
   // Use ref for study context to avoid recreating connect callback
   const studyContextRef = useRef(studyContext);
@@ -45,6 +47,13 @@ export const useLiveSession = (studyContext: StudyContext) => {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+
+    if (volumeIntervalRef.current) {
+      clearInterval(volumeIntervalRef.current);
+      volumeIntervalRef.current = null;
+    }
+
+    analyserRef.current = null;
 
     if (scriptProcessorRef.current) {
       scriptProcessorRef.current.disconnect();
@@ -173,6 +182,24 @@ export const useLiveSession = (studyContext: StudyContext) => {
 
             source.connect(scriptProcessor);
             scriptProcessor.connect(inputCtx.destination);
+
+            // Single shared analyser for output volume — avoids creating one per audio chunk
+            const analyser = outputCtx.createAnalyser();
+            analyser.fftSize = 256;
+            analyser.connect(outputCtx.destination);
+            analyserRef.current = analyser;
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            volumeIntervalRef.current = setInterval(() => {
+              if (sourcesRef.current.size > 0) {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                setVolume(prev => ({ ...prev, output: (sum / dataArray.length) / 255 }));
+              } else {
+                setVolume(prev => prev.output > 0 ? { ...prev, output: 0 } : prev);
+              }
+            }, 50);
           },
           onmessage: async (message: LiveServerMessage) => {
             if (message.serverContent?.outputTranscription) {
@@ -225,24 +252,15 @@ export const useLiveSession = (studyContext: StudyContext) => {
               const source = outputCtx.createBufferSource();
               source.buffer = audioBuffer;
 
-              const analyser = outputCtx.createAnalyser();
-              analyser.fftSize = 256;
-              source.connect(analyser);
-              analyser.connect(outputCtx.destination);
-
-              const volumeInterval = setInterval(() => {
-                const dataArray = new Uint8Array(analyser.frequencyBinCount);
-                analyser.getByteFrequencyData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-                const avg = sum / dataArray.length;
-                setVolume(prev => ({ ...prev, output: avg / 255 }));
-              }, 50);
+              // Connect to the shared analyser created in onopen
+              if (analyserRef.current) {
+                source.connect(analyserRef.current);
+              } else {
+                source.connect(outputCtx.destination);
+              }
 
               source.addEventListener('ended', () => {
                 sourcesRef.current.delete(source);
-                clearInterval(volumeInterval);
-                setVolume(prev => ({ ...prev, output: 0 }));
               });
 
               source.start(nextStartTimeRef.current);
