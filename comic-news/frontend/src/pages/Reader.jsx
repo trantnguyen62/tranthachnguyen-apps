@@ -52,19 +52,27 @@ function Reader() {
   }, [isFullscreen, navigate, id]);
 
   useEffect(() => {
+    let rafId = null;
     const handleScroll = () => {
-      if (scrollContainerRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-        const progress = (scrollTop / (scrollHeight - clientHeight)) * 100;
-        setScrollProgress(progress || 0);
-        setShowScrollTop(scrollTop > 500);
-      }
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (scrollContainerRef.current) {
+          const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+          const progress = (scrollTop / (scrollHeight - clientHeight)) * 100;
+          setScrollProgress(progress || 0);
+          setShowScrollTop(scrollTop > 500);
+        }
+      });
     };
 
     const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener('scroll', handleScroll);
-      return () => container.removeEventListener('scroll', handleScroll);
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      return () => {
+        container.removeEventListener('scroll', handleScroll);
+        if (rafId) cancelAnimationFrame(rafId);
+      };
     }
   }, [comic]);
 

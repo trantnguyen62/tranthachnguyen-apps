@@ -140,6 +140,13 @@ I now do all my grocery shopping online.`,
 let bookmarks = [];
 let readingProgress = {};
 
+// Precomputed static data
+const genreList = ['All', ...new Set(comics.map(c => c.genre))];
+const featuredComics = [...comics]
+  .sort((a, b) => b.rating - a.rating)
+  .slice(0, 4)
+  .map(({ pages, ...comic }) => comic);
+
 // Get all comics
 app.get('/api/comics', (req, res) => {
   const { genre, search, sort } = req.query;
@@ -173,13 +180,14 @@ app.get('/api/comics/:id', (req, res) => {
   if (!comic) {
     return res.status(404).json({ error: 'Comic not found' });
   }
+  res.set('Cache-Control', 'public, max-age=300');
   res.json(comic);
 });
 
 // Get genres
 app.get('/api/genres', (req, res) => {
-  const genres = ['All', ...new Set(comics.map(c => c.genre))];
-  res.json(genres);
+  res.set('Cache-Control', 'public, max-age=3600');
+  res.json(genreList);
 });
 
 // Bookmarks
@@ -224,11 +232,8 @@ app.post('/api/progress/:id', (req, res) => {
 
 // Featured/Popular comics
 app.get('/api/featured', (req, res) => {
-  const featured = [...comics]
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 4)
-    .map(({ pages, ...comic }) => comic);
-  res.json(featured);
+  res.set('Cache-Control', 'public, max-age=300');
+  res.json(featuredComics);
 });
 
 // robots.txt
