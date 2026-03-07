@@ -132,7 +132,9 @@ const QUESTIONS = {
         { q: "What is a data source in Terraform?", a: ["Reads external data", "Creates resources", "Stores state", "Defines variables"], c: 0 },
         { q: "What is terraform output?", a: ["Displays output values", "Creates resources", "Shows plan", "Validates config"], c: 0 },
         { q: "What is a resource block?", a: ["Defines infrastructure", "Stores state", "Imports modules", "Sets variables"], c: 0 },
-        { q: "What is remote state?", a: ["State stored externally", "Local state", "Cached state", "Temp state"], c: 0 }
+        { q: "What is remote state?", a: ["State stored externally", "Local state", "Cached state", "Temp state"], c: 0 },
+        { q: "What is a Terraform local value?", a: ["Named expression within a module", "Local state file", "Module variable", "Provider config"], c: 0 },
+        { q: "What does the 'count' meta-argument do?", a: ["Creates multiple resource instances", "Counts total resources", "Limits resource quantity", "Checks resource count"], c: 0 }
     ],
     git: [
         { q: "What does 'git clone' do?", a: ["Copies a repository", "Creates a branch", "Merges branches", "Pushes changes"], c: 0 },
@@ -218,7 +220,9 @@ const QUESTIONS = {
         { q: "What are Ansible tags?", a: ["Labels to run specific tasks", "Inventory groups", "Variable files", "Module parameters"], c: 0 },
         { q: "What is AWX?", a: ["Open-source Ansible web UI", "CLI tool for Ansible", "Module library", "Inventory plugin"], c: 0 },
         { q: "What is ansible-lint?", a: ["Checks playbook best practices", "Runs playbooks", "Manages inventory", "Encrypts variables"], c: 0 },
-        { q: "What is the 'with_items' loop?", a: ["Iterates over a list", "Waits for items", "Counts items", "Filters items"], c: 0 }
+        { q: "What is the 'with_items' loop?", a: ["Iterates over a list", "Waits for items", "Counts items", "Filters items"], c: 0 },
+        { q: "What is an Ansible ad hoc command?", a: ["One-off task without a playbook", "Scheduled playbook run", "Role-based execution", "Module unit test"], c: 0 },
+        { q: "What does 'delegate_to' do in Ansible?", a: ["Runs the task on a different host", "Delegates role creation", "Assigns task priority", "Runs as a different user"], c: 0 }
     ],
     azure: [
         { q: "What is Azure?", a: ["Microsoft's cloud platform", "AWS service", "Google product", "Linux distro"], c: 0 },
@@ -238,7 +242,9 @@ const QUESTIONS = {
         { q: "What is Azure Virtual Network?", a: ["Private network in Azure", "Public internet backbone", "CDN service", "DNS service"], c: 0 },
         { q: "What is Azure Service Bus?", a: ["Managed message broker", "Compute service", "Database service", "Storage service"], c: 0 },
         { q: "What is Azure Key Vault?", a: ["Secrets and key management", "Container registry", "Code repository", "CI/CD platform"], c: 0 },
-        { q: "What is an Azure Subscription?", a: ["Billing and resource boundary", "Virtual machine type", "Network zone", "Storage tier"], c: 0 }
+        { q: "What is an Azure Subscription?", a: ["Billing and resource boundary", "Virtual machine type", "Network zone", "Storage tier"], c: 0 },
+        { q: "What is Azure Policy?", a: ["Governance rules for resources", "User access management", "Network routing config", "Storage tier selection"], c: 0 },
+        { q: "What is Azure Logic Apps?", a: ["Workflow automation service", "Container orchestration", "Relational database service", "Monitoring solution"], c: 0 }
     ],
     devsecops: [
         { q: "What is DevSecOps?", a: ["Security integrated in DevOps", "Development operations", "Security department", "Operations security"], c: 0 },
@@ -258,7 +264,9 @@ const QUESTIONS = {
         { q: "What is an SBOM?", a: ["Software Bill of Materials", "Secure Build Output Manifest", "Source Branch Operations Map", "Service Bus Object Model"], c: 0 },
         { q: "What is the principle of least privilege?", a: ["Minimal access rights needed", "Admin access for all users", "Shared team credentials", "Public read access"], c: 0 },
         { q: "What is MFA?", a: ["Multi-Factor Authentication", "Multi-Function Application", "Main Firewall Application", "Managed Function App"], c: 0 },
-        { q: "What is Snyk?", a: ["Developer security platform", "Container orchestrator", "CI/CD tool", "Log aggregator"], c: 0 }
+        { q: "What is Snyk?", a: ["Developer security platform", "Container orchestrator", "CI/CD tool", "Log aggregator"], c: 0 },
+        { q: "What is IaC security scanning?", a: ["Checking infrastructure code for vulnerabilities", "Monitoring network traffic", "Managing user access rights", "Testing application performance"], c: 0 },
+        { q: "What is zero trust security?", a: ["Never trust, always verify every request", "Trust all internal network traffic", "Trust verified users indefinitely", "Block all external traffic"], c: 0 }
     ],
     networking: [
         { q: "What does DNS do?", a: ["Translates domains to IPs", "Encrypts data", "Routes traffic", "Balances load"], c: 0 },
@@ -279,7 +287,8 @@ const QUESTIONS = {
         { q: "What is ICMP used for?", a: ["Error messages and diagnostics", "File transfer", "Email delivery", "Web content delivery"], c: 0 },
         { q: "What is an API Gateway?", a: ["Manages and routes API requests", "Network switch", "DNS server", "Firewall"], c: 0 },
         { q: "What is anycast routing?", a: ["One IP, nearest of many servers", "One IP, one fixed server", "Many IPs, one server", "Broadcast to all servers"], c: 0 },
-        { q: "What is network latency?", a: ["Delay in data transmission", "Bandwidth limit", "Packet loss rate", "Connection timeout"], c: 0 }
+        { q: "What is network latency?", a: ["Delay in data transmission", "Bandwidth limit", "Packet loss rate", "Connection timeout"], c: 0 },
+        { q: "What is a service mesh?", a: ["Infrastructure for service-to-service communication", "Physical network cabling", "DNS management system", "Hardware load balancer"], c: 0 }
     ]
 };
 
