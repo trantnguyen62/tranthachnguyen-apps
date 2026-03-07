@@ -479,6 +479,8 @@ function initStars() {
     }
 }
 
+// Returns the next learnable content item for the current topic.
+// Cycles through all items without repetition before reshuffling.
 function getNextLearnableContent() {
     const content = LEARNABLE_CONTENT[game.selectedTopic];
     if (game.usedContentIndices.size >= content.length) {
@@ -938,6 +940,8 @@ function startQuestionTimer() {
     }, 1000);
 }
 
+// Handles answer selection: disables all buttons and highlights the chosen one,
+// then defers the correctness check by 300ms to let the selection animation play.
 function selectAnswer(index) {
     if (!game.questionActive || game.currentQuestion.answered) return;
 
@@ -1113,6 +1117,9 @@ function darkenColor(hex, percent) {
     return `rgb(${R}, ${G}, ${B})`;
 }
 
+// Rebuilds the topic-specific offscreen canvases for the player sprite and
+// obstacle columns. Call this whenever the selected topic or canvas size changes.
+// Pre-rendering avoids expensive per-frame gradient and shadow operations.
 function updateTopicCache() {
     const topic = TOPICS.find(t => t.id === game.selectedTopic);
     const lightColor20 = lightenColor(topic.color, 20);

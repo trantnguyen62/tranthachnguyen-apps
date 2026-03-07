@@ -82,9 +82,9 @@ pipeline-runner/
 This game is designed for app store deployment using Capacitor:
 
 - iOS: Ready for App Store with Xcode project in `/ios`
-- Android: Coming soon
+- Android: Add the Android platform with `npx cap add android`, then `npx cap sync android` and `npx cap open android`
 
-See [Apple Developer Program](https://developer.apple.com) for app store submission requirements.
+See [Apple Developer Program](https://developer.apple.com) for iOS App Store submission requirements.
 
 ## ⚙️ Game Configuration
 
@@ -99,6 +99,17 @@ Key constants in `game.js` (`CONFIG` object) that control gameplay feel:
 | `OBSTACLE_SPAWN_RATE` | `2200` | Milliseconds between obstacle spawns |
 | `QUESTION_INTERVAL` | `5` | Gates passed before a quiz question triggers |
 | `QUESTION_TIME` | `12` | Seconds to answer each quiz question |
+
+## 💾 Local Storage
+
+Progress is persisted in the browser's `localStorage` under two keys:
+
+| Key | Description |
+|-----|-------------|
+| `pipeline-runner-best` | All-time highest gate score |
+| `pipeline-runner-learned` | Cumulative count of commands learned across all sessions |
+
+To reset progress, run `localStorage.clear()` in the browser console.
 
 ## 📄 License
 
