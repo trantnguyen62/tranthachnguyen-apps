@@ -471,20 +471,22 @@ function setupEventListeners() {
     document.addEventListener('keydown', (e) => {
         game.keys[e.key.toLowerCase()] = true;
 
-        if (game.running && !game.paused) {
-            // Answer selection with number keys
-            if (game.questionActive && ['1', '2', '3', '4'].includes(e.key)) {
-                selectAnswer(parseInt(e.key) - 1);
-            }
-
-            // Shoot with space (when not answering)
-            if (e.key === ' ' && !game.questionActive) {
-                shoot();
-            }
-
-            // Pause
+        if (game.running) {
+            // Pause toggle works in both directions
             if (e.key.toLowerCase() === 'p') {
                 togglePause();
+            }
+
+            if (!game.paused) {
+                // Answer selection with number keys
+                if (game.questionActive && ['1', '2', '3', '4'].includes(e.key)) {
+                    selectAnswer(parseInt(e.key) - 1);
+                }
+
+                // Shoot with space (when not answering)
+                if (e.key === ' ' && !game.questionActive) {
+                    shoot();
+                }
             }
         }
 
@@ -1053,6 +1055,8 @@ function handleTimeout() {
     game.streak = 0;
     game.multiplier = 1;
 
+    const enemy = game.currentQuestion.enemy; // Save reference before closeQuestion
+
     // Show correct answer
     const btns = document.querySelectorAll('.answer-btn');
     btns[game.currentQuestion.correctIndex].classList.add('correct');
@@ -1061,6 +1065,7 @@ function handleTimeout() {
 
     setTimeout(() => {
         closeQuestion();
+        destroyEnemy(enemy);
     }, 1000);
 
     updateHUD();
@@ -1195,6 +1200,7 @@ function destroyEnemyByShot(enemy) {
     }
 
     game.enemies = game.enemies.filter(e => e !== enemy);
+    game.enemiesDefeated++;
     game.score += CONFIG.SHOOT_SCORE;
     updateHUD();
 
