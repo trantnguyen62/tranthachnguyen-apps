@@ -50,6 +50,7 @@ const App: React.FC = () => {
   const handleGenerate = useCallback(async () => {
     if (!currentImage) return;
     if (!prompt.trim()) return;
+    if (status === AppStatus.PROCESSING) return;
 
     setStatus(AppStatus.PROCESSING);
     setErrorMsg(null);

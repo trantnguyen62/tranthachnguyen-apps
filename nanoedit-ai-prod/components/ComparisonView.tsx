@@ -21,7 +21,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
     <div className={`transition-all duration-500 ease-in-out ${isExpanded ? 'fixed inset-0 z-50 bg-slate-900/95 p-4 overflow-y-auto' : 'w-full'}`}>
       
       {isExpanded && (
-        <div className="absolute top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50">
            <button 
             onClick={() => setIsExpanded(false)}
             className="p-2 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-sm"
