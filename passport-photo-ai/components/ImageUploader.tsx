@@ -25,12 +25,29 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   const handleFile = useCallback((file: File | null) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) return;
-    
+
     const reader = new FileReader();
     reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        onImageSelected({ data: reader.result, mimeType: file.type || 'image/jpeg' });
-      }
+      if (typeof reader.result !== 'string') return;
+      const dataUrl = reader.result;
+
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1500;
+        let w = img.width, h = img.height;
+        if (w <= MAX && h <= MAX) {
+          onImageSelected({ data: dataUrl, mimeType: file.type || 'image/jpeg' });
+          return;
+        }
+        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+        else { w = Math.round(w * MAX / h); h = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+        onImageSelected({ data: canvas.toDataURL('image/jpeg', 0.92), mimeType: 'image/jpeg' });
+      };
+      img.src = dataUrl;
     };
     reader.readAsDataURL(file);
   }, [onImageSelected]);

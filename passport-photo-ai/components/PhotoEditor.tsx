@@ -62,16 +62,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
     setProgress(10);
     
     try {
-      const img = new Image();
-      img.src = image.data;
-      await new Promise((r) => img.onload = r);
-      
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      canvas.getContext('2d')!.drawImage(img, 0, 0);
-      
-      const blob = await new Promise<Blob>((r) => canvas.toBlob((b) => r(b!), 'image/png'));
+      const blob = await fetch(image.data).then((r) => r.blob());
       setProgress(30);
       
       const removed = await removeBackground(blob, {
