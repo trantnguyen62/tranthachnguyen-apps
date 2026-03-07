@@ -25,6 +25,10 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   const handleFile = useCallback((file: File | null) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setCameraError('File is too large. Please use an image under 10 MB.');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {

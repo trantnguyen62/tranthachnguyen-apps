@@ -3530,10 +3530,10 @@ function renderCodebase() {
 }
 
 // Escape HTML for code display
+const _escapeEl = document.createElement('div');
 function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    _escapeEl.textContent = text;
+    return _escapeEl.innerHTML;
 }
 
 // Copy codebase to clipboard

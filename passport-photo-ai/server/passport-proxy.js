@@ -12,20 +12,38 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 
+// Simple in-memory rate limiter: max 10 AI requests per IP per minute
+const _rateMap = new Map();
+function apiRateLimit(req, res, next) {
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const entry = _rateMap.get(ip) || { count: 0, resetAt: now + 60_000 };
+  if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + 60_000; }
+  entry.count++;
+  _rateMap.set(ip, entry);
+  if (entry.count > 10) return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  next();
+}
+// Periodically clean up stale entries to prevent memory growth
+setInterval(() => { const now = Date.now(); _rateMap.forEach((v, k) => { if (now > v.resetAt) _rateMap.delete(k); }); }, 120_000);
+
 // Serve static files from dist
 const distPath = join(__dirname, '../dist');
 app.use(express.static(distPath));
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-app.post('/api/passport/check', async (req, res) => {
+const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+
+app.post('/api/passport/check', apiRateLimit, async (req, res) => {
   try {
     const { base64Image } = req.body;
-    if (!base64Image) return res.status(400).json({ error: 'No image' });
-    
-    const mimeMatch = base64Image.match(/^data:(image\/\w+);base64,/);
-    const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-    const clean = base64Image.replace(/^data:image\/\w+;base64,/, '');
+    if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
+
+    const mimeMatch = base64Image.match(/^data:(image\/[a-z]+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : null;
+    if (!mimeType || !ALLOWED_MIME_TYPES.has(mimeType)) return res.status(400).json({ error: 'Invalid image type' });
+    const clean = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
@@ -51,17 +69,18 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
     });
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: 'Analysis failed. Please try again.' });
   }
 });
 
-app.post('/api/passport/analyze', async (req, res) => {
+app.post('/api/passport/analyze', apiRateLimit, async (req, res) => {
   try {
     const { base64Image } = req.body;
-    if (!base64Image) return res.status(400).json({ error: 'No image' });
-    const mimeMatch2 = base64Image.match(/^data:(image\/\w+);base64,/);
-    const mimeType2 = mimeMatch2 ? mimeMatch2[1] : 'image/jpeg';
-    const clean = base64Image.replace(/^data:image\/\w+;base64,/, '');
+    if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
+    const mimeMatch2 = base64Image.match(/^data:(image\/[a-z]+);base64,/);
+    const mimeType2 = mimeMatch2 ? mimeMatch2[1] : null;
+    if (!mimeType2 || !ALLOWED_MIME_TYPES.has(mimeType2)) return res.status(400).json({ error: 'Invalid image type' });
+    const clean = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
