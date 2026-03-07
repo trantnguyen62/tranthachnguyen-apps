@@ -71,6 +71,15 @@ export const ComparisonView = memo<ComparisonViewProps>(({
              </div>
           </div>
 
+          {/* Mobile separator */}
+          <div className="lg:hidden flex items-center gap-3 text-xs font-medium text-slate-400">
+            <div className="flex-1 h-px bg-slate-200" />
+            <span className="flex items-center gap-1">
+              <ArrowRight className="w-3 h-3" /> AI Result
+            </span>
+            <div className="flex-1 h-px bg-slate-200" />
+          </div>
+
           {/* Processed (Image or Video) */}
           <div className="space-y-3 relative">
              <div className={`relative rounded-xl overflow-hidden border-2 border-brand-500 bg-slate-100 shadow-xl ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>

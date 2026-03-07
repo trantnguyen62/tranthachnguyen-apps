@@ -44,8 +44,8 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-slate-400">Target Language</label>
+      <div role="group" aria-labelledby="lang-selector-label" className="flex flex-col gap-2">
+        <span id="lang-selector-label" className="text-sm font-medium text-slate-400">Target Language</span>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
           {LANGUAGES.map((lang) => (
             <button
@@ -73,8 +73,8 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
 
       {/* Voice Selection - only for Vietnamese English */}
       {selected.code === 'en-vi' && (
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-slate-400">Chọn giọng nói / Choose Voice</label>
+        <div role="group" aria-labelledby="voice-selector-label" className="flex flex-col gap-2">
+          <span id="voice-selector-label" className="text-sm font-medium text-slate-400">Chọn giọng nói / Choose Voice</span>
           <div className="flex flex-wrap gap-2">
             {FEMALE_VOICES.map((voice) => {
               const isSelected = selected.voiceName === voice.id;
@@ -106,8 +106,8 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
 
       {/* Level Selection - shows when a language with levels is selected */}
       {selected.levels && selected.levels.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-slate-400">Chọn cấp độ / Select Level</label>
+        <div role="group" aria-labelledby="level-selector-label" className="flex flex-col gap-2">
+          <span id="level-selector-label" className="text-sm font-medium text-slate-400">Chọn cấp độ / Select Level</span>
           <div className="flex flex-wrap gap-2">
             {selected.levels.map((levelConfig) => {
               const colors = LEVEL_COLORS[levelConfig.level];
@@ -148,8 +148,8 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
 
       {/* Topic Selection - shows when Vietnamese English is selected and has a level */}
       {selected.code === 'en-vi' && selected.selectedLevel && (
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-slate-400">Chủ đề nói chuyện / Topic (tuỳ chọn)</label>
+        <div role="group" aria-labelledby="topic-selector-label" className="flex flex-col gap-2">
+          <span id="topic-selector-label" className="text-sm font-medium text-slate-400">Chủ đề nói chuyện / Topic (tuỳ chọn)</span>
           <div className="flex flex-wrap gap-2">
             {CONVERSATION_TOPICS.map((topic) => {
               const isSelected = selected.selectedTopic === topic.id;

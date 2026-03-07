@@ -82,6 +82,10 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
     setExistingProfile(null);
   }, []);
 
+  const handleBackdropKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  }, [onClose]);
+
   if (!isOpen) return null;
 
   const formatDate = (dateStr: string) => {
@@ -99,8 +103,10 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
       aria-modal="true"
       aria-labelledby="profile-modal-title"
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+      onKeyDown={handleBackdropKeyDown}
     >
-      <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden">
+      <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
           <h2 id="profile-modal-title" className="text-xl font-bold text-white">

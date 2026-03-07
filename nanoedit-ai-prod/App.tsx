@@ -71,6 +71,7 @@ const App: React.FC = () => {
         setHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
         setStatus(AppStatus.COMPLETED);
+        setPrompt('');
       } else {
         throw new Error("Failed to generate image. Please try again.");
       }
@@ -216,9 +217,16 @@ const App: React.FC = () => {
                     rows={3}
                   />
                   <div className="px-2 pb-2 flex justify-between items-center gap-2">
-                    <span className="text-xs text-slate-400 pl-2 hidden sm:block">
-                      <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate · Shift+Enter for new line
-                    </span>
+                    {status === AppStatus.PROCESSING ? (
+                      <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5 animate-pulse">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        Generating your edit…
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400 pl-2 hidden sm:block">
+                        <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate · Shift+Enter for new line
+                      </span>
+                    )}
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
                       <Button
                         onClick={handleGenerate}
