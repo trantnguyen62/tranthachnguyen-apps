@@ -57,9 +57,30 @@ linguaflow/
 ├── server/             # Backend servers
 │   ├── api-server.js   # REST API
 │   └── websocket-proxy.js  # WebSocket for live audio
-├── data/               # Language data and phrases
+├── data/               # User session data (users.json)
 └── Dockerfile*         # Docker configurations
 ```
+
+## ⚙️ Environment Variables
+
+Create `.env.local` in the project root:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GEMINI_API_KEY` | Yes | Google Gemini API key (get one at [aistudio.google.com](https://aistudio.google.com)) |
+| `VITE_PROXY_URL` | Yes | WebSocket proxy URL. Use `ws://localhost:3001` for local dev, `/ws` for production |
+
+## 📜 Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start frontend dev server (port 3000) |
+| `npm run server` | Start both backend servers (WebSocket proxy + API) |
+| `npm run proxy` | Start WebSocket proxy only (port 3001) |
+| `npm run api` | Start API server only (port 3002) |
+| `npm run build` | Build frontend for production |
+| `npm test` | Run all tests |
+| `npm run test:security` | Run WebSocket security tests |
 
 ## 🛠️ Tech Stack
 
