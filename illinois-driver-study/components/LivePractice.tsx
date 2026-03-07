@@ -321,8 +321,8 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       </div>
 
       <div className="relative">
-        {/* Status Indicator Ring */}
-        <div className={`w-40 h-40 rounded-full flex items-center justify-center transition-all duration-500 border-4 ${
+        {/* Status Indicator Ring (decorative) */}
+        <div aria-hidden="true" className={`w-40 h-40 rounded-full flex items-center justify-center transition-all duration-500 border-4 ${
           status === 'speaking' ? 'border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.5)]' :
           status === 'connected' ? 'border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.3)]' :
           status === 'connecting' ? 'border-yellow-400 animate-pulse' :
@@ -347,24 +347,24 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
                  <div className="w-2 bg-blue-500 animate-[bounce_1s_infinite_0.05s] h-7"></div>
                </div>
              ) : status === 'connected' ? (
-                <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
              ) : (
-                <svg className="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                 </svg>
              )}
           </div>
         </div>
 
-        {isActive && (
-          <div aria-live="polite" aria-atomic="true" className="absolute -bottom-8 left-0 right-0 text-center font-medium text-slate-500 animate-pulse text-sm">
-            {status === 'connecting' ? t.status_connecting :
-             status === 'speaking' ? t.status_speaking :
-             t.status_connected}
-          </div>
-        )}
+        <div aria-live="polite" aria-atomic="true" className="absolute -bottom-8 left-0 right-0 text-center font-medium text-slate-500 animate-pulse text-sm">
+          {status === 'connecting' ? t.status_connecting :
+           status === 'speaking' ? t.status_speaking :
+           status === 'connected' ? t.status_connected :
+           status === 'disconnected' ? t.status_disconnected :
+           null}
+        </div>
       </div>
 
       <div className="w-full min-h-[200px] flex items-center justify-center">

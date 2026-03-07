@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo, lazy, Suspense } from 'react';
+import React, { useState, useCallback, memo, lazy, Suspense, useEffect } from 'react';
 import { QuizMode } from './components/QuizMode';
 import { StudyMode } from './components/StudyMode';
 import { AppMode, Language } from './types';
@@ -42,7 +42,7 @@ const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: stri
         : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
     }`}
   >
-    <div className="mb-2">{icon}</div>
+    <div className="mb-2" aria-hidden="true">{icon}</div>
     <span className="font-medium text-sm">{label}</span>
   </button>
 ));
@@ -57,6 +57,10 @@ const App: React.FC = () => {
   const handleModeChange = useCallback((newMode: AppMode) => {
     setMode(newMode);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const toggleLanguage = useCallback(() => {
     setLanguage(l => l === 'en' ? 'vi' : 'en');

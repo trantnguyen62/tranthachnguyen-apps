@@ -36,9 +36,9 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
               <span className="text-slate-500 mr-2">#{q.id}.</span>
               {q.text}
             </h3>
-            <div className="space-y-2">
+            <ul role="list" className="space-y-2">
               {q.options.map((opt, idx) => (
-                <div
+                <li
                   key={idx}
                   className={`p-3 rounded-md flex items-start ${idx === q.correctIndex ? 'bg-green-50 border border-green-200 text-green-900' : 'text-slate-500'}`}
                 >
@@ -46,9 +46,9 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
                     {idx === q.correctIndex ? '✓' : String.fromCharCode(65 + idx)}
                   </span>
                   <span>{opt}{idx === q.correctIndex && <span className="sr-only"> (correct answer)</span>}</span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         ))}
       </div>
