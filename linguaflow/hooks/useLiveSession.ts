@@ -261,9 +261,6 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
 
               const source = outputCtx.createBufferSource();
               source.buffer = audioBuffer;
-              const gainNode = outputCtx.createGain();
-              // Rudimentary volume check for visualizer during playback
-              // Ideally we use an AnalyserNode, but for simplicity here we just toggle state
 
               // Analyzer for output visualization
               const analyser = outputCtx.createAnalyser();

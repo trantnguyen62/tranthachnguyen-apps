@@ -318,10 +318,15 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Basic Footer */}
+      {/* Footer */}
       <footer className="border-t border-slate-200 mt-auto py-8 bg-white">
-        <div className="max-w-7xl mx-auto px-4 text-center text-slate-400 text-sm">
-          <p>&copy; {new Date().getFullYear()} NanoEdit AI. Built with React & Gemini.</p>
+        <div className="max-w-7xl mx-auto px-4 text-center space-y-3">
+          <p className="text-slate-500 text-sm max-w-xl mx-auto">
+            NanoEdit AI is a free AI-powered image editor. Remove backgrounds, retouch portraits, create passport photos, and apply artistic filters — all with simple text prompts.
+          </p>
+          <p className="text-slate-400 text-xs">
+            &copy; {new Date().getFullYear()} NanoEdit AI &middot; Powered by Google Gemini &middot; Free online photo editor
+          </p>
         </div>
       </footer>
     </div>
