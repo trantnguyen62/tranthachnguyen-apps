@@ -378,8 +378,10 @@ function renderTopicButtons() {
 
     TOPICS.forEach(topic => {
         const btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = `topic-btn ${topic.id === game.selectedTopic ? 'selected' : ''}`;
         btn.setAttribute('aria-pressed', topic.id === game.selectedTopic ? 'true' : 'false');
+        btn.setAttribute('aria-label', `${topic.name} topic`);
         btn.innerHTML = `${topic.icon} ${topic.name}`;
         btn.onclick = () => selectTopic(topic.id);
         container.appendChild(btn);
@@ -842,11 +844,13 @@ function showQuestion() {
 
     answers.forEach((answer, i) => {
         const btn = document.createElement('button');
+        btn.type = 'button';
         btn.className = 'answer-btn';
         btn.innerHTML = `
-            <span class="answer-key">${i + 1}</span>
+            <span class="answer-key" aria-hidden="true">${i + 1}</span>
             <span class="answer-text">${answer.text}</span>
         `;
+        btn.setAttribute('aria-label', `Option ${i + 1}: ${answer.text}`);
         btn.onclick = () => selectAnswer(i);
         answerGrid.appendChild(btn);
     });
@@ -891,6 +895,7 @@ function selectAnswer(index) {
 
     btns.forEach((btn, i) => {
         btn.classList.add('disabled');
+        btn.setAttribute('aria-disabled', 'true');
         if (i === index) btn.classList.add('selected');
     });
 
