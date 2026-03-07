@@ -303,7 +303,7 @@ let game = {
     obstacleInterval: null,
 
     selectedTopic: 'docker',
-    usedContentIndices: [],
+    usedContentIndices: new Set(),
 
     player: {
         x: 100,
@@ -412,16 +412,16 @@ function initStars() {
 
 function getNextLearnableContent() {
     const content = LEARNABLE_CONTENT[game.selectedTopic];
-    if (game.usedContentIndices.length >= content.length) {
-        game.usedContentIndices = [];
+    if (game.usedContentIndices.size >= content.length) {
+        game.usedContentIndices.clear();
     }
 
     let index;
     do {
         index = Math.floor(Math.random() * content.length);
-    } while (game.usedContentIndices.includes(index));
+    } while (game.usedContentIndices.has(index));
 
-    game.usedContentIndices.push(index);
+    game.usedContentIndices.add(index);
     return content[index];
 }
 
@@ -479,6 +479,7 @@ function resizeCanvas() {
     game.cachedBgGradient = bgGrad;
 
     initStars();
+    if (game.topicCache) updateTopicCache();
 }
 
 function showScreen(screenId) {
@@ -505,7 +506,7 @@ function startGame() {
     game.particles = [];
     game.floatingTexts = [];
     game.learnedItems = [];
-    game.usedContentIndices = [];
+    game.usedContentIndices = new Set();
     game.questionActive = false;
     game.currentQuestion = null;
     game.questionTimerInterval = null;
@@ -578,22 +579,26 @@ function update() {
         }
     });
 
-    game.obstacles = game.obstacles.filter(obs => obs.x > -CONFIG.OBSTACLE_WIDTH * 2);
+    for (let i = game.obstacles.length - 1; i >= 0; i--) {
+        if (game.obstacles[i].x <= -CONFIG.OBSTACLE_WIDTH * 2) game.obstacles.splice(i, 1);
+    }
 
     // Update floating texts
-    game.floatingTexts = game.floatingTexts.filter(ft => {
+    for (let i = game.floatingTexts.length - 1; i >= 0; i--) {
+        const ft = game.floatingTexts[i];
         ft.y -= 1;
         ft.life -= 0.015;
-        return ft.life > 0;
-    });
+        if (ft.life <= 0) game.floatingTexts.splice(i, 1);
+    }
 
-    game.particles = game.particles.filter(p => {
+    for (let i = game.particles.length - 1; i >= 0; i--) {
+        const p = game.particles[i];
         p.x += p.vx;
         p.y += p.vy;
         p.life -= 0.02;
         p.vy += 0.1;
-        return p.life > 0;
-    });
+        if (p.life <= 0) game.particles.splice(i, 1);
+    }
 
     // Check collision (skip if invincible after respawn)
     if (!game.respawnInvincible && checkCollision()) {
@@ -673,18 +678,14 @@ function drawPipelineBackground(ctx) {
 }
 
 function drawObstacle(ctx, obs) {
-    const { topic, lightColor20 } = game.topicCache;
+    const { topic, obstacleCanvas } = game.topicCache;
     const gateWidth = CONFIG.OBSTACLE_WIDTH;
     const gateColor = topic.color;
 
-    // Top gate
-    const topGradient = ctx.createLinearGradient(obs.x, 0, obs.x + gateWidth, 0);
-    topGradient.addColorStop(0, gateColor);
-    topGradient.addColorStop(0.5, lightColor20);
-    topGradient.addColorStop(1, gateColor);
-
-    ctx.fillStyle = topGradient;
-    ctx.fillRect(obs.x, 0, gateWidth, obs.gapY);
+    // Top gate - blit from prerendered obstacle canvas
+    if (obs.gapY > 0) {
+        ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, obs.gapY, obs.x, 0, gateWidth, obs.gapY);
+    }
 
     // Top gate cap with command
     ctx.fillStyle = '#1e293b';
@@ -700,10 +701,12 @@ function drawObstacle(ctx, obs) {
     ctx.textBaseline = 'middle';
     ctx.fillText(obs.content.cmd, obs.x + gateWidth / 2, obs.gapY - 17);
 
-    // Bottom gate
+    // Bottom gate - blit from prerendered obstacle canvas
     const bottomY = obs.gapY + CONFIG.OBSTACLE_GAP;
-    ctx.fillStyle = topGradient;
-    ctx.fillRect(obs.x, bottomY, gateWidth, game.height - bottomY);
+    const bottomH = game.height - bottomY;
+    if (bottomH > 0) {
+        ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, bottomH, obs.x, bottomY, gateWidth, bottomH);
+    }
 
     // Bottom gate cap with description hint
     ctx.fillStyle = '#1e293b';
@@ -718,37 +721,16 @@ function drawObstacle(ctx, obs) {
 
 function drawPlayer(ctx) {
     const p = game.player;
-    const { topic, lightColor30, darkColor20 } = game.topicCache;
+    const { playerCanvas, playerOX, playerOY } = game.topicCache;
 
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rotation * Math.PI / 180);
 
-    ctx.shadowColor = topic.color;
-    ctx.shadowBlur = 20;
-
-    const gradient = ctx.createLinearGradient(-25, -20, 25, 20);
-    gradient.addColorStop(0, lightColor30);
-    gradient.addColorStop(0.5, topic.color);
-    gradient.addColorStop(1, darkColor20);
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.roundRect(-25, -18, 50, 36, 8);
-    ctx.fill();
-
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.shadowBlur = 0;
-    ctx.font = '22px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(topic.icon, 0, 0);
+    ctx.drawImage(playerCanvas, -playerOX, -playerOY);
 
     if (p.velocity < 0) {
-        ctx.fillStyle = `rgba(255, 200, 100, 0.8)`;
+        ctx.fillStyle = 'rgba(255, 200, 100, 0.8)';
         ctx.beginPath();
         ctx.moveTo(-25, -5);
         ctx.lineTo(-40 - Math.random() * 15, 0);
@@ -1050,11 +1032,59 @@ function darkenColor(hex, percent) {
 
 function updateTopicCache() {
     const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    const lightColor20 = lightenColor(topic.color, 20);
+    const lightColor30 = lightenColor(topic.color, 30);
+    const darkColor20 = darkenColor(topic.color, 20);
+
+    // Prerender obstacle column to offscreen canvas (avoids createLinearGradient per frame)
+    const gateWidth = CONFIG.OBSTACLE_WIDTH;
+    const obstacleCanvas = document.createElement('canvas');
+    obstacleCanvas.width = gateWidth;
+    obstacleCanvas.height = game.height || 800;
+    const oc = obstacleCanvas.getContext('2d');
+    const oGrad = oc.createLinearGradient(0, 0, gateWidth, 0);
+    oGrad.addColorStop(0, topic.color);
+    oGrad.addColorStop(0.5, lightColor20);
+    oGrad.addColorStop(1, topic.color);
+    oc.fillStyle = oGrad;
+    oc.fillRect(0, 0, gateWidth, obstacleCanvas.height);
+
+    // Prerender player sprite to offscreen canvas (avoids shadowBlur + gradient per frame)
+    const PAD = 24;
+    const ox = PAD + 25;
+    const oy = PAD + 18;
+    const playerCanvas = document.createElement('canvas');
+    playerCanvas.width = 50 + PAD * 2;
+    playerCanvas.height = 36 + PAD * 2;
+    const pc = playerCanvas.getContext('2d');
+    pc.shadowColor = topic.color;
+    pc.shadowBlur = 20;
+    const pGrad = pc.createLinearGradient(PAD, PAD - 2, PAD + 50, PAD + 38);
+    pGrad.addColorStop(0, lightColor30);
+    pGrad.addColorStop(0.5, topic.color);
+    pGrad.addColorStop(1, darkColor20);
+    pc.fillStyle = pGrad;
+    pc.beginPath();
+    pc.roundRect(PAD, PAD, 50, 36, 8);
+    pc.fill();
+    pc.shadowBlur = 0;
+    pc.strokeStyle = 'rgba(255,255,255,0.5)';
+    pc.lineWidth = 2;
+    pc.stroke();
+    pc.font = '22px Arial';
+    pc.textAlign = 'center';
+    pc.textBaseline = 'middle';
+    pc.fillText(topic.icon, ox, oy);
+
     game.topicCache = {
         topic,
-        lightColor20: lightenColor(topic.color, 20),
-        lightColor30: lightenColor(topic.color, 30),
-        darkColor20: darkenColor(topic.color, 20)
+        lightColor20,
+        lightColor30,
+        darkColor20,
+        obstacleCanvas,
+        playerCanvas,
+        playerOX: ox,
+        playerOY: oy
     };
 }
 
@@ -1145,7 +1175,6 @@ const AdManager = {
 
     // Continue game after rewarded ad
     continueGame: function () {
-        console.log('[AdManager] Continuing game after reward...');
 
         // Reset player position to center of screen
         game.player.x = game.width * 0.12;
@@ -1199,8 +1228,6 @@ const AdManager = {
         const resumeHandler = (e) => {
             if (!game.running || !game.paused) return;
 
-            console.log('[AdManager] Player tapped to resume');
-
             // Enable invincibility for 3 seconds (longer to give player time)
             game.respawnInvincible = true;
             setTimeout(() => {
@@ -1230,8 +1257,6 @@ const AdManager = {
 
         game.canvas.addEventListener('click', resumeHandler);
         game.canvas.addEventListener('touchstart', resumeHandler);
-
-        console.log('[AdManager] Waiting for player tap to resume...');
     },
 
     // Reset for new game
