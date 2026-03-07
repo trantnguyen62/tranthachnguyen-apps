@@ -37,7 +37,7 @@ It will continue to be unusually cold until Monday, when we can expect a relativ
 
 Conditions are expected to be worse to the south of the immediate Chicago area — with accumulating snow Saturday causing hazardous travel conditions, mostly south of Interstate 80.`,
     pages: [
-      { id: 1, image: "/images/evanston-cold-weather.png", caption: "A scrollable comic strip for iPhone" }
+      { id: 1, image: "/images/evanston-cold-weather.png", caption: "Evanston braces for dangerous wind chill and near-zero temperatures" }
     ],
     panels: [
       { id: 1, title: "Saturday Noon", description: "10°F - National Weather Service: It's 10 degrees now... but just wait!" },
@@ -92,6 +92,47 @@ About a week later she creeped me on social media. Then email. Inferring things.
       { id: 6, title: "Her Secret", description: "She doesn't want her husband to know her past" },
       { id: 7, title: "The Proposition", description: "She wants to start an affair - nostalgic for those times" },
       { id: 8, title: "The Decision", description: "I declined - not good business, and I respect her husband" }
+    ]
+  }
+  },
+  {
+    id: 3,
+    title: "I Accidentally Said 'Love You' to a Cashier",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    coverImage: "/images/love-you-cashier.png",
+    description: "An awkward moment at the checkout that spiraled into the most embarrassing exit of my life.",
+    rating: 4.8,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I accidentally said "love you" to a cashier.
+
+It was a Thursday. I was tired. I grabbed my coffee, my sad little sandwich, put it all on the counter.
+
+The cashier — friendly guy, probably around my age — scanned everything and said "Have a good one!"
+
+And I said "Love you."
+
+Not quietly. Not under my breath. Full volume. Clear as a bell. "Love you."
+
+He froze. I froze. The person behind me in line froze. Time froze.
+
+He said "...thanks, man."
+
+I could not recover from this. I grabbed my bag, said "okay" for some reason, and walked directly into the automatic door before it had fully opened.
+
+I now do all my grocery shopping online.`,
+    pages: [
+      { id: 1, image: "/images/love-you-cashier.png", caption: "The moment that changed everything at the checkout counter" }
+    ],
+    panels: [
+      { id: 1, title: "A Normal Thursday", description: "Coffee, sad sandwich, checkout counter — a routine errand" },
+      { id: 2, title: "Have a Good One!", description: "The cashier offers a perfectly normal farewell" },
+      { id: 3, title: "Love You", description: "Full volume. Clear as a bell. No taking it back." },
+      { id: 4, title: "The Freeze", description: "All parties involved experience a collective system failure" },
+      { id: 5, title: "...Thanks, Man", description: "The cashier handles it with more grace than deserved" },
+      { id: 6, title: "Okay", description: "A nonsensical parting word before walking into a closed door" }
     ]
   }
 ];

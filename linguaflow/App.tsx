@@ -144,7 +144,7 @@ function App() {
             <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
               LinguaFlow
             </h1>
-            <p className="text-xs text-slate-400">Powered by Gemini Native Audio</p>
+            <p className="text-xs text-slate-400">Real-time AI conversation partner</p>
           </div>
         </div>
 
