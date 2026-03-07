@@ -3301,7 +3301,14 @@ function loadProgress() {
     const saved = localStorage.getItem('devops-mastery-progress');
     if (saved) {
         try {
-            state.progress = JSON.parse(saved);
+            const parsed = JSON.parse(saved);
+            // Convert flashcardsViewed arrays to Sets for O(1) lookup
+            for (const topicId in parsed) {
+                if (Array.isArray(parsed[topicId].flashcardsViewed)) {
+                    parsed[topicId].flashcardsViewed = new Set(parsed[topicId].flashcardsViewed);
+                }
+            }
+            state.progress = parsed;
         } catch (e) {
             localStorage.removeItem('devops-mastery-progress');
         }
@@ -3310,7 +3317,7 @@ function loadProgress() {
     devopsData.topics.forEach(topic => {
         if (!state.progress[topic.id]) {
             state.progress[topic.id] = {
-                flashcardsViewed: [],
+                flashcardsViewed: new Set(),
                 quizBestScore: 0,
                 quizAttempts: 0
             };
@@ -3320,7 +3327,16 @@ function loadProgress() {
 
 // Save progress to localStorage
 function saveProgress() {
-    localStorage.setItem('devops-mastery-progress', JSON.stringify(state.progress));
+    const serializable = {};
+    for (const topicId in state.progress) {
+        const p = state.progress[topicId];
+        serializable[topicId] = {
+            flashcardsViewed: [...p.flashcardsViewed],
+            quizBestScore: p.quizBestScore,
+            quizAttempts: p.quizAttempts
+        };
+    }
+    localStorage.setItem('devops-mastery-progress', JSON.stringify(serializable));
     updateHeaderStats();
 }
 
@@ -3332,7 +3348,7 @@ function calculateOverallProgress() {
     devopsData.topics.forEach(topic => {
         totalCards += topic.flashcards.length;
         if (state.progress[topic.id]) {
-            viewedCards += state.progress[topic.id].flashcardsViewed.length;
+            viewedCards += state.progress[topic.id].flashcardsViewed.size;
         }
     });
 
@@ -3344,7 +3360,7 @@ function calculateTopicProgress(topicId) {
     const topic = topicMap.get(topicId);
     if (!topic || !state.progress[topicId]) return 0;
 
-    const cardProgress = (state.progress[topicId].flashcardsViewed.length / topic.flashcards.length) * 50;
+    const cardProgress = (state.progress[topicId].flashcardsViewed.size / topic.flashcards.length) * 50;
     const quizProgress = (state.progress[topicId].quizBestScore / topic.quiz.length) * 50;
 
     return Math.round(cardProgress + quizProgress);
@@ -3359,8 +3375,8 @@ function updateHeaderStats() {
         totalCardsStudied += p.flashcardsViewed.length;
     });
 
-    document.getElementById('totalProgress').textContent = totalProgress + '%';
-    document.getElementById('cardsStudied').textContent = totalCardsStudied;
+    dom.totalProgress.textContent = totalProgress + '%';
+    dom.cardsStudied.textContent = totalCardsStudied;
 }
 
 // Render sidebar topics
@@ -3423,11 +3439,20 @@ function renderTopicGrid() {
 
 // Select a topic
 function selectTopic(topic) {
+    // Update sidebar active state without rebuilding the whole list
+    if (state.currentTopic) {
+        const prev = document.querySelector(`.topic-item[data-id="${state.currentTopic.id}"]`);
+        if (prev) prev.classList.remove('active');
+    }
+
     state.currentTopic = topic;
     state.currentCardIndex = 0;
     state.currentQuestionIndex = 0;
     state.quizScore = 0;
     state.isCardFlipped = false;
+
+    const next = document.querySelector(`.topic-item[data-id="${topic.id}"]`);
+    if (next) next.classList.add('active');
 
     // Update UI
     document.getElementById('welcomeScreen').classList.add('hidden');
@@ -3439,19 +3464,23 @@ function selectTopic(topic) {
     state.currentTab = 'flashcards';
     updateTabs();
     renderFlashcard();
-    renderSidebarTopics();
 }
 
 // Go back to welcome screen
 function goBack() {
+    if (state.currentTopic) {
+        const item = document.querySelector(`.topic-item[data-id="${state.currentTopic.id}"]`);
+        if (item) item.classList.remove('active');
+    }
     state.currentTopic = null;
     state.currentView = 'welcome';
 
     document.getElementById('welcomeScreen').classList.remove('hidden');
     document.getElementById('studyArea').classList.add('hidden');
-
-    renderSidebarTopics();
 }
+
+// Cached DOM elements (populated in init)
+let dom = {};
 
 // Cached tab buttons (set once DOM is ready)
 let _cachedTabBtns = null;
@@ -3786,22 +3815,22 @@ function renderFlashcard() {
     const cards = state.currentTopic.flashcards;
     const card = cards[state.currentCardIndex];
 
-    document.getElementById('flashcardTerm').textContent = card.term;
-    document.getElementById('flashcardDefinition').textContent = card.definition;
-    document.getElementById('currentCardNum').textContent = state.currentCardIndex + 1;
-    document.getElementById('totalCards').textContent = cards.length;
+    dom.flashcardTerm.textContent = card.term;
+    dom.flashcardDefinition.textContent = card.definition;
+    dom.currentCardNum.textContent = state.currentCardIndex + 1;
+    dom.totalCardsEl.textContent = cards.length;
 
     // Update progress bar
     const progress = ((state.currentCardIndex + 1) / cards.length) * 100;
-    document.getElementById('flashcardProgress').style.width = progress + '%';
+    dom.flashcardProgress.style.width = progress + '%';
 
     // Reset flip state
-    document.getElementById('flashcard').classList.remove('flipped');
+    dom.flashcard.classList.remove('flipped');
     state.isCardFlipped = false;
 
     // Update button states
-    document.getElementById('prevCard').disabled = state.currentCardIndex === 0;
-    document.getElementById('nextCard').disabled = state.currentCardIndex === cards.length - 1;
+    dom.prevCard.disabled = state.currentCardIndex === 0;
+    dom.nextCard.disabled = state.currentCardIndex === cards.length - 1;
 
     // Mark as viewed
     markCardViewed(state.currentTopic.id, state.currentCardIndex);
@@ -3810,11 +3839,11 @@ function renderFlashcard() {
 // Mark card as viewed
 function markCardViewed(topicId, cardIndex) {
     if (!state.progress[topicId]) {
-        state.progress[topicId] = { flashcardsViewed: [], quizBestScore: 0, quizAttempts: 0 };
+        state.progress[topicId] = { flashcardsViewed: new Set(), quizBestScore: 0, quizAttempts: 0 };
     }
 
-    if (!state.progress[topicId].flashcardsViewed.includes(cardIndex)) {
-        state.progress[topicId].flashcardsViewed.push(cardIndex);
+    if (!state.progress[topicId].flashcardsViewed.has(cardIndex)) {
+        state.progress[topicId].flashcardsViewed.add(cardIndex);
         saveProgress();
         updateSidebarTopicProgress(topicId);
     }
@@ -3822,8 +3851,7 @@ function markCardViewed(topicId, cardIndex) {
 
 // Flip flashcard
 function flipCard() {
-    const flashcard = document.getElementById('flashcard');
-    flashcard.classList.toggle('flipped');
+    dom.flashcard.classList.toggle('flipped');
     state.isCardFlipped = !state.isCardFlipped;
 }
 
@@ -3849,13 +3877,12 @@ function renderQuizQuestion() {
     const questions = state.currentTopic.quiz;
     const question = questions[state.currentQuestionIndex];
 
-    document.getElementById('quizQuestion').textContent = question.question;
-    document.getElementById('currentQuestionNum').textContent = state.currentQuestionIndex + 1;
-    document.getElementById('totalQuestions').textContent = questions.length;
-    document.getElementById('quizScore').textContent = state.quizScore;
+    dom.quizQuestion.textContent = question.question;
+    dom.currentQuestionNum.textContent = state.currentQuestionIndex + 1;
+    dom.totalQuestions.textContent = questions.length;
+    dom.quizScore.textContent = state.quizScore;
 
-    const optionsContainer = document.getElementById('quizOptions');
-    optionsContainer.innerHTML = '';
+    dom.quizOptions.innerHTML = '';
 
     const letters = ['A', 'B', 'C', 'D'];
     question.options.forEach((option, index) => {
@@ -3866,16 +3893,16 @@ function renderQuizQuestion() {
             <span>${option}</span>
         `;
         btn.addEventListener('click', () => selectAnswer(index));
-        optionsContainer.appendChild(btn);
+        dom.quizOptions.appendChild(btn);
     });
 
     // Update progress bar
     const progress = ((state.currentQuestionIndex + 1) / questions.length) * 100;
-    document.getElementById('quizProgress').style.width = progress + '%';
+    dom.quizProgress.style.width = progress + '%';
 
     // Hide feedback and next button
-    document.getElementById('quizFeedback').classList.add('hidden');
-    document.getElementById('quizNextBtn').classList.add('hidden');
+    dom.quizFeedback.classList.add('hidden');
+    dom.quizNextBtn.classList.add('hidden');
     state.quizAnswered = false;
 }
 
@@ -3889,12 +3916,11 @@ function selectAnswer(selectedIndex) {
 
     if (isCorrect) {
         state.quizScore++;
-        document.getElementById('quizScore').textContent = state.quizScore;
+        dom.quizScore.textContent = state.quizScore;
     }
 
     // Highlight answers
-    const options = document.querySelectorAll('.quiz-option');
-    options.forEach((opt, index) => {
+    dom.quizOptions.querySelectorAll('.quiz-option').forEach((opt, index) => {
         opt.disabled = true;
         if (index === question.correct) {
             opt.classList.add('correct');
@@ -3904,16 +3930,14 @@ function selectAnswer(selectedIndex) {
     });
 
     // Show feedback
-    const feedback = document.getElementById('quizFeedback');
-    const feedbackText = document.getElementById('feedbackText');
-    feedback.classList.remove('hidden', 'correct', 'incorrect');
-    feedback.classList.add(isCorrect ? 'correct' : 'incorrect');
-    feedbackText.textContent = isCorrect
+    dom.quizFeedback.classList.remove('hidden', 'correct', 'incorrect');
+    dom.quizFeedback.classList.add(isCorrect ? 'correct' : 'incorrect');
+    dom.feedbackText.textContent = isCorrect
         ? '✓ Correct! Well done!'
         : `✗ Incorrect. The correct answer is: ${question.options[question.correct]}`;
 
     // Show next button
-    document.getElementById('quizNextBtn').classList.remove('hidden');
+    dom.quizNextBtn.classList.remove('hidden');
 }
 
 // Next quiz question
@@ -3928,40 +3952,33 @@ function nextQuizQuestion() {
 
 // Show quiz results
 function showQuizResults() {
-    const quizView = document.getElementById('quizView');
-    const quizResults = document.getElementById('quizResults');
-
-    quizView.classList.add('hidden');
-    quizResults.classList.remove('hidden');
+    dom.quizView.classList.add('hidden');
+    dom.quizResults.classList.remove('hidden');
 
     const totalQuestions = state.currentTopic.quiz.length;
     const percentage = Math.round((state.quizScore / totalQuestions) * 100);
 
-    document.getElementById('finalScore').textContent = state.quizScore;
-    document.getElementById('maxScore').textContent = totalQuestions;
-    document.getElementById('resultsPercentage').textContent = percentage + '%';
-
-    // Update icon and title based on score
-    const resultsIcon = document.getElementById('resultsIcon');
-    const resultsTitle = document.getElementById('resultsTitle');
+    dom.finalScore.textContent = state.quizScore;
+    dom.maxScore.textContent = totalQuestions;
+    dom.resultsPercentage.textContent = percentage + '%';
 
     if (percentage >= 80) {
-        resultsIcon.textContent = '🎉';
-        resultsTitle.textContent = 'Excellent Work!';
+        dom.resultsIcon.textContent = '🎉';
+        dom.resultsTitle.textContent = 'Excellent Work!';
     } else if (percentage >= 60) {
-        resultsIcon.textContent = '👍';
-        resultsTitle.textContent = 'Good Job!';
+        dom.resultsIcon.textContent = '👍';
+        dom.resultsTitle.textContent = 'Good Job!';
     } else if (percentage >= 40) {
-        resultsIcon.textContent = '📚';
-        resultsTitle.textContent = 'Keep Studying!';
+        dom.resultsIcon.textContent = '📚';
+        dom.resultsTitle.textContent = 'Keep Studying!';
     } else {
-        resultsIcon.textContent = '💪';
-        resultsTitle.textContent = 'Practice Makes Perfect!';
+        dom.resultsIcon.textContent = '💪';
+        dom.resultsTitle.textContent = 'Practice Makes Perfect!';
     }
 
     // Update best score
     if (!state.progress[state.currentTopic.id]) {
-        state.progress[state.currentTopic.id] = { flashcardsViewed: [], quizBestScore: 0, quizAttempts: 0 };
+        state.progress[state.currentTopic.id] = { flashcardsViewed: new Set(), quizBestScore: 0, quizAttempts: 0 };
     }
 
     if (state.quizScore > state.progress[state.currentTopic.id].quizBestScore) {
@@ -3969,7 +3986,7 @@ function showQuizResults() {
     }
     state.progress[state.currentTopic.id].quizAttempts++;
     saveProgress();
-    renderSidebarTopics();
+    updateSidebarTopicProgress(state.currentTopic.id);
 }
 
 // Retry quiz
@@ -3978,8 +3995,8 @@ function retryQuiz() {
     state.quizScore = 0;
     state.quizAnswered = false;
 
-    document.getElementById('quizResults').classList.add('hidden');
-    document.getElementById('quizView').classList.remove('hidden');
+    dom.quizResults.classList.add('hidden');
+    dom.quizView.classList.remove('hidden');
     renderQuizQuestion();
 }
 
@@ -3988,7 +4005,7 @@ function studyCards() {
     state.currentTab = 'flashcards';
     state.currentCardIndex = 0;
 
-    document.getElementById('quizResults').classList.add('hidden');
+    dom.quizResults.classList.add('hidden');
     updateTabs();
     renderFlashcard();
 }
@@ -4033,6 +4050,36 @@ function handleSearch(event) {
 
 // Initialize app
 function init() {
+    // Cache frequently accessed DOM elements
+    dom = {
+        totalProgress: document.getElementById('totalProgress'),
+        cardsStudied: document.getElementById('cardsStudied'),
+        flashcard: document.getElementById('flashcard'),
+        flashcardTerm: document.getElementById('flashcardTerm'),
+        flashcardDefinition: document.getElementById('flashcardDefinition'),
+        currentCardNum: document.getElementById('currentCardNum'),
+        totalCardsEl: document.getElementById('totalCards'),
+        flashcardProgress: document.getElementById('flashcardProgress'),
+        prevCard: document.getElementById('prevCard'),
+        nextCard: document.getElementById('nextCard'),
+        quizQuestion: document.getElementById('quizQuestion'),
+        currentQuestionNum: document.getElementById('currentQuestionNum'),
+        totalQuestions: document.getElementById('totalQuestions'),
+        quizScore: document.getElementById('quizScore'),
+        quizOptions: document.getElementById('quizOptions'),
+        quizProgress: document.getElementById('quizProgress'),
+        quizFeedback: document.getElementById('quizFeedback'),
+        feedbackText: document.getElementById('feedbackText'),
+        quizNextBtn: document.getElementById('quizNextBtn'),
+        quizView: document.getElementById('quizView'),
+        quizResults: document.getElementById('quizResults'),
+        finalScore: document.getElementById('finalScore'),
+        maxScore: document.getElementById('maxScore'),
+        resultsPercentage: document.getElementById('resultsPercentage'),
+        resultsIcon: document.getElementById('resultsIcon'),
+        resultsTitle: document.getElementById('resultsTitle'),
+    };
+
     loadProgress();
     renderSidebarTopics();
     renderTopicGrid();
@@ -4040,10 +4087,10 @@ function init() {
 
     // Event listeners
     document.getElementById('backBtn').addEventListener('click', goBack);
-    document.getElementById('flashcard').addEventListener('click', flipCard);
-    document.getElementById('prevCard').addEventListener('click', prevCard);
-    document.getElementById('nextCard').addEventListener('click', nextCard);
-    document.getElementById('quizNextBtn').addEventListener('click', nextQuizQuestion);
+    dom.flashcard.addEventListener('click', flipCard);
+    dom.prevCard.addEventListener('click', prevCard);
+    dom.nextCard.addEventListener('click', nextCard);
+    dom.quizNextBtn.addEventListener('click', nextQuizQuestion);
     document.getElementById('retryQuizBtn').addEventListener('click', retryQuiz);
     document.getElementById('studyCardsBtn').addEventListener('click', studyCards);
     document.getElementById('searchInput').addEventListener('input', debounce(handleSearch, 150));
