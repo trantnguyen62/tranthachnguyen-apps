@@ -2190,20 +2190,43 @@ echo "Server setup complete!"`
                 { term: 'Alerting', definition: 'Automated notifications triggered when metrics exceed thresholds, enabling quick response to issues.' },
                 { term: 'APM', definition: 'Application Performance Monitoring - Tools that track application performance, errors, and user experience.' },
                 { term: 'ELK Stack', definition: 'Elasticsearch, Logstash, and Kibana - A popular stack for log aggregation, search, and visualization.' },
-                { term: 'SLI/SLO/SLA', definition: 'Service Level Indicator (metric), Objective (target), and Agreement (contract) - Key concepts for reliability measurement.' }
+                { term: 'SLI/SLO/SLA', definition: 'Service Level Indicator (metric), Objective (target), and Agreement (contract) - Key concepts for reliability measurement.' },
+                { term: 'OpenTelemetry', definition: 'A vendor-neutral open standard for collecting and exporting telemetry data (metrics, logs, traces) from applications and infrastructure.' },
+                { term: 'Distributed Tracing', definition: 'Tracking a request as it flows through multiple services, showing latency and errors at each hop. Tools include Jaeger and Zipkin.' },
+                { term: 'RED Method', definition: 'A monitoring methodology for services: Rate (requests/sec), Errors (failed requests), Duration (response time).' },
+                { term: 'USE Method', definition: 'A monitoring methodology for resources: Utilization, Saturation, Errors - useful for diagnosing infrastructure bottlenecks.' },
+                { term: 'Alertmanager', definition: 'A component of the Prometheus stack that handles routing, deduplication, grouping, and silencing of alerts.' },
+                { term: 'Node Exporter', definition: 'A Prometheus exporter that exposes hardware and OS-level metrics from Linux/Unix systems like CPU, memory, and disk.' },
+                { term: 'Loki', definition: 'A horizontally scalable log aggregation system by Grafana Labs, designed to index only metadata (labels) rather than full log content.' },
+                { term: 'MTTR / MTTF', definition: 'Mean Time To Recovery (how fast you restore service) and Mean Time To Failure (how long before the next failure). Key reliability metrics.' },
+                { term: 'Dead Man\'s Switch Alert', definition: 'An alert that fires when the monitoring pipeline itself goes silent, ensuring you are notified if the alerting system fails.' },
+                { term: 'Cardinality', definition: 'The number of unique label combinations in a time-series database. High cardinality (e.g. per-user labels) can cause performance issues.' },
+                { term: 'PromQL', definition: 'Prometheus Query Language - a functional query language for selecting and aggregating time-series data in Prometheus.' },
+                { term: 'Span', definition: 'The basic unit of distributed tracing - represents a single operation within a trace, including timing and metadata.' }
             ],
             commands: [
                 { command: 'prometheus --config.file=prometheus.yml', description: 'Start Prometheus with config' },
                 { command: 'curl localhost:9090/metrics', description: 'View Prometheus metrics endpoint' },
                 { command: 'grafana-server', description: 'Start Grafana server' },
                 { command: 'journalctl -u service-name -f', description: 'Follow systemd service logs' },
-                { command: 'tail -f /var/log/syslog', description: 'Follow system logs' }
+                { command: 'tail -f /var/log/syslog', description: 'Follow system logs' },
+                { command: 'promtool check rules alerts.yml', description: 'Validate Prometheus alerting rules' },
+                { command: 'amtool alert query', description: 'List active alerts in Alertmanager' },
+                { command: 'logcli query \'{app="myapp"}\' --limit=100', description: 'Query Loki logs with LogQL' }
             ],
             quiz: [
                 { question: 'What is Prometheus primarily used for?', options: ['Log management', 'Monitoring and alerting', 'Container orchestration', 'Configuration management'], correct: 1 },
                 { question: 'What does Grafana help you create?', options: ['Containers', 'Alerts', 'Visualization dashboards', 'Logs'], correct: 2 },
                 { question: 'What does ELK stand for?', options: ['Elastic, Lambda, Kubernetes', 'Elasticsearch, Logstash, Kibana', 'Event, Log, Key', 'External Load Keeper'], correct: 1 },
-                { question: 'What is an SLO?', options: ['Service Level Output', 'Service Level Objective', 'System Log Observer', 'Server Load Optimizer'], correct: 1 }
+                { question: 'What is an SLO?', options: ['Service Level Output', 'Service Level Objective', 'System Log Observer', 'Server Load Optimizer'], correct: 1 },
+                { question: 'What does the RED method stand for?', options: ['Reliability, Errors, Downtime', 'Rate, Errors, Duration', 'Requests, Events, Data', 'Resources, Endpoints, DNS'], correct: 1 },
+                { question: 'What is OpenTelemetry?', options: ['A Grafana plugin', 'A vendor-neutral standard for telemetry collection', 'An AWS monitoring service', 'A log format'], correct: 1 },
+                { question: 'What does Alertmanager handle in the Prometheus stack?', options: ['Storing metrics', 'Routing and deduplication of alerts', 'Scraping targets', 'Visualizing dashboards'], correct: 1 },
+                { question: 'What is Loki used for?', options: ['Metrics storage', 'Log aggregation', 'Tracing', 'Container scanning'], correct: 1 },
+                { question: 'What does MTTR measure?', options: ['Mean Time To Replicate', 'Mean Time To Recovery', 'Maximum Throughput Rate', 'Minimum Traffic Requirement'], correct: 1 },
+                { question: 'What is distributed tracing used for?', options: ['Distributing alerts', 'Tracking a request across multiple services', 'Tracing network packets', 'Distributing logs'], correct: 1 },
+                { question: 'What is PromQL?', options: ['A database engine', 'Prometheus Query Language', 'A protocol buffer format', 'A provisioning tool'], correct: 1 },
+                { question: 'What is high cardinality a problem for in Prometheus?', options: ['Alert routing', 'Time-series database performance', 'Log formatting', 'Dashboard rendering'], correct: 1 }
             ],
             codebase: [
                 {
@@ -2788,20 +2811,43 @@ stages:
                 { term: 'Secret Management', definition: 'Securely storing, distributing, and rotating sensitive data like API keys, passwords, and certificates.' },
                 { term: 'OWASP Top 10', definition: 'A standard awareness document listing the most critical security risks to web applications.' },
                 { term: 'Dependency Scanning', definition: 'Automated checking of third-party libraries and dependencies for known security vulnerabilities.' },
-                { term: 'Infrastructure Scanning', definition: 'Analyzing IaC templates and cloud configurations for security misconfigurations and compliance issues.' }
+                { term: 'Infrastructure Scanning', definition: 'Analyzing IaC templates and cloud configurations for security misconfigurations and compliance issues.' },
+                { term: 'Zero Trust Security', definition: 'A security model that assumes no user or system is trusted by default, requiring verification for every access request regardless of network location.' },
+                { term: 'CVE', definition: 'Common Vulnerabilities and Exposures - a publicly disclosed list of known cybersecurity vulnerabilities, each with a unique CVE ID and severity score (CVSS).' },
+                { term: 'SBOM', definition: 'Software Bill of Materials - a formal inventory of all components, libraries, and dependencies in a software product, used for vulnerability tracking.' },
+                { term: 'Policy as Code', definition: 'Defining and enforcing security and compliance policies through code (e.g., OPA/Rego), enabling automated, version-controlled policy enforcement.' },
+                { term: 'IAST', definition: 'Interactive Application Security Testing - analyzes application behavior from inside during runtime testing, combining aspects of SAST and DAST.' },
+                { term: 'Supply Chain Security', definition: 'Protecting the software supply chain from compromised dependencies, malicious packages, or tampered build pipelines (e.g., using Sigstore to sign artifacts).' },
+                { term: 'CSPM', definition: 'Cloud Security Posture Management - tools that continuously monitor cloud infrastructure for misconfigurations and compliance violations.' },
+                { term: 'Runtime Security', definition: 'Monitoring and protecting applications while they are running, detecting anomalous behavior like unexpected system calls. Tools include Falco.' },
+                { term: 'Secrets Rotation', definition: 'The practice of automatically changing credentials, API keys, and certificates on a schedule to minimize the impact of credential compromise.' },
+                { term: 'Sigstore', definition: 'An open-source project for signing, verifying, and protecting software artifacts. Cosign is its tool for signing container images.' },
+                { term: 'Network Policy', definition: 'Kubernetes resource that controls which pods can communicate with each other and external endpoints, acting as a firewall at the pod level.' }
             ],
             commands: [
                 { command: 'trivy image myimage:tag', description: 'Scan container for vulnerabilities' },
                 { command: 'snyk test', description: 'Test project dependencies for vulnerabilities' },
                 { command: 'gitleaks detect', description: 'Detect secrets in git repos' },
                 { command: 'checkov -f main.tf', description: 'Scan Terraform for misconfigurations' },
-                { command: 'tfsec .', description: 'Security scanner for Terraform' }
+                { command: 'tfsec .', description: 'Security scanner for Terraform' },
+                { command: 'cosign sign --key cosign.key myimage:tag', description: 'Sign a container image with Sigstore Cosign' },
+                { command: 'trivy fs --scanners vuln,secret .', description: 'Scan filesystem for vulnerabilities and secrets' },
+                { command: 'semgrep --config=p/owasp-top-ten .', description: 'Run SAST scan with OWASP Top 10 rules' },
+                { command: 'syft myimage:tag -o cyclonedx-json', description: 'Generate SBOM for a container image' }
             ],
             quiz: [
                 { question: 'What does "Shift Left" mean in DevSecOps?', options: ['Move to cloud', 'Integrate security early', 'Use left-aligned code', 'Deploy faster'], correct: 1 },
                 { question: 'What is SAST?', options: ['Simple Auth Service', 'Static Application Security Testing', 'Server Authentication', 'System Admin Tool'], correct: 1 },
                 { question: 'What does Trivy scan for?', options: ['Performance issues', 'Container vulnerabilities', 'Network traffic', 'User activity'], correct: 1 },
-                { question: 'What is the OWASP Top 10?', options: ['Best frameworks', 'Critical web security risks', 'Programming languages', 'Cloud providers'], correct: 1 }
+                { question: 'What is the OWASP Top 10?', options: ['Best frameworks', 'Critical web security risks', 'Programming languages', 'Cloud providers'], correct: 1 },
+                { question: 'What is Zero Trust Security?', options: ['No passwords required', 'No user or system is trusted by default', 'No encryption used', 'No cloud access'], correct: 1 },
+                { question: 'What does SBOM stand for?', options: ['Secure Build Output Map', 'Software Bill of Materials', 'System Binary Object Model', 'Security Baseline Operations Manual'], correct: 1 },
+                { question: 'What is Policy as Code?', options: ['Writing documentation', 'Defining security policies in code for automation', 'Coding security patches', 'A compliance framework'], correct: 1 },
+                { question: 'What does CSPM stand for?', options: ['Container Security Policy Manager', 'Cloud Security Posture Management', 'Continuous Security Pipeline Monitor', 'Code Scanning and Patch Management'], correct: 1 },
+                { question: 'What tool does Sigstore Cosign help with?', options: ['Container networking', 'Signing container images', 'Scanning for CVEs', 'Managing secrets'], correct: 1 },
+                { question: 'What is Falco used for?', options: ['IaC scanning', 'Runtime security monitoring', 'Container building', 'Secret rotation'], correct: 1 },
+                { question: 'What does secrets rotation protect against?', options: ['Source code leaks', 'Impact of credential compromise', 'Network attacks', 'Dependency vulnerabilities'], correct: 1 },
+                { question: 'What is IAST?', options: ['A firewall type', 'Interactive Application Security Testing combining SAST and DAST', 'A cloud security scanner', 'An IaC tool'], correct: 1 }
             ],
             codebase: [
                 {
