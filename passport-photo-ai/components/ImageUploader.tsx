@@ -117,7 +117,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); }, []);
   const onDragLeave = useCallback((e: React.DragEvent) => { e.preventDefault(); setIsDragging(false); }, []);
   const onDrop = useCallback((e: React.DragEvent) => { e.preventDefault(); setIsDragging(false); handleFile(e.dataTransfer.files?.[0] || null); }, [handleFile]);
-  const handleClear = useCallback(() => onImageSelected(null), [onImageSelected]);
+  const handleClear = useCallback(() => { setCameraError(null); onImageSelected(null); }, [onImageSelected]);
 
   const { accentPink, accentGold, accentPurple } = THEME;
 

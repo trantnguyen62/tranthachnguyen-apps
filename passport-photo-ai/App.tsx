@@ -20,6 +20,7 @@ export default function App() {
   const handleImageSelected = useCallback((img: PassportImage | null) => {
     setImage(img);
     setResult(null);
+    setStatus(AppStatus.IDLE);
   }, []);
 
   const handleEditorSave = useCallback((img: PassportImage) => {
@@ -45,6 +46,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ base64Image: image.data }),
       });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
       setResult(data);
       setStatus(AppStatus.COMPLETED);
