@@ -79,10 +79,8 @@ function Reader() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   };
 
