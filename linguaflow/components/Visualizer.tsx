@@ -32,12 +32,24 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (!isActive) {
-        // Idle animation
+        // Idle pulsing animation
+        const now = Date.now() / 1000;
+        const pulse = 0.5 + 0.5 * Math.sin(now * 2);
+        const radius = 36 + pulse * 6;
+        const alpha = 0.2 + pulse * 0.25;
+
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, 40, 0, Math.PI * 2);
-        ctx.strokeStyle = '#334155';
+        ctx.arc(canvas.width / 2, canvas.height / 2, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(100, 116, 139, ${alpha})`;
         ctx.lineWidth = 2;
         ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(100, 116, 139, 0.5)`;
+        ctx.fill();
+
+        requestRef.current = requestAnimationFrame(animate);
         return;
     }
 

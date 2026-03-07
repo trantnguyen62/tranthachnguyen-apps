@@ -92,6 +92,32 @@ function App() {
   const isConnected = connectionState === ConnectionState.CONNECTED;
   const isConnecting = connectionState === ConnectionState.CONNECTING;
 
+  const [sessionStart, setSessionStart] = useState<number | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (isConnected) {
+      setSessionStart(Date.now());
+      setElapsed(0);
+    } else {
+      setSessionStart(null);
+    }
+  }, [isConnected]);
+
+  useEffect(() => {
+    if (!sessionStart) return;
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - sessionStart) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [sessionStart]);
+
+  const formatElapsed = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, '0')}`;
+  };
+
   const handleCloseModal = useCallback(() => {
     setShowProfileModal(false);
   }, []);

@@ -16,7 +16,7 @@ A simple yet powerful AI-assisted photo editor for quick touch-ups and enhanceme
 ### Prerequisites
 
 - Node.js >= 18.x
-- Gemini API Key
+- [gemini-web-proxy](https://github.com/tranthachnguyen/gemini-web-proxy) running (Puppeteer-based Gemini automation)
 
 ### Run Locally
 
@@ -25,18 +25,43 @@ A simple yet powerful AI-assisted photo editor for quick touch-ups and enhanceme
 npm install
 
 # Set up environment
-cp .env.example .env.local
-# Add your GEMINI_API_KEY to .env.local
+cp .env.local.example .env.local
+# Edit .env.local and set GEMINI_PROXY_URL to your gemini-web-proxy URL
 
-# Start development server
+# Start the proxy server (port 5174)
+node server/proxy.js
+
+# In a separate terminal, start the frontend dev server (port 5173)
 npm run dev
+```
+
+### Environment Variables
+
+| Variable | Where | Default | Description |
+|---|---|---|---|
+| `VITE_PROXY_URL` | Frontend | `http://localhost:5174` | URL of the local proxy server |
+| `GEMINI_PROXY_URL` | Proxy server (`.env.local`) | `http://localhost:3000` | URL of the gemini-web-proxy instance |
+
+### Architecture
+
+```
+Browser (Vite :5173)
+  └─► Proxy Server (Express :5174)   [server/proxy.js]
+        └─► gemini-web-proxy (:3000) [Puppeteer / Gemini web UI]
 ```
 
 ### Run with Docker
 
 ```bash
+# Build and run the combined image (frontend + proxy server)
 docker build -t nanoedit-ai .
-docker run -p 5173:5173 -p 5174:5174 nanoedit-ai
+docker run -p 5173:5173 -p 5174:5174 \
+  -e GEMINI_PROXY_URL=http://your-gemini-web-proxy:3000 \
+  nanoedit-ai
+
+# Or build separate images
+docker build -f Dockerfile.web -t nanoedit-ai-web .
+docker build -f Dockerfile.api -t nanoedit-ai-api .
 ```
 
 ## 📁 Project Structure
