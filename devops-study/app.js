@@ -3385,30 +3385,32 @@ function renderSidebarTopics() {
     });
 }
 
+// Create a topic card element
+function createTopicCard(topic) {
+    const progress = calculateTopicProgress(topic.id);
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.style.setProperty('--card-color', topic.color);
+    card.innerHTML = `
+        <span class="topic-card-icon">${topic.icon}</span>
+        <h3 class="topic-card-name">${topic.name}</h3>
+        <div class="topic-card-stats">
+            <span>📇 ${topic.flashcards.length} cards</span>
+            <span>❓ ${topic.quiz.length} questions</span>
+        </div>
+        <div class="topic-card-progress">
+            <div class="topic-card-progress-fill" style="width: ${progress}%"></div>
+        </div>
+    `;
+    card.addEventListener('click', () => selectTopic(topic));
+    return card;
+}
+
 // Render topic grid on welcome screen
 function renderTopicGrid() {
     const topicGrid = document.getElementById('topicGrid');
     topicGrid.innerHTML = '';
-
-    devopsData.topics.forEach(topic => {
-        const progress = calculateTopicProgress(topic.id);
-        const card = document.createElement('div');
-        card.className = 'topic-card';
-        card.style.setProperty('--card-color', topic.color);
-        card.innerHTML = `
-            <span class="topic-card-icon">${topic.icon}</span>
-            <h3 class="topic-card-name">${topic.name}</h3>
-            <div class="topic-card-stats">
-                <span>📇 ${topic.flashcards.length} cards</span>
-                <span>❓ ${topic.quiz.length} questions</span>
-            </div>
-            <div class="topic-card-progress">
-                <div class="topic-card-progress-fill" style="width: ${progress}%"></div>
-            </div>
-        `;
-        card.addEventListener('click', () => selectTopic(topic));
-        topicGrid.appendChild(card);
-    });
+    devopsData.topics.forEach(topic => topicGrid.appendChild(createTopicCard(topic)));
 }
 
 // Select a topic
@@ -3521,7 +3523,8 @@ function renderCodebase() {
                 <pre><code>${escapeHtml(item.code)}</code></pre>
             </div>
         `;
-        codeItem.querySelector('.codebase-copy-btn').addEventListener('click', () => copyCodebase(index));
+        const copyBtn = codeItem.querySelector('.codebase-copy-btn');
+        copyBtn.addEventListener('click', () => copyCodebase(copyBtn, index));
         codebaseList.appendChild(codeItem);
     });
 }
@@ -3534,18 +3537,15 @@ function escapeHtml(text) {
 }
 
 // Copy codebase to clipboard
-function copyCodebase(index) {
+function copyCodebase(btn, index) {
     const codebase = state.currentTopic.codebase || [];
     if (codebase[index]) {
         navigator.clipboard.writeText(codebase[index].code).then(() => {
-            const btns = document.querySelectorAll('.codebase-copy-btn');
-            if (btns[index]) {
-                const originalText = btns[index].textContent;
-                btns[index].textContent = '✓ Copied!';
-                setTimeout(() => {
-                    btns[index].textContent = originalText;
-                }, 1500);
-            }
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 1500);
         });
     }
 }
@@ -4017,25 +4017,7 @@ function handleSearch(event) {
         return;
     }
 
-    results.forEach(({ topic }) => {
-        const progress = calculateTopicProgress(topic.id);
-        const card = document.createElement('div');
-        card.className = 'topic-card';
-        card.style.setProperty('--card-color', topic.color);
-        card.innerHTML = `
-            <span class="topic-card-icon">${topic.icon}</span>
-            <h3 class="topic-card-name">${topic.name}</h3>
-            <div class="topic-card-stats">
-                <span>📇 ${topic.flashcards.length} cards</span>
-                <span>❓ ${topic.quiz.length} questions</span>
-            </div>
-            <div class="topic-card-progress">
-                <div class="topic-card-progress-fill" style="width: ${progress}%"></div>
-            </div>
-        `;
-        card.addEventListener('click', () => selectTopic(topic));
-        topicGrid.appendChild(card);
-    });
+    results.forEach(({ topic }) => topicGrid.appendChild(createTopicCard(topic)));
 }
 
 // Initialize app
