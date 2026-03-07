@@ -3372,6 +3372,7 @@ function renderSidebarTopics() {
         const progress = calculateTopicProgress(topic.id);
         const li = document.createElement('li');
         li.className = `topic-item ${state.currentTopic?.id === topic.id ? 'active' : ''}`;
+        li.dataset.id = topic.id;
         li.style.setProperty('--topic-color', topic.color);
         li.innerHTML = `
             <span class="topic-icon">${topic.icon}</span>
@@ -3383,6 +3384,13 @@ function renderSidebarTopics() {
         li.addEventListener('click', () => selectTopic(topic));
         topicList.appendChild(li);
     });
+}
+
+// Update a single sidebar topic's progress bar without rebuilding the whole list
+function updateSidebarTopicProgress(topicId) {
+    const progress = calculateTopicProgress(topicId);
+    const fill = document.querySelector(`.topic-item[data-id="${topicId}"] .topic-progress-fill`);
+    if (fill) fill.style.width = progress + '%';
 }
 
 // Create a topic card element
@@ -3445,9 +3453,12 @@ function goBack() {
     renderSidebarTopics();
 }
 
+// Cached tab buttons (set once DOM is ready)
+let _cachedTabBtns = null;
+
 // Update tabs
 function updateTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabBtns = _cachedTabBtns || (_cachedTabBtns = document.querySelectorAll('.tab-btn'));
     tabBtns.forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === state.currentTab);
     });
@@ -3805,7 +3816,7 @@ function markCardViewed(topicId, cardIndex) {
     if (!state.progress[topicId].flashcardsViewed.includes(cardIndex)) {
         state.progress[topicId].flashcardsViewed.push(cardIndex);
         saveProgress();
-        renderSidebarTopics();
+        updateSidebarTopicProgress(topicId);
     }
 }
 
