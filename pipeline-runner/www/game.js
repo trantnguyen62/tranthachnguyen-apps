@@ -46,7 +46,9 @@ const LEARNABLE_CONTENT = {
         { cmd: 'Dockerfile', desc: 'Blueprint for building images' },
         { cmd: '-d flag', desc: 'Runs container in background (detached)' },
         { cmd: 'multi-stage build', desc: 'Reduces final image size by discarding build tools' },
-        { cmd: 'COPY vs ADD', desc: 'COPY is preferred; ADD also extracts archives and fetches URLs' }
+        { cmd: 'COPY vs ADD', desc: 'COPY is preferred; ADD also extracts archives and fetches URLs' },
+        { cmd: 'docker stats', desc: 'Shows real-time CPU, memory, and network usage per container' },
+        { cmd: 'HEALTHCHECK', desc: 'Dockerfile instruction to test if a container is healthy' }
     ],
     kubernetes: [
         { cmd: 'kubectl apply', desc: 'Creates or updates resources from YAML' },
@@ -65,7 +67,9 @@ const LEARNABLE_CONTENT = {
         { cmd: 'Namespace', desc: 'Virtual cluster partition' },
         { cmd: 'HPA', desc: 'Horizontal Pod Autoscaler' },
         { cmd: 'RBAC', desc: 'Role-Based Access Control for cluster permissions' },
-        { cmd: 'NetworkPolicy', desc: 'Controls traffic flow between pods' }
+        { cmd: 'NetworkPolicy', desc: 'Controls traffic flow between pods' },
+        { cmd: 'resource limits', desc: 'Caps CPU/memory a container can consume in a pod' },
+        { cmd: 'CronJob', desc: 'Runs a Job on a repeating schedule (like cron)' }
     ],
     cicd: [
         { cmd: 'CI Pipeline', desc: 'Automates build and test on commit' },
@@ -84,7 +88,9 @@ const LEARNABLE_CONTENT = {
         { cmd: 'Shift Left', desc: 'Test earlier in development cycle' },
         { cmd: 'Feature Flag', desc: 'Toggle features without deploy' },
         { cmd: 'Pipeline cache', desc: 'Stores dependencies between runs to speed up builds' },
-        { cmd: 'DAST', desc: 'Dynamic Application Security Testing in pipelines' }
+        { cmd: 'DAST', desc: 'Dynamic Application Security Testing in pipelines' },
+        { cmd: 'SAST', desc: 'Static Application Security Testing on source code before execution' },
+        { cmd: 'Smoke test', desc: 'Quick sanity check run immediately after deployment' }
     ],
     aws: [
         { cmd: 'EC2', desc: 'Elastic Compute Cloud - VMs in cloud' },
@@ -103,7 +109,9 @@ const LEARNABLE_CONTENT = {
         { cmd: 'SNS', desc: 'Simple Notification Service' },
         { cmd: 'DynamoDB', desc: 'NoSQL database, serverless' },
         { cmd: 'CloudTrail', desc: 'Logs and audits API calls for compliance' },
-        { cmd: 'EFS', desc: 'Elastic File System - shared NFS storage for EC2' }
+        { cmd: 'EFS', desc: 'Elastic File System - shared NFS storage for EC2' },
+        { cmd: 'Secrets Manager', desc: 'Stores and automatically rotates secrets like DB passwords and API keys' },
+        { cmd: 'ACM', desc: 'AWS Certificate Manager - provisions and renews TLS/SSL certificates' }
     ],
     terraform: [
         { cmd: 'terraform init', desc: 'Initialize working directory' },
@@ -122,7 +130,9 @@ const LEARNABLE_CONTENT = {
         { cmd: 'Backend', desc: 'Where state is stored (S3, etc)' },
         { cmd: 'HCL', desc: 'HashiCorp Configuration Language' },
         { cmd: 'for_each', desc: 'Creates multiple resources from a map or set' },
-        { cmd: 'locals', desc: 'Named values computed within a module to reduce repetition' }
+        { cmd: 'locals', desc: 'Named values computed within a module to reduce repetition' },
+        { cmd: 'terraform taint', desc: 'Marks a resource for forced recreation on next apply' },
+        { cmd: 'depends_on', desc: 'Declares explicit dependencies between resources' }
     ],
     git: [
         { cmd: 'git clone', desc: 'Copy repository to local machine' },
@@ -141,7 +151,9 @@ const LEARNABLE_CONTENT = {
         { cmd: 'Pull Request', desc: 'Request to merge with code review' },
         { cmd: '.gitignore', desc: 'Exclude files from tracking' },
         { cmd: 'git bisect', desc: 'Binary search to find the commit that introduced a bug' },
-        { cmd: 'git blame', desc: 'Shows who last modified each line of a file' }
+        { cmd: 'git blame', desc: 'Shows who last modified each line of a file' },
+        { cmd: 'git reflog', desc: 'Records all ref updates - lifeline for recovering lost commits' },
+        { cmd: 'git hooks', desc: 'Scripts that run automatically on Git events like commit and push' }
     ],
     linux: [
         { cmd: 'ls', desc: 'List directory contents' },
@@ -160,7 +172,9 @@ const LEARNABLE_CONTENT = {
         { cmd: 'ssh', desc: 'Secure shell remote connection' },
         { cmd: 'curl', desc: 'Transfer data via URLs' },
         { cmd: 'pipe |', desc: 'Passes stdout of one command to stdin of the next' },
-        { cmd: 'env / export', desc: 'Sets or displays environment variables in the shell' }
+        { cmd: 'env / export', desc: 'Sets or displays environment variables in the shell' },
+        { cmd: 'journalctl', desc: 'Queries systemd journal for service and kernel logs' },
+        { cmd: 'ss', desc: 'Shows active network connections and listening ports (replaces netstat)' }
     ],
     monitoring: [
         { cmd: 'Prometheus', desc: 'Metrics collection and alerting' },
@@ -179,7 +193,9 @@ const LEARNABLE_CONTENT = {
         { cmd: 'Latency', desc: 'Response time / delay' },
         { cmd: 'Error Rate', desc: 'Percentage of failed requests' },
         { cmd: 'MTTR', desc: 'Mean Time to Recovery - how quickly incidents are resolved' },
-        { cmd: 'cardinality', desc: 'Number of unique label value combinations in metrics' }
+        { cmd: 'cardinality', desc: 'Number of unique label value combinations in metrics' },
+        { cmd: 'PromQL', desc: 'Prometheus Query Language for querying time-series metrics' },
+        { cmd: 'P95 / P99 latency', desc: '95th/99th percentile response time - reveals worst-case user experience' }
     ]
 };
 
@@ -199,7 +215,9 @@ const QUESTIONS = {
         { q: "What does ENTRYPOINT do in a Dockerfile?", a: ["Sets the container's main process", "Exposes a port", "Sets environment variables", "Copies files into the image"], c: 0, fact: "Unlike CMD, ENTRYPOINT arguments are not overridden by docker run arguments." },
         { q: "What does 'docker inspect' return?", a: ["Detailed JSON metadata", "Container logs", "Image layers", "Network stats"], c: 0, fact: "docker inspect reveals IP addresses, mounts, env vars, and more." },
         { q: "What is a multi-stage Docker build?", a: ["Build that discards intermediate layers to reduce final image size", "A build with multiple Dockerfiles", "Running multiple builds in parallel", "A build using multiple base images"], c: 0, fact: "Multi-stage builds can shrink images from gigabytes to just megabytes!" },
-        { q: "When should you use ADD instead of COPY in a Dockerfile?", a: ["When you need to extract a tarball or fetch a URL", "When copying local files", "Always - ADD is more modern", "When copying directories only"], c: 0, fact: "Best practice: use COPY for simple file copies; ADD only when extraction or URL fetching is needed." }
+        { q: "When should you use ADD instead of COPY in a Dockerfile?", a: ["When you need to extract a tarball or fetch a URL", "When copying local files", "Always - ADD is more modern", "When copying directories only"], c: 0, fact: "Best practice: use COPY for simple file copies; ADD only when extraction or URL fetching is needed." },
+        { q: "What does 'docker stats' display?", a: ["Real-time CPU, memory, and network usage per container", "Container environment variables", "Image build history", "Volume mount points"], c: 0, fact: "docker stats is ideal for spotting memory leaks and CPU hogs in running containers." },
+        { q: "What does HEALTHCHECK do in a Dockerfile?", a: ["Tests whether the container process is healthy", "Checks the image for vulnerabilities", "Validates environment variables", "Scans the network configuration"], c: 0, fact: "Docker marks containers as healthy/unhealthy based on HEALTHCHECK exit codes, enabling automated restarts." }
     ],
     kubernetes: [
         { q: "What is a Kubernetes Pod?", a: ["Smallest deployable unit", "A cluster", "A service", "A volume"], c: 0, fact: "A Pod can contain one or more containers that share resources." },
@@ -215,7 +233,9 @@ const QUESTIONS = {
         { q: "What is a PersistentVolumeClaim?", a: ["Request for storage by a pod", "A type of Service", "A network policy", "A pod scheduling rule"], c: 0, fact: "PVCs decouple storage requests from the underlying infrastructure." },
         { q: "What does 'kubectl rollout undo' do?", a: ["Reverts to previous Deployment version", "Pauses a rollout", "Scales down pods", "Deletes a Deployment"], c: 0, fact: "Kubernetes keeps rollout history so you can roll back instantly." },
         { q: "What does RBAC stand for in Kubernetes?", a: ["Role-Based Access Control", "Resource Binding and Config", "Runtime Behavior Checks", "Replica Balancing Algorithm"], c: 0, fact: "RBAC lets you control who can perform which actions on which K8s resources." },
-        { q: "What is a Kubernetes NetworkPolicy?", a: ["Controls traffic flow between pods", "Scales network bandwidth", "Manages DNS resolution", "Load balances ingress traffic"], c: 0, fact: "Without NetworkPolicies, all pods can communicate with each other by default." }
+        { q: "What is a Kubernetes NetworkPolicy?", a: ["Controls traffic flow between pods", "Scales network bandwidth", "Manages DNS resolution", "Load balances ingress traffic"], c: 0, fact: "Without NetworkPolicies, all pods can communicate with each other by default." },
+        { q: "What is a Kubernetes CronJob?", a: ["Runs a Job on a repeating schedule", "A pod that runs continuously", "A recurring deployment update", "A scheduled node drain"], c: 0, fact: "CronJobs are ideal for periodic tasks like database backups and cleanup jobs." },
+        { q: "What happens when a container exceeds its memory limit in Kubernetes?", a: ["It is killed by the OOMKiller", "It is throttled slowly", "It gets more memory automatically", "The pod is rescheduled"], c: 0, fact: "Setting memory limits prevents a single container from starving other pods on the same node." }
     ],
     cicd: [
         { q: "What does CI stand for?", a: ["Continuous Integration", "Code Inspection", "Container Instance", "Cloud Infrastructure"], c: 0, fact: "CI automates building and testing code on every commit." },
@@ -231,7 +251,9 @@ const QUESTIONS = {
         { q: "What is a staging environment?", a: ["Pre-production environment for testing", "The production server", "A build server", "A developer's laptop"], c: 0, fact: "Staging mirrors production to catch issues before they reach users." },
         { q: "What does 'shift-left' mean in CI/CD?", a: ["Testing earlier in the development cycle", "Deploying to the left region", "Shifting traffic gradually", "Moving jobs to earlier pipeline stages"], c: 0, fact: "Shift-left reduces the cost of bugs by catching them sooner." },
         { q: "What is pipeline caching used for?", a: ["Stores dependencies to speed up subsequent runs", "Saves pipeline configuration permanently", "Caches production traffic", "Stores test results across teams"], c: 0, fact: "Caching node_modules or Maven's .m2 can cut build times by 50% or more." },
-        { q: "What is DAST in a security pipeline?", a: ["Dynamic Application Security Testing against a running app", "Docker Automated Scan Tool", "Deployment Audit and Status Tracker", "Data Access Security Token"], c: 0, fact: "DAST tests the live application and complements SAST static code analysis." }
+        { q: "What is DAST in a security pipeline?", a: ["Dynamic Application Security Testing against a running app", "Docker Automated Scan Tool", "Deployment Audit and Status Tracker", "Data Access Security Token"], c: 0, fact: "DAST tests the live application and complements SAST static code analysis." },
+        { q: "What is SAST in a CI pipeline?", a: ["Static code analysis for security vulnerabilities", "A server-side automated scaling test", "A syntax audit of shell scripts", "A sequential artifact storage tool"], c: 0, fact: "SAST runs without executing code, making it fast enough to include in every pull request check." },
+        { q: "What is a smoke test in CI/CD?", a: ["Quick sanity check after deployment", "A load test that stresses the system", "A test that checks for memory leaks", "A full regression test suite"], c: 0, fact: "Smoke tests verify core functionality in under a minute — catching obvious failures before deeper testing." }
     ],
     aws: [
         { q: "What is EC2?", a: ["Elastic Compute Cloud", "Elastic Container Cloud", "Enterprise Cloud Computing", "Easy Cloud Creation"], c: 0, fact: "EC2 provides resizable virtual servers in the cloud." },
@@ -247,7 +269,9 @@ const QUESTIONS = {
         { q: "What is AWS SQS used for?", a: ["Decoupling services via message queues", "Storing objects", "Running serverless code", "Managing DNS records"], c: 0, fact: "SQS can buffer millions of messages to prevent service overload." },
         { q: "What does AWS Auto Scaling do?", a: ["Adjusts capacity to meet demand", "Balances DNS queries", "Replicates databases", "Manages IAM roles"], c: 0, fact: "Auto Scaling can scale both up and down to optimize cost." },
         { q: "What is AWS CloudTrail?", a: ["Logs and audits all API calls across your AWS account", "Monitors EC2 CPU performance", "Manages SSL/TLS certificates", "Routes DNS queries"], c: 0, fact: "CloudTrail is essential for security auditing, compliance, and incident investigation." },
-        { q: "What is Amazon EFS?", a: ["Elastic File System - shared NFS storage mountable by multiple instances", "Elastic Firewall Service", "Event Forwarding System", "Encrypted File Storage bucket"], c: 0, fact: "EFS automatically scales capacity and can be mounted simultaneously by many EC2 instances." }
+        { q: "What is Amazon EFS?", a: ["Elastic File System - shared NFS storage mountable by multiple instances", "Elastic Firewall Service", "Event Forwarding System", "Encrypted File Storage bucket"], c: 0, fact: "EFS automatically scales capacity and can be mounted simultaneously by many EC2 instances." },
+        { q: "What is AWS Secrets Manager used for?", a: ["Storing and automatically rotating secrets like API keys and passwords", "Managing IAM user accounts", "Encrypting S3 bucket objects", "Storing CloudFormation templates"], c: 0, fact: "Secrets Manager can automatically rotate credentials for RDS, Redshift, and third-party services." },
+        { q: "What is AWS Certificate Manager (ACM)?", a: ["Provisions and auto-renews TLS/SSL certificates for AWS services", "Manages IAM certificates and roles", "Issues code-signing certificates for Lambda", "Stores SSH keys for EC2 instances"], c: 0, fact: "ACM certificates are free and renew automatically, eliminating manual certificate management." }
     ],
     terraform: [
         { q: "What is Terraform?", a: ["Infrastructure as Code tool", "Container runtime", "CI/CD platform", "Monitoring tool"], c: 0, fact: "Terraform works with 1000+ providers (AWS, Azure, GCP, etc)." },
@@ -263,7 +287,9 @@ const QUESTIONS = {
         { q: "What is a Terraform workspace?", a: ["Isolated state environment", "A module directory", "A provider configuration", "A backend type"], c: 0, fact: "Workspaces let you manage multiple environments (dev/staging/prod) from one config." },
         { q: "Where should Terraform state be stored in teams?", a: ["Remote backend like S3", "Local filesystem", "Git repository", "Environment variable"], c: 0, fact: "Never commit tfstate to Git — it can contain sensitive values in plaintext." },
         { q: "What does 'for_each' do in Terraform?", a: ["Creates multiple resource instances from a map or set", "Loops through all state files", "Iterates provider configurations", "Repeats plan operations"], c: 0, fact: "for_each assigns each instance a unique key, making it easier to manage than count." },
-        { q: "What are Terraform 'locals'?", a: ["Named values computed within a module", "Local state files on disk", "Variables passed from the CLI", "Provider-specific settings"], c: 0, fact: "Locals reduce repetition by naming complex expressions once and reusing them throughout a module." }
+        { q: "What are Terraform 'locals'?", a: ["Named values computed within a module", "Local state files on disk", "Variables passed from the CLI", "Provider-specific settings"], c: 0, fact: "Locals reduce repetition by naming complex expressions once and reusing them throughout a module." },
+        { q: "What does 'terraform taint' do?", a: ["Marks a resource for forced recreation on next apply", "Marks a resource as read-only", "Skips a resource during plan", "Locks a resource in the state file"], c: 0, fact: "terraform taint is useful when a resource is degraded but Terraform doesn't detect it automatically." },
+        { q: "What is 'depends_on' used for in Terraform?", a: ["Declaring explicit dependencies between resources", "Setting resource creation order globally", "Specifying provider version constraints", "Defining module output order"], c: 0, fact: "Terraform usually infers dependencies automatically; use depends_on only when implicit references are insufficient." }
     ],
     git: [
         { q: "What does 'git clone' do?", a: ["Copies a repository", "Creates a branch", "Merges branches", "Pushes changes"], c: 0, fact: "Clone copies the entire repository history." },
@@ -279,7 +305,9 @@ const QUESTIONS = {
         { q: "What is 'git cherry-pick'?", a: ["Applies a specific commit to current branch", "Picks files to stage", "Selects a merge strategy", "Chooses a remote"], c: 0, fact: "Cherry-pick is useful for backporting fixes to release branches." },
         { q: "What does 'git tag' do?", a: ["Marks a specific commit", "Creates a branch", "Stages all files", "Pushes to remote"], c: 0, fact: "Tags are commonly used to mark release versions like v1.0.0." },
         { q: "What is 'git bisect' used for?", a: ["Binary search to find the commit that introduced a bug", "Split a large repository into two", "Bisect a merge conflict", "Divide commit history evenly"], c: 0, fact: "git bisect finds a bad commit in O(log n) steps even across thousands of commits." },
-        { q: "What does 'git blame' show?", a: ["Who last modified each line of a file", "Which commits have bugs", "Files untracked by Git", "Blame messages in commit logs"], c: 0, fact: "git blame is invaluable for understanding when and why a specific change was made." }
+        { q: "What does 'git blame' show?", a: ["Who last modified each line of a file", "Which commits have bugs", "Files untracked by Git", "Blame messages in commit logs"], c: 0, fact: "git blame is invaluable for understanding when and why a specific change was made." },
+        { q: "What is 'git reflog' used for?", a: ["Recovering lost commits by viewing all ref history", "Viewing the remote repository log", "Listing all git references in a repo", "Auditing repository access logs"], c: 0, fact: "git reflog is your safety net — even after a reset --hard, commits remain recoverable for ~90 days." },
+        { q: "What are Git hooks?", a: ["Scripts that run automatically on Git events", "Git's plugin system for extensions", "Remote server callbacks for pushes", "Aliases for complex git commands"], c: 0, fact: "Pre-commit hooks are widely used to run linters and tests before a commit is recorded." }
     ],
     linux: [
         { q: "What does 'ls' command do?", a: ["Lists directory contents", "Creates file", "Deletes file", "Moves file"], c: 0, fact: "ls -la shows hidden files and detailed info." },
@@ -295,7 +323,9 @@ const QUESTIONS = {
         { q: "What is cron used for?", a: ["Scheduling recurring tasks", "Compressing files", "Managing users", "Monitoring processes"], c: 0, fact: "Cron expressions have 5 fields: minute, hour, day, month, weekday." },
         { q: "What does 'top' display?", a: ["Real-time process and resource usage", "Network topology", "File system tree", "Open ports"], c: 0, fact: "Press 'q' to quit top, or try 'htop' for a friendlier interface." },
         { q: "What does the pipe (|) operator do in Linux?", a: ["Sends stdout of one command to stdin of the next", "Creates a named pipe file", "Combines two text files", "Redirects output to a log file"], c: 0, fact: "Pipes enable powerful one-liners like: cat access.log | grep ERROR | wc -l" },
-        { q: "What does 'export' do in a Linux shell?", a: ["Makes a variable available to child processes", "Exports files to a remote server", "Backs up environment settings", "Installs a package"], c: 0, fact: "Variables without export are local to the current shell and invisible to spawned processes." }
+        { q: "What does 'export' do in a Linux shell?", a: ["Makes a variable available to child processes", "Exports files to a remote server", "Backs up environment settings", "Installs a package"], c: 0, fact: "Variables without export are local to the current shell and invisible to spawned processes." },
+        { q: "What does 'journalctl' do?", a: ["Queries systemd logs for services and the kernel", "Manages journal disk quota", "Monitors journal network traffic", "Lists all installed services"], c: 0, fact: "journalctl -u nginx -f follows live nginx log output — equivalent to tail -f for systemd services." },
+        { q: "What does 'ss -tlnp' show?", a: ["TCP listening ports with the associated process", "All active SSH sessions", "System socket buffer sizes", "TLS certificate details"], c: 0, fact: "ss is the modern replacement for netstat and is faster because it reads directly from the kernel." }
     ],
     monitoring: [
         { q: "What is Prometheus?", a: ["Monitoring system", "Container runtime", "CI/CD tool", "Load balancer"], c: 0, fact: "Prometheus uses a pull model to scrape metrics." },
@@ -311,7 +341,9 @@ const QUESTIONS = {
         { q: "What is Jaeger used for?", a: ["Distributed tracing", "Log aggregation", "Metrics collection", "Alert routing"], c: 0, fact: "Jaeger is a CNCF project for end-to-end distributed transaction monitoring." },
         { q: "What is a health check endpoint?", a: ["API endpoint reporting service status", "A monitoring dashboard", "A log aggregator", "An alert rule"], c: 0, fact: "Kubernetes uses health checks (liveness/readiness probes) to manage pod lifecycle." },
         { q: "What does MTTR stand for?", a: ["Mean Time to Recovery", "Maximum Threshold for Retries", "Monthly Tracking and Reporting Rate", "Metric Threshold for Risk Rating"], c: 0, fact: "Reducing MTTR is a core SRE goal — fast recovery matters as much as preventing outages." },
-        { q: "What is high cardinality in metrics?", a: ["Many unique label value combinations", "High metric collection frequency", "Large number of dashboards", "High alert sensitivity"], c: 0, fact: "Using user IDs or request IDs as Prometheus labels can cause memory issues at scale." }
+        { q: "What is high cardinality in metrics?", a: ["Many unique label value combinations", "High metric collection frequency", "Large number of dashboards", "High alert sensitivity"], c: 0, fact: "Using user IDs or request IDs as Prometheus labels can cause memory issues at scale." },
+        { q: "What is PromQL?", a: ["Prometheus Query Language for querying time-series metrics", "A protocol for log forwarding", "A query language for Grafana dashboards only", "A plugin for alerting rules"], c: 0, fact: "PromQL functions like rate(), sum(), and histogram_quantile() are essential for writing useful dashboards and alerts." },
+        { q: "What do P95 and P99 latency represent?", a: ["95th and 99th percentile response times", "Probability of 95% and 99% uptime", "Peak load at 95% and 99% capacity", "Error rates below 5% and 1%"], c: 0, fact: "P99 latency reveals the worst 1% of user experiences — often more meaningful than average response time." }
     ]
 };
 
