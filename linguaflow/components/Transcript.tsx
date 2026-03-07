@@ -27,7 +27,7 @@ const Transcript = memo<Props>(({ messages }) => {
         <div
           key={msg.id}
           aria-label={`${msg.role === 'user' ? 'You' : 'Gemini'}: ${msg.text}`}
-          className={`flex flex-col max-w-[85%] ${msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'}`}
+          className={`msg-fade-in flex flex-col max-w-[85%] ${msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'}`}
         >
           <div className={`
             px-4 py-2 rounded-2xl text-sm leading-relaxed

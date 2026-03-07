@@ -275,7 +275,10 @@ function App() {
                  )}
 
                  {/* End Session Button */}
-                 <div className="flex justify-center">
+                 <div className="flex flex-col items-center gap-2">
+                   <span className="text-xs text-slate-500 font-mono tabular-nums" aria-live="polite" aria-label={`Session duration: ${formatElapsed(elapsed)}`}>
+                     {formatElapsed(elapsed)}
+                   </span>
                    <button
                      onClick={disconnect}
                      className="px-8 py-4 rounded-full font-semibold text-lg bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center gap-2"
