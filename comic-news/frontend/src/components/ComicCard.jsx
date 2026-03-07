@@ -1,15 +1,22 @@
 import { Link } from 'react-router-dom';
 import { Star, BookOpen } from 'lucide-react';
+import { useState } from 'react';
 
 function ComicCard({ comic }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+
   return (
     <Link to={`/comic/${comic.id}`} className="comic-card group block cursor-pointer">
       <div className="relative overflow-hidden rounded-xl bg-dark-200 border border-white/5 hover:border-red-500/30">
-        <div className="aspect-[2/3] overflow-hidden">
+        <div className="aspect-[2/3] overflow-hidden relative">
+          {!imgLoaded && (
+            <div className="absolute inset-0 bg-dark-100 animate-pulse" />
+          )}
           <img
             src={comic.coverImage}
             alt={comic.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            onLoad={() => setImgLoaded(true)}
+            className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">

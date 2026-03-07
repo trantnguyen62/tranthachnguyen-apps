@@ -167,8 +167,17 @@ function Reader() {
         </div>
       </div>
 
+      {/* Tap hint - fades out after first interaction */}
+      {showControls && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+          <span className="text-xs text-gray-500 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
+            Tap to toggle controls
+          </span>
+        </div>
+      )}
+
       {/* Seamless Scrolling Comic Panels */}
-      <div 
+      <div
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto"
         onClick={() => setShowControls(!showControls)}

@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -13,6 +17,11 @@ body {
   background-color: #11111b;
   color: #ffffff;
   min-height: 100vh;
+}
+
+::selection {
+  background-color: rgba(239, 68, 68, 0.25);
+  color: #ffffff;
 }
 
 ::-webkit-scrollbar {

@@ -59,7 +59,7 @@ function Navbar() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             {showSearch ? (
               <form onSubmit={handleSearch} className="relative">
                 <input
@@ -67,7 +67,7 @@ function Navbar() {
                   placeholder="Search stories..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-48 md:w-64 px-4 py-2 bg-dark-200 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
+                  className="w-40 md:w-64 px-4 py-2 bg-dark-200 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
                   autoFocus
                   onBlur={() => !searchQuery && setShowSearch(false)}
                 />
@@ -75,23 +75,23 @@ function Navbar() {
             ) : (
               <button
                 onClick={() => setShowSearch(true)}
-                className="p-2 text-gray-300 hover:text-white transition-colors"
+                className="p-2 text-gray-300 hover:text-white transition-colors rounded-lg hover:bg-white/10"
               >
                 <Search className="w-5 h-5" />
               </button>
             )}
-          </div>
 
-          <div className="flex md:hidden items-center gap-4">
-            <Link to="/" className={isActive('/') ? 'text-red-500' : 'text-gray-300'}>
-              <Home className="w-5 h-5" />
-            </Link>
-            <Link to="/library" className={isActive('/library') ? 'text-red-500' : 'text-gray-300'}>
-              <Library className="w-5 h-5" />
-            </Link>
-            <Link to="/bookmarks" className={isActive('/bookmarks') ? 'text-red-500' : 'text-gray-300'}>
-              <Bookmark className="w-5 h-5" />
-            </Link>
+            <div className="flex md:hidden items-center gap-1 ml-1">
+              <Link to="/" className={`p-2 rounded-lg transition-colors ${isActive('/') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+                <Home className="w-5 h-5" />
+              </Link>
+              <Link to="/library" className={`p-2 rounded-lg transition-colors ${isActive('/library') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+                <Library className="w-5 h-5" />
+              </Link>
+              <Link to="/bookmarks" className={`p-2 rounded-lg transition-colors ${isActive('/bookmarks') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+                <Bookmark className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>
