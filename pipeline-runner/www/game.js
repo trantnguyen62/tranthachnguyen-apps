@@ -393,6 +393,8 @@ function selectTopic(topicId) {
     updateTopicCache();
     renderTopicButtons();
     document.querySelector('.icon-preview').textContent = game.topicCache.topic.icon;
+    const selectedBtn = document.querySelector('.topic-btn.selected');
+    if (selectedBtn) selectedBtn.focus();
 }
 
 function initStars() {
@@ -893,6 +895,14 @@ function checkAnswer(index) {
         btns[index].classList.add('incorrect');
     }
 
+    const feedbackEl = document.getElementById('answerFeedback');
+    if (feedbackEl) {
+        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
+        feedbackEl.textContent = correct
+            ? 'Correct!'
+            : `Incorrect. The correct answer was: ${correctText}`;
+    }
+
     game.questionsAnswered++;
 
     if (correct) {
@@ -926,6 +936,12 @@ function handleTimeout() {
 
     const btns = document.querySelectorAll('.answer-btn');
     btns[game.currentQuestion.correctIndex].classList.add('correct');
+
+    const feedbackEl = document.getElementById('answerFeedback');
+    if (feedbackEl) {
+        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
+        feedbackEl.textContent = `Time's up! The correct answer was: ${correctText}`;
+    }
 
     game.lastLearnedFact = game.currentQuestion.fact || "Time's up! Try to answer faster.";
 
@@ -1175,7 +1191,6 @@ const AdManager = {
 
     // Continue game after rewarded ad
     continueGame: function () {
-
         // Reset player position to center of screen
         game.player.x = game.width * 0.12;
         game.player.y = game.height / 2;

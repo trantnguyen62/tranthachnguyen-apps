@@ -147,7 +147,7 @@
 <body>
     <main class="game-container">
         <!-- Ad Banner (Top) -->
-        <div class="ad-banner ad-banner-top" id="adBannerTop">
+        <div class="ad-banner ad-banner-top" id="adBannerTop" aria-hidden="true">
             <div class="ad-placeholder">
                 <span class="ad-label">📢 Advertisement</span>
                 <span class="ad-demo-text">Your AdSense banner will appear here</span>
@@ -195,12 +195,12 @@
                 </div>
                 <div class="hud-center">
                     <div class="score-display">
-                        <span id="currentScore">0</span>
+                        <span class="sr-only">Score: </span><span id="currentScore">0</span>
                     </div>
                 </div>
                 <div class="hud-right">
-                    <div class="lives-display">❤️ <span id="livesCount">0</span></div>
-                    <div class="streak-display">🔥 <span id="streakCount">0</span></div>
+                    <div class="lives-display"><span aria-hidden="true">❤️</span> <span id="livesCount">0</span><span class="sr-only"> lives</span></div>
+                    <div class="streak-display"><span aria-hidden="true">🔥</span> <span id="streakCount">0</span><span class="sr-only"> streak</span></div>
                 </div>
             </div>
 
@@ -283,6 +283,9 @@
                 </button>
             </div>
         </div>
+
+        <!-- Live region for screen reader announcements -->
+        <div id="answerFeedback" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
 
         <footer class="site-footer">
             <p>Pipeline Runner &mdash; Free DevOps learning game. Master Docker, Kubernetes, CI/CD, AWS &amp; more.</p>
