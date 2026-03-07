@@ -198,6 +198,11 @@ app.get('/api/bookmarks', (req, res) => {
   res.json(bookmarkedComics);
 });
 
+app.get('/api/bookmarks/check/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  res.json({ isBookmarked: bookmarks.includes(id) });
+});
+
 app.post('/api/bookmarks/:id', (req, res) => {
   const id = parseInt(req.params.id);
   if (!bookmarks.includes(id)) {
@@ -210,11 +215,6 @@ app.delete('/api/bookmarks/:id', (req, res) => {
   const id = parseInt(req.params.id);
   bookmarks = bookmarks.filter(b => b !== id);
   res.json({ success: true, bookmarks });
-});
-
-app.get('/api/bookmarks/check/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  res.json({ isBookmarked: bookmarks.includes(id) });
 });
 
 // Reading progress
