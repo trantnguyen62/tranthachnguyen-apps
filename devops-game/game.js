@@ -422,7 +422,6 @@ function init() {
 
     // Load assets then initialize
     AssetLoader.loadAll(() => {
-        loadHighScore();
         setupEventListeners();
         renderTopicGrid();
         resizeCanvas();
@@ -449,6 +448,7 @@ function init() {
         domCache.newHighScore  = document.getElementById('newHighScore');
         domCache.menuHighScore = document.getElementById('menuHighScore');
 
+        loadHighScore();
         window.addEventListener('resize', resizeCanvas);
     });
 }
@@ -1055,7 +1055,7 @@ function handleTimeout() {
 
     // Show correct answer
     const btns = document.querySelectorAll('.answer-btn');
-    btns[game.currentQuestion.c].classList.add('correct');
+    btns[game.currentQuestion.correctIndex].classList.add('correct');
 
     takeDamage(CONFIG.DAMAGE_TIMEOUT);
 
