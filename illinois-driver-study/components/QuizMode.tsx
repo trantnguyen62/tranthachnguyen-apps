@@ -111,9 +111,10 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
 
         {question.image && (
           <div className="mb-6 flex justify-center">
-            <img 
-              src={question.image} 
-              alt={question.text} 
+            <img
+              src={question.image}
+              alt={question.text}
+              loading="lazy"
               className="max-h-48 object-contain rounded-lg shadow-sm border border-slate-200"
             />
           </div>

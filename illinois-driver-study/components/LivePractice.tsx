@@ -81,6 +81,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const nextStartTimeRef = useRef<number>(0);
   const sessionRef = useRef<any>(null);
+  const resolvedSessionRef = useRef<any>(null);
   
   const t = TRANSLATIONS[language];
 
@@ -116,6 +117,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       audioContextRef.current = null;
     }
     
+    resolvedSessionRef.current = null;
     setIsActive(false);
     setStatus('idle');
     setVolume(0);
@@ -177,6 +179,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
         ...config,
         callbacks: {
           onopen: () => {
+            sessionPromise.then(s => { resolvedSessionRef.current = s; });
             setStatus('connected');
             
             const source = audioContext.createMediaStreamSource(stream);
@@ -198,15 +201,18 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
               setVolume(Math.min(rms * 5, 1));
 
               const pcmData = createPcmData(inputData);
-              const base64Data = btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(pcmData.buffer))));
+              const uint8 = new Uint8Array(pcmData.buffer);
+              let binary = '';
+              for (let j = 0; j < uint8.length; j += 32768) {
+                binary += String.fromCharCode(...uint8.subarray(j, j + 32768));
+              }
+              const base64Data = btoa(binary);
               
-              sessionPromise.then(session => {
-                session.sendRealtimeInput({
-                  media: {
-                    mimeType: 'audio/pcm;rate=16000',
-                    data: base64Data
-                  }
-                });
+              resolvedSessionRef.current?.sendRealtimeInput({
+                media: {
+                  mimeType: 'audio/pcm;rate=16000',
+                  data: base64Data
+                }
               });
             };
             
@@ -242,10 +248,8 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
                   };
                 });
 
-                sessionPromise.then(session => {
-                  session.sendToolResponse({
-                    functionResponses: responses
-                  });
+                resolvedSessionRef.current?.sendToolResponse({
+                  functionResponses: responses
                 });
              }
 
@@ -368,7 +372,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
             <h3 className="text-lg font-bold text-slate-800 mb-4">{currentQuestion.text}</h3>
             {currentQuestion.image && (
                <div className="mb-4 flex justify-center">
-                 <img src={currentQuestion.image} alt={currentQuestion.text} className="max-h-40 object-contain rounded shadow-sm" />
+                 <img src={currentQuestion.image} alt={currentQuestion.text} loading="lazy" className="max-h-40 object-contain rounded shadow-sm" />
                </div>
             )}
             <div className="space-y-2">
