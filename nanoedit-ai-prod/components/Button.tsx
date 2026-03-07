@@ -29,10 +29,11 @@ export const Button = memo<ButtonProps>(({
   <button
     className={`${BASE_STYLES} ${VARIANT_STYLES[variant]} ${SIZE_STYLES} ${className}`}
     disabled={disabled || isLoading}
+    aria-busy={isLoading || undefined}
     {...props}
   >
-    {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-    {!isLoading && leftIcon && <span className="mr-2">{leftIcon}</span>}
+    {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" />}
+    {!isLoading && leftIcon && <span className="mr-2" aria-hidden="true">{leftIcon}</span>}
     {children}
   </button>
 ));

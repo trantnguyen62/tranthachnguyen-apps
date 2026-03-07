@@ -22,11 +22,12 @@ export const ComparisonView = memo<ComparisonViewProps>(({
       
       {isExpanded && (
         <div className="fixed top-4 right-4 z-50">
-           <button 
+           <button
             onClick={() => setIsExpanded(false)}
             className="p-2 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-sm"
+            aria-label="Exit fullscreen"
           >
-            <Minimize2 className="w-6 h-6" />
+            <Minimize2 className="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
       )}
@@ -37,12 +38,13 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-xl font-bold text-slate-800">Result</h3>
             <div className="flex gap-2">
-               <button 
+               <button
                 onClick={() => setIsExpanded(true)}
                 className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
                 title="Fullscreen"
+                aria-label="View fullscreen"
               >
-                <Maximize2 className="w-5 h-5" />
+                <Maximize2 className="w-5 h-5" aria-hidden="true" />
               </button>
               <button 
                 onClick={onDownload}
@@ -60,9 +62,9 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           {/* Original */}
           <div className="space-y-3">
              <div className={`relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>
-               <img 
-                 src={originalImage} 
-                 alt="Original" 
+               <img
+                 src={originalImage}
+                 alt="Original image before editing"
                  className="w-full h-full object-contain"
                />
                <div className="absolute bottom-4 left-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide">
@@ -92,9 +94,9 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                     className="w-full h-full object-contain bg-black"
                  />
                ) : (
-                 <img 
-                   src={processedImage} 
-                   alt="Processed" 
+                 <img
+                   src={processedImage}
+                   alt="AI-processed result"
                    className="w-full h-full object-contain"
                  />
                )}

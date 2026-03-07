@@ -154,8 +154,9 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
               onClick={clearImage}
               className="p-1.5 bg-white/80 backdrop-blur-sm text-slate-700 rounded-full hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm"
               title="Remove image"
+              aria-label="Remove image"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         )}
@@ -180,27 +181,29 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
         
         {/* Camera Overlay Controls */}
         <div className="absolute top-4 right-4 z-10">
-          <button 
+          <button
             onClick={stopCamera}
             className="p-2 bg-black/40 text-white rounded-full hover:bg-black/60 backdrop-blur-sm transition-colors"
+            aria-label="Close camera"
           >
-            <X className="w-6 h-6" />
+            <X className="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
 
         <div className="absolute bottom-6 left-0 right-0 z-10 flex items-center justify-center gap-8">
-           <button 
+           <button
              onClick={stopCamera}
              className="text-white text-sm font-medium px-4 py-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm"
            >
              Cancel
            </button>
-           
-           <button 
+
+           <button
              onClick={capturePhoto}
              className="w-16 h-16 rounded-full border-4 border-white flex items-center justify-center bg-white/20 hover:bg-white/40 transition-all active:scale-95"
+             aria-label="Take photo"
            >
-             <div className="w-12 h-12 bg-white rounded-full"></div>
+             <div className="w-12 h-12 bg-white rounded-full" aria-hidden="true"></div>
            </button>
 
            <div className="w-16"></div> {/* Spacer for balance */}
@@ -213,7 +216,11 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
   return (
     <div className="w-full">
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload image — click or drag and drop"
         onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
@@ -226,12 +233,14 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
           ${error ? 'border-red-300 bg-red-50' : ''}
         `}
       >
-        <input 
-          type="file" 
-          ref={inputRef} 
-          className="hidden" 
+        <input
+          type="file"
+          ref={inputRef}
+          className="hidden"
           accept="image/png, image/jpeg, image/webp"
           onChange={handleChange}
+          aria-hidden="true"
+          tabIndex={-1}
         />
         
         <div className="flex flex-col items-center p-6 text-center space-y-6 z-10">

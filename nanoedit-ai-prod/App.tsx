@@ -190,10 +190,11 @@ const App: React.FC = () => {
                       disabled={!canUndo}
                       className="p-1.5 rounded-md hover:bg-slate-100 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       title="Undo"
+                      aria-label="Undo"
                     >
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
-                    <span className="text-xs font-mono text-slate-400 select-none">
+                    <span className="text-xs font-mono text-slate-400 select-none" aria-label={`Edit ${historyIndex + 1} of ${history.length}`}>
                       {historyIndex + 1}/{history.length}
                     </span>
                     <button
@@ -201,8 +202,9 @@ const App: React.FC = () => {
                       disabled={!canRedo}
                       className="p-1.5 rounded-md hover:bg-slate-100 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       title="Redo"
+                      aria-label="Redo"
                     >
-                      <RotateCw className="w-4 h-4" />
+                      <RotateCw className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
                 </div>
@@ -211,6 +213,7 @@ const App: React.FC = () => {
                   <textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
+                    aria-label="Describe the image changes you want"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -282,7 +285,7 @@ const App: React.FC = () => {
 
                 {/* Error Message */}
                 {errorMsg && (
-                  <div className="p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
+                  <div role="alert" className="p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-sm">Generation Failed</p>
