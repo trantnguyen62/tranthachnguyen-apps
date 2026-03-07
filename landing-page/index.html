@@ -26,20 +26,28 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+            }
+            .glass-card { will-change: auto; }
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-50 min-h-screen flex flex-col items-center justify-center p-6 relative overflow-x-hidden">
-    
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:font-semibold">Skip to main content</a>
+
     <!-- Background blobs -->
     <div aria-hidden="true" class="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
     <div aria-hidden="true" class="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
 
-    <main class="max-w-5xl w-full z-10">
+    <main id="main-content" class="max-w-5xl w-full z-10">
         <header class="text-center mb-16">
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-4">
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-2">
                 Tran Thach Nguyen
-                <span class="block text-2xl md:text-3xl mt-2 font-medium text-slate-400">AI Projects Showcase</span>
             </h1>
+            <p class="text-2xl md:text-3xl font-medium text-slate-400 mb-2">AI Projects Showcase</p>
             <p class="text-slate-400 max-w-2xl mx-auto text-lg">
                 A collection of practical AI tools built to solve real problems — from language learning to photo editing, DevOps training, and more.
             </p>
@@ -145,7 +153,7 @@
 
         </div>
 
-        <footer class="mt-20 text-center text-slate-500 text-sm" role="contentinfo">
+        <footer class="mt-20 text-center text-slate-500 text-sm">
             <p>&copy; 2026 Tran Thach Nguyen. All rights reserved.</p>
         </footer>
     </main>
