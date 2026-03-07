@@ -61,7 +61,7 @@ function Home() {
             </p>
             <Link
               to="/library"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg shadow-red-500/25"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg shadow-red-500/25 hover:scale-105 active:scale-95"
             >
               Explore Stories
               <ArrowRight className="w-5 h-5" />

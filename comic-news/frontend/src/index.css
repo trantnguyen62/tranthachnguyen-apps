@@ -47,7 +47,7 @@ body {
 }
 
 .comic-card:hover {
-  @apply transform -translate-y-2;
+  @apply transform -translate-y-2 drop-shadow-[0_8px_24px_rgba(239,68,68,0.15)];
 }
 
 .gradient-text {

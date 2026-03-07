@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Filter, SortAsc } from 'lucide-react';
+import { Filter, SortAsc, SearchX } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 
 function Library() {
@@ -110,6 +110,7 @@ function Library() {
         </div>
       ) : comics.length === 0 ? (
         <div className="text-center py-20">
+          <SearchX className="w-12 h-12 text-gray-600 mx-auto mb-4" />
           <p className="text-gray-400 text-lg">No stories found</p>
           <p className="text-gray-500 mt-2">Try adjusting your filters or search query</p>
         </div>

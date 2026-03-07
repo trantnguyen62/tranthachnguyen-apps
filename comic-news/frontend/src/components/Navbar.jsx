@@ -31,30 +31,33 @@ function Navbar() {
           <div className="hidden md:flex items-center gap-8">
             <Link
               to="/"
-              className={`flex items-center gap-2 transition-colors ${
+              className={`flex items-center gap-2 transition-colors relative pb-1 ${
                 isActive('/') ? 'text-red-500' : 'text-gray-300 hover:text-white'
               }`}
             >
               <Home className="w-4 h-4" />
               <span>Home</span>
+              {isActive('/') && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full" />}
             </Link>
             <Link
               to="/library"
-              className={`flex items-center gap-2 transition-colors ${
+              className={`flex items-center gap-2 transition-colors relative pb-1 ${
                 isActive('/library') ? 'text-red-500' : 'text-gray-300 hover:text-white'
               }`}
             >
               <Library className="w-4 h-4" />
               <span>Library</span>
+              {isActive('/library') && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full" />}
             </Link>
             <Link
               to="/bookmarks"
-              className={`flex items-center gap-2 transition-colors ${
+              className={`flex items-center gap-2 transition-colors relative pb-1 ${
                 isActive('/bookmarks') ? 'text-red-500' : 'text-gray-300 hover:text-white'
               }`}
             >
               <Bookmark className="w-4 h-4" />
               <span>Bookmarks</span>
+              {isActive('/bookmarks') && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full" />}
             </Link>
           </div>
 

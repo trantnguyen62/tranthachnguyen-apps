@@ -16,6 +16,7 @@ function Reader() {
   const [comic, setComic] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showControls, setShowControls] = useState(true);
+  const [hintVisible, setHintVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loadedImages, setLoadedImages] = useState({});
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -35,6 +36,11 @@ function Reader() {
     };
     fetchComic();
   }, [id]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setHintVisible(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -173,14 +179,12 @@ function Reader() {
         </div>
       </div>
 
-      {/* Tap hint - fades out after first interaction */}
-      {showControls && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
-          <span className="text-xs text-gray-500 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
-            Tap to toggle controls
-          </span>
-        </div>
-      )}
+      {/* Tap hint - fades out after 3 seconds */}
+      <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-40 pointer-events-none transition-opacity duration-700 ${hintVisible ? 'opacity-100' : 'opacity-0'}`}>
+        <span className="text-xs text-gray-500 bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm">
+          Tap to toggle controls
+        </span>
+      </div>
 
       {/* Seamless Scrolling Comic Panels */}
       <div
