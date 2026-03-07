@@ -139,9 +139,16 @@ const App: React.FC = () => {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
               AI Image Editor — Edit Photos with <span className="text-brand-600">Natural Language</span>
             </h2>
-            <p className="text-lg text-slate-600 mb-8">
+            <p className="text-lg text-slate-600 mb-6">
               Upload any photo and describe what you want. Remove backgrounds, enhance colors, create passport photos, retouch portraits, or apply artistic effects — all in seconds with Google Gemini AI.
             </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement"].map((feat) => (
+                <span key={feat} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-medium shadow-sm">
+                  {feat}
+                </span>
+              ))}
+            </div>
           </div>
         )}
 
@@ -293,7 +300,7 @@ const App: React.FC = () => {
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 h-full">
                 <div className="flex items-center gap-2 mb-4 text-slate-500 text-sm">
                   <History className="w-4 h-4" />
-                  <span>Viewing step {historyIndex} of {history.length - 1}</span>
+                  <span>Edit {historyIndex} of {history.length - 1}</span>
                 </div>
                 <ComparisonView
                   originalImage={originalImage.data}

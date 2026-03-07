@@ -46,7 +46,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
               </button>
               <button 
                 onClick={onDownload}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors shadow-sm text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors shadow-sm text-sm font-medium"
               >
                 <Download className="w-4 h-4" />
                 Download
