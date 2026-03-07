@@ -241,19 +241,20 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           style={{ display: 'none' }}
           onChange={(e) => { handleFile(e.target.files?.[0] || null); e.target.value = ''; }}
         />
-        <div style={{ 
-          width: 72, height: 72, borderRadius: 20, 
+        <div style={{
+          width: 72, height: 72, borderRadius: 20,
           background: `linear-gradient(135deg, ${accentPink}22, ${accentGold}22)`,
           border: `1px solid ${accentPink}33`,
           display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
           fontSize: 28
         }}>
-          📁
+          🖼️
         </div>
         <p style={{ color: '#F8F8F8', fontWeight: 600, marginBottom: 6, fontFamily: "'Syne', sans-serif" }}>
           Drop your photo here
         </p>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>or click to browse files</p>
+        <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, marginTop: 8 }}>JPG, PNG, WEBP — max 10 MB</p>
       </div>
 
       <button

@@ -175,7 +175,10 @@ export default function App() {
                 }}
               >
                 {status === AppStatus.CHECKING ? (
-                  <span style={{ animation: 'pulse 1s infinite' }}>Analyzing...</span>
+                  <>
+                    <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                    Analyzing...
+                  </>
                 ) : (
                   <>🔍 Analyze</>
                 )}
@@ -337,6 +340,7 @@ export default function App() {
       <style>{`
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
     </div>
   );

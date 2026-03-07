@@ -107,25 +107,29 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
     setContrast(+e.target.value);
   }, []);
 
+  const accentPink = '#E94560';
+  const accentGold = '#F4A261';
+  const accentPurple = '#9D4EDD';
+
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="editor-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-      <div style={{ background: '#111', borderRadius: 16, width: '90%', maxWidth: 700, padding: 20 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2 id="editor-title">🎨 AI Photo Studio</h2>
-          <button onClick={onCancel} aria-label="Close editor" style={{ background: 'none', border: 'none', color: '#888', fontSize: 20, cursor: 'pointer' }}>×</button>
+    <div role="dialog" aria-modal="true" aria-labelledby="editor-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+      <div style={{ background: 'rgba(17,17,17,0.95)', borderRadius: 24, width: '90%', maxWidth: 700, padding: 28, border: '1px solid rgba(255,255,255,0.08)', boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)` }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+          <h2 id="editor-title" style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 700, background: `linear-gradient(135deg, #fff 0%, ${accentGold} 60%, ${accentPink} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Photo Studio</h2>
+          <button onClick={onCancel} aria-label="Close editor" style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>×</button>
         </div>
 
-        <div style={{ display: 'flex', gap: 20, marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 20, marginBottom: 24 }}>
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: '#888', marginBottom: 8 }}>ORIGINAL</p>
-            <img src={image.data} alt="Original photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 8 }} />
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Original</p>
+            <img src={image.data} alt="Original photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }} />
           </div>
           <div style={{ flex: 1, textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: '#10B981', marginBottom: 8 }}>RESULT</p>
+            <p style={{ fontSize: 11, color: '#10B981', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Result</p>
             {result ? (
-              <img src={result} alt="Processed passport photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 8 }} />
+              <img src={result} alt="Processed passport photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(16,185,129,0.2)' }} />
             ) : (
-              <div style={{ height: 200, background: '#222', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555' }}>
+              <div style={{ height: 200, background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>
                 Click "Auto-Fix" to start
               </div>
             )}
@@ -133,25 +137,25 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
         </div>
 
         {step === 'processing' && (
-          <div style={{ background: 'rgba(0,217,255,0.1)', borderRadius: 8, padding: 12, marginBottom: 16 }}>
-            <div style={{ height: 4, background: '#333', borderRadius: 2, overflow: 'hidden', marginBottom: 8 }}>
+          <div style={{ background: `linear-gradient(135deg, ${accentPurple}15, ${accentPink}08)`, border: `1px solid ${accentPurple}33`, borderRadius: 12, padding: 14, marginBottom: 20 }}>
+            <div style={{ height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 2, overflow: 'hidden', marginBottom: 10 }}>
               <div
                 role="progressbar"
                 aria-valuenow={progress}
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-label="Processing progress"
-                style={{ width: `${progress}%`, height: '100%', background: '#00D9FF', transition: 'width 0.3s' }}
+                style={{ width: `${progress}%`, height: '100%', background: `linear-gradient(90deg, ${accentPurple}, ${accentPink})`, transition: 'width 0.3s', borderRadius: 2 }}
               />
             </div>
-            <p style={{ fontSize: 12, color: '#00D9FF', textAlign: 'center' }}>Processing... {progress}%</p>
+            <p style={{ fontSize: 12, color: accentPurple, textAlign: 'center', fontWeight: 500 }}>Processing... {progress}%</p>
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 16, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)' }}>
           <div>
-            <p style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Background</p>
-            <div style={{ display: 'flex', gap: 6 }}>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Background</p>
+            <div style={{ display: 'flex', gap: 8 }}>
               {BG_COLORS.map((c) => (
                 <button
                   key={c}
@@ -159,30 +163,30 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
                   disabled={step !== 'done'}
                   aria-label={`Background color: ${BG_COLOR_NAMES[c]}`}
                   aria-pressed={bgColor === c}
-                  style={{ width: 28, height: 28, borderRadius: 6, background: c, border: bgColor === c ? '2px solid #00D9FF' : '2px solid transparent', cursor: 'pointer' }}
+                  style={{ width: 30, height: 30, borderRadius: 8, background: c, border: bgColor === c ? `2px solid ${accentPurple}` : '2px solid rgba(255,255,255,0.15)', cursor: step === 'done' ? 'pointer' : 'not-allowed', transition: 'border-color 0.2s', boxShadow: bgColor === c ? `0 0 0 3px ${accentPurple}33` : 'none' }}
                 />
               ))}
             </div>
           </div>
           <div style={{ flex: 1 }}>
-            <label htmlFor="brightness-range" style={{ fontSize: 12, color: '#888', marginBottom: 6, display: 'block' }}>Brightness: {brightness}%</label>
-            <input id="brightness-range" type="range" min="90" max="120" value={brightness} onChange={handleBrightnessChange} disabled={step !== 'done'} style={{ width: '100%' }} />
+            <label htmlFor="brightness-range" style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, display: 'block', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Brightness: {brightness}%</label>
+            <input id="brightness-range" type="range" min="90" max="120" value={brightness} onChange={handleBrightnessChange} disabled={step !== 'done'} style={{ width: '100%', accentColor: accentGold }} />
           </div>
           <div style={{ flex: 1 }}>
-            <label htmlFor="contrast-range" style={{ fontSize: 12, color: '#888', marginBottom: 6, display: 'block' }}>Contrast: {contrast}%</label>
-            <input id="contrast-range" type="range" min="90" max="120" value={contrast} onChange={handleContrastChange} disabled={step !== 'done'} style={{ width: '100%' }} />
+            <label htmlFor="contrast-range" style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, display: 'block', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Contrast: {contrast}%</label>
+            <input id="contrast-range" type="range" min="90" max="120" value={contrast} onChange={handleContrastChange} disabled={step !== 'done'} style={{ width: '100%', accentColor: accentGold }} />
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-          <button onClick={onCancel} style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid #444', background: 'transparent', color: '#888', cursor: 'pointer' }}>Cancel</button>
+          <button onClick={onCancel} style={{ padding: '11px 22px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500, transition: 'all 0.2s' }}>Cancel</button>
           {step !== 'done' ? (
-            <button onClick={process} disabled={step === 'processing'} style={{ padding: '10px 20px', borderRadius: 8, border: 'none', background: '#8B5CF6', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
-              {step === 'processing' ? '⏳ Processing...' : '✨ Auto-Fix'}
+            <button onClick={process} disabled={step === 'processing'} style={{ padding: '11px 22px', borderRadius: 10, border: 'none', background: step === 'processing' ? 'rgba(157,78,221,0.4)' : `linear-gradient(135deg, ${accentPurple}, ${accentPink})`, color: '#fff', fontWeight: 600, cursor: step === 'processing' ? 'not-allowed' : 'pointer', fontFamily: "'Space Grotesk', sans-serif", boxShadow: step !== 'processing' ? `0 8px 24px ${accentPurple}44` : 'none', transition: 'all 0.3s' }}>
+              {step === 'processing' ? 'Processing...' : 'Auto-Fix'}
             </button>
           ) : (
-            <button onClick={handleSave} style={{ padding: '10px 20px', borderRadius: 8, border: 'none', background: '#10B981', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
-              ✓ Use Photo
+            <button onClick={handleSave} style={{ padding: '11px 22px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #10B981, #34D399)', color: '#fff', fontWeight: 600, cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", boxShadow: '0 8px 24px rgba(16,185,129,0.35)', transition: 'all 0.3s' }}>
+              Use Photo
             </button>
           )}
         </div>
