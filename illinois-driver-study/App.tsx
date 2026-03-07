@@ -92,7 +92,7 @@ const App: React.FC = () => {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 py-6 w-full flex-grow flex flex-col">
-        <nav className="flex flex-wrap gap-3 mb-8 justify-center">
+        <nav aria-label="Study modes" className="flex flex-wrap gap-3 mb-8 justify-center">
           <NavButton 
             targetMode={AppMode.QUIZ} 
             currentMode={mode}
