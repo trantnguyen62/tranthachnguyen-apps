@@ -455,6 +455,36 @@ body {
 }
 
 /* =====================================================
+   Focus Styles
+   ===================================================== */
+:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+.topic-item:focus-visible,
+.topic-card:focus-visible,
+.match-item:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+.tab-btn:focus-visible,
+.control-btn:focus-visible,
+.back-btn:focus-visible,
+.quiz-option:focus-visible,
+.action-btn:focus-visible,
+.quiz-next-btn:focus-visible,
+.mode-toggle:focus-visible,
+.match-restart-btn:focus-visible,
+.command-copy-btn:focus-visible,
+.codebase-copy-btn:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+}
+
+/* =====================================================
    Main Content
    ===================================================== */
 .main-content {
@@ -1082,6 +1112,43 @@ body {
    ===================================================== */
 .hidden {
     display: none !important;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =====================================================
+   Reduced Motion
+   ===================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .bg-orb {
+        animation: none;
+    }
+
+    .logo-icon {
+        animation: none;
+    }
+
+    .welcome-title {
+        animation: none;
+    }
 }
 
 /* =====================================================

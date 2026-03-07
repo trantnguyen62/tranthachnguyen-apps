@@ -29,12 +29,13 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">
-                    <span class="logo-icon">⚡</span>
+                    <span class="logo-icon" aria-hidden="true">⚡</span>
                     <h1>DevOps<span class="logo-accent">Mastery</span></h1>
                 </div>
                 <div class="search-container">
-                    <input type="text" id="searchInput" class="search-input" placeholder="Search topics, terms...">
-                    <span class="search-icon">🔍</span>
+                    <label for="searchInput" class="sr-only">Search topics and terms</label>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search topics, terms..." aria-label="Search topics and terms">
+                    <span class="search-icon" aria-hidden="true">🔍</span>
                 </div>
                 <div class="header-stats">
                     <div class="stat-item">
@@ -61,7 +62,7 @@
                 </nav>
                 <div class="sidebar-footer">
                     <button class="mode-toggle" id="modeToggle">
-                        <span class="mode-icon">📚</span>
+                        <span class="mode-icon" aria-hidden="true">📚</span>
                         <span class="mode-text">Study Mode</span>
                     </button>
                 </div>
@@ -83,28 +84,28 @@
                 <!-- Study Area -->
                 <section class="study-area hidden" id="studyArea">
                     <div class="study-header">
-                        <button class="back-btn" id="backBtn">
-                            <span>←</span> Back to Topics
+                        <button class="back-btn" id="backBtn" aria-label="Back to Topics">
+                            <span aria-hidden="true">←</span> Back to Topics
                         </button>
                         <div class="study-title">
                             <span class="topic-icon" id="currentTopicIcon"></span>
                             <h2 id="currentTopicName"></h2>
                         </div>
-                        <div class="study-tabs">
-                            <button class="tab-btn active" data-tab="flashcards">
-                                <span>📇</span> Flashcards
+                        <div class="study-tabs" role="tablist" aria-label="Study modes">
+                            <button class="tab-btn active" data-tab="flashcards" role="tab" aria-selected="true" aria-controls="flashcardView">
+                                <span aria-hidden="true">📇</span> Flashcards
                             </button>
-                            <button class="tab-btn" data-tab="quiz">
-                                <span>❓</span> Quiz
+                            <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" aria-controls="quizView">
+                                <span aria-hidden="true">❓</span> Quiz
                             </button>
-                            <button class="tab-btn" data-tab="match">
-                                <span>🎯</span> Match
+                            <button class="tab-btn" data-tab="match" role="tab" aria-selected="false" aria-controls="matchView">
+                                <span aria-hidden="true">🎯</span> Match
                             </button>
-                            <button class="tab-btn" data-tab="codebase">
-                                <span>📝</span> Codebase
+                            <button class="tab-btn" data-tab="codebase" role="tab" aria-selected="false" aria-controls="codebaseView">
+                                <span aria-hidden="true">📝</span> Codebase
                             </button>
-                            <button class="tab-btn" data-tab="commands">
-                                <span>💻</span> Commands
+                            <button class="tab-btn" data-tab="commands" role="tab" aria-selected="false" aria-controls="commandsView">
+                                <span aria-hidden="true">💻</span> Commands
                             </button>
                         </div>
                     </div>
@@ -128,18 +129,18 @@
                             </div>
                         </div>
                         <div class="flashcard-controls">
-                            <button class="control-btn" id="prevCard">
-                                <span>←</span> Previous
+                            <button class="control-btn" id="prevCard" aria-label="Previous card">
+                                <span aria-hidden="true">←</span> Previous
                             </button>
-                            <div class="card-counter">
+                            <div class="card-counter" aria-live="polite" aria-atomic="true">
                                 <span id="currentCardNum">1</span> / <span id="totalCards">10</span>
                             </div>
-                            <button class="control-btn" id="nextCard">
-                                Next <span>→</span>
+                            <button class="control-btn" id="nextCard" aria-label="Next card">
+                                Next <span aria-hidden="true">→</span>
                             </button>
                         </div>
                         <div class="flashcard-progress">
-                            <div class="progress-bar">
+                            <div class="progress-bar" role="progressbar" aria-label="Flashcard progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 <div class="progress-fill" id="flashcardProgress"></div>
                             </div>
                         </div>
@@ -161,13 +162,13 @@
                             <div class="quiz-options" id="quizOptions">
                                 <!-- Options will be populated by JS -->
                             </div>
-                            <div class="quiz-feedback hidden" id="quizFeedback">
+                            <div class="quiz-feedback hidden" id="quizFeedback" aria-live="polite" aria-atomic="true">
                                 <p id="feedbackText"></p>
                             </div>
                             <button class="quiz-next-btn hidden" id="quizNextBtn">Next Question</button>
                         </div>
                         <div class="quiz-progress">
-                            <div class="progress-bar">
+                            <div class="progress-bar" role="progressbar" aria-label="Quiz progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 <div class="progress-fill" id="quizProgress"></div>
                             </div>
                         </div>
