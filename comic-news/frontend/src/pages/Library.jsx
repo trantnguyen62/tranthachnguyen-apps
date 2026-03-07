@@ -14,6 +14,10 @@ function Library() {
   const searchQuery = searchParams.get('search') || '';
 
   useEffect(() => {
+    document.title = 'Story Library - Comic News';
+  }, []);
+
+  useEffect(() => {
     const fetchGenres = async () => {
       try {
         const res = await fetch('/api/genres');

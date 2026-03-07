@@ -27,11 +27,12 @@ const TRANSLATIONS = {
 } as const;
 
 // Memoized NavButton component
-const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: string; currentMode: AppMode; onClick: (mode: AppMode) => void }>(({ 
-  targetMode, icon, label, currentMode, onClick 
+const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: string; currentMode: AppMode; onClick: (mode: AppMode) => void }>(({
+  targetMode, icon, label, currentMode, onClick
 }) => (
   <button
     onClick={() => onClick(targetMode)}
+    aria-current={currentMode === targetMode ? 'page' : undefined}
     className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-200 w-full sm:w-auto flex-1 ${
       currentMode === targetMode
         ? 'bg-blue-600 text-white shadow-lg scale-105'
@@ -64,7 +65,7 @@ const App: React.FC = () => {
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             </div>
             <h1 className="text-xl font-bold text-slate-800 hidden sm:block">{t.appTitle}</h1>
             <h1 className="text-xl font-bold text-slate-800 sm:hidden">{t.shortTitle}</h1>

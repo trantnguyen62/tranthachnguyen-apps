@@ -9,6 +9,10 @@ function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = 'Comic News - Daily News Turned Into Comics';
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const [featuredRes, comicsRes] = await Promise.all([

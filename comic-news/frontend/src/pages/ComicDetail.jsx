@@ -25,6 +25,7 @@ function ComicDetail() {
         setComic(comicData);
         setIsBookmarked(bookmarkData.isBookmarked);
         setProgress(progressData.page);
+        document.title = `${comicData.title} - Comic News`;
       } catch (error) {
         console.error('Error fetching comic:', error);
       } finally {
