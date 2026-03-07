@@ -134,17 +134,43 @@ function App() {
       <div className="flex-1 flex flex-col p-6 gap-8 relative z-10">
         
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-            </svg>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
+                LinguaFlow
+              </h1>
+              <p className="text-xs text-slate-400">Real-time AI conversation partner</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
-              LinguaFlow
-            </h1>
-            <p className="text-xs text-slate-400">Real-time AI conversation partner</p>
+          <div className="flex items-center gap-2 text-xs" aria-live="polite">
+            {isConnected ? (
+              <>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                <span className="text-green-400 font-mono tabular-nums">{formatElapsed(elapsed)}</span>
+              </>
+            ) : isConnecting ? (
+              <>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                </span>
+                <span className="text-yellow-400">Connecting</span>
+              </>
+            ) : (
+              <>
+                <span className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
+                <span className="text-slate-500">Idle</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -276,9 +302,6 @@ function App() {
 
                  {/* End Session Button */}
                  <div className="flex flex-col items-center gap-2">
-                   <span className="text-xs text-slate-500 font-mono tabular-nums" aria-live="polite" aria-label={`Session duration: ${formatElapsed(elapsed)}`}>
-                     {formatElapsed(elapsed)}
-                   </span>
                    <button
                      onClick={disconnect}
                      className="px-8 py-4 rounded-full font-semibold text-lg bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center gap-2"
