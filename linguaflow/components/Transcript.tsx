@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, memo } from 'react';
 import { ChatMessage } from '../types';
-import { sanitizeText } from '../utils/sanitize';
 
 interface Props {
   messages: ChatMessage[];
@@ -38,7 +37,7 @@ const Transcript = memo<Props>(({ messages }) => {
               ? 'bg-blue-600 text-white rounded-br-none'
               : 'bg-slate-700 text-slate-200 rounded-bl-none'}
           `}>
-            {sanitizeText(msg.text)}
+            {msg.text}
           </div>
           <span className="text-[10px] text-slate-500 mt-1 px-1">
             {msg.role === 'user' ? 'You' : 'AI Tutor'} • {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

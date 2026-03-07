@@ -124,7 +124,20 @@ export class ProxyLiveSession {
       type: 'realtimeInput',
       input: input
     };
-    
+
+    if (this.isOpen && this.ws) {
+      this.ws.send(JSON.stringify(message));
+    } else {
+      this.messageQueue.push(message);
+    }
+  }
+
+  sendClientContent(content: any): void {
+    const message = {
+      type: 'clientContent',
+      content: content
+    };
+
     if (this.isOpen && this.ws) {
       this.ws.send(JSON.stringify(message));
     } else {

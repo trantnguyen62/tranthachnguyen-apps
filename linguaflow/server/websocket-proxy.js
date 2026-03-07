@@ -41,7 +41,7 @@ const CONNECTION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 const MAX_MESSAGE_SIZE = 1024 * 1024;
 
 // Valid message types
-const VALID_MESSAGE_TYPES = ['connect', 'realtimeInput', 'disconnect'];
+const VALID_MESSAGE_TYPES = ['connect', 'realtimeInput', 'clientContent', 'disconnect'];
 
 // ============================================================================
 // SECURITY STATE TRACKING
@@ -169,6 +169,10 @@ function validateMessage(data) {
 
   if (data.type === 'connect' && !data.config) {
     return { valid: false, error: 'Missing configuration' };
+  }
+
+  if (data.type === 'clientContent' && !data.content) {
+    return { valid: false, error: 'Missing content data' };
   }
 
   return { valid: true };
@@ -353,6 +357,11 @@ wss.on('connection', (clientWs, req) => {
       // Handle audio/data from client to send to Gemini
       else if (data.type === 'realtimeInput' && geminiSession) {
         await geminiSession.sendRealtimeInput(data.input);
+      }
+
+      // Handle text/instruction content from client
+      else if (data.type === 'clientContent' && geminiSession) {
+        await geminiSession.sendClientContent(data.content);
       }
 
       // Handle disconnect request

@@ -9,6 +9,12 @@ import UserProfileModal from './components/UserProfileModal';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+const formatElapsed = (s: number) => {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+};
+
 // Color mapping moved outside component
 const VISUALIZER_COLORS: Record<string, string> = {
   'es': '#F59E0B', // Amber
@@ -111,12 +117,6 @@ function App() {
     }, 1000);
     return () => clearInterval(interval);
   }, [sessionStart]);
-
-  const formatElapsed = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, '0')}`;
-  };
 
   const handleCloseModal = useCallback(() => {
     setShowProfileModal(false);
