@@ -1707,7 +1707,26 @@ resource "aws_ecs_service" "app" {
                 { term: 'Pull Request', definition: 'A method for submitting contributions where changes are reviewed before being merged into the target branch.' },
                 { term: 'Rebase', definition: 'An alternative to merging that applies commits from one branch on top of another, creating a linear history.' },
                 { term: 'Git Clone', definition: 'Creates a local copy of a remote repository, including all files, branches, and commit history.' },
-                { term: 'Git Stash', definition: 'Temporarily saves changes that are not ready to be committed, allowing you to switch branches cleanly.' }
+                { term: 'Git Stash', definition: 'Temporarily saves changes that are not ready to be committed, allowing you to switch branches cleanly.' },
+                { term: 'Git Fetch', definition: 'Downloads changes from a remote repository without merging them into the local branch, updating remote-tracking branches.' },
+                { term: 'Git Pull', definition: 'Fetches changes from a remote repository and immediately merges them into the current local branch (fetch + merge).' },
+                { term: 'Git Cherry-pick', definition: 'Applies the changes from a specific commit onto the current branch, useful for porting individual fixes.' },
+                { term: 'Git Tag', definition: 'A named reference to a specific commit, commonly used to mark release versions like v1.0.0.' },
+                { term: 'Git Remote', definition: 'A named reference to another Git repository (usually a server), enabling push and pull operations. "origin" is the default name.' },
+                { term: 'Git Reset', definition: 'Moves the HEAD and branch pointer to a previous commit. --soft keeps staged changes, --mixed unstages them, --hard discards all changes.' },
+                { term: 'Git Reflog', definition: 'A log of all HEAD movements in the local repository. Useful for recovering commits after a bad reset or rebase.' },
+                { term: 'Git Bisect', definition: 'A binary search tool that helps find the commit that introduced a bug by testing good/bad states.' },
+                { term: 'Git Blame', definition: 'Shows who last modified each line of a file and in which commit, useful for tracing the origin of code.' },
+                { term: 'Git Diff', definition: 'Shows differences between commits, the working tree, or the index. Essential for reviewing changes before committing.' },
+                { term: 'Merge Conflict', definition: 'Occurs when two branches modify the same lines of a file differently. Git requires manual resolution before completing the merge.' },
+                { term: '.gitignore', definition: 'A file specifying patterns of files and directories that Git should not track, like build artifacts and secrets.' },
+                { term: 'Fork', definition: 'A personal copy of another user\'s repository on a hosting platform. Enables contributing to projects without direct write access.' },
+                { term: 'Conventional Commits', definition: 'A commit message convention using prefixes like feat:, fix:, docs:, chore: to communicate intent and automate changelogs.' },
+                { term: 'Git Hooks', definition: 'Scripts that run automatically at key Git events like pre-commit, pre-push, or post-merge to enforce rules or automate tasks.' },
+                { term: 'Git Submodule', definition: 'A repository embedded within another repository at a specific commit, used to include external dependencies with version pinning.' },
+                { term: 'Squash Commits', definition: 'Combining multiple commits into a single one during a rebase or merge to keep the branch history clean.' },
+                { term: 'Fast-forward Merge', definition: 'A merge where Git simply moves the branch pointer forward because there is a linear path from the target to the source branch.' },
+                { term: 'Three-way Merge', definition: 'A merge that creates a new merge commit when branches have diverged, using the common ancestor as a reference.' }
             ],
             quiz: [
                 {
@@ -1728,6 +1747,46 @@ resource "aws_ecs_service" "app" {
                 {
                     question: 'What is a Pull Request?',
                     options: ['Downloading code', 'A method for reviewing and merging changes', 'A type of branch', 'A commit message'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the difference between git fetch and git pull?',
+                    options: ['No difference', 'fetch downloads without merging; pull fetches and merges', 'pull is faster', 'fetch only works with tags'],
+                    correct: 1
+                },
+                {
+                    question: 'What does git reset --hard do?',
+                    options: ['Stages all files', 'Moves HEAD and discards all local changes', 'Creates a hard link', 'Resets remote branches'],
+                    correct: 1
+                },
+                {
+                    question: 'What is git cherry-pick used for?',
+                    options: ['Selecting best commits to delete', 'Applying a specific commit onto the current branch', 'Picking merge conflicts', 'Choosing a base branch'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the git reflog useful for?',
+                    options: ['Listing remote repos', 'Recovering lost commits after a reset', 'Showing remote logs', 'Formatting commit messages'],
+                    correct: 1
+                },
+                {
+                    question: 'What does git stash do?',
+                    options: ['Deletes uncommitted changes', 'Temporarily saves uncommitted changes', 'Sends changes to remote', 'Creates a new branch'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the Conventional Commits convention?',
+                    options: ['A GUI tool', 'A commit message format with prefixes like feat: and fix:', 'A branching model', 'A merge strategy'],
+                    correct: 1
+                },
+                {
+                    question: 'What are Git hooks?',
+                    options: ['Network connections', 'Scripts that run automatically at Git events', 'Branch policies', 'Remote aliases'],
+                    correct: 1
+                },
+                {
+                    question: 'What does git bisect help you find?',
+                    options: ['Duplicate files', 'The commit that introduced a bug', 'Merge conflicts', 'Deleted branches'],
                     correct: 1
                 }
             ],

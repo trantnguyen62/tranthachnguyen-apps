@@ -188,7 +188,17 @@ const QUESTIONS = {
         { q: "What is APM?", a: ["Application Performance Monitoring", "Automated Process Manager", "Advanced Package Manager", "Application Process Memory"], c: 0 },
         { q: "What is tracing?", a: ["Following request paths", "Logging errors", "Measuring latency", "Counting requests"], c: 0 },
         { q: "What is a dashboard?", a: ["Visual display of metrics", "Configuration file", "Log aggregator", "Alert manager"], c: 0 },
-        { q: "What is log aggregation?", a: ["Collecting logs centrally", "Deleting old logs", "Compressing logs", "Encrypting logs"], c: 0 }
+        { q: "What is log aggregation?", a: ["Collecting logs centrally", "Deleting old logs", "Compressing logs", "Encrypting logs"], c: 0 },
+        { q: "What is OpenTelemetry?", a: ["Observability framework", "Container runtime", "CI/CD tool", "Database service"], c: 0 },
+        { q: "What is a time series database?", a: ["Stores timestamped data points", "SQL relational database", "NoSQL document store", "In-memory cache"], c: 0 },
+        { q: "What is Jaeger used for?", a: ["Distributed tracing", "Log aggregation", "Metrics storage", "Alert routing"], c: 0 },
+        { q: "What is Loki?", a: ["Log aggregation system", "Metrics database", "Tracing tool", "Alert manager"], c: 0 },
+        { q: "What is an SLA?", a: ["Service Level Agreement", "System Load Average", "Server Log Analysis", "Service Launch Action"], c: 0 },
+        { q: "What does MTTR measure?", a: ["Mean Time To Recovery", "Maximum Transfer Rate", "Minimum Threshold Ratio", "Mean Traffic Rate"], c: 0 },
+        { q: "What is an SLI?", a: ["Service Level Indicator", "System Log Index", "Server Load Index", "Service Launch Indicator"], c: 0 },
+        { q: "What does PagerDuty do?", a: ["Incident management", "Log storage", "Metric collection", "Code deployment"], c: 0 },
+        { q: "What is Datadog?", a: ["Monitoring and analytics platform", "Database management tool", "CI/CD platform", "Container runtime"], c: 0 },
+        { q: "What is an on-call rotation?", a: ["Scheduled team incident response", "Database backup schedule", "Deployment schedule", "Sprint planning cycle"], c: 0 }
     ],
     ansible: [
         { q: "What is Ansible?", a: ["Configuration management tool", "Container runtime", "CI/CD platform", "Monitoring system"], c: 0 },
@@ -200,7 +210,15 @@ const QUESTIONS = {
         { q: "What is an Ansible module?", a: ["Reusable task unit", "Playbook section", "Inventory group", "Variable file"], c: 0 },
         { q: "What is idempotency?", a: ["Same result on repeated runs", "Parallel execution", "Sequential tasks", "Error handling"], c: 0 },
         { q: "What is Ansible Galaxy?", a: ["Role sharing platform", "Monitoring dashboard", "Log aggregator", "Container registry"], c: 0 },
-        { q: "What does a handler do?", a: ["Runs when notified", "Always runs", "Never runs", "Runs first"], c: 0 }
+        { q: "What does a handler do?", a: ["Runs when notified", "Always runs", "Never runs", "Runs first"], c: 0 },
+        { q: "What does 'become: yes' do in Ansible?", a: ["Privilege escalation", "Enables a module", "Registers a result", "Skips the task"], c: 0 },
+        { q: "What is an Ansible fact?", a: ["Auto-gathered host information", "Static variable", "Task output", "Module parameter"], c: 0 },
+        { q: "What does the 'register' keyword do?", a: ["Saves task output to variable", "Registers a module", "Registers a host", "Creates a fact"], c: 0 },
+        { q: "What does the 'when' keyword do?", a: ["Conditional task execution", "Times a task", "Schedules a task", "Waits for input"], c: 0 },
+        { q: "What are Ansible tags?", a: ["Labels to run specific tasks", "Inventory groups", "Variable files", "Module parameters"], c: 0 },
+        { q: "What is AWX?", a: ["Open-source Ansible web UI", "CLI tool for Ansible", "Module library", "Inventory plugin"], c: 0 },
+        { q: "What is ansible-lint?", a: ["Checks playbook best practices", "Runs playbooks", "Manages inventory", "Encrypts variables"], c: 0 },
+        { q: "What is the 'with_items' loop?", a: ["Iterates over a list", "Waits for items", "Counts items", "Filters items"], c: 0 }
     ],
     azure: [
         { q: "What is Azure?", a: ["Microsoft's cloud platform", "AWS service", "Google product", "Linux distro"], c: 0 },
@@ -212,7 +230,15 @@ const QUESTIONS = {
         { q: "What is Azure AD?", a: ["Identity management", "Application deployment", "Network configuration", "Storage management"], c: 0 },
         { q: "What is an Azure Resource Group?", a: ["Container for resources", "Virtual network", "Storage account", "Compute instance"], c: 0 },
         { q: "What is Azure CLI?", a: ["Command-line tool", "GUI application", "Mobile app", "Web portal"], c: 0 },
-        { q: "What is Azure Pipelines?", a: ["CI/CD service", "Data pipeline", "Network route", "Storage tier"], c: 0 }
+        { q: "What is Azure Pipelines?", a: ["CI/CD service", "Data pipeline", "Network route", "Storage tier"], c: 0 },
+        { q: "What is Azure App Service?", a: ["Platform for hosting web apps", "Virtual machine", "Database service", "Object storage"], c: 0 },
+        { q: "What is Azure Monitor?", a: ["Monitoring and alerting service", "Storage service", "Compute service", "Network service"], c: 0 },
+        { q: "What is Azure Container Registry?", a: ["Private container image registry", "Kubernetes service", "Serverless platform", "CI/CD service"], c: 0 },
+        { q: "What is Bicep?", a: ["Azure infrastructure-as-code language", "CI/CD tool", "Container runtime", "Monitoring tool"], c: 0 },
+        { q: "What is Azure Virtual Network?", a: ["Private network in Azure", "Public internet backbone", "CDN service", "DNS service"], c: 0 },
+        { q: "What is Azure Service Bus?", a: ["Managed message broker", "Compute service", "Database service", "Storage service"], c: 0 },
+        { q: "What is Azure Key Vault?", a: ["Secrets and key management", "Container registry", "Code repository", "CI/CD platform"], c: 0 },
+        { q: "What is an Azure Subscription?", a: ["Billing and resource boundary", "Virtual machine type", "Network zone", "Storage tier"], c: 0 }
     ],
     devsecops: [
         { q: "What is DevSecOps?", a: ["Security integrated in DevOps", "Development operations", "Security department", "Operations security"], c: 0 },
@@ -224,7 +250,15 @@ const QUESTIONS = {
         { q: "What is OWASP Top 10?", a: ["Web security risks list", "Programming languages", "Cloud providers", "CI/CD tools"], c: 0 },
         { q: "What is Trivy?", a: ["Vulnerability scanner", "Container runtime", "CI/CD tool", "Monitoring system"], c: 0 },
         { q: "What is dependency scanning?", a: ["Checking libraries for vulnerabilities", "Installing packages", "Updating code", "Building images"], c: 0 },
-        { q: "What is a CVE?", a: ["Common Vulnerabilities and Exposures", "Code Version Error", "Container Virtual Environment", "Cloud Vendor Edition"], c: 0 }
+        { q: "What is a CVE?", a: ["Common Vulnerabilities and Exposures", "Code Version Error", "Container Virtual Environment", "Cloud Vendor Edition"], c: 0 },
+        { q: "What is threat modeling?", a: ["Identifying security risks early", "Network performance monitoring", "Load testing", "Code review process"], c: 0 },
+        { q: "What is a security gate in a pipeline?", a: ["Automated security check that blocks failures", "Physical server access control", "Network firewall rule", "Database security policy"], c: 0 },
+        { q: "What is HashiCorp Vault used for?", a: ["Secrets management", "Container orchestration", "CI/CD automation", "Infrastructure monitoring"], c: 0 },
+        { q: "What is SonarQube?", a: ["Code quality and security analyzer", "Container image scanner", "CI/CD orchestrator", "Monitoring platform"], c: 0 },
+        { q: "What is an SBOM?", a: ["Software Bill of Materials", "Secure Build Output Manifest", "Source Branch Operations Map", "Service Bus Object Model"], c: 0 },
+        { q: "What is the principle of least privilege?", a: ["Minimal access rights needed", "Admin access for all users", "Shared team credentials", "Public read access"], c: 0 },
+        { q: "What is MFA?", a: ["Multi-Factor Authentication", "Multi-Function Application", "Main Firewall Application", "Managed Function App"], c: 0 },
+        { q: "What is Snyk?", a: ["Developer security platform", "Container orchestrator", "CI/CD tool", "Log aggregator"], c: 0 }
     ],
     networking: [
         { q: "What does DNS do?", a: ["Translates domains to IPs", "Encrypts data", "Routes traffic", "Balances load"], c: 0 },
@@ -238,7 +272,14 @@ const QUESTIONS = {
         { q: "What is a subnet?", a: ["Network subdivision", "Server type", "Protocol version", "Port range"], c: 0 },
         { q: "What is CIDR notation?", a: ["IP address range format", "Security protocol", "Routing algorithm", "DNS record type"], c: 0 },
         { q: "What is SSL/TLS?", a: ["Encryption protocols", "Routing protocols", "Transfer protocols", "Authentication protocols"], c: 0 },
-        { q: "What is a CDN?", a: ["Content Delivery Network", "Central Data Node", "Cloud Database Network", "Container Distribution Network"], c: 0 }
+        { q: "What is a CDN?", a: ["Content Delivery Network", "Central Data Node", "Cloud Database Network", "Container Distribution Network"], c: 0 },
+        { q: "What is a VLAN?", a: ["Virtual LAN segment", "Very Large Area Network", "Virtual Load Application Network", "Variable Length Area Node"], c: 0 },
+        { q: "What is BGP?", a: ["Border Gateway Protocol", "Basic Gateway Protocol", "Binary Graph Protocol", "Bridge Gateway Port"], c: 0 },
+        { q: "What does MTU stand for?", a: ["Maximum Transmission Unit", "Minimum Transfer Unit", "Maximum Transfer Usage", "Multiple Transmission Unit"], c: 0 },
+        { q: "What is ICMP used for?", a: ["Error messages and diagnostics", "File transfer", "Email delivery", "Web content delivery"], c: 0 },
+        { q: "What is an API Gateway?", a: ["Manages and routes API requests", "Network switch", "DNS server", "Firewall"], c: 0 },
+        { q: "What is anycast routing?", a: ["One IP, nearest of many servers", "One IP, one fixed server", "Many IPs, one server", "Broadcast to all servers"], c: 0 },
+        { q: "What is network latency?", a: ["Delay in data transmission", "Bandwidth limit", "Packet loss rate", "Connection timeout"], c: 0 }
     ]
 };
 
