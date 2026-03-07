@@ -38,14 +38,14 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
             </h3>
             <div className="space-y-2">
               {q.options.map((opt, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className={`p-3 rounded-md flex items-start ${idx === q.correctIndex ? 'bg-green-50 border border-green-200 text-green-900' : 'text-slate-500'}`}
                 >
-                  <span className={`w-6 h-6 rounded-full border flex-shrink-0 flex items-center justify-center mr-3 text-sm ${idx === q.correctIndex ? 'border-green-600 bg-green-600 text-white' : 'border-slate-300'}`}>
+                  <span aria-hidden="true" className={`w-6 h-6 rounded-full border flex-shrink-0 flex items-center justify-center mr-3 text-sm ${idx === q.correctIndex ? 'border-green-600 bg-green-600 text-white' : 'border-slate-300'}`}>
                     {idx === q.correctIndex ? '✓' : String.fromCharCode(65 + idx)}
                   </span>
-                  <span>{opt}</span>
+                  <span>{opt}{idx === q.correctIndex && <span className="sr-only"> (correct answer)</span>}</span>
                 </div>
               ))}
             </div>

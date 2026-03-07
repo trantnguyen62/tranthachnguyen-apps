@@ -348,7 +348,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
         </div>
 
         {isActive && (
-          <div className="absolute -bottom-8 left-0 right-0 text-center font-medium text-slate-500 animate-pulse text-sm">
+          <div aria-live="polite" aria-atomic="true" className="absolute -bottom-8 left-0 right-0 text-center font-medium text-slate-500 animate-pulse text-sm">
             {status === 'connecting' ? t.status_connecting :
              status === 'speaking' ? t.status_speaking :
              t.status_connected}
@@ -391,9 +391,10 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
 
       <button
         onClick={isActive ? stopSession : startSession}
+        aria-label={isActive ? (language === 'vi' ? 'Kết thúc phiên luyện tập' : 'End practice session') : (language === 'vi' ? 'Bắt đầu phiên luyện tập' : 'Start practice session')}
         className={`px-8 py-3 rounded-full text-lg font-bold shadow-lg transition-all transform hover:-translate-y-1 ${
-          isActive 
-            ? 'bg-red-500 hover:bg-red-600 text-white' 
+          isActive
+            ? 'bg-red-500 hover:bg-red-600 text-white'
             : 'bg-indigo-600 hover:bg-indigo-700 text-white'
         }`}
       >

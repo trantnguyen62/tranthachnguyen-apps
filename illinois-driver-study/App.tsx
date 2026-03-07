@@ -74,6 +74,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-3">
              <button
                onClick={toggleLanguage}
+               aria-label={language === 'en' ? 'Switch to Vietnamese' : 'Chuyển sang tiếng Anh'}
                className="px-3 py-1 rounded-full text-xs font-bold border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors"
              >
                {language === 'en' ? '🇺🇸 EN' : '🇻🇳 VN'}

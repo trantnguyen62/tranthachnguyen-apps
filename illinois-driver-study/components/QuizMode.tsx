@@ -90,9 +90,10 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
 
         <div className="flex gap-2 items-start mb-6">
           <h2 className="text-xl font-bold text-slate-800 flex-grow">{question.text}</h2>
-          <button 
+          <button
             onClick={playAudio}
             disabled={isPlayingAudio}
+            aria-label={language === 'vi' ? (isPlayingAudio ? 'Đang đọc...' : 'Đọc câu hỏi') : (isPlayingAudio ? 'Playing...' : 'Read question aloud')}
             className={`flex-shrink-0 p-2 rounded-full transition-colors ${isPlayingAudio ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
             title={language === 'vi' ? "Đọc câu hỏi" : "Read question aloud"}
           >
@@ -118,13 +119,15 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
           </div>
         )}
 
-        <div className="space-y-3">
+        <div role="radiogroup" aria-label={language === 'vi' ? 'Các lựa chọn' : 'Answer options'} className="space-y-3">
           {question.options.map((option, idx) => {
             let className = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ";
+            const isCorrect = showResult && idx === question.correctIndex;
+            const isWrong = showResult && idx === selectedOption && idx !== question.correctIndex;
             if (showResult) {
-              if (idx === question.correctIndex) {
+              if (isCorrect) {
                 className += "border-green-500 bg-green-50 text-green-900";
-              } else if (idx === selectedOption) {
+              } else if (isWrong) {
                 className += "border-red-500 bg-red-50 text-red-900";
               } else {
                 className += "border-slate-100 text-slate-400 opacity-60";
@@ -133,20 +136,25 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
               className += "border-slate-200 hover:border-blue-400 hover:bg-slate-50 text-slate-700";
             }
 
+            const ariaLabel = `${String.fromCharCode(65 + idx)}: ${option}${isCorrect ? (language === 'vi' ? ' — Đúng' : ' — Correct') : isWrong ? (language === 'vi' ? ' — Sai' : ' — Incorrect') : ''}`;
+
             return (
               <button
                 key={idx}
+                role="radio"
+                aria-checked={selectedOption === idx}
+                aria-label={ariaLabel}
                 onClick={() => handleOptionSelect(idx)}
                 disabled={showResult}
                 className={className}
               >
                 <div className="flex items-center">
-                  <span className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
-                     showResult && idx === question.correctIndex ? "border-green-600 bg-green-600 text-white" :
-                     showResult && idx === selectedOption ? "border-red-500 bg-red-500 text-white" :
+                  <span aria-hidden="true" className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
+                     isCorrect ? "border-green-600 bg-green-600 text-white" :
+                     isWrong ? "border-red-500 bg-red-500 text-white" :
                      "border-slate-300 text-slate-500"
                   }`}>
-                    {showResult && idx === question.correctIndex ? (
+                    {isCorrect ? (
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                     ) : (
                       String.fromCharCode(65 + idx)
@@ -158,6 +166,15 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
             );
           })}
         </div>
+        {showResult && (
+          <div aria-live="polite" aria-atomic="true" className="sr-only">
+            {selectedOption === question.correctIndex
+              ? (language === 'vi' ? 'Đúng!' : 'Correct!')
+              : (language === 'vi'
+                  ? `Sai. Đáp án đúng là: ${question.options[question.correctIndex]}`
+                  : `Incorrect. The correct answer is: ${question.options[question.correctIndex]}`)}
+          </div>
+        )}
       </div>
 
       {showResult && (
