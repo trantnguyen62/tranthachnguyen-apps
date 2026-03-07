@@ -389,8 +389,10 @@ function init() {
 }
 
 function loadProgress() {
-    game.bestScore = parseInt(localStorage.getItem('pipeline-runner-best') || '0');
-    game.totalLearned = parseInt(localStorage.getItem('pipeline-runner-learned') || '0');
+    const rawBest = parseInt(localStorage.getItem('pipeline-runner-best') || '0', 10);
+    const rawLearned = parseInt(localStorage.getItem('pipeline-runner-learned') || '0', 10);
+    game.bestScore = (isNaN(rawBest) || rawBest < 0) ? 0 : Math.min(rawBest, 1e7);
+    game.totalLearned = (isNaN(rawLearned) || rawLearned < 0) ? 0 : Math.min(rawLearned, 1e7);
     document.getElementById('bestScore').textContent = game.bestScore;
     document.getElementById('totalLearned').textContent = game.totalLearned;
 }
@@ -421,6 +423,7 @@ function renderTopicButtons() {
 }
 
 function selectTopic(topicId) {
+    if (!TOPICS.some(t => t.id === topicId)) return;
     game.selectedTopic = topicId;
     updateTopicCache();
     renderTopicButtons();
