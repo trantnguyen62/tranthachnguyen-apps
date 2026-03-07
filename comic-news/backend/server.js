@@ -93,7 +93,6 @@ About a week later she creeped me on social media. Then email. Inferring things.
       { id: 7, title: "The Proposition", description: "She wants to start an affair - nostalgic for those times" },
       { id: 8, title: "The Decision", description: "I declined - not good business, and I respect her husband" }
     ]
-  }
   },
   {
     id: 3,
@@ -225,7 +224,7 @@ app.post('/api/progress/:id', (req, res) => {
 
 // Featured/Popular comics
 app.get('/api/featured', (req, res) => {
-  const featured = comics
+  const featured = [...comics]
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 4)
     .map(({ pages, ...comic }) => comic);
