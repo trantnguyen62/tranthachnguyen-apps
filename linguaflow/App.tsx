@@ -158,12 +158,12 @@ function App() {
            
            <div className="text-center space-y-2" aria-live="polite" aria-atomic="true">
              <h2 className="text-2xl font-light">
-               {isConnected ? 'Listening...' : 'Ready to practice?'}
+               {isConnected ? 'Listening...' : 'Start speaking, start learning'}
              </h2>
              <p className="text-slate-400 text-sm max-w-md mx-auto">
-               {isConnected 
-                 ? `Conversation in ${activeLanguage.name} is active. Speak clearly into your microphone.` 
-                 : `Select ${activeLanguage.name} or another language below to start your session.`}
+               {isConnected
+                 ? `Speaking ${activeLanguage.name} — your AI tutor is listening. Speak clearly for best results.`
+                 : 'Choose a language below, then press Start Conversation to speak with your AI tutor.'}
              </p>
            </div>
         </div>

@@ -1,6 +1,7 @@
 import { LanguageConfig, VoiceOption, TopicOption } from './types';
 
 export const FEMALE_VOICES: VoiceOption[] = [
+  { id: 'Zephyr', name: 'Zephyr', gender: 'female', description: 'Rõ ràng, tự nhiên' },
   { id: 'Kore', name: 'Kore', gender: 'female', description: 'Nhẹ nhàng, dịu dàng' },
   { id: 'Aoede', name: 'Aoede', gender: 'female', description: 'Vui tươi, năng động' },
 ];
@@ -56,7 +57,7 @@ export const LANGUAGES: LanguageConfig[] = [
   },
   {
     code: 'en',
-    name: 'English (Practice)',
+    name: 'English Fluency',
     flag: '🇬🇧',
     voiceName: 'Zephyr',
     systemInstruction: 'You are an English conversation partner. The user wants to improve their pronunciation. Converse naturally, but if the user mispronounces a word, stop the conversation to correct them. 1. Identify the mispronounced word. 2. PRONOUNCE it in ISOLATION, SLOWLY and CLEARLY so they can hear the correct sounds. 3. Ask them to repeat it before continuing. Focus on accent reduction.'
