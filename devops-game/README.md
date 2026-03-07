@@ -2,15 +2,29 @@
 
 A 2D space shooter game that teaches DevOps concepts through gameplay. Answer questions correctly to defeat enemies and progress through topic zones!
 
-## 🎯 Features
+## 🎯 Game Modes
 
-- **Adventure Mode** - Progress through DevOps topic zones (Docker, Kubernetes, CI/CD, etc.)
-- **Endless Mode** - Survive as long as you can while answering questions
-- **Speed Quiz Mode** - Answer fast, score high
-- **Practice Mode** - Focus on specific topics
-- **Multiple Topics** - Docker, Kubernetes, CI/CD, AWS, Terraform, Git, Linux, Monitoring
+| Mode | Description |
+|------|-------------|
+| **Adventure** | Progress through 8 DevOps topic zones, 5 waves each |
+| **Endless** | Survive as long as possible with increasing difficulty |
+| **Speed Quiz** | Race against the clock — answer fast for maximum points |
+| **Practice** | Choose a specific topic zone to drill |
 
-## 🕹️ Controls
+## 📚 Topics Covered
+
+| Topic | Skills |
+|-------|--------|
+| 🐳 Docker | Images, containers, volumes, networking, Dockerfile |
+| ☸️ Kubernetes | Pods, deployments, services, scaling, storage |
+| 🔄 CI/CD | Pipelines, GitOps, deployment strategies, versioning |
+| ☁️ AWS | EC2, S3, Lambda, IAM, VPC, RDS, ECS |
+| 🏗️ Terraform | IaC concepts, providers, state, modules, workspaces |
+| 🌿 Git | Branching, merging, rebase, workflows, hooks |
+| 🐧 Linux | Commands, permissions, processes, scripting, networking |
+| 📊 Monitoring | Prometheus, Grafana, alerting, logging, SLOs |
+
+## 🕹️ Controls & Scoring
 
 | Key | Action |
 |-----|--------|
@@ -18,6 +32,15 @@ A 2D space shooter game that teaches DevOps concepts through gameplay. Answer qu
 | `1, 2, 3, 4` | Select answer |
 | `Space` | Confirm / Fire |
 | `P` | Pause game |
+
+| Event | Points |
+|-------|--------|
+| Correct answer | +100 |
+| Speed bonus (< 5 sec) | +50 |
+| Shoot enemy | +50 |
+| Streak multiplier | ×1.5 per streak |
+| Wrong answer | −20 HP |
+| Timeout | −15 HP |
 
 ## 🚀 Quick Start
 
@@ -55,4 +78,4 @@ devops-game/
 
 ## 📄 License
 
-© 2025 Tran Thach Nguyen. All rights reserved.
+© 2026 Tran Thach Nguyen. All rights reserved.
