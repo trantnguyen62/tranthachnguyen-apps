@@ -103,8 +103,8 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Your creative AI studio for perfect passport photos.<br/>
-            <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Enhance</span> · <span style={{ color: accentPurple }}>Export</span>
+            Check and perfect your passport photo in seconds.<br/>
+            <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Analyze</span> · <span style={{ color: accentPurple }}>Export</span>
           </p>
         </header>
 
@@ -237,7 +237,7 @@ export default function App() {
                         color: result.compliant ? '#10B981' : accentPink,
                         marginBottom: 4
                       }}>
-                        {result.compliant ? 'Perfect Shot!' : 'Needs Attention'}
+                        {result.compliant ? 'Photo Approved!' : 'Issues Detected'}
                       </h3>
                       <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
                         {result.summary}
@@ -311,7 +311,7 @@ export default function App() {
                   filter: 'grayscale(100%)'
                 }}>🖼️</div>
                 <p style={{ fontSize: 15, maxWidth: 220, lineHeight: 1.6 }}>
-                  Upload a photo to receive AI-powered feedback and suggestions
+                  Upload a photo, then click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> to check passport compliance
                 </p>
               </div>
             )}
