@@ -1,4 +1,4 @@
-import { useState, useCallback, memo, useMemo } from 'react';
+import { useState, useCallback, memo, useMemo, useRef, useEffect } from 'react';
 import { FileNode } from '../types';
 import { Copy, Check, Code2 } from 'lucide-react';
 
@@ -7,8 +7,38 @@ interface CodeViewerProps {
   onCodeSelect?: (code: string) => void;
 }
 
+const LINE_HEIGHT = 20; // px — matches text-sm line-height (1.25rem)
+const BUFFER = 15;      // extra lines rendered above/below viewport
+
 const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   const [copied, setCopied] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [viewportHeight, setViewportHeight] = useState(600);
+
+  const lines = useMemo(() => file?.content?.split('\n') || [], [file?.content]);
+
+  // Reset scroll and measure viewport when file changes
+  useEffect(() => {
+    setScrollTop(0);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+      setViewportHeight(scrollRef.current.clientHeight);
+    }
+  }, [file?.path]);
+
+  // Track viewport height changes
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setViewportHeight(el.clientHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [file]);
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    setScrollTop(e.currentTarget.scrollTop);
+  }, []);
 
   const handleCopy = useCallback(async () => {
     if (file?.content) {
@@ -25,7 +55,11 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
     }
   }, [onCodeSelect]);
 
-  const lines = useMemo(() => file?.content?.split('\n') || [], [file?.content]);
+  // Virtual window — only render lines visible in the viewport + buffer
+  const visibleStart = Math.max(0, Math.floor(scrollTop / LINE_HEIGHT) - BUFFER);
+  const visibleEnd = Math.min(lines.length, Math.ceil((scrollTop + viewportHeight) / LINE_HEIGHT) + BUFFER);
+  const paddingTop = visibleStart * LINE_HEIGHT;
+  const paddingBottom = Math.max(0, (lines.length - visibleEnd) * LINE_HEIGHT);
 
   if (!file) {
     return (
@@ -39,7 +73,6 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
       </div>
     );
   }
-
 
   return (
     <div className="flex-1 flex flex-col bg-slate-800/50 rounded-lg overflow-hidden">
@@ -66,20 +99,27 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
       </div>
 
       {/* Code content */}
-      <div 
+      <div
+        ref={scrollRef}
         className="flex-1 overflow-auto p-4"
         onMouseUp={handleTextSelect}
+        onScroll={handleScroll}
       >
         <pre className="code-font text-sm">
           <code>
-            {lines.map((line, index) => (
-              <div key={index} className="flex hover:bg-slate-700/30">
-                <span className="w-12 text-right pr-4 text-slate-500 select-none">
-                  {index + 1}
-                </span>
-                <span className="text-slate-300 whitespace-pre">{line || ' '}</span>
-              </div>
-            ))}
+            <div style={{ height: `${paddingTop}px` }} />
+            {lines.slice(visibleStart, visibleEnd).map((line, i) => {
+              const lineIndex = visibleStart + i;
+              return (
+                <div key={lineIndex} className="flex hover:bg-slate-700/30" style={{ height: `${LINE_HEIGHT}px` }}>
+                  <span className="w-12 text-right pr-4 text-slate-500 select-none leading-5">
+                    {lineIndex + 1}
+                  </span>
+                  <span className="text-slate-300 whitespace-pre leading-5">{line || ' '}</span>
+                </div>
+              );
+            })}
+            <div style={{ height: `${paddingBottom}px` }} />
           </code>
         </pre>
       </div>

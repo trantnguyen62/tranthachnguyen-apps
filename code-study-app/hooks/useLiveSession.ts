@@ -199,7 +199,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
               } else {
                 setVolume(prev => prev.output > 0 ? { ...prev, output: 0 } : prev);
               }
-            }, 50);
+            }, 100);
           },
           onmessage: async (message: LiveServerMessage) => {
             if (message.serverContent?.outputTranscription) {

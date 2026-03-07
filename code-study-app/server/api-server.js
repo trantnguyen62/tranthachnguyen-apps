@@ -155,15 +155,25 @@ app.get('/api/projects', (req, res) => {
   res.json(projects);
 });
 
+// Simple in-memory cache for file trees (TTL: 60s)
+const treeCache = new Map();
+const TREE_CACHE_TTL = 60_000;
+
 // Get file tree for a project
 app.get('/api/projects/:project/tree', (req, res) => {
   const projectPath = path.join(CODEBASE_PATH, req.params.project);
-  
+
   if (!fs.existsSync(projectPath)) {
     return res.status(404).json({ error: 'Project not found' });
   }
-  
+
+  const cached = treeCache.get(req.params.project);
+  if (cached && Date.now() - cached.ts < TREE_CACHE_TTL) {
+    return res.json(cached.tree);
+  }
+
   const tree = buildFileTree(projectPath);
+  treeCache.set(req.params.project, { tree, ts: Date.now() });
   res.json(tree);
 });
 

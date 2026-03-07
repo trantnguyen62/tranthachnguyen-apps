@@ -9,17 +9,22 @@ interface VisualizerProps {
 const BARS = 12;
 const MAX_HEIGHT = 60;
 
+// Pre-compute static per-bar geometry — never changes
+const BAR_MULTIPLIERS = Array.from({ length: BARS }, (_, i) => {
+  const centerDistance = Math.abs(i - (BARS - 1) / 2);
+  return 1 - (centerDistance / (BARS / 2)) * 0.5;
+});
+
 const Visualizer = memo<VisualizerProps>(({ volume, isConnected, color = '#10B981' }) => {
   const combinedVolume = useMemo(() => Math.max(volume.input, volume.output), [volume.input, volume.output]);
+  const baseHeight = isConnected ? 8 : 4;
+  const opacity = isConnected ? 0.8 + combinedVolume * 0.2 : 0.3;
 
   return (
     <div className="flex items-center justify-center gap-1 h-20">
-      {Array.from({ length: BARS }).map((_, i) => {
-        const centerDistance = Math.abs(i - (BARS - 1) / 2);
-        const baseHeight = isConnected ? 8 : 4;
-        const heightMultiplier = 1 - (centerDistance / (BARS / 2)) * 0.5;
-        const dynamicHeight = isConnected 
-          ? baseHeight + (combinedVolume * MAX_HEIGHT * heightMultiplier)
+      {BAR_MULTIPLIERS.map((heightMultiplier, i) => {
+        const dynamicHeight = isConnected
+          ? baseHeight + combinedVolume * MAX_HEIGHT * heightMultiplier
           : baseHeight;
 
         return (
@@ -29,7 +34,7 @@ const Visualizer = memo<VisualizerProps>(({ volume, isConnected, color = '#10B98
             style={{
               height: `${Math.min(dynamicHeight, MAX_HEIGHT)}px`,
               backgroundColor: color,
-              opacity: isConnected ? 0.8 + (combinedVolume * 0.2) : 0.3,
+              opacity,
             }}
           />
         );
