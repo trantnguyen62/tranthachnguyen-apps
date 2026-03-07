@@ -76,6 +76,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   
   const audioContextRef = useRef<AudioContext | null>(null);
+  const outputAudioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
@@ -116,6 +117,11 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
+
+    if (outputAudioContextRef.current) {
+      outputAudioContextRef.current.close();
+      outputAudioContextRef.current = null;
+    }
     
     resolvedSessionRef.current = null;
     setIsActive(false);
@@ -137,6 +143,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       audioContextRef.current = audioContext;
       
       const outputAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      outputAudioContextRef.current = outputAudioContext;
       const outputNode = outputAudioContext.createGain();
       outputNode.connect(outputAudioContext.destination);
 

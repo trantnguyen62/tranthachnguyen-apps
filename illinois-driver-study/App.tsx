@@ -1,8 +1,11 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, lazy, Suspense } from 'react';
 import { QuizMode } from './components/QuizMode';
 import { StudyMode } from './components/StudyMode';
-import { LivePractice } from './components/LivePractice';
 import { AppMode, Language } from './types';
+
+const LivePractice = lazy(() =>
+  import('./components/LivePractice').then(m => ({ default: m.LivePractice }))
+);
 
 // Static translations moved outside component
 const TRANSLATIONS = {
@@ -116,7 +119,11 @@ const App: React.FC = () => {
         <div className="flex-grow animate-fade-in">
           {mode === AppMode.QUIZ && <QuizMode language={language} />}
           {mode === AppMode.STUDY && <StudyMode language={language} />}
-          {mode === AppMode.LIVE_PRACTICE && <LivePractice language={language} />}
+          {mode === AppMode.LIVE_PRACTICE && (
+            <Suspense fallback={<div className="flex justify-center py-16 text-slate-400">Loading...</div>}>
+              <LivePractice language={language} />
+            </Suspense>
+          )}
         </div>
       </div>
       
