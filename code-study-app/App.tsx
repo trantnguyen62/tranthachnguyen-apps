@@ -61,7 +61,7 @@ function App() {
   // Load file tree when project changes
   useEffect(() => {
     if (selectedProject) {
-      fetch(`${API_URL}/api/projects/${selectedProject.path}/tree`)
+      fetch(`${API_URL}/api/projects/${encodeURIComponent(selectedProject.path)}/tree`)
         .then(res => res.json())
         .then(data => setFileTree(data))
         .catch(err => console.error('Failed to load file tree:', err));

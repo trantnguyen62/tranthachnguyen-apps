@@ -95,9 +95,6 @@ export const useLiveSession = (studyContext: StudyContext) => {
         }
       }
 
-      const inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-      const outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -106,6 +103,9 @@ export const useLiveSession = (studyContext: StudyContext) => {
           sampleRate: 16000
         }
       });
+
+      const inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+      const outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
 
       audioContextsRef.current = { input: inputCtx, output: outputCtx };
       streamRef.current = stream;

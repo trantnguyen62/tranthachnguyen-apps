@@ -212,6 +212,11 @@ app.get('/api/search', (req, res) => {
   
   const results = [];
   const searchPath = project ? path.join(CODEBASE_PATH, project) : CODEBASE_PATH;
+
+  // Security: ensure search path is within codebase
+  if (project && !searchPath.startsWith(CODEBASE_PATH + path.sep) && searchPath !== CODEBASE_PATH) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
   
   function searchDir(dirPath, basePath = '') {
     try {
