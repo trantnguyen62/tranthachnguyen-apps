@@ -23,13 +23,15 @@ app.post('/api/passport/check', async (req, res) => {
     const { base64Image } = req.body;
     if (!base64Image) return res.status(400).json({ error: 'No image' });
     
+    const mimeMatch = base64Image.match(/^data:(image\/\w+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
     const clean = base64Image.replace(/^data:image\/\w+;base64,/, '');
-    
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: {
         parts: [
-          { inlineData: { data: clean, mimeType: 'image/jpeg' } },
+          { inlineData: { data: clean, mimeType } },
           { text: `Analyze this passport photo. Return JSON only:
 {"compliant":boolean,"summary":"string","issues":["string"],"suggestions":["string"]}
 Check: plain background, neutral expression, proper lighting, no glasses glare, face centered.` }
@@ -57,13 +59,15 @@ app.post('/api/passport/analyze', async (req, res) => {
   try {
     const { base64Image } = req.body;
     if (!base64Image) return res.status(400).json({ error: 'No image' });
+    const mimeMatch2 = base64Image.match(/^data:(image\/\w+);base64,/);
+    const mimeType2 = mimeMatch2 ? mimeMatch2[1] : 'image/jpeg';
     const clean = base64Image.replace(/^data:image\/\w+;base64,/, '');
-    
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: {
         parts: [
-          { inlineData: { data: clean, mimeType: 'image/jpeg' } },
+          { inlineData: { data: clean, mimeType: mimeType2 } },
           { text: `Analyze photo for passport. Return JSON:
 {"overallScore":number,"autoFixRecommendations":{"adjustBrightness":number,"adjustContrast":number}}
 adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }

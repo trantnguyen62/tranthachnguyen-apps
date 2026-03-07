@@ -69,6 +69,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
         progress: (_, cur, total) => setProgress(30 + Math.round((cur / total) * 50)),
       });
       
+      if (removedBgRef.current) URL.revokeObjectURL(removedBgRef.current);
       const url = URL.createObjectURL(removed);
       removedBgRef.current = url;
       setProgress(90);

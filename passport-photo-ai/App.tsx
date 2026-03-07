@@ -196,7 +196,20 @@ export default function App() {
             </div>
             
             <div aria-live="polite" aria-atomic="true">
-            {result ? (
+            {status === AppStatus.ERROR ? (
+              <div style={{
+                height: 350,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                textAlign: 'center'
+              }}>
+                <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+                <p style={{ color: accentPink, fontWeight: 600, marginBottom: 8 }}>Analysis failed</p>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', maxWidth: 220 }}>
+                  Could not reach the server. Please try again.
+                </p>
+              </div>
+            ) : result ? (
               <div style={{ animation: 'fadeSlideIn 0.5s ease' }}>
                 {/* Status Card */}
                 <div style={{

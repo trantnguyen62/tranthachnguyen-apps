@@ -235,7 +235,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           type="file"
           accept="image/*"
           style={{ display: 'none' }}
-          onChange={(e) => handleFile(e.target.files?.[0] || null)}
+          onChange={(e) => { handleFile(e.target.files?.[0] || null); e.target.value = ''; }}
         />
         <div style={{ 
           width: 72, height: 72, borderRadius: 20, 
