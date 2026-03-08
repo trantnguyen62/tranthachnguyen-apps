@@ -7,5 +7,5 @@ COPY --chown=appuser:appgroup index.html ./
 COPY --chown=appuser:appgroup robots.txt ./
 COPY --chown=appuser:appgroup sitemap.xml ./
 USER appuser
-EXPOSE 3000
-CMD ["serve", "-s", ".", "-l", "3000"]
+EXPOSE 80
+CMD ["serve", "-s", ".", "-l", "80"]
