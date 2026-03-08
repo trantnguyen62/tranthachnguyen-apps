@@ -134,7 +134,7 @@ const App: React.FC = () => {
             </h1>
           </div>
           <div className="hidden sm:flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
-            <Info className="w-3.5 h-3.5" />
+            <Info className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Powered by Gemini</span>
           </div>
         </div>
@@ -170,9 +170,9 @@ const App: React.FC = () => {
             {/* Upload Area */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
                   1. Upload Image
-                </h3>
+                </h2>
                 {history.length > 0 && (
                   <span className="text-xs text-slate-500">Original Source</span>
                 )}
@@ -188,9 +188,9 @@ const App: React.FC = () => {
             {originalImage && (
               <div className="space-y-4 animate-fadeIn">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                  <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
                     2. Describe Changes
-                  </h3>
+                  </h2>
 
                   {/* History Controls */}
                   <div className="flex items-center gap-1">
@@ -254,7 +254,7 @@ const App: React.FC = () => {
                         Generating your edit…
                       </span>
                     ) : (
-                      <span className="text-xs text-slate-400 pl-2 hidden sm:block">
+                      <span className="text-xs text-slate-500 pl-2 hidden sm:block">
                         <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate · Shift+Enter for new line
                       </span>
                     )}
@@ -276,7 +276,7 @@ const App: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-medium text-slate-500 flex items-center gap-1">
-                      <Command className="w-3 h-3" /> Quick actions:
+                      <Command className="w-3 h-3" aria-hidden="true" /> Quick actions:
                     </p>
                   </div>
 
@@ -284,6 +284,7 @@ const App: React.FC = () => {
                     {/* Passport Photo Button */}
                     <button
                       onClick={() => handlePresetClick(PASSPORT_PROMPT)}
+                      aria-pressed={prompt === PASSPORT_PROMPT}
                       className={`flex items-center justify-center gap-2 px-3 py-2 border rounded-lg transition-colors text-xs sm:text-sm font-medium col-span-2 ${prompt === PASSPORT_PROMPT ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}
                     >
                       <UserSquare2 className="w-4 h-4" />
@@ -298,6 +299,7 @@ const App: React.FC = () => {
                         <button
                           key={i}
                           onClick={() => handlePresetClick(text)}
+                          aria-pressed={isActive}
                           className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border rounded-full transition-colors ${isActive ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200'}`}
                         >
                           <Icon className="w-3 h-3" aria-hidden="true" />
