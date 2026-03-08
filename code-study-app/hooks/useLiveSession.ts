@@ -127,7 +127,11 @@ export const useLiveSession = (studyContext: StudyContext) => {
       if (ctx.currentFile) {
         systemInstruction += `\n\nCURRENT FILE: ${ctx.currentFile.path}\nLANGUAGE: ${ctx.currentFile.language || 'unknown'}`;
         if (ctx.currentFile.content) {
-          systemInstruction += `\n\nFILE CONTENT:\n\`\`\`${ctx.currentFile.language || ''}\n${ctx.currentFile.content}\n\`\`\``;
+          const MAX_FILE_CHARS = 12000;
+          const content = ctx.currentFile.content.length > MAX_FILE_CHARS
+            ? ctx.currentFile.content.slice(0, MAX_FILE_CHARS) + '\n... [truncated]'
+            : ctx.currentFile.content;
+          systemInstruction += `\n\nFILE CONTENT:\n\`\`\`${ctx.currentFile.language || ''}\n${content}\n\`\`\``;
         }
       }
       if (ctx.currentProject) {

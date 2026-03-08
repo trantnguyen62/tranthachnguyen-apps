@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLiveSession } from './hooks/useLiveSession';
 import { ConnectionState, FileNode, Project, StudyContext } from './types';
 import FileTree from './components/FileTree';
@@ -33,6 +33,7 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [activeTab, setActiveTab] = useState<'files' | 'search'>('files');
   const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const fileCache = useRef<Map<string, { content: string; language: string }>>(new Map());
 
   // Study context for AI - memoized to prevent unnecessary re-renders
   const studyContext = useMemo<StudyContext>(() => ({
@@ -60,6 +61,7 @@ function App() {
 
   // Load file tree when project changes
   useEffect(() => {
+    fileCache.current.clear();
     if (selectedProject) {
       fetch(`${API_URL}/api/projects/${encodeURIComponent(selectedProject.path)}/tree`)
         .then(res => res.json())
@@ -74,16 +76,23 @@ function App() {
   // Handle file selection
   const handleFileSelect = useCallback(async (file: FileNode) => {
     if (file.type !== 'file') return;
-    
+
+    const filePath = selectedProject
+      ? `${selectedProject.path}/${file.path}`
+      : file.path;
+
+    const cached = fileCache.current.get(filePath);
+    if (cached) {
+      setSelectedFile({ ...file, content: cached.content, language: cached.language });
+      return;
+    }
+
     setIsLoadingFile(true);
     try {
-      const filePath = selectedProject 
-        ? `${selectedProject.path}/${file.path}` 
-        : file.path;
-      
       const res = await fetch(`${API_URL}/api/file?path=${encodeURIComponent(filePath)}`);
       const data = await res.json();
-      
+
+      fileCache.current.set(filePath, { content: data.content, language: data.language });
       setSelectedFile({
         ...file,
         content: data.content,
