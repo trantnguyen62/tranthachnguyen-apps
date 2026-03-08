@@ -2,6 +2,25 @@
    Pipeline Runner - DevOps Learning Game Engine
    ===================================================== */
 
+// Polyfill for CanvasRenderingContext2D.roundRect (not available in older browsers)
+if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radii) {
+        const r = typeof radii === 'number' ? radii : (Array.isArray(radii) ? radii[0] : 0);
+        const clampedR = Math.min(r, width / 2, height / 2);
+        this.moveTo(x + clampedR, y);
+        this.lineTo(x + width - clampedR, y);
+        this.arcTo(x + width, y, x + width, y + clampedR, clampedR);
+        this.lineTo(x + width, y + height - clampedR);
+        this.arcTo(x + width, y + height, x + width - clampedR, y + height, clampedR);
+        this.lineTo(x + clampedR, y + height);
+        this.arcTo(x, y + height, x, y + height - clampedR, clampedR);
+        this.lineTo(x, y + clampedR);
+        this.arcTo(x, y, x + clampedR, y, clampedR);
+        this.closePath();
+        return this;
+    };
+}
+
 // Cached math constants
 const TWO_PI = Math.PI * 2;
 const DEG_TO_RAD = Math.PI / 180;
@@ -604,7 +623,10 @@ function startGame() {
     game.usedContentIndices = new Set();
     game.questionActive = false;
     game.currentQuestion = null;
-    game.questionTimerInterval = null;
+    if (game.questionTimerInterval) {
+        clearInterval(game.questionTimerInterval);
+        game.questionTimerInterval = null;
+    }
     game.lastLearnedFact = '';
 
     game.player.x = game.width * 0.12;
