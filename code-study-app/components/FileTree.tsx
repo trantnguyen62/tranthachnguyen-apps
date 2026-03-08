@@ -43,8 +43,10 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
 
   if (node.type === 'directory') {
     return (
-      <div role="treeitem" aria-expanded={isExpanded} aria-label={node.name}>
+      <div>
         <button
+          role="treeitem"
+          aria-expanded={isExpanded}
           onClick={handleToggle}
           className="flex items-center gap-1 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm"
           style={{ paddingLeft: `${depth * 12 + 8}px` }}

@@ -111,6 +111,8 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
         className="flex-1 overflow-auto p-4"
         onMouseUp={handleTextSelect}
         onScroll={handleScroll}
+        aria-label={`Code content for ${file.path}`}
+        role="region"
       >
         <pre className="code-font text-sm">
           <code>
@@ -120,7 +122,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
               const lineNumWidth = lines.length >= 10000 ? 'w-16' : lines.length >= 1000 ? 'w-14' : 'w-10';
               return (
                 <div key={lineIndex} className="flex hover:bg-slate-700/40 group" style={{ height: `${LINE_HEIGHT}px` }}>
-                  <span className={`${lineNumWidth} text-right pr-3 text-slate-600 group-hover:text-slate-500 select-none leading-5 flex-shrink-0`}>
+                  <span className={`${lineNumWidth} text-right pr-3 text-slate-600 group-hover:text-slate-500 select-none leading-5 flex-shrink-0`} aria-hidden="true">
                     {lineIndex + 1}
                   </span>
                   <span className="text-slate-300 whitespace-pre leading-5">{line || ' '}</span>

@@ -226,7 +226,7 @@ function App() {
                 />
               ) : (
                 <div className="text-center text-slate-500 py-8">
-                  <FolderOpen className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <FolderOpen className="w-12 h-12 mx-auto mb-2 opacity-50" aria-hidden="true" />
                   <p>Select a project to browse files</p>
                 </div>
               )
@@ -299,14 +299,15 @@ function App() {
           {/* Connection Status */}
           <div className="flex items-center gap-2">
             {error && (
-              <div className="flex items-center gap-2 text-red-400 text-sm">
-                <AlertCircle className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-red-400 text-sm" role="alert">
+                <AlertCircle className="w-4 h-4" aria-hidden="true" />
                 <span>{error}</span>
               </div>
             )}
             <button
               onClick={isConnected ? disconnect : connect}
               disabled={isConnecting}
+              aria-label={isConnecting ? 'Connecting to AI tutor' : isConnected ? 'End voice session' : 'Start voice session'}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 isConnected
                   ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
@@ -317,7 +318,7 @@ function App() {
             >
               {isConnecting ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
                   Connecting...
                 </>
               ) : isConnected ? (
@@ -340,13 +341,13 @@ function App() {
           {/* Code Viewer */}
           <div className="flex-1 p-4 flex flex-col">
             {isLoadingFile ? (
-              <div className="flex-1 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
+              <div className="flex-1 flex items-center justify-center" role="status" aria-label="Loading file">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-400" aria-hidden="true" />
               </div>
             ) : fileLoadError ? (
-              <div className="flex-1 flex items-center justify-center bg-slate-800/50 rounded-lg">
+              <div className="flex-1 flex items-center justify-center bg-slate-800/50 rounded-lg" role="alert">
                 <div className="text-center space-y-3">
-                  <AlertCircle className="w-10 h-10 text-red-400/70 mx-auto" />
+                  <AlertCircle className="w-10 h-10 text-red-400/70 mx-auto" aria-hidden="true" />
                   <div>
                     <p className="text-slate-300 font-medium">Failed to load file</p>
                     <p className="text-slate-500 text-sm mt-1 code-font">{fileLoadError}</p>
