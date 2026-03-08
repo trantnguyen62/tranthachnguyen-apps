@@ -2307,7 +2307,12 @@ echo "Server setup complete!"`
                 { term: 'Dead Man\'s Switch Alert', definition: 'An alert that fires when the monitoring pipeline itself goes silent, ensuring you are notified if the alerting system fails.' },
                 { term: 'Cardinality', definition: 'The number of unique label combinations in a time-series database. High cardinality (e.g. per-user labels) can cause performance issues.' },
                 { term: 'PromQL', definition: 'Prometheus Query Language - a functional query language for selecting and aggregating time-series data in Prometheus.' },
-                { term: 'Span', definition: 'The basic unit of distributed tracing - represents a single operation within a trace, including timing and metadata.' }
+                { term: 'Span', definition: 'The basic unit of distributed tracing - represents a single operation within a trace, including timing and metadata.' },
+                { term: 'Four Golden Signals', definition: 'Google SRE\'s key service metrics: Latency (time to serve a request), Traffic (demand), Errors (rate of failed requests), Saturation (how full the service is).' },
+                { term: 'Error Budget', definition: 'The maximum allowable downtime or error rate derived from an SLO (e.g., 99.9% SLO = 0.1% error budget). When exhausted, new feature work stops until reliability improves.' },
+                { term: 'Thanos', definition: 'A highly available, long-term storage extension for Prometheus. Provides global query view, unlimited retention via object storage, and multi-cluster metrics federation.' },
+                { term: 'Grafana Tempo', definition: 'A high-scale, cost-efficient distributed tracing backend by Grafana Labs. Integrates natively with Grafana, Loki, and Prometheus for unified observability.' },
+                { term: 'Burn Rate', definition: 'The rate at which an error budget is being consumed. A burn rate greater than 1 means the budget will be exhausted before the SLO window ends, triggering an alert.' }
             ],
             commands: [
                 { command: 'prometheus --config.file=prometheus.yml', description: 'Start Prometheus with config' },
@@ -2331,7 +2336,10 @@ echo "Server setup complete!"`
                 { question: 'What does MTTR measure?', options: ['Mean Time To Replicate', 'Mean Time To Recovery', 'Maximum Throughput Rate', 'Minimum Traffic Requirement'], correct: 1 },
                 { question: 'What is distributed tracing used for?', options: ['Distributing alerts', 'Tracking a request across multiple services', 'Tracing network packets', 'Distributing logs'], correct: 1 },
                 { question: 'What is PromQL?', options: ['A database engine', 'Prometheus Query Language', 'A protocol buffer format', 'A provisioning tool'], correct: 1 },
-                { question: 'What is high cardinality a problem for in Prometheus?', options: ['Alert routing', 'Time-series database performance', 'Log formatting', 'Dashboard rendering'], correct: 1 }
+                { question: 'What is high cardinality a problem for in Prometheus?', options: ['Alert routing', 'Time-series database performance', 'Log formatting', 'Dashboard rendering'], correct: 1 },
+                { question: 'What are the Four Golden Signals from the Google SRE book?', options: ['CPU, Memory, Disk, Network', 'Latency, Traffic, Errors, Saturation', 'Rate, Errors, Duration, Load', 'Uptime, Throughput, Lag, Cost'], correct: 1 },
+                { question: 'What happens when an error budget is exhausted?', options: ['The service is shut down', 'New feature work pauses until reliability improves', 'SLOs are automatically relaxed', 'Alerts are silenced'], correct: 1 },
+                { question: 'What is Thanos primarily used for?', options: ['Replacing Prometheus', 'Long-term Prometheus metrics storage and global querying', 'Log aggregation', 'Distributed tracing'], correct: 1 }
             ],
             codebase: [
                 {
@@ -2514,7 +2522,12 @@ scrape_configs:
                 { term: 'Ad-hoc Command', definition: 'A one-line Ansible command that runs a single module against hosts without writing a playbook. Good for quick checks and simple tasks.' },
                 { term: 'Collection', definition: 'A packaged format for distributing and consuming Ansible content including roles, modules, plugins, and playbooks. The modern evolution of Galaxy roles.' },
                 { term: 'Dynamic Inventory', definition: 'An inventory script or plugin that queries external sources (AWS, Azure, GCP, etc.) at runtime to build the host list automatically.' },
-                { term: 'Ansible AWX', definition: 'The open-source upstream project for Red Hat Ansible Automation Platform, providing a web UI, REST API, and RBAC for managing Ansible at scale.' }
+                { term: 'Ansible AWX', definition: 'The open-source upstream project for Red Hat Ansible Automation Platform, providing a web UI, REST API, and RBAC for managing Ansible at scale.' },
+                { term: 'Block/Rescue/Always', definition: 'Ansible\'s error-handling mechanism. "block" groups tasks; "rescue" runs on failure (like try/catch); "always" runs regardless of success or failure.' },
+                { term: 'ansible.cfg', definition: 'The main Ansible configuration file that sets defaults for inventory path, remote user, SSH options, privilege escalation, and more. Searched in order: ANSIBLE_CONFIG env, ./ansible.cfg, ~/.ansible.cfg, /etc/ansible/ansible.cfg.' },
+                { term: 'ansible-lint', definition: 'A tool that checks Ansible playbooks and roles for best practices, style issues, and common mistakes. Integrates with CI/CD pipelines.' },
+                { term: 'delegate_to', definition: 'A task directive that runs a task on a different host than the current one. Useful for registering a service or running a command on a load balancer.' },
+                { term: 'serial', definition: 'Controls the number of hosts Ansible manages at once in a play. Enables rolling updates by processing hosts in batches (e.g., serial: 1 for one-at-a-time).' }
             ],
             commands: [
                 { command: 'ansible-playbook site.yml', description: 'Run a playbook' },
@@ -2543,7 +2556,10 @@ scrape_configs:
                 { question: 'What is a dynamic inventory?', options: ['An inventory that updates itself hourly', 'An inventory built at runtime from external sources', 'A YAML inventory file', 'An encrypted inventory'], correct: 1 },
                 { question: 'What replaced Ansible "with_items" in modern versions?', options: ['foreach', 'loop', 'iterate', 'each'], correct: 1 },
                 { question: 'What templating engine does Ansible use?', options: ['Mustache', 'Handlebars', 'Jinja2', 'ERB'], correct: 2 },
-                { question: 'What is Ansible AWX?', options: ['A module for AWS', 'Open-source web UI for managing Ansible at scale', 'An inventory plugin', 'A vault tool'], correct: 1 }
+                { question: 'What is Ansible AWX?', options: ['A module for AWS', 'Open-source web UI for managing Ansible at scale', 'An inventory plugin', 'A vault tool'], correct: 1 },
+                { question: 'What does the "rescue" block do in Ansible?', options: ['Saves task results', 'Runs when tasks in the block fail', 'Restores files from backup', 'Escalates privileges'], correct: 1 },
+                { question: 'What does the "serial" keyword control in Ansible?', options: ['Playbook order', 'Number of hosts managed at once for rolling updates', 'Task execution speed', 'SSH timeout'], correct: 1 },
+                { question: 'What does "delegate_to" do in Ansible?', options: ['Delegates RBAC roles', 'Runs a task on a different host than the current one', 'Assigns inventory groups', 'Delegates to AWX'], correct: 1 }
             ],
             codebase: [
                 {
@@ -2927,7 +2943,12 @@ stages:
                 { term: 'Runtime Security', definition: 'Monitoring and protecting applications while they are running, detecting anomalous behavior like unexpected system calls. Tools include Falco.' },
                 { term: 'Secrets Rotation', definition: 'The practice of automatically changing credentials, API keys, and certificates on a schedule to minimize the impact of credential compromise.' },
                 { term: 'Sigstore', definition: 'An open-source project for signing, verifying, and protecting software artifacts. Cosign is its tool for signing container images.' },
-                { term: 'Network Policy', definition: 'Kubernetes resource that controls which pods can communicate with each other and external endpoints, acting as a firewall at the pod level.' }
+                { term: 'Network Policy', definition: 'Kubernetes resource that controls which pods can communicate with each other and external endpoints, acting as a firewall at the pod level.' },
+                { term: 'SLSA', definition: 'Supply chain Levels for Software Artifacts - a security framework providing a checklist of standards to prevent tampering, improve integrity, and secure software packages and infrastructure.' },
+                { term: 'OWASP ZAP', definition: 'Zed Attack Proxy - an open-source DAST tool for finding security vulnerabilities in web applications. Supports both automated scanning and manual testing.' },
+                { term: 'SonarQube', definition: 'An open-source platform for continuous code quality and security analysis. Detects bugs, code smells, and security vulnerabilities (hotspots) via static analysis.' },
+                { term: 'Penetration Testing', definition: 'A simulated cyberattack against a system to identify exploitable vulnerabilities before malicious actors do. Can be manual or automated, black/white/grey box.' },
+                { term: 'OpenSSF Scorecard', definition: 'An automated security assessment tool that evaluates the security health of open-source projects using a set of heuristic checks.' }
             ],
             commands: [
                 { command: 'trivy image myimage:tag', description: 'Scan container for vulnerabilities' },
@@ -2952,7 +2973,10 @@ stages:
                 { question: 'What tool does Sigstore Cosign help with?', options: ['Container networking', 'Signing container images', 'Scanning for CVEs', 'Managing secrets'], correct: 1 },
                 { question: 'What is Falco used for?', options: ['IaC scanning', 'Runtime security monitoring', 'Container building', 'Secret rotation'], correct: 1 },
                 { question: 'What does secrets rotation protect against?', options: ['Source code leaks', 'Impact of credential compromise', 'Network attacks', 'Dependency vulnerabilities'], correct: 1 },
-                { question: 'What is IAST?', options: ['A firewall type', 'Interactive Application Security Testing combining SAST and DAST', 'A cloud security scanner', 'An IaC tool'], correct: 1 }
+                { question: 'What is IAST?', options: ['A firewall type', 'Interactive Application Security Testing combining SAST and DAST', 'A cloud security scanner', 'An IaC tool'], correct: 1 },
+                { question: 'What does SLSA help protect against?', options: ['DDoS attacks', 'Software supply chain tampering', 'Container escape', 'Network intrusion'], correct: 1 },
+                { question: 'What is OWASP ZAP primarily used for?', options: ['Static code analysis', 'Dynamic application security testing', 'Container scanning', 'Secret rotation'], correct: 1 },
+                { question: 'What does SonarQube analyze?', options: ['Container images', 'Network traffic', 'Code quality and security vulnerabilities', 'Cloud misconfigurations'], correct: 2 }
             ],
             codebase: [
                 {

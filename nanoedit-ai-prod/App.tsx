@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo } from 'react';
-import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2, Scissors, Sun, PenLine, Zap, Film, X } from 'lucide-react';
+import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2, Scissors, Sun, PenLine, Zap, Film, X, CheckCircle2 } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { Button } from './components/Button';
 import { ComparisonView } from './components/ComparisonView';
@@ -26,6 +26,7 @@ const App: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   // Derived state
   const currentImage = history[historyIndex] || null;
@@ -105,6 +106,8 @@ const App: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setDownloadSuccess(true);
+    setTimeout(() => setDownloadSuccess(false), 2500);
   }, [currentImage]);
 
   const handlePresetClick = useCallback((text: string) => {
@@ -275,7 +278,7 @@ const App: React.FC = () => {
                     {/* Passport Photo Button */}
                     <button
                       onClick={() => handlePresetClick(PASSPORT_PROMPT)}
-                      className="flex items-center justify-center gap-2 px-3 py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-xs sm:text-sm font-medium col-span-2"
+                      className={`flex items-center justify-center gap-2 px-3 py-2 border rounded-lg transition-colors text-xs sm:text-sm font-medium col-span-2 ${prompt === PASSPORT_PROMPT ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}
                     >
                       <UserSquare2 className="w-4 h-4" />
                       Passport Photo
@@ -283,16 +286,19 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {PRESET_PROMPTS.map(({ text, Icon }, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handlePresetClick(text)}
-                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200 transition-colors"
-                      >
-                        <Icon className="w-3 h-3" aria-hidden="true" />
-                        {text}
-                      </button>
-                    ))}
+                    {PRESET_PROMPTS.map(({ text, Icon }, i) => {
+                      const isActive = prompt === text;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => handlePresetClick(text)}
+                          className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border rounded-full transition-colors ${isActive ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200'}`}
+                        >
+                          <Icon className="w-3 h-3" aria-hidden="true" />
+                          {text}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -300,10 +306,17 @@ const App: React.FC = () => {
                 {errorMsg && (
                   <div role="alert" className="p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">Generation Failed</p>
                       <p className="text-sm opacity-90">{errorMsg}</p>
                     </div>
+                    <button
+                      onClick={handleGenerate}
+                      disabled={!prompt.trim()}
+                      className="flex-shrink-0 text-xs font-medium px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Retry
+                    </button>
                   </div>
                 )}
               </div>
@@ -331,6 +344,14 @@ const App: React.FC = () => {
 
         </div>
       </main>
+
+      {/* Download toast */}
+      {downloadSuccess && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg animate-fadeIn text-sm font-medium">
+          <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+          Image downloaded!
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="border-t border-slate-200 mt-auto py-8 bg-white">
