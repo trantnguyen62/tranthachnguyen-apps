@@ -473,16 +473,41 @@ function renderTopicButtons() {
     const container = document.getElementById('topicButtons');
     container.innerHTML = '';
 
-    TOPICS.forEach(topic => {
+    TOPICS.forEach((topic, index) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `topic-btn ${topic.id === game.selectedTopic ? 'selected' : ''}`;
         btn.setAttribute('aria-pressed', topic.id === game.selectedTopic ? 'true' : 'false');
         btn.setAttribute('aria-label', `${topic.name} topic`);
+        // Roving tabindex: only the selected button is in the tab order
+        btn.tabIndex = topic.id === game.selectedTopic ? 0 : -1;
         btn.innerHTML = `${topic.icon} ${topic.name}`;
         btn.onclick = () => selectTopic(topic.id);
+        btn.addEventListener('keydown', handleTopicKeydown);
         container.appendChild(btn);
     });
+}
+
+function handleTopicKeydown(e) {
+    const btns = Array.from(document.querySelectorAll('.topic-btn'));
+    const currentIndex = btns.indexOf(e.currentTarget);
+    let nextIndex = -1;
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        nextIndex = (currentIndex + 1) % btns.length;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        nextIndex = (currentIndex - 1 + btns.length) % btns.length;
+    } else if (e.key === 'Home') {
+        nextIndex = 0;
+    } else if (e.key === 'End') {
+        nextIndex = btns.length - 1;
+    }
+
+    if (nextIndex >= 0) {
+        e.preventDefault();
+        const topic = TOPICS[nextIndex];
+        selectTopic(topic.id);
+    }
 }
 
 function selectTopic(topicId) {
@@ -1007,6 +1032,12 @@ function startQuestionTimer() {
         game.questionTimer--;
         game.elTimer.textContent = game.questionTimer;
         game.elTimer.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
+
+        // Announce only at key thresholds to avoid flooding screen readers
+        if (game.questionTimer === 5 || game.questionTimer === 3) {
+            const feedbackEl = document.getElementById('answerFeedback');
+            if (feedbackEl) feedbackEl.textContent = `${game.questionTimer} seconds remaining`;
+        }
 
         if (game.questionTimer <= 0) {
             clearInterval(game.questionTimerInterval);
