@@ -197,7 +197,7 @@ export default function App() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <span aria-hidden="true" style={{ fontSize: 20 }}>📋</span>
-              <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 600 }}>Analysis</h2>
+              <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 600 }}>Compliance Check</h2>
             </div>
             
             <div aria-live="polite" aria-atomic="true">
@@ -211,7 +211,7 @@ export default function App() {
                 <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
                 <p style={{ color: accentPink, fontWeight: 600, marginBottom: 8 }}>Analysis failed</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', maxWidth: 220 }}>
-                  Could not reach the server. Please try again.
+                  Check your connection and try again. If the issue persists, try a smaller image.
                 </p>
               </div>
             ) : result ? (
@@ -315,9 +315,15 @@ export default function App() {
                   fontSize: 64, marginBottom: 16, opacity: 0.3,
                   filter: 'grayscale(100%)'
                 }}>🖼️</div>
-                <p style={{ fontSize: 15, maxWidth: 220, lineHeight: 1.6 }}>
+                <p style={{ fontSize: 15, maxWidth: 220, lineHeight: 1.6, marginBottom: 20 }}>
                   Upload a photo, then click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> to check passport compliance
                 </p>
+                <ul style={{ listStyle: 'none', textAlign: 'left', fontSize: 12, color: 'rgba(255,255,255,0.2)', lineHeight: 2 }}>
+                  <li>✓ Face the camera directly</li>
+                  <li>✓ Neutral expression, eyes open</li>
+                  <li>✓ Plain or white background</li>
+                  <li>✓ Even lighting, no harsh shadows</li>
+                </ul>
               </div>
             )}
             </div>
@@ -333,6 +339,9 @@ export default function App() {
         }}>
           <p>
             Crafted with <span style={{ color: accentPink }}>♥</span> by PassportLens Studio · {new Date().getFullYear()}
+          </p>
+          <p style={{ marginTop: 8, fontSize: 12 }}>
+            Your photos are processed privately and never stored on our servers.
           </p>
         </footer>
       </div>

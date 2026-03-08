@@ -43,26 +43,27 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
 
   if (node.type === 'directory') {
     return (
-      <div>
+      <div role="treeitem" aria-expanded={isExpanded} aria-label={node.name}>
         <button
           onClick={handleToggle}
           className="flex items-center gap-1 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm"
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
+          aria-label={`${node.name} folder, ${isExpanded ? 'expanded' : 'collapsed'}`}
         >
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-slate-500" />
+            <ChevronDown className="w-4 h-4 text-slate-500" aria-hidden="true" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-slate-500" />
+            <ChevronRight className="w-4 h-4 text-slate-500" aria-hidden="true" />
           )}
           {isExpanded ? (
-            <FolderOpen className="w-4 h-4 text-amber-400" />
+            <FolderOpen className="w-4 h-4 text-amber-400" aria-hidden="true" />
           ) : (
-            <Folder className="w-4 h-4 text-amber-400" />
+            <Folder className="w-4 h-4 text-amber-400" aria-hidden="true" />
           )}
           <span className="text-slate-300 truncate">{node.name}</span>
         </button>
         {isExpanded && node.children && (
-          <div>
+          <div role="group">
             {node.children.map((child) => (
               <TreeNode
                 key={child.path}
@@ -81,12 +82,15 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
   return (
     <button
       onClick={handleSelect}
+      role="treeitem"
+      aria-selected={isSelected}
+      title={node.name}
       className={`flex items-center gap-2 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm transition-colors ${
         isSelected ? 'bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500' : 'border-l-2 border-transparent'
       }`}
       style={{ paddingLeft: `${depth * 12 + 24}px` }}
     >
-      <File className={`w-4 h-4 ${getFileIcon(node.name)}`} />
+      <File className={`w-4 h-4 ${getFileIcon(node.name)}`} aria-hidden="true" />
       <span className="text-slate-300 truncate">{node.name}</span>
     </button>
   );
@@ -104,7 +108,7 @@ const FileTree = memo<FileTreeProps>(({ nodes, onFileSelect, selectedPath }) => 
   }
 
   return (
-    <div className="space-y-0.5">
+    <div role="tree" aria-label="File tree" className="space-y-0.5">
       {nodes.map((node) => (
         <TreeNode
           key={node.path}

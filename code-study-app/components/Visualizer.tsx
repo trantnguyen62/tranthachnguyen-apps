@@ -20,8 +20,16 @@ const Visualizer = memo<VisualizerProps>(({ volume, isConnected, color = '#10B98
   const baseHeight = isConnected ? 8 : 4;
   const opacity = isConnected ? 0.8 + combinedVolume * 0.2 : 0.3;
 
+  const volumeLabel = isConnected
+    ? `Audio active, volume level ${Math.round(combinedVolume * 100)}%`
+    : 'Audio inactive';
+
   return (
-    <div className="flex items-center justify-center gap-1 h-20">
+    <div
+      role="img"
+      aria-label={volumeLabel}
+      className="flex items-center justify-center gap-1 h-20"
+    >
       {BAR_MULTIPLIERS.map((heightMultiplier, i) => {
         const dynamicHeight = isConnected
           ? baseHeight + combinedVolume * MAX_HEIGHT * heightMultiplier

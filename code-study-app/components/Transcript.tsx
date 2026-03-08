@@ -32,18 +32,26 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
   }
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-y-auto space-y-4 pr-2">
+    <div
+      ref={containerRef}
+      role="log"
+      aria-label="Conversation transcript"
+      aria-live="polite"
+      aria-relevant="additions"
+      className="flex-1 overflow-y-auto space-y-4 pr-2"
+    >
       {messages.map((message) => (
         <div
           key={message.id}
           className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
         >
           {message.role === 'model' && (
-            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
               <Bot className="w-4 h-4 text-emerald-400" />
             </div>
           )}
           <div
+            aria-label={`${message.role === 'user' ? 'You' : 'AI Tutor'}: ${message.text}`}
             className={`max-w-[80%] rounded-2xl px-4 py-2 ${
               message.role === 'user'
                 ? 'bg-blue-500/20 text-blue-100'
@@ -53,7 +61,7 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
           </div>
           {message.role === 'user' && (
-            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
               <User className="w-4 h-4 text-blue-400" />
             </div>
           )}

@@ -134,7 +134,7 @@ function App() {
   const isConnecting = connectionState === ConnectionState.CONNECTING;
 
   return (
-    <div className="min-h-screen bg-slate-900 flex text-slate-100">
+    <div className="min-h-screen bg-slate-900 flex text-slate-100" id="main-content">
       {/* Sidebar */}
       {showSidebar && (
         <div className="w-80 bg-slate-800/50 border-r border-slate-700/50 flex flex-col">
@@ -156,6 +156,7 @@ function App() {
             <select
               value={selectedProject?.path || ''}
               onChange={handleProjectChange}
+              aria-label="Select project"
               className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             >
               <option value="">Select a project...</option>

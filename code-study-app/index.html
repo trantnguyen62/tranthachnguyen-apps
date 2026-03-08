@@ -25,6 +25,26 @@
       body {
         font-family: 'Inter', sans-serif;
       }
+      /* Skip link for keyboard navigation */
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: #10B981;
+        color: white;
+        padding: 8px 16px;
+        z-index: 9999;
+        font-weight: 600;
+        border-radius: 0 0 4px 0;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+      /* Visible focus indicator */
+      :focus-visible {
+        outline: 2px solid #10B981;
+        outline-offset: 2px;
+      }
       .code-font {
         font-family: 'JetBrains Mono', monospace;
       }
@@ -73,6 +93,7 @@
     </script>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

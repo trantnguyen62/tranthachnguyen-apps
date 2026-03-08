@@ -251,9 +251,9 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           🖼️
         </div>
         <p style={{ color: '#F8F8F8', fontWeight: 600, marginBottom: 6, fontFamily: "'Syne', sans-serif" }}>
-          Drop your photo here
+          Upload your photo
         </p>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>or click to browse files</p>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>Drag &amp; drop or tap to browse</p>
         <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, marginTop: 8 }}>JPG, PNG, WEBP — max 10 MB</p>
       </div>
 
