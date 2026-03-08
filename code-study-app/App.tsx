@@ -93,6 +93,9 @@ function App() {
       const data = await res.json();
 
       fileCache.current.set(filePath, { content: data.content, language: data.language });
+      if (fileCache.current.size > 50) {
+        fileCache.current.delete(fileCache.current.keys().next().value!);
+      }
       setSelectedFile({
         ...file,
         content: data.content,

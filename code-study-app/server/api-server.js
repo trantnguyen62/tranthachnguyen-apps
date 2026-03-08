@@ -178,48 +178,45 @@ app.get('/api/projects/:project/tree', (req, res) => {
 });
 
 // Get file content
-app.get('/api/file', (req, res) => {
+app.get('/api/file', async (req, res) => {
   const filePath = req.query.path;
-  
+
   if (!filePath) {
     return res.status(400).json({ error: 'Path required' });
   }
-  
+
   const fullPath = path.join(CODEBASE_PATH, filePath);
-  
+
   // Security: ensure path is within codebase (append sep to prevent partial-name traversal)
   if (!fullPath.startsWith(CODEBASE_PATH + path.sep) && fullPath !== CODEBASE_PATH) {
     return res.status(403).json({ error: 'Access denied' });
   }
-  
-  if (!fs.existsSync(fullPath)) {
-    return res.status(404).json({ error: 'File not found' });
-  }
-  
+
   try {
-    const content = fs.readFileSync(fullPath, 'utf-8');
+    const content = await fs.promises.readFile(fullPath, 'utf-8');
     const language = getLanguage(filePath);
-    
+
     res.json({
       path: filePath,
       content,
       language
     });
   } catch (err) {
+    if (err.code === 'ENOENT') return res.status(404).json({ error: 'File not found' });
     console.error('Error reading file:', err.message);
     res.status(500).json({ error: 'Failed to read file' });
   }
 });
 
 // Search files
-app.get('/api/search', (req, res) => {
+app.get('/api/search', async (req, res) => {
   const query = req.query.q?.toLowerCase();
   const project = req.query.project;
-  
+
   if (!query) {
     return res.status(400).json({ error: 'Query required' });
   }
-  
+
   const results = [];
   const searchPath = project ? path.join(CODEBASE_PATH, project) : CODEBASE_PATH;
 
@@ -227,57 +224,61 @@ app.get('/api/search', (req, res) => {
   if (project && !searchPath.startsWith(CODEBASE_PATH + path.sep) && searchPath !== CODEBASE_PATH) {
     return res.status(403).json({ error: 'Access denied' });
   }
-  
-  function searchDir(dirPath, basePath = '') {
+
+  async function searchDir(dirPath, basePath = '') {
+    if (results.length >= 50) return;
+    let entries;
     try {
-      const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-      
-      for (const entry of entries) {
-        if (results.length >= 50) return; // Limit results
-        
-        const fullPath = path.join(dirPath, entry.name);
-        const relativePath = path.join(basePath, entry.name);
-        
-        if (entry.isDirectory()) {
-          if (IGNORED_DIRS.includes(entry.name)) continue;
-          searchDir(fullPath, relativePath);
-        } else {
-          if (IGNORED_FILES.includes(entry.name)) continue;
-          
-          const ext = path.extname(entry.name).toLowerCase();
-          if (!CODE_EXTENSIONS.includes(ext)) continue;
-          
-          // Search in filename
-          if (entry.name.toLowerCase().includes(query)) {
+      entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
+    } catch (err) {
+      return;
+    }
+
+    for (const entry of entries) {
+      if (results.length >= 50) break;
+
+      const fullPath = path.join(dirPath, entry.name);
+      const relativePath = path.join(basePath, entry.name);
+
+      if (entry.isDirectory()) {
+        if (IGNORED_DIRS.includes(entry.name)) continue;
+        await searchDir(fullPath, relativePath);
+      } else {
+        if (IGNORED_FILES.includes(entry.name)) continue;
+
+        const ext = path.extname(entry.name).toLowerCase();
+        if (!CODE_EXTENSIONS.includes(ext)) continue;
+
+        // Search in filename
+        if (entry.name.toLowerCase().includes(query)) {
+          results.push({
+            name: entry.name,
+            path: relativePath,
+            type: 'file',
+            language: getLanguage(entry.name),
+            matchType: 'filename'
+          });
+          continue;
+        }
+
+        // Search in content
+        try {
+          const content = await fs.promises.readFile(fullPath, 'utf-8');
+          if (content.toLowerCase().includes(query)) {
             results.push({
               name: entry.name,
               path: relativePath,
               type: 'file',
               language: getLanguage(entry.name),
-              matchType: 'filename'
+              matchType: 'content'
             });
-            continue;
           }
-          
-          // Search in content
-          try {
-            const content = fs.readFileSync(fullPath, 'utf-8');
-            if (content.toLowerCase().includes(query)) {
-              results.push({
-                name: entry.name,
-                path: relativePath,
-                type: 'file',
-                language: getLanguage(entry.name),
-                matchType: 'content'
-              });
-            }
-          } catch (e) {}
-        }
+        } catch (e) {}
       }
-    } catch (err) {}
+    }
   }
-  
-  searchDir(searchPath);
+
+  await searchDir(searchPath);
   res.json(results);
 });
 
