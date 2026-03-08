@@ -41,18 +41,25 @@ async function initDataStore() {
   }
 }
 
+// In-memory cache — populated on first read, updated on every write
+let usersCache = null;
+
 // Read users data
 async function readUsers() {
+  if (usersCache) return usersCache;
   try {
     const data = await fs.readFile(USERS_FILE, 'utf-8');
-    return JSON.parse(data);
+    usersCache = JSON.parse(data);
+    return usersCache;
   } catch {
-    return { users: {} };
+    usersCache = { users: {} };
+    return usersCache;
   }
 }
 
 // Write users data
 async function writeUsers(data) {
+  usersCache = data;
   await fs.writeFile(USERS_FILE, JSON.stringify(data, null, 2));
 }
 

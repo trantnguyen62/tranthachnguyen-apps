@@ -24,6 +24,10 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
   }, []);
 
   const animate = () => {
+    if (document.hidden) {
+      requestRef.current = requestAnimationFrame(animate);
+      return;
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');

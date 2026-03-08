@@ -229,6 +229,19 @@ const wss = new WebSocketServer({
   }
 });
 
+// Periodically clean up stale rate-limit entries to prevent unbounded Map growth
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, timestamps] of connectionAttempts.entries()) {
+    const recent = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+    if (recent.length === 0) {
+      connectionAttempts.delete(ip);
+    } else {
+      connectionAttempts.set(ip, recent);
+    }
+  }
+}, RATE_LIMIT_WINDOW_MS).unref();
+
 logger.info(`LinguaFlow WebSocket Proxy Server running on port ${PORT}`);
 logger.info(`API Key loaded: ${process.env.GEMINI_API_KEY ? 'Yes' : 'No'}`);
 
