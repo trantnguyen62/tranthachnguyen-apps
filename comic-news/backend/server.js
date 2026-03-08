@@ -224,12 +224,15 @@ app.get('/api/bookmarks', (req, res) => {
 });
 
 app.get('/api/bookmarks/check/:id', (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   res.json({ isBookmarked: bookmarks.includes(id) });
 });
 
 app.post('/api/bookmarks/:id', (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
+  if (!comics.find(c => c.id === id)) return res.status(404).json({ error: 'Comic not found' });
   if (!bookmarks.includes(id)) {
     bookmarks.push(id);
   }
@@ -237,20 +240,24 @@ app.post('/api/bookmarks/:id', (req, res) => {
 });
 
 app.delete('/api/bookmarks/:id', (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   bookmarks = bookmarks.filter(b => b !== id);
   res.json({ success: true, bookmarks });
 });
 
 // Reading progress
 app.get('/api/progress/:id', (req, res) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   res.json({ page: readingProgress[id] || 1 });
 });
 
 app.post('/api/progress/:id', (req, res) => {
-  const id = req.params.id;
-  const { page } = req.body;
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
+  const page = parseInt(req.body.page, 10);
+  if (isNaN(page) || page < 1) return res.status(400).json({ error: 'Invalid page' });
   readingProgress[id] = page;
   res.json({ success: true });
 });
