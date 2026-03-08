@@ -1,18 +1,20 @@
 import React, { useState, memo } from 'react';
-import { Download, Maximize2, Minimize2, ArrowRight, Play } from 'lucide-react';
+import { Download, Maximize2, Minimize2, ArrowRight, Play, Loader2 } from 'lucide-react';
 
 interface ComparisonViewProps {
   originalImage: string;
   processedImage: string;
   processedMimeType?: string;
   onDownload: () => void;
+  isProcessing?: boolean;
 }
 
-export const ComparisonView = memo<ComparisonViewProps>(({ 
-  originalImage, 
-  processedImage, 
+export const ComparisonView = memo<ComparisonViewProps>(({
+  originalImage,
+  processedImage,
   processedMimeType = 'image/png',
-  onDownload 
+  onDownload,
+  isProcessing = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isVideo = processedMimeType.startsWith('video/');
@@ -84,23 +86,32 @@ export const ComparisonView = memo<ComparisonViewProps>(({
 
           {/* Processed (Image or Video) */}
           <div className="space-y-3 relative">
-             <div className={`relative rounded-xl overflow-hidden border-2 border-brand-500 bg-slate-100 shadow-xl ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>
+             <div className={`relative rounded-xl overflow-hidden border-2 bg-slate-100 shadow-xl transition-colors ${isProcessing ? 'border-slate-300' : 'border-brand-500'} ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>
                {isVideo ? (
-                 <video 
-                    src={processedImage} 
-                    controls 
-                    autoPlay 
-                    loop 
+                 <video
+                    src={processedImage}
+                    controls
+                    autoPlay
+                    loop
                     className="w-full h-full object-contain bg-black"
                  />
                ) : (
                  <img
                    src={processedImage}
                    alt="AI-processed result"
-                   className="w-full h-full object-contain"
+                   className={`w-full h-full object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-30' : 'opacity-100'}`}
                  />
                )}
-               
+
+               {isProcessing && (
+                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                   <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+                   <span className="text-xs font-medium text-slate-600 bg-white/80 px-3 py-1 rounded-full backdrop-blur-sm">
+                     Generating new edit…
+                   </span>
+                 </div>
+               )}
+
                <div className="absolute bottom-4 left-4 px-3 py-1 bg-brand-600/90 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide shadow-lg flex items-center gap-1">
                  {isVideo && <Play className="w-3 h-3 fill-current" />}
                  {isVideo ? 'VIDEO RESULT' : 'AFTER'}

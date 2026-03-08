@@ -1,5 +1,5 @@
 import React, { useState, useCallback, memo } from 'react';
-import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2 } from 'lucide-react';
+import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2, Scissors, Sun, PenLine, Zap, Film, X } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { Button } from './components/Button';
 import { ComparisonView } from './components/ComparisonView';
@@ -8,12 +8,12 @@ import { ProcessedImage, AppStatus } from './types';
 
 // Static data moved outside component to prevent recreation
 const PRESET_PROMPTS = [
-  "Remove the background",
-  "Enhance colors and brightness",
-  "Turn this into a sketch",
-  "Add a cyberpunk neon filter",
-  "Make it look like a vintage photo",
-  "Remove blemishes and smooth skin",
+  { text: "Remove the background", Icon: Scissors },
+  { text: "Enhance colors and brightness", Icon: Sun },
+  { text: "Turn this into a sketch", Icon: PenLine },
+  { text: "Add a cyberpunk neon filter", Icon: Zap },
+  { text: "Make it look like a vintage photo", Icon: Film },
+  { text: "Remove blemishes and smooth skin", Icon: Sparkles },
 ] as const;
 
 const PASSPORT_PROMPT = "Convert this into a professional passport photo: solid white background, center the subject, crop to head and shoulders, ensure even lighting, and make it look professional.";
@@ -210,22 +210,34 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="bg-white p-1 rounded-xl shadow-sm border border-slate-200 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent transition-all">
-                  <textarea
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    aria-label="Describe the image changes you want"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleGenerate();
-                      }
-                    }}
-                    placeholder={historyIndex === 0
-                      ? "E.g., 'Remove the person in the background' or 'Make it look vintage'"
-                      : "Describe the next change..."}
-                    className="w-full p-4 text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent rounded-lg text-base"
-                    rows={3}
-                  />
+                  <div className="relative">
+                    <textarea
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      aria-label="Describe the image changes you want"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleGenerate();
+                        }
+                      }}
+                      placeholder={historyIndex === 0
+                        ? "E.g., 'Remove the person in the background' or 'Make it look vintage'"
+                        : "Describe the next change..."}
+                      className="w-full p-4 pr-10 text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent rounded-lg text-base"
+                      rows={3}
+                    />
+                    {prompt && (
+                      <button
+                        onClick={() => setPrompt('')}
+                        className="absolute top-3 right-3 p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                        aria-label="Clear prompt"
+                        tabIndex={-1}
+                      >
+                        <X className="w-4 h-4" aria-hidden="true" />
+                      </button>
+                    )}
+                  </div>
                   <div className="px-2 pb-2 flex justify-between items-center gap-2">
                     {status === AppStatus.PROCESSING ? (
                       <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5 animate-pulse">
@@ -271,13 +283,14 @@ const App: React.FC = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {PRESET_PROMPTS.map((p, i) => (
+                    {PRESET_PROMPTS.map(({ text, Icon }, i) => (
                       <button
                         key={i}
-                        onClick={() => handlePresetClick(p)}
-                        className="text-xs px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200 transition-colors"
+                        onClick={() => handlePresetClick(text)}
+                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200 transition-colors"
                       >
-                        {p}
+                        <Icon className="w-3 h-3" aria-hidden="true" />
+                        {text}
                       </button>
                     ))}
                   </div>
@@ -310,6 +323,7 @@ const App: React.FC = () => {
                   processedImage={currentImage.data}
                   processedMimeType={currentImage.mimeType}
                   onDownload={handleDownload}
+                  isProcessing={status === AppStatus.PROCESSING}
                 />
               </div>
             </div>
