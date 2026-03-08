@@ -554,6 +554,11 @@ function getNextLearnableContent() {
         game.usedContentIndices.clear();
     }
 
+    if (content.length === 1) {
+        game.usedContentIndices.add(0);
+        return content[0];
+    }
+
     let index;
     do {
         index = Math.floor(Math.random() * content.length);
@@ -939,7 +944,7 @@ function spawnObstacle() {
     if (!game.running || game.questionActive) return;
 
     const minGapY = 120;
-    const maxGapY = Math.max(minGapY, game.height - CONFIG.OBSTACLE_GAP - 120);
+    const maxGapY = Math.max(minGapY + 1, game.height - CONFIG.OBSTACLE_GAP - 120);
     const gapY = Math.random() * (maxGapY - minGapY) + minGapY;
 
     const content = getNextLearnableContent();
@@ -989,7 +994,7 @@ function showQuestion() {
     game.questionTimer = CONFIG.QUESTION_TIME;
     game.paused = true;
 
-    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    const topic = TOPICS.find(t => t.id === game.selectedTopic) || TOPICS[0];
     document.getElementById('questionTopic').textContent = `${topic.icon} ${topic.name}`;
     document.getElementById('questionText').textContent = question.q;
     document.getElementById('questionTimer').textContent = CONFIG.QUESTION_TIME;
@@ -1200,8 +1205,10 @@ function useLife() {
     game.obstacles = game.obstacles.filter(obs => obs.x > game.player.x + 150 || obs.x < game.player.x - 100);
 
     // Invincibility for 1.5 seconds
-    setTimeout(() => {
+    if (game.respawnInvincibleTimeout) clearTimeout(game.respawnInvincibleTimeout);
+    game.respawnInvincibleTimeout = setTimeout(() => {
         game.respawnInvincible = false;
+        game.respawnInvincibleTimeout = null;
     }, 1500);
 }
 
@@ -1426,8 +1433,10 @@ const AdManager = {
 
             // Enable invincibility for 3 seconds (longer to give player time)
             game.respawnInvincible = true;
-            setTimeout(() => {
+            if (game.respawnInvincibleTimeout) clearTimeout(game.respawnInvincibleTimeout);
+            game.respawnInvincibleTimeout = setTimeout(() => {
                 game.respawnInvincible = false;
+                game.respawnInvincibleTimeout = null;
                 showTip('⚠️ Invincibility ended - stay alert!');
             }, 3000);
 
@@ -1440,6 +1449,7 @@ const AdManager = {
             // Start spawning obstacles after a delay
             setTimeout(() => {
                 if (game.running) {
+                    if (game.obstacleInterval) clearInterval(game.obstacleInterval);
                     game.obstacleInterval = setInterval(spawnObstacle, CONFIG.OBSTACLE_SPAWN_RATE);
                 }
             }, 1500);
