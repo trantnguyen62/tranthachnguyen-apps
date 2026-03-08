@@ -145,6 +145,48 @@ I now do all my grocery shopping online.`,
       { id: 5, title: "...Thanks, Man", description: "The cashier handles it with more grace than deserved" },
       { id: 6, title: "Okay", description: "A nonsensical parting word before walking into a closed door" }
     ]
+  },
+  {
+    id: 4,
+    title: "I Said 'You Too' When the Waiter Said 'Enjoy Your Meal'",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    coverImage: "/images/you-too-waiter.svg",
+    description: "The two words left my mouth before any part of my brain could intervene. The waiter deserved better.",
+    rating: 4.9,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I said "you too" when the waiter said "enjoy your meal."
+
+It was a Saturday. My wife and I had a reservation. Nice place. I was having a good night until precisely the moment I was not.
+
+The waiter — professional, composed, clearly excellent at his job — set down our plates with a warm smile.
+
+"Enjoy your meal!" he said.
+
+"You too," I said.
+
+There was a pause. Not a long pause. But a very specific kind of pause. The kind where everyone in a two-foot radius immediately understands what has just occurred.
+
+My wife looked down at the table. The waiter looked at me. I looked at the waiter.
+
+"Thank you," he said, and walked away with extraordinary dignity.
+
+I've been coming back to this restaurant for three years. He still works there. He still remembers. I can tell by the way he carefully avoids eye contact while taking my order.
+
+I still tip 25%. It feels like the right thing to do.`,
+    pages: [
+      { id: 1, image: "/images/you-too-waiter.svg", caption: "The moment two words brought an entire restaurant to a halt" }
+    ],
+    panels: [
+      { id: 1, title: "A Nice Saturday", description: "Reservation made, good restaurant, everything going smoothly" },
+      { id: 2, title: "Enjoy Your Meal!", description: "The waiter delivers plates with professional warmth" },
+      { id: 3, title: "You Too", description: "The words exit before any part of my brain can intervene" },
+      { id: 4, title: "The Pause", description: "A very specific kind of pause. Everyone in range understands." },
+      { id: 5, title: "Thank You", description: "He accepts it with extraordinary dignity and walks away" },
+      { id: 6, title: "Three Years Later", description: "He still works there. He still remembers. I still tip 25%." }
+    ]
   }
 ];
 

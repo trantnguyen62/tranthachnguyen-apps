@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="header" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#f97316"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="600" fill="url(#bg)"/>
+
+  <!-- Header bar -->
+  <rect x="0" y="0" width="400" height="75" fill="url(#header)"/>
+  <text x="200" y="30" text-anchor="middle" fill="white" font-size="15" font-family="Georgia, serif" font-weight="bold">I Said "You Too"</text>
+  <text x="200" y="54" text-anchor="middle" fill="rgba(255,255,255,0.88)" font-size="13" font-family="Georgia, serif">When the Waiter Said "Enjoy Your Meal"</text>
+
+  <!-- Table surface -->
+  <ellipse cx="200" cy="390" rx="150" ry="32" fill="#2a1f1a" stroke="#4a3a30" stroke-width="2"/>
+
+  <!-- Left plate -->
+  <ellipse cx="148" cy="374" rx="42" ry="21" fill="#3a3a5a" stroke="#5a5a7a" stroke-width="1.5"/>
+  <ellipse cx="148" cy="372" rx="34" ry="17" fill="#4a4a6a"/>
+  <path d="M 132 368 Q 140 362 148 368 Q 156 374 164 368" stroke="#c4855a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 129 375 Q 137 369 145 375 Q 153 381 161 375" stroke="#c4855a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Right plate -->
+  <ellipse cx="255" cy="374" rx="42" ry="21" fill="#3a3a5a" stroke="#5a5a7a" stroke-width="1.5"/>
+  <ellipse cx="255" cy="372" rx="34" ry="17" fill="#4a4a6a"/>
+  <path d="M 239 368 Q 247 362 255 368 Q 263 374 271 368" stroke="#c4855a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 236 375 Q 244 369 252 375 Q 260 381 268 375" stroke="#c4855a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Candle -->
+  <rect x="196" y="340" width="9" height="28" fill="#f5f0e0" rx="1"/>
+  <ellipse cx="200" cy="336" rx="5" ry="9" fill="#ff8c00" opacity="0.85"/>
+  <ellipse cx="200" cy="334" rx="3" ry="6" fill="#ffdd00" opacity="0.9"/>
+
+  <!-- Wine glass left -->
+  <path d="M 180 358 L 180 348 Q 173 338 168 325 L 192 325 Q 187 338 180 348" fill="#6a9aaa" opacity="0.55" stroke="#8abaca" stroke-width="0.5"/>
+  <rect x="178" y="358" width="4" height="14" fill="#6a9aaa" opacity="0.45"/>
+  <rect x="172" y="372" width="16" height="3" fill="#6a9aaa" opacity="0.4"/>
+
+  <!-- Wine glass right -->
+  <path d="M 222 358 L 222 348 Q 215 338 210 325 L 234 325 Q 229 338 222 348" fill="#6a9aaa" opacity="0.55" stroke="#8abaca" stroke-width="0.5"/>
+  <rect x="220" y="358" width="4" height="14" fill="#6a9aaa" opacity="0.45"/>
+  <rect x="214" y="372" width="16" height="3" fill="#6a9aaa" opacity="0.4"/>
+
+  <!-- Waiter figure (right, standing) -->
+  <rect x="300" y="248" width="44" height="85" rx="5" fill="#1a1a3a"/>
+  <rect x="313" y="254" width="16" height="74" rx="2" fill="#f0f0f0"/>
+  <circle cx="322" cy="226" r="22" fill="#c8956a"/>
+  <ellipse cx="322" cy="208" rx="20" ry="9" fill="#2a1a0a"/>
+  <!-- Waiter arm with tray -->
+  <rect x="258" y="262" width="46" height="9" rx="4" fill="#1a1a3a"/>
+  <ellipse cx="246" cy="261" rx="22" ry="5.5" fill="#8a7a6a" stroke="#6a5a4a" stroke-width="1.5"/>
+
+  <!-- Seated person (left) -->
+  <rect x="60" y="270" width="48" height="85" rx="5" fill="#2a3a5a"/>
+  <circle cx="84" cy="248" r="22" fill="#d4a06a"/>
+  <ellipse cx="84" cy="230" rx="20" ry="9" fill="#2a1a0a"/>
+  <!-- Seated person arms on table -->
+  <rect x="84" y="300" width="55" height="9" rx="4" fill="#2a3a5a"/>
+
+  <!-- Waiter speech bubble: "Enjoy your meal!" -->
+  <ellipse cx="230" cy="152" rx="95" ry="30" fill="white" opacity="0.96"/>
+  <polygon points="285,182 302,196 278,188" fill="white" opacity="0.96"/>
+  <text x="230" y="148" text-anchor="middle" fill="#1a1a2e" font-size="11.5" font-family="Georgia, serif" font-style="italic">Enjoy your meal!</text>
+
+  <!-- Person's "You too." bubble (red, prominent) -->
+  <ellipse cx="128" cy="174" rx="68" ry="31" fill="#ef4444"/>
+  <polygon points="108,205 90,218 118,210" fill="#ef4444"/>
+  <text x="128" y="171" text-anchor="middle" fill="white" font-size="16" font-family="Georgia, serif" font-weight="bold" font-style="italic">You too.</text>
+
+  <!-- Awkward pause lines -->
+  <line x1="52" y1="228" x2="40" y2="218" stroke="#6a6a9a" stroke-width="1.5" opacity="0.55"/>
+  <line x1="46" y1="237" x2="32" y2="235" stroke="#6a6a9a" stroke-width="1.5" opacity="0.55"/>
+  <line x1="53" y1="246" x2="40" y2="251" stroke="#6a6a9a" stroke-width="1.5" opacity="0.55"/>
+
+  <!-- Bottom panel -->
+  <rect x="0" y="490" width="400" height="110" fill="rgba(0,0,0,0.35)"/>
+
+  <!-- Genre badge -->
+  <rect x="20" y="502" width="100" height="22" rx="11" fill="rgba(239,68,68,0.2)"/>
+  <text x="70" y="517" text-anchor="middle" fill="#ef4444" font-size="10" font-family="Georgia, serif" font-weight="bold" letter-spacing="1">SLICE OF LIFE</text>
+
+  <!-- Stars -->
+  <text x="20" y="549" fill="#f59e0b" font-size="15">★★★★★</text>
+  <text x="103" y="548" fill="#9ca3af" font-size="12" font-family="sans-serif"> 4.9</text>
+
+  <!-- Author -->
+  <text x="20" y="572" fill="#6b7280" font-size="11" font-family="Georgia, serif">Anonymous</text>
+
+  <!-- Decorative dots -->
+  <circle cx="372" cy="510" r="3" fill="#ef4444" opacity="0.35"/>
+  <circle cx="360" cy="530" r="2" fill="#f97316" opacity="0.25"/>
+  <circle cx="382" cy="555" r="4" fill="#ef4444" opacity="0.18"/>
+</svg>
