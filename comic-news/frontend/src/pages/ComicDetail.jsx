@@ -25,7 +25,38 @@ function ComicDetail() {
         setComic(comicData);
         setIsBookmarked(bookmarkData.isBookmarked);
         setProgress(progressData.page);
-        document.title = `${comicData.title} - Comic News`;
+
+        const pageTitle = `${comicData.title} - Comic News`;
+        document.title = pageTitle;
+
+        // Update OG/Twitter meta tags
+        const setMeta = (sel, content) => document.querySelector(sel)?.setAttribute('content', content);
+        const imgUrl = `${window.location.origin}${comicData.coverImage}`;
+        setMeta('meta[name="description"]', comicData.description);
+        setMeta('meta[property="og:title"]', pageTitle);
+        setMeta('meta[property="og:description"]', comicData.description);
+        setMeta('meta[property="og:image"]', imgUrl);
+        setMeta('meta[property="og:type"]', 'article');
+        setMeta('meta[name="twitter:title"]', pageTitle);
+        setMeta('meta[name="twitter:description"]', comicData.description);
+        setMeta('meta[name="twitter:image"]', imgUrl);
+
+        // JSON-LD structured data
+        document.getElementById('page-jsonld')?.remove();
+        const ld = document.createElement('script');
+        ld.id = 'page-jsonld';
+        ld.type = 'application/ld+json';
+        ld.textContent = JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: comicData.title,
+          description: comicData.description,
+          author: { '@type': 'Person', name: comicData.author },
+          image: imgUrl,
+          genre: comicData.genre,
+          url: window.location.href,
+        });
+        document.head.appendChild(ld);
       } catch (error) {
         console.error('Error fetching comic:', error);
       } finally {
@@ -33,6 +64,9 @@ function ComicDetail() {
       }
     };
     fetchData();
+    return () => {
+      document.getElementById('page-jsonld')?.remove();
+    };
   }, [id]);
 
   const toggleBookmark = async () => {

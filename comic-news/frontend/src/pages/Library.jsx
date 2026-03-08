@@ -15,6 +15,11 @@ function Library() {
 
   useEffect(() => {
     document.title = 'Story Library - Comic News';
+    const canonical = Object.assign(document.createElement('link'), {
+      id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/library`,
+    });
+    document.head.appendChild(canonical);
+    return () => canonical.remove();
   }, []);
 
   useEffect(() => {
