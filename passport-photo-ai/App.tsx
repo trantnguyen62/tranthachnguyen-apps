@@ -105,8 +105,8 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Check and perfect your passport photo in seconds.<br/>
-            <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Analyze</span> · <span style={{ color: accentPurple }}>Export</span>
+            Instantly verify your passport photo meets official requirements — for any country.<br/>
+            <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Analyze</span> · <span style={{ color: accentPurple }}>Download</span>
           </p>
         </header>
 
@@ -316,13 +316,13 @@ export default function App() {
                   filter: 'grayscale(100%)'
                 }}>🖼️</div>
                 <p style={{ fontSize: 15, maxWidth: 220, lineHeight: 1.6, marginBottom: 20 }}>
-                  Upload a photo, then click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> to check passport compliance
+                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> to get your full compliance report
                 </p>
                 <ul style={{ listStyle: 'none', textAlign: 'left', fontSize: 12, color: 'rgba(255,255,255,0.2)', lineHeight: 2 }}>
-                  <li>✓ Face the camera directly</li>
-                  <li>✓ Neutral expression, eyes open</li>
-                  <li>✓ Plain or white background</li>
-                  <li>✓ Even lighting, no harsh shadows</li>
+                  <li>✓ Look directly into the camera</li>
+                  <li>✓ Neutral expression, both eyes open</li>
+                  <li>✓ Use a plain white or light background</li>
+                  <li>✓ Even, natural lighting — no harsh shadows</li>
                 </ul>
               </div>
             )}
@@ -341,7 +341,7 @@ export default function App() {
             Crafted with <span style={{ color: accentPink }}>♥</span> by PassportLens Studio · {new Date().getFullYear()}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
-            Your photos are processed privately and never stored on our servers.
+            Your photos are analyzed privately and deleted immediately — never stored on our servers.
           </p>
         </footer>
       </div>
