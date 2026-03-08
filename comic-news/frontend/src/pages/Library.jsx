@@ -68,8 +68,8 @@ function Library() {
         <h1 className="text-3xl font-bold text-white mb-2">
           {searchQuery ? `Search: "${searchQuery}"` : 'Story Library'}
         </h1>
-        <p className="text-gray-400">
-          {searchQuery 
+        <p className="text-gray-400" aria-live="polite" aria-atomic="true">
+          {searchQuery
             ? `Found ${comics.length} stories matching your search`
             : 'Browse all news stories turned into comics'
           }
@@ -83,11 +83,12 @@ function Library() {
             <Filter className="w-5 h-5 text-gray-400" />
             <span className="text-gray-400 text-sm">Category:</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by genre">
             {genres.map((genre) => (
               <button
                 key={genre}
                 onClick={() => setSelectedGenre(genre)}
+                aria-pressed={selectedGenre === genre}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   selectedGenre === genre
                     ? 'bg-red-500 text-white'
@@ -98,12 +99,13 @@ function Library() {
               </button>
             ))}
           </div>
-          
+
           <div className="md:ml-auto flex items-center gap-2">
-            <SortAsc className="w-5 h-5 text-gray-400" />
+            <SortAsc className="w-5 h-5 text-gray-400" aria-hidden="true" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Sort stories"
               className="bg-dark-200 text-gray-300 px-4 py-2 rounded-lg border border-white/10 focus:outline-none focus:border-red-500"
             >
               <option value="rating">Top Rated</option>
@@ -115,8 +117,8 @@ function Library() {
 
       {/* Comics Grid */}
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex items-center justify-center py-20" role="status" aria-label="Loading stories">
+          <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
         </div>
       ) : comics.length === 0 ? (
         <div className="text-center py-20">

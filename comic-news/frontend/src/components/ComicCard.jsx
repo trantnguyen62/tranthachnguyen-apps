@@ -10,7 +10,7 @@ function ComicCard({ comic }) {
       <div className="relative overflow-hidden rounded-xl bg-dark-200 border border-white/5 hover:border-red-500/30">
         <div className="aspect-[2/3] overflow-hidden relative">
           {!imgLoaded && (
-            <div className="absolute inset-0 bg-dark-100 animate-pulse" />
+            <div className="absolute inset-0 bg-dark-100 animate-pulse" aria-hidden="true" />
           )}
           <img
             src={comic.coverImage}
@@ -21,7 +21,7 @@ function ComicCard({ comic }) {
             className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" aria-hidden="true">
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <p className="text-sm text-gray-300 line-clamp-2">{comic.description}</p>
           </div>
@@ -43,12 +43,12 @@ function ComicCard({ comic }) {
         <p className="text-sm text-gray-400 truncate">{comic.author}</p>
         <div className="flex items-center gap-3 mt-2">
           <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-            <span className="text-sm text-gray-300">{comic.rating}</span>
+            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" aria-hidden="true" />
+            <span className="text-sm text-gray-300" aria-label={`Rating: ${comic.rating}`}>{comic.rating}</span>
           </div>
           <div className="flex items-center gap-1 text-gray-400">
-            <BookOpen className="w-4 h-4" />
-            <span className="text-sm">{comic.chapters} ch</span>
+            <BookOpen className="w-4 h-4" aria-hidden="true" />
+            <span className="text-sm" aria-label={`${comic.chapters} chapters`}>{comic.chapters} ch</span>
           </div>
         </div>
       </div>

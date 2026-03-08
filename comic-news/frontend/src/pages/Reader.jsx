@@ -108,8 +108,8 @@ function Reader() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-black flex items-center justify-center" role="status" aria-label="Loading comic">
+        <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
       </div>
     );
   }
@@ -165,15 +165,17 @@ function Reader() {
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleFullscreen}
+                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
                 className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
               >
-                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                {isFullscreen ? <Minimize2 className="w-5 h-5" aria-hidden="true" /> : <Maximize2 className="w-5 h-5" aria-hidden="true" />}
               </button>
               <Link
                 to="/"
+                aria-label="Go to home"
                 className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
               >
-                <Home className="w-5 h-5" />
+                <Home className="w-5 h-5" aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -235,9 +237,10 @@ function Reader() {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
+          aria-label="Scroll to top"
           className="fixed bottom-6 right-6 p-3 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg transition-all z-50"
         >
-          <ChevronUp className="w-6 h-6" />
+          <ChevronUp className="w-6 h-6" aria-hidden="true" />
         </button>
       )}
     </div>
