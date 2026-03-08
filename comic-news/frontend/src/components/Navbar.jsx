@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen, Home, Library, Bookmark, Search } from 'lucide-react';
+import { BookOpen, Home, Library, Bookmark, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
 function Navbar() {
@@ -66,7 +66,7 @@ function Navbar() {
 
           <div className="flex items-center gap-2">
             {showSearch ? (
-              <form onSubmit={handleSearch} className="relative">
+              <form onSubmit={handleSearch} className="relative flex items-center gap-1">
                 <input
                   type="text"
                   placeholder="Search stories..."
@@ -76,6 +76,14 @@ function Navbar() {
                   autoFocus
                   onBlur={() => !searchQuery && setShowSearch(false)}
                 />
+                <button
+                  type="button"
+                  onClick={() => { setSearchQuery(''); setShowSearch(false); }}
+                  aria-label="Close search"
+                  className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                >
+                  <X className="w-4 h-4" aria-hidden="true" />
+                </button>
               </form>
             ) : (
               <button

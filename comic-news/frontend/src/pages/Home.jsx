@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Sparkles, ArrowRight, BookOpen, Bookmark, Monitor } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
+import SkeletonCard from '../components/SkeletonCard';
 
 function Home() {
   const [featured, setFeatured] = useState([]);
@@ -63,14 +64,6 @@ function Home() {
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -78,7 +71,7 @@ function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 via-dark-300 to-dark-300"></div>
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-extrabold mb-6">
@@ -87,16 +80,24 @@ function Home() {
               <span className="text-white">Turned Into Comics</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-              Experience the news like never before. We transform trending stories 
+              Experience the news like never before. We transform trending stories
               into engaging visual comics you'll actually want to read.
             </p>
-            <Link
-              to="/library"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg shadow-red-500/25 hover:scale-105 active:scale-95"
-            >
-              Explore Stories
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            <div className="flex items-center justify-center gap-4 flex-wrap">
+              <Link
+                to="/library"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg shadow-red-500/25 hover:scale-105 active:scale-95"
+              >
+                Explore Stories
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                to="/bookmarks"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95"
+              >
+                My Bookmarks
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -108,14 +109,15 @@ function Home() {
             <Sparkles className="w-6 h-6 text-yellow-500" />
             <h2 className="text-2xl font-bold text-white">Featured Stories</h2>
           </div>
-          <Link to="/library" className="text-red-500 hover:text-red-400 flex items-center gap-1">
+          <Link to="/library" className="text-red-500 hover:text-red-400 flex items-center gap-1 text-sm">
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {featured.map((comic) => (
-            <ComicCard key={comic.id} comic={comic} />
-          ))}
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+            : featured.map((comic) => <ComicCard key={comic.id} comic={comic} />)
+          }
         </div>
       </section>
 
@@ -126,14 +128,15 @@ function Home() {
             <TrendingUp className="w-6 h-6 text-red-500" />
             <h2 className="text-2xl font-bold text-white">Trending Stories</h2>
           </div>
-          <Link to="/library" className="text-red-500 hover:text-red-400 flex items-center gap-1">
+          <Link to="/library" className="text-red-500 hover:text-red-400 flex items-center gap-1 text-sm">
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {comics.map((comic) => (
-            <ComicCard key={comic.id} comic={comic} />
-          ))}
+          {loading
+            ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+            : comics.map((comic) => <ComicCard key={comic.id} comic={comic} />)
+          }
         </div>
       </section>
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Filter, SortAsc, SearchX } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
+import SkeletonCard from '../components/SkeletonCard';
 
 function Library() {
   const [searchParams] = useSearchParams();
@@ -69,9 +70,11 @@ function Library() {
           {searchQuery ? `Search: "${searchQuery}"` : 'Story Library'}
         </h1>
         <p className="text-gray-400" aria-live="polite" aria-atomic="true">
-          {searchQuery
-            ? `Found ${comics.length} stories matching your search`
-            : 'Browse all news stories turned into comics'
+          {loading
+            ? 'Loading stories…'
+            : searchQuery
+              ? `Found ${comics.length} ${comics.length === 1 ? 'story' : 'stories'} matching your search`
+              : `${comics.length} ${comics.length === 1 ? 'story' : 'stories'} available`
           }
         </p>
       </div>
@@ -117,8 +120,8 @@ function Library() {
 
       {/* Comics Grid */}
       {loading ? (
-        <div className="flex items-center justify-center py-20" role="status" aria-label="Loading stories">
-          <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6" role="status" aria-label="Loading stories">
+          {Array.from({ length: 10 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : comics.length === 0 ? (
         <div className="text-center py-20">
