@@ -2,6 +2,10 @@
    Pipeline Runner - DevOps Learning Game Engine
    ===================================================== */
 
+// Cached math constants
+const TWO_PI = Math.PI * 2;
+const DEG_TO_RAD = Math.PI / 180;
+
 // Game Configuration
 const CONFIG = {
     GRAVITY: 0.35,          // Downward acceleration applied each frame (px/frame²)
@@ -468,17 +472,30 @@ function initStars() {
     game.stars = [];
     for (let i = 0; i < 100; i++) {
         const brightness = Math.random() * 0.5 + 0.3;
+        // Quantize brightness to 0.1 steps so stars can be grouped by fillStyle
+        const quantized = Math.round(brightness * 10) / 10;
         game.stars.push({
             x: Math.random() * (game.width || 600),
             y: Math.random() * (game.height || 800),
             size: Math.random() * 2 + 0.5,
             speed: Math.random() * 1.5 + 0.5,
             brightness,
-            fillStyle: `rgba(255, 255, 255, ${brightness})`
+            fillStyle: `rgba(255, 255, 255, ${quantized})`
         });
     }
+
+    // Group stars by fillStyle to batch canvas draw calls
+    const groups = new Map();
+    for (const star of game.stars) {
+        let group = groups.get(star.fillStyle);
+        if (!group) { group = []; groups.set(star.fillStyle, group); }
+        group.push(star);
+    }
+    game.starGroups = groups;
 }
 
+// Returns the next learnable content item for the current topic.
+// Cycles through all items without repetition before reshuffling.
 function getNextLearnableContent() {
     const content = LEARNABLE_CONTENT[game.selectedTopic];
     if (game.usedContentIndices.size >= content.length) {
@@ -548,6 +565,7 @@ function resizeCanvas() {
     game.cachedBgGradient = bgGrad;
 
     initStars();
+    cachePipelineBackground();
     if (game.topicCache) updateTopicCache();
 }
 
@@ -622,15 +640,19 @@ function update() {
     game.player.y += game.player.velocity;
     game.player.rotation = Math.min(Math.max(game.player.velocity * 2.5, -20), 60);
 
-    game.stars.forEach(star => {
+    const stars = game.stars;
+    for (let i = 0; i < stars.length; i++) {
+        const star = stars[i];
         star.x -= star.speed;
         if (star.x < 0) {
             star.x = game.width;
             star.y = Math.random() * game.height;
         }
-    });
+    }
 
-    game.obstacles.forEach(obs => {
+    const obstacles = game.obstacles;
+    for (let oi = 0; oi < obstacles.length; oi++) {
+        const obs = obstacles[oi];
         obs.x -= CONFIG.OBSTACLE_SPEED;
 
         if (!obs.passed && obs.x + CONFIG.OBSTACLE_WIDTH < game.player.x) {
@@ -646,7 +668,7 @@ function update() {
                 showQuestion();
             }
         }
-    });
+    }
 
     for (let i = game.obstacles.length - 1; i >= 0; i--) {
         if (game.obstacles[i].x <= -CONFIG.OBSTACLE_WIDTH * 2) game.obstacles.splice(i, 1);
@@ -698,52 +720,78 @@ function render() {
     ctx.fillStyle = game.cachedBgGradient;
     ctx.fillRect(0, 0, game.width, game.height);
 
-    game.stars.forEach(star => {
-        ctx.fillStyle = star.fillStyle;
+    // Batch stars by pre-grouped fillStyle to minimise canvas state changes
+    for (const [fillStyle, group] of game.starGroups) {
+        ctx.fillStyle = fillStyle;
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        for (let i = 0; i < group.length; i++) {
+            const star = group[i];
+            ctx.moveTo(star.x + star.size, star.y);
+            ctx.arc(star.x, star.y, star.size, 0, TWO_PI);
+        }
         ctx.fill();
-    });
+    }
 
     drawPipelineBackground(ctx);
 
-    game.particles.forEach(p => {
+    const particles = game.particles;
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
         ctx.fillStyle = `rgba(${p.color}, ${p.life})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.size * p.life, 0, TWO_PI);
         ctx.fill();
-    });
+    }
 
-    game.obstacles.forEach(obs => drawObstacle(ctx, obs));
+    const obstacles = game.obstacles;
+    for (let i = 0; i < obstacles.length; i++) {
+        drawObstacle(ctx, obstacles[i]);
+    }
 
-    // Draw floating learned texts
-    game.floatingTexts.forEach(ft => {
+    // Draw floating learned texts with a single save/restore block
+    const floatingTexts = game.floatingTexts;
+    if (floatingTexts.length > 0) {
         ctx.save();
-        ctx.globalAlpha = ft.life;
         ctx.fillStyle = '#22c55e';
         ctx.font = 'bold 14px Outfit';
         ctx.textAlign = 'left';
-        ctx.fillText(ft.text, ft.x, ft.y);
+        for (let i = 0; i < floatingTexts.length; i++) {
+            const ft = floatingTexts[i];
+            ctx.globalAlpha = ft.life;
+            ctx.fillText(ft.text, ft.x, ft.y);
+        }
         ctx.restore();
-    });
+    }
 
     drawPlayer(ctx);
 }
 
-function drawPipelineBackground(ctx) {
-    ctx.strokeStyle = 'rgba(59, 130, 246, 0.1)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([20, 20]);
+function cachePipelineBackground() {
+    const offscreen = document.createElement('canvas');
+    offscreen.width = game.canvas.width;
+    offscreen.height = game.canvas.height;
+    const offCtx = offscreen.getContext('2d');
+
+    const dpr = window.devicePixelRatio || 1;
+    offCtx.scale(dpr, dpr);
+
+    offCtx.strokeStyle = 'rgba(59, 130, 246, 0.1)';
+    offCtx.lineWidth = 2;
+    offCtx.setLineDash([20, 20]);
 
     for (let i = 1; i < 4; i++) {
         const y = (game.height / 4) * i;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(game.width, y);
-        ctx.stroke();
+        offCtx.beginPath();
+        offCtx.moveTo(0, y);
+        offCtx.lineTo(game.width, y);
+        offCtx.stroke();
     }
 
-    ctx.setLineDash([]);
+    game.pipelineCanvas = offscreen;
+}
+
+function drawPipelineBackground(ctx) {
+    ctx.drawImage(game.pipelineCanvas, 0, 0, game.width, game.height);
 }
 
 function drawObstacle(ctx, obs) {
@@ -794,7 +842,7 @@ function drawPlayer(ctx) {
 
     ctx.save();
     ctx.translate(p.x, p.y);
-    ctx.rotate(p.rotation * Math.PI / 180);
+    ctx.rotate(p.rotation * DEG_TO_RAD);
 
     ctx.drawImage(playerCanvas, -playerOX, -playerOY);
 
@@ -938,6 +986,8 @@ function startQuestionTimer() {
     }, 1000);
 }
 
+// Handles answer selection: disables all buttons and highlights the chosen one,
+// then defers the correctness check by 300ms to let the selection animation play.
 function selectAnswer(index) {
     if (!game.questionActive || game.currentQuestion.answered) return;
 
@@ -1113,6 +1163,9 @@ function darkenColor(hex, percent) {
     return `rgb(${R}, ${G}, ${B})`;
 }
 
+// Rebuilds the topic-specific offscreen canvases for the player sprite and
+// obstacle columns. Call this whenever the selected topic or canvas size changes.
+// Pre-rendering avoids expensive per-frame gradient and shadow operations.
 function updateTopicCache() {
     const topic = TOPICS.find(t => t.id === game.selectedTopic);
     const lightColor20 = lightenColor(topic.color, 20);
