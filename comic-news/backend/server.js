@@ -11,10 +11,10 @@ const PORT = process.env.PORT || 5187;
 
 app.use(cors());
 app.use(express.json());
-app.use('/images', express.static(join(__dirname, 'images')));
+app.use('/images', express.static(join(__dirname, 'images'), { maxAge: '7d' }));
 
 // Serve static frontend (for Docker deployment)
-app.use(express.static(join(__dirname, 'dist')));
+app.use(express.static(join(__dirname, 'dist'), { maxAge: '1h', index: false }));
 
 // Comic data
 const comics = [
@@ -147,8 +147,19 @@ const featuredComics = [...comics]
   .slice(0, 4)
   .map(({ pages, ...comic }) => comic);
 
+const baseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
+const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${baseUrl}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>${baseUrl}/library</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+${comics.map(c =>
+  `  <url><loc>${baseUrl}/comic/${c.id}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`
+).join('\n')}
+</urlset>`;
+
 // Get all comics
 app.get('/api/comics', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=60');
   const { genre, search, sort } = req.query;
   let result = [...comics];
 
@@ -244,18 +255,9 @@ app.get('/robots.txt', (req, res) => {
 
 // sitemap.xml
 app.get('/sitemap.xml', (req, res) => {
-  const baseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
-  const comicUrls = comics.map(c =>
-    `  <url><loc>${baseUrl}/comic/${c.id}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>`
-  ).join('\n');
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${baseUrl}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>${baseUrl}/library</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-${comicUrls}
-</urlset>`;
+  res.set('Cache-Control', 'public, max-age=86400');
   res.type('application/xml');
-  res.send(xml);
+  res.send(sitemapXml);
 });
 
 // SPA fallback - serve index.html for all non-API routes

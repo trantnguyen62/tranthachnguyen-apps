@@ -17,6 +17,7 @@ function ComicCard({ comic }) {
             alt={comic.title}
             onLoad={() => setImgLoaded(true)}
             loading="lazy"
+            decoding="async"
             className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
           />
         </div>

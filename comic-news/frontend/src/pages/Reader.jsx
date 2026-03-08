@@ -210,6 +210,8 @@ function Reader() {
                   }`}
                   onLoad={() => handleImageLoad(index)}
                   loading={index < 3 ? "eager" : "lazy"}
+                  decoding={index === 0 ? "sync" : "async"}
+                  fetchPriority={index === 0 ? "high" : index < 3 ? "auto" : "low"}
                 />
               </div>
             ))}
