@@ -16,12 +16,12 @@ Browse and read daily news stories transformed into comics. Track your reading p
 ### Development
 
 ```bash
-# Start backend (port 5187)
+# Start backend on port 5188 (vite proxy expects this port in dev)
 cd backend
 npm install
-npm start
+PORT=5188 npm start
 
-# Start frontend dev server (port 5173)
+# Start frontend dev server (port 5187)
 cd frontend
 npm install
 npm run dev
@@ -64,7 +64,7 @@ comic-news/
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/comics` | List comics. Query params: `genre`, `search`, `sort` (`rating`\|`title`) |
-| GET | `/api/comics/:id` | Get single comic with pages |
+| GET | `/api/comics/:id` | Get single comic with `pages` (images) and `panels` (text descriptions) |
 | GET | `/api/genres` | List available genres |
 | GET | `/api/featured` | Top-rated comics (up to 4) |
 | GET | `/api/bookmarks` | Get bookmarked comics |

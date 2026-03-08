@@ -7,6 +7,7 @@ export default defineConfig({
     port: 5187,
     host: true,
     proxy: {
+      // Dev backend must run on 5188 (PORT=5188 npm start) to avoid conflict
       '/api': {
         target: 'http://localhost:5188',
         changeOrigin: true
