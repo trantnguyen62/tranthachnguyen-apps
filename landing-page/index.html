@@ -149,6 +149,12 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        @media (forced-colors: active) {
+            .gradient-text {
+                -webkit-text-fill-color: CanvasText;
+                background: none;
+            }
+        }
         .blob {
             animation: blob-drift 12s ease-in-out infinite alternate;
         }
@@ -187,7 +193,7 @@
             </p>
         </header>
 
-        <ul class="grid grid-cols-1 md:grid-cols-2 gap-8 list-none p-0 m-0" role="list">
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-8 list-none p-0 m-0" role="list" aria-label="Projects and apps">
 
             <!-- LinguaFlow -->
             <li><a href="https://linguaflow.tranthachnguyen.com" rel="noopener noreferrer" aria-label="Launch LinguaFlow — AI Language app" class="glass-card p-8 rounded-2xl border-t-2 border-blue-500/40 hover:scale-[1.02] transition-transform duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400 focus-visible:outline-offset-2 group cursor-pointer block">
@@ -289,7 +295,7 @@
 
     </main>
 
-    <footer class="mt-20 mb-6 text-center text-slate-500 text-sm z-10">
+    <footer class="mt-20 mb-6 text-center text-slate-400 text-sm z-10">
         <p>&copy; 2026 Tran Thach Nguyen. All rights reserved.</p>
     </footer>
 
