@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
-import { removeBackground } from '@imgly/background-removal';
 import { PassportImage } from '../types';
 
 interface Props {
@@ -70,6 +69,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
       const blob = new Blob([bytes], { type: mime });
       setProgress(30);
       
+      const { removeBackground } = await import('@imgly/background-removal');
       const removed = await removeBackground(blob, {
         progress: (_, cur, total) => setProgress(30 + Math.round((cur / total) * 50)),
       });

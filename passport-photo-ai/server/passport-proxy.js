@@ -29,7 +29,14 @@ setInterval(() => { const now = Date.now(); _rateMap.forEach((v, k) => { if (now
 
 // Serve static files from dist
 const distPath = join(__dirname, '../dist');
-app.use(express.static(distPath));
+app.use(express.static(distPath, {
+  maxAge: '7d',
+  immutable: true,
+  setHeaders(res, filePath) {
+    // HTML must not be cached aggressively (SPA entry point changes on deploy)
+    if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+  },
+}));
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 

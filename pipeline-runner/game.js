@@ -414,6 +414,14 @@ function init() {
     game.canvas = document.getElementById('gameCanvas');
     game.ctx = game.canvas.getContext('2d');
 
+    // Cache frequently accessed DOM elements to avoid repeated lookups
+    game.elScore   = document.getElementById('currentScore');
+    game.elLives   = document.getElementById('livesCount');
+    game.elStreak  = document.getElementById('streakCount');
+    game.elTipBanner = document.getElementById('tipBanner');
+    game.elTipText   = document.getElementById('tipText');
+    game.elTimer     = document.getElementById('questionTimer');
+
     loadProgress();
     renderTopicButtons();
     setupEventListeners();
@@ -607,9 +615,9 @@ function startGame() {
     updateTopicCache();
     const topic = game.topicCache.topic;
     document.getElementById('currentTopicBadge').textContent = `${topic.icon} ${topic.name}`;
-    document.getElementById('currentScore').textContent = '0';
-    document.getElementById('streakCount').textContent = '0';
-    document.getElementById('livesCount').textContent = '0';
+    game.elScore.textContent = '0';
+    game.elStreak.textContent = '0';
+    game.elLives.textContent = '0';
 
     showScreen('gameScreen');
     hideTipBanner();
@@ -658,7 +666,7 @@ function update() {
         if (!obs.passed && obs.x + CONFIG.OBSTACLE_WIDTH < game.player.x) {
             obs.passed = true;
             game.score++;
-            document.getElementById('currentScore').textContent = game.score;
+            game.elScore.textContent = game.score;
 
             // Show learned content as floating text
             game.learnedItems.push(obs.content);
@@ -974,9 +982,8 @@ function startQuestionTimer() {
         }
 
         game.questionTimer--;
-        const timerEl = document.getElementById('questionTimer');
-        timerEl.textContent = game.questionTimer;
-        timerEl.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
+        game.elTimer.textContent = game.questionTimer;
+        game.elTimer.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
 
         if (game.questionTimer <= 0) {
             clearInterval(game.questionTimerInterval);
@@ -1026,20 +1033,20 @@ function checkAnswer(index) {
         game.correctAnswers++;
         game.streak++;
         game.bestStreak = Math.max(game.bestStreak, game.streak);
-        document.getElementById('streakCount').textContent = game.streak;
+        game.elStreak.textContent = game.streak;
 
         game.score += 5;
-        document.getElementById('currentScore').textContent = game.score;
+        game.elScore.textContent = game.score;
 
         // Award a life for correct answer!
         game.lives++;
-        document.getElementById('livesCount').textContent = game.lives;
+        game.elLives.textContent = game.lives;
         showTip(`+1 Life! ❤️ You now have ${game.lives} lives!`);
 
         game.lastLearnedFact = game.currentQuestion.fact || "Great job! Keep learning!";
     } else {
         game.streak = 0;
-        document.getElementById('streakCount').textContent = '0';
+        game.elStreak.textContent = '0';
         game.lastLearnedFact = game.currentQuestion.fact || "Remember this for next time!";
     }
 
@@ -1049,7 +1056,7 @@ function checkAnswer(index) {
 function handleTimeout() {
     game.questionsAnswered++;
     game.streak = 0;
-    document.getElementById('streakCount').textContent = '0';
+    game.elStreak.textContent = '0';
 
     const btns = document.querySelectorAll('.answer-btn');
     btns[game.currentQuestion.correctIndex].classList.add('correct');
@@ -1077,16 +1084,16 @@ function closeQuestion() {
 }
 
 // Tips
+let _tipHideTimer = null;
 function showTip(text) {
-    const banner = document.getElementById('tipBanner');
-    document.getElementById('tipText').textContent = text;
-    banner.classList.remove('hidden');
-
-    setTimeout(() => hideTipBanner(), 3000);
+    if (_tipHideTimer) { clearTimeout(_tipHideTimer); _tipHideTimer = null; }
+    game.elTipText.textContent = text;
+    game.elTipBanner.classList.remove('hidden');
+    _tipHideTimer = setTimeout(() => { hideTipBanner(); _tipHideTimer = null; }, 3000);
 }
 
 function hideTipBanner() {
-    document.getElementById('tipBanner').classList.add('hidden');
+    game.elTipBanner.classList.add('hidden');
 }
 
 // Game Over
@@ -1125,7 +1132,7 @@ function gameOver() {
 // Use a life to respawn
 function useLife() {
     game.lives--;
-    document.getElementById('livesCount').textContent = game.lives;
+    game.elLives.textContent = game.lives;
 
     game.respawnInvincible = true;
     showTip(`❤️ Used 1 life! ${game.lives} remaining. Keep going!`);
@@ -1297,7 +1304,7 @@ const AdManager = {
     // Grant extra life and continue game
     grantExtraLife: function () {
         game.lives++;
-        document.getElementById('livesCount').textContent = game.lives;
+        game.elLives.textContent = game.lives;
 
         // Disable the watch ad button
         const watchAdBtn = document.getElementById('watchAdBtn');
