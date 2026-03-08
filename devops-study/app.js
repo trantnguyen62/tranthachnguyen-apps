@@ -3410,7 +3410,6 @@ function debounce(fn, delay) {
 }
 
 const debouncedSaveProgress = debounce(saveProgress, 500);
-}
 
 // Fast topic lookup map (O(1) vs O(n) find)
 const topicMap = new Map(devopsData.topics.map(t => [t.id, t]));
@@ -3681,6 +3680,7 @@ function renderCodebase() {
         return;
     }
 
+    const codebaseFragment = document.createDocumentFragment();
     codebase.forEach((item, index) => {
         const codeItem = document.createElement('div');
         codeItem.className = 'codebase-item';
@@ -3701,8 +3701,9 @@ function renderCodebase() {
         `;
         const copyBtn = codeItem.querySelector('.codebase-copy-btn');
         copyBtn.addEventListener('click', () => copyCodebase(copyBtn, index));
-        codebaseList.appendChild(codeItem);
+        codebaseFragment.appendChild(codeItem);
     });
+    codebaseList.appendChild(codebaseFragment);
 }
 
 // Escape HTML for code display
@@ -3739,6 +3740,7 @@ function renderCommands() {
         return;
     }
 
+    const commandsFragment = document.createDocumentFragment();
     commands.forEach(cmd => {
         const item = document.createElement('div');
         item.className = 'command-item';
@@ -3748,8 +3750,9 @@ function renderCommands() {
             <p class="command-description">${escapeHtml(cmd.description)}</p>
         `;
         item.querySelector('.command-copy-btn').addEventListener('click', (e) => copyCommand(e, cmd.command));
-        commandsList.appendChild(item);
+        commandsFragment.appendChild(item);
     });
+    commandsList.appendChild(commandsFragment);
 }
 
 // Copy command to clipboard
@@ -3772,6 +3775,7 @@ function copyCommand(event, command) {
 let matchState = {
     pairs: [],
     selectedTerm: null,
+    selectedTermEl: null,
     matchedPairs: 0,
     attempts: 0,
     startTime: null,
@@ -3794,6 +3798,7 @@ function initMatchGame() {
     matchState = {
         pairs: [],
         selectedTerm: null,
+        selectedTermEl: null,
         matchedPairs: 0,
         attempts: 0,
         startTime: Date.now(),
@@ -3867,50 +3872,53 @@ function renderMatchItems() {
 
 function selectMatchItem(element, id, type) {
     if (element.classList.contains('matched')) return;
-    
+
     if (type === 'term') {
         // Deselect previous term if any
-        document.querySelectorAll('.match-item.term.selected').forEach(el => {
-            el.classList.remove('selected');
-        });
-        
+        if (matchState.selectedTermEl) {
+            matchState.selectedTermEl.classList.remove('selected');
+        }
+
         element.classList.add('selected');
         matchState.selectedTerm = id;
+        matchState.selectedTermEl = element;
     } else if (type === 'definition' && matchState.selectedTerm !== null) {
         // Check if match
         matchState.attempts++;
         document.getElementById('matchAttempts').textContent = matchState.attempts;
-        
+
         if (matchState.selectedTerm === id) {
             // Correct match!
             matchState.pairs[id].matched = true;
             matchState.matchedPairs++;
             document.getElementById('matchedPairs').textContent = matchState.matchedPairs;
-            
+
             // Mark both items as matched
             document.querySelectorAll(`.match-item[data-id="${id}"]`).forEach(el => {
                 el.classList.remove('selected');
                 el.classList.add('matched');
             });
-            
+
             matchState.selectedTerm = null;
-            
+            matchState.selectedTermEl = null;
+
             // Check if game complete
             if (matchState.matchedPairs === matchState.pairs.length) {
                 endMatchGame();
             }
         } else {
             // Wrong match - shake animation
+            const selectedTermEl = matchState.selectedTermEl;
             element.classList.add('incorrect');
-            const selectedTermEl = document.querySelector(`.match-item.term.selected`);
             if (selectedTermEl) selectedTermEl.classList.add('incorrect');
-            
+
             setTimeout(() => {
                 element.classList.remove('incorrect');
                 if (selectedTermEl) {
                     selectedTermEl.classList.remove('incorrect', 'selected');
                 }
                 matchState.selectedTerm = null;
+                matchState.selectedTermEl = null;
             }, 500);
         }
     }
@@ -4181,7 +4189,9 @@ function handleSearch(event) {
         return;
     }
 
-    results.forEach(({ topic }) => topicGrid.appendChild(createTopicCard(topic)));
+    const searchFragment = document.createDocumentFragment();
+    results.forEach(({ topic }) => searchFragment.appendChild(createTopicCard(topic)));
+    topicGrid.appendChild(searchFragment);
 }
 
 // Initialize app
