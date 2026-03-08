@@ -61,6 +61,11 @@
                     <span class="logo-icon" aria-hidden="true">⚡</span>
                     <h1>DevOps<span class="logo-accent">Mastery</span></h1>
                 </div>
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="sidebar">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
                 <div class="search-container">
                     <label for="searchInput" class="sr-only">Search topics and terms</label>
                     <input type="text" id="searchInput" class="search-input" placeholder="Search topics, terms..." aria-label="Search topics and terms">
@@ -79,10 +84,13 @@
             </div>
         </header>
 
+        <!-- Sidebar backdrop overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
         <!-- Main Layout -->
         <div class="main-layout">
             <!-- Sidebar -->
-            <aside class="sidebar">
+            <aside class="sidebar" id="sidebar">
                 <nav class="topic-nav">
                     <h2 class="nav-title">Topics</h2>
                     <ul class="topic-list" id="topicList">

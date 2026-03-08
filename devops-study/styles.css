@@ -255,6 +255,49 @@ body {
     background-clip: text;
 }
 
+/* Hamburger menu button (visible only on mobile) */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: var(--space-sm);
+    background: var(--bg-glass);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.hamburger-line {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--text-secondary);
+    border-radius: 2px;
+    transition: var(--transition-base);
+}
+
+.hamburger-btn:hover .hamburger-line {
+    background: var(--text-primary);
+}
+
+/* Sidebar backdrop overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
 .search-container {
     flex: 1;
     max-width: 400px;
@@ -1155,9 +1198,14 @@ body {
    Responsive Design
    ===================================================== */
 @media (max-width: 1024px) {
+    .hamburger-btn {
+        display: flex;
+    }
+
     .sidebar {
         transform: translateX(-100%);
         transition: transform var(--transition-base);
+        z-index: 100;
     }
 
     .sidebar.open {
@@ -1239,6 +1287,15 @@ body {
     .quiz-container {
         padding: var(--space-lg);
     }
+
+    /* Hide tab text labels on very small screens, show only icons */
+    .tab-btn span:last-child {
+        display: none;
+    }
+
+    .tab-btn {
+        padding: var(--space-sm) var(--space-md);
+    }
 }
 
 /* =====================================================
@@ -1290,16 +1347,23 @@ body {
     transform: translateX(4px);
 }
 
+.command-item-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
 .command-code {
+    flex: 1;
     font-family: 'Monaco', 'Consolas', monospace;
     font-size: var(--font-size-sm);
     color: #22d3ee;
     background: rgba(0, 0, 0, 0.4);
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-sm);
-    margin-bottom: var(--space-sm);
-    display: block;
     overflow-x: auto;
+    margin: 0;
 }
 
 .command-description {
@@ -1308,7 +1372,7 @@ body {
 }
 
 .command-copy-btn {
-    float: right;
+    flex-shrink: 0;
     background: rgba(255, 255, 255, 0.1);
     border: none;
     padding: var(--space-xs) var(--space-sm);

@@ -3745,8 +3745,10 @@ function renderCommands() {
         const item = document.createElement('div');
         item.className = 'command-item';
         item.innerHTML = `
-            <button class="command-copy-btn">📋 Copy</button>
-            <code class="command-code">${escapeHtml(cmd.command)}</code>
+            <div class="command-item-header">
+                <code class="command-code">${escapeHtml(cmd.command)}</code>
+                <button class="command-copy-btn">📋 Copy</button>
+            </div>
             <p class="command-description">${escapeHtml(cmd.description)}</p>
         `;
         item.querySelector('.command-copy-btn').addEventListener('click', (e) => copyCommand(e, cmd.command));
@@ -4242,6 +4244,38 @@ function init() {
     document.getElementById('searchInput').addEventListener('input', debounce(handleSearch, 150));
     document.getElementById('matchRestartBtn').addEventListener('click', restartMatchGame);
     document.getElementById('matchPlayAgainBtn').addEventListener('click', restartMatchGame);
+
+    // Mobile sidebar toggle
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        hamburgerBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    hamburgerBtn.addEventListener('click', () => {
+        if (sidebar.classList.contains('open')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    });
+
+    sidebarOverlay.addEventListener('click', closeSidebar);
+
+    // Close sidebar on topic selection (mobile)
+    document.getElementById('topicList').addEventListener('click', () => {
+        if (window.innerWidth <= 1024) closeSidebar();
+    });
 
     // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
