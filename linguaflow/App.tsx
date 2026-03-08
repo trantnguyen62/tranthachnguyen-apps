@@ -148,29 +148,36 @@ function App() {
               <p className="text-xs text-slate-400">Real-time AI conversation partner</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs" aria-live="polite">
-            {isConnected ? (
-              <>
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                </span>
-                <span className="text-green-400 font-mono tabular-nums">{formatElapsed(elapsed)}</span>
-              </>
-            ) : isConnecting ? (
-              <>
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-                </span>
-                <span className="text-yellow-400">Connecting</span>
-              </>
-            ) : (
-              <>
-                <span className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
-                <span className="text-slate-500">Idle</span>
-              </>
+          <div className="flex items-center gap-3" aria-live="polite">
+            {userProfile && (
+              <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0" title={userProfile.name}>
+                {userProfile.name.charAt(0).toUpperCase()}
+              </div>
             )}
+            <div className="flex items-center gap-2 text-xs">
+              {isConnected ? (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  <span className="text-green-400 font-mono tabular-nums">{formatElapsed(elapsed)}</span>
+                </>
+              ) : isConnecting ? (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                  </span>
+                  <span className="text-yellow-400">Connecting</span>
+                </>
+              ) : (
+                <>
+                  <span className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
+                  <span className="text-slate-500">Idle</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -183,8 +190,13 @@ function App() {
            />
            
            <div className="text-center space-y-2" aria-live="polite" aria-atomic="true">
-             <h2 className="text-2xl font-light">
-               {isConnected ? 'Listening...' : 'Start speaking, start learning'}
+             <h2 className="text-2xl font-light flex items-center justify-center gap-2">
+               {isConnected ? (
+                 <>
+                   <span role="img" aria-hidden="true">{activeLanguage.flag}</span>
+                   <span>Listening...</span>
+                 </>
+               ) : 'Start speaking, start learning'}
              </h2>
              <p className="text-slate-400 text-sm max-w-md mx-auto">
                {isConnected

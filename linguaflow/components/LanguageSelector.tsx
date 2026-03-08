@@ -57,14 +57,16 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                 flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200
                 ${selected.code === lang.code
                   ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20'
-                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-750 hover:border-slate-600'}
+                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:border-slate-600'}
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
               <span className="text-2xl" role="img" aria-label={lang.name}>{lang.flag}</span>
               <div className="text-left">
                 <div className="font-semibold text-sm">{lang.name}</div>
-                <div className="text-xs opacity-70">Voice: {selected.code === lang.code ? selected.voiceName : lang.voiceName}</div>
+                {selected.code === lang.code && (
+                  <div className="text-xs opacity-70">Voice: {selected.voiceName}</div>
+                )}
               </div>
             </button>
           ))}
@@ -88,7 +90,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                     flex items-center gap-2 px-4 py-3 rounded-xl border transition-all duration-200
                     ${isSelected
                       ? 'bg-pink-600 border-pink-500 text-white shadow-lg'
-                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-750 hover:border-pink-500'}
+                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:border-pink-500'}
                     ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                   `}
                 >
@@ -122,7 +124,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                     flex flex-col items-start px-4 py-3 rounded-xl border transition-all duration-200
                     ${isSelected
                       ? `${colors.bg} ${colors.border} text-white shadow-lg`
-                      : `bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-750 hover:${colors.border}`}
+                      : `bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:${colors.border}`}
                     ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                   `}
                 >
@@ -163,7 +165,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                     flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200
                     ${isSelected
                       ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg'
-                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-750 hover:border-indigo-500'}
+                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:border-indigo-500'}
                     ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                   `}
                 >
