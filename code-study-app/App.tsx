@@ -169,27 +169,31 @@ function App() {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-slate-700/50">
+          <div role="tablist" aria-label="Sidebar navigation" className="flex border-b border-slate-700/50">
             <button
+              role="tab"
+              aria-selected={activeTab === 'files'}
               onClick={handleTabFiles}
               className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 ${
-                activeTab === 'files' 
-                  ? 'text-emerald-400 border-b-2 border-emerald-400' 
+                activeTab === 'files'
+                  ? 'text-emerald-400 border-b-2 border-emerald-400'
                   : 'text-slate-400 hover:text-slate-300'
               }`}
             >
-              <FolderOpen className="w-4 h-4" />
+              <FolderOpen className="w-4 h-4" aria-hidden="true" />
               Files
             </button>
             <button
+              role="tab"
+              aria-selected={activeTab === 'search'}
               onClick={handleTabSearch}
               className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 ${
-                activeTab === 'search' 
-                  ? 'text-emerald-400 border-b-2 border-emerald-400' 
+                activeTab === 'search'
+                  ? 'text-emerald-400 border-b-2 border-emerald-400'
                   : 'text-slate-400 hover:text-slate-300'
               }`}
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-4 h-4" aria-hidden="true" />
               Search
             </button>
           </div>
@@ -218,14 +222,16 @@ function App() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     placeholder="Search files..."
+                    aria-label="Search files"
                     className="flex-1 bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
                   <button
                     onClick={handleSearch}
                     disabled={isSearching}
+                    aria-label={isSearching ? 'Searching...' : 'Search'}
                     className="px-3 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 disabled:opacity-50"
                   >
-                    {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    {isSearching ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Search className="w-4 h-4" aria-hidden="true" />}
                   </button>
                 </div>
                 {searchResults.length > 0 ? (
@@ -249,9 +255,11 @@ function App() {
         <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center px-4 gap-4">
           <button
             onClick={handleToggleSidebar}
+            aria-label={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
+            aria-expanded={showSidebar}
             className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
           >
-            <ChevronLeft className={`w-5 h-5 transition-transform ${showSidebar ? '' : 'rotate-180'}`} />
+            <ChevronLeft className={`w-5 h-5 transition-transform ${showSidebar ? '' : 'rotate-180'}`} aria-hidden="true" />
           </button>
           
           {selectedFile && (

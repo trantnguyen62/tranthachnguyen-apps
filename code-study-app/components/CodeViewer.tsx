@@ -88,12 +88,13 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
         <button
           onClick={handleCopy}
           className="p-1.5 hover:bg-slate-600/50 rounded transition-colors"
-          title="Copy code"
+          title={copied ? 'Copied!' : 'Copy code'}
+          aria-label={copied ? 'Copied!' : 'Copy code'}
         >
           {copied ? (
-            <Check className="w-4 h-4 text-green-400" />
+            <Check className="w-4 h-4 text-green-400" aria-hidden="true" />
           ) : (
-            <Copy className="w-4 h-4 text-slate-400" />
+            <Copy className="w-4 h-4 text-slate-400" aria-hidden="true" />
           )}
         </button>
       </div>
