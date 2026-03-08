@@ -60,7 +60,7 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
           ) : (
             <Folder className="w-4 h-4 text-amber-400" aria-hidden="true" />
           )}
-          <span className="text-slate-300 truncate">{node.name}</span>
+          <span className="text-slate-200 font-medium truncate">{node.name}</span>
         </button>
         {isExpanded && node.children && (
           <div role="group">
@@ -86,12 +86,12 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
       aria-selected={isSelected}
       title={node.name}
       className={`flex items-center gap-2 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm transition-colors ${
-        isSelected ? 'bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500' : 'border-l-2 border-transparent'
+        isSelected ? 'bg-emerald-500/10 border-l-2 border-emerald-500' : 'border-l-2 border-transparent'
       }`}
       style={{ paddingLeft: `${depth * 12 + 24}px` }}
     >
       <File className={`w-4 h-4 ${getFileIcon(node.name)}`} aria-hidden="true" />
-      <span className="text-slate-300 truncate">{node.name}</span>
+      <span className={`truncate ${isSelected ? 'text-emerald-300 font-medium' : 'text-slate-300'}`}>{node.name}</span>
     </button>
   );
 });

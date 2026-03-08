@@ -244,11 +244,16 @@ function App() {
                   </button>
                 </div>
                 {searchResults.length > 0 ? (
-                  <FileTree 
-                    nodes={searchResults} 
-                    onFileSelect={handleFileSelect}
-                    selectedPath={selectedFile?.path}
-                  />
+                  <>
+                    <p className="text-xs text-slate-500 px-2">
+                      {searchResults.length} file{searchResults.length !== 1 ? 's' : ''} found
+                    </p>
+                    <FileTree
+                      nodes={searchResults}
+                      onFileSelect={handleFileSelect}
+                      selectedPath={selectedFile?.path}
+                    />
+                  </>
                 ) : searchQuery && !isSearching ? (
                   <p className="text-center text-slate-500 py-4">No results found</p>
                 ) : null}
@@ -340,7 +345,8 @@ function App() {
                 <MessageSquare className="w-4 h-4 text-emerald-400" />
                 <span className="text-sm font-medium">AI Tutor</span>
                 {isConnected && (
-                  <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full">
+                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Live
                   </span>
                 )}
@@ -356,17 +362,23 @@ function App() {
             {/* Selected Code Context */}
             {selectedCode && (
               <div className="p-4 border-t border-slate-700/50">
-                <div className="text-xs text-slate-500 mb-2">Selected code context:</div>
-                <div className="bg-slate-700/30 rounded p-2 text-xs code-font text-slate-400 max-h-20 overflow-auto">
-                  {selectedCode.substring(0, 200)}
-                  {selectedCode.length > 200 && '...'}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-slate-400 font-medium">Code context</span>
+                  <button
+                    onClick={() => setSelectedCode('')}
+                    className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+                    aria-label="Clear selected code context"
+                  >
+                    ✕ Clear
+                  </button>
                 </div>
-                <button
-                  onClick={() => setSelectedCode('')}
-                  className="text-xs text-slate-500 hover:text-slate-400 mt-1"
-                >
-                  Clear selection
-                </button>
+                <div className="bg-slate-700/40 rounded-lg p-2 text-xs code-font text-slate-300 max-h-20 overflow-auto border border-slate-600/30">
+                  {selectedCode.substring(0, 200)}
+                  {selectedCode.length > 200 && <span className="text-slate-500">…</span>}
+                </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  {selectedCode.split('\n').length} line{selectedCode.split('\n').length !== 1 ? 's' : ''} selected
+                </p>
               </div>
             )}
           </div>

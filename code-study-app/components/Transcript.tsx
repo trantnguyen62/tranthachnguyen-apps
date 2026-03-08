@@ -22,13 +22,27 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
   if (messages.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center space-y-4 px-4">
-          <Bot className="w-10 h-10 mx-auto text-emerald-500/30" />
-          <p className="text-slate-400 font-medium">No conversation yet</p>
-          <div className="text-left space-y-2 text-sm text-slate-500">
-            <p className="flex items-start gap-2"><span className="text-emerald-500/60 font-bold">1.</span> Select a project and open a file</p>
-            <p className="flex items-start gap-2"><span className="text-emerald-500/60 font-bold">2.</span> Click <span className="text-emerald-400">Start Voice Session</span></p>
-            <p className="flex items-start gap-2"><span className="text-emerald-500/60 font-bold">3.</span> Ask questions about your code</p>
+        <div className="text-center space-y-5 px-4">
+          <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto">
+            <Bot className="w-7 h-7 text-emerald-500/50" />
+          </div>
+          <div>
+            <p className="text-slate-300 font-semibold mb-1">AI Tutor ready</p>
+            <p className="text-slate-500 text-xs">Start a voice session to ask questions about your code</p>
+          </div>
+          <div className="text-left space-y-2.5 text-xs text-slate-500 bg-slate-800/60 rounded-lg p-3">
+            <p className="flex items-center gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0">1</span>
+              Open a file from the sidebar
+            </p>
+            <p className="flex items-center gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0">2</span>
+              Click <span className="text-emerald-400 font-medium mx-1">Start Voice Session</span>
+            </p>
+            <p className="flex items-center gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0">3</span>
+              Speak your question
+            </p>
           </div>
         </div>
       </div>

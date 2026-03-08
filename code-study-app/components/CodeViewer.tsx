@@ -64,11 +64,17 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   if (!file) {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-800/50 rounded-lg">
-        <div className="text-center text-slate-500 space-y-2">
-          <Code2 className="w-10 h-10 mx-auto opacity-30" />
-          <p className="text-base font-medium text-slate-400">No file selected</p>
-          <p className="text-sm">Pick a file from the sidebar to view it here</p>
-          <p className="text-xs text-slate-600">Tip: select any code text to give the AI tutor specific context</p>
+        <div className="text-center text-slate-500 space-y-3">
+          <div className="w-16 h-16 rounded-2xl bg-slate-700/50 flex items-center justify-center mx-auto">
+            <Code2 className="w-8 h-8 opacity-30" />
+          </div>
+          <div>
+            <p className="text-base font-medium text-slate-400">No file selected</p>
+            <p className="text-sm mt-1">Pick a file from the sidebar to view it here</p>
+          </div>
+          <p className="text-xs text-slate-600 bg-slate-800/60 rounded-lg px-3 py-2 inline-block">
+            Tip: select code text to add it as AI context
+          </p>
         </div>
       </div>
     );
@@ -111,9 +117,10 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
             <div style={{ height: `${paddingTop}px` }} />
             {lines.slice(visibleStart, visibleEnd).map((line, i) => {
               const lineIndex = visibleStart + i;
+              const lineNumWidth = lines.length >= 10000 ? 'w-16' : lines.length >= 1000 ? 'w-14' : 'w-10';
               return (
-                <div key={lineIndex} className="flex hover:bg-slate-700/30" style={{ height: `${LINE_HEIGHT}px` }}>
-                  <span className="w-12 text-right pr-4 text-slate-500 select-none leading-5">
+                <div key={lineIndex} className="flex hover:bg-slate-700/40 group" style={{ height: `${LINE_HEIGHT}px` }}>
+                  <span className={`${lineNumWidth} text-right pr-3 text-slate-600 group-hover:text-slate-500 select-none leading-5 flex-shrink-0`}>
                     {lineIndex + 1}
                   </span>
                   <span className="text-slate-300 whitespace-pre leading-5">{line || ' '}</span>
