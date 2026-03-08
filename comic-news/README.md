@@ -27,6 +27,8 @@ npm install
 npm run dev
 ```
 
+> In development, set `ALLOWED_ORIGIN=http://localhost:5187` to allow the Vite dev server to reach the API.
+
 ### Docker
 
 The Dockerfile expects a pre-built frontend. Build locally first, then build the image:
@@ -84,6 +86,7 @@ comic-news/
 |----------|---------|-------------|
 | `PORT` | `5187` | Backend server port |
 | `BASE_URL` | `https://comic-news.tranthachnguyen.com` | Base URL used in sitemap.xml |
+| `ALLOWED_ORIGIN` | `https://comic-news.tranthachnguyen.com` | CORS allowed origin for API requests |
 
 ## Tech Stack
 
