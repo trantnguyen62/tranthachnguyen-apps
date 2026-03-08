@@ -3409,6 +3409,9 @@ function debounce(fn, delay) {
     };
 }
 
+const debouncedSaveProgress = debounce(saveProgress, 500);
+}
+
 // Fast topic lookup map (O(1) vs O(n) find)
 const topicMap = new Map(devopsData.topics.map(t => [t.id, t]));
 
@@ -3513,6 +3516,7 @@ function renderSidebarTopics() {
     const topicList = document.getElementById('topicList');
     topicList.innerHTML = '';
 
+    const fragment = document.createDocumentFragment();
     devopsData.topics.forEach(topic => {
         const progress = calculateTopicProgress(topic.id);
         const li = document.createElement('li');
@@ -3527,8 +3531,9 @@ function renderSidebarTopics() {
             </div>
         `;
         li.addEventListener('click', () => selectTopic(topic));
-        topicList.appendChild(li);
+        fragment.appendChild(li);
     });
+    topicList.appendChild(fragment);
 }
 
 // Update a single sidebar topic's progress bar without rebuilding the whole list
@@ -3563,7 +3568,9 @@ function createTopicCard(topic) {
 function renderTopicGrid() {
     const topicGrid = document.getElementById('topicGrid');
     topicGrid.innerHTML = '';
-    devopsData.topics.forEach(topic => topicGrid.appendChild(createTopicCard(topic)));
+    const fragment = document.createDocumentFragment();
+    devopsData.topics.forEach(topic => fragment.appendChild(createTopicCard(topic)));
+    topicGrid.appendChild(fragment);
 }
 
 // Select a topic
@@ -3973,7 +3980,7 @@ function markCardViewed(topicId, cardIndex) {
 
     if (!state.progress[topicId].flashcardsViewed.has(cardIndex)) {
         state.progress[topicId].flashcardsViewed.add(cardIndex);
-        saveProgress();
+        debouncedSaveProgress();
         updateSidebarTopicProgress(topicId);
     }
 }
