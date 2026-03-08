@@ -531,12 +531,16 @@ function renderTopicGrid() {
         const card = document.createElement('div');
         card.className = 'topic-card';
         card.style.setProperty('--topic-color', topic.color);
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', `${topic.name} - ${QUESTIONS[topic.id].length} questions`);
         card.innerHTML = `
-            <div class="topic-card-icon">${topic.icon}</div>
+            <div class="topic-card-icon" aria-hidden="true">${topic.icon}</div>
             <div class="topic-card-name">${topic.name}</div>
             <div class="topic-card-count">${QUESTIONS[topic.id].length} questions</div>
         `;
         card.onclick = () => startGame('practice', topic.id);
+        card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startGame('practice', topic.id); } };
         grid.appendChild(card);
     });
 }
@@ -972,8 +976,9 @@ function showQuestion(enemy) {
     answers.forEach((answer, i) => {
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
+        btn.setAttribute('aria-label', `${i + 1}: ${answer.text}`);
         btn.innerHTML = `
-            <span class="answer-key">${i + 1}</span>
+            <span class="answer-key" aria-hidden="true">${i + 1}</span>
             <span class="answer-text">${answer.text}</span>
         `;
         btn.onclick = () => selectAnswer(i);
@@ -989,6 +994,7 @@ function selectAnswer(index) {
 
     btns.forEach((btn, i) => {
         btn.classList.add('disabled');
+        btn.disabled = true;
         if (i === index) btn.classList.add('selected');
     });
 

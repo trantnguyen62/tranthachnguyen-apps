@@ -252,6 +252,11 @@ body {
     transition-duration: 0.05s;
 }
 
+.menu-btn:focus-visible {
+    outline: 2px solid var(--nano-cyan);
+    outline-offset: 3px;
+}
+
 .btn-icon {
     font-size: 1.5rem;
 }
@@ -432,6 +437,11 @@ body {
     transform: scale(0.98);
 }
 
+.game-menu-btn:focus-visible {
+    outline: 2px solid var(--nano-cyan);
+    outline-offset: 3px;
+}
+
 .menu-icon-img {
     width: 24px;
     height: 24px;
@@ -518,6 +528,11 @@ body {
 .answer-btn:active:not(.disabled) {
     transform: scale(0.98);
     transition-duration: 0.05s;
+}
+
+.answer-btn:focus-visible:not(.disabled) {
+    outline: 2px solid var(--nano-cyan);
+    outline-offset: 3px;
 }
 
 .answer-key {
@@ -633,6 +648,13 @@ body {
     box-shadow: 0 0 20px var(--nano-yellow-glow);
 }
 
+.topic-card:focus-visible {
+    outline: 2px solid var(--nano-cyan);
+    outline-offset: 3px;
+    border-color: var(--nano-yellow);
+    box-shadow: 0 0 20px var(--nano-yellow-glow);
+}
+
 .topic-card-icon {
     font-size: 3rem;
     margin-bottom: 0.5rem;
@@ -663,6 +685,11 @@ body {
 .back-btn:hover {
     border-color: var(--nano-yellow);
     color: var(--nano-yellow);
+}
+
+.back-btn:focus-visible {
+    outline: 2px solid var(--nano-cyan);
+    outline-offset: 3px;
 }
 
 /* Instructions (How to Play) */
