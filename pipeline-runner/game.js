@@ -752,8 +752,14 @@ function render() {
     }
 
     const obstacles = game.obstacles;
-    for (let i = 0; i < obstacles.length; i++) {
-        drawObstacle(ctx, obstacles[i]);
+    if (obstacles.length > 0) {
+        // Set shared obstacle state once per frame
+        ctx.lineWidth = 2;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i < obstacles.length; i++) {
+            drawObstacle(ctx, obstacles[i]);
+        }
     }
 
     // Draw floating learned texts with a single save/restore block
@@ -816,14 +822,11 @@ function drawObstacle(ctx, obs) {
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(obs.x - 8, obs.gapY - 35, gateWidth + 16, 35);
     ctx.strokeStyle = gateColor;
-    ctx.lineWidth = 2;
     ctx.strokeRect(obs.x - 8, obs.gapY - 35, gateWidth + 16, 35);
 
     // Command text on top gate
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 11px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
     ctx.fillText(obs.content.cmd, obs.x + gateWidth / 2, obs.gapY - 17);
 
     // Bottom gate - blit from prerendered obstacle canvas
@@ -833,13 +836,11 @@ function drawObstacle(ctx, obs) {
         ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, bottomH, obs.x, bottomY, gateWidth, bottomH);
     }
 
-    // Bottom gate cap with description hint
+    // Bottom gate cap with topic icon
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(obs.x - 8, bottomY, gateWidth + 16, 35);
     ctx.strokeStyle = gateColor;
     ctx.strokeRect(obs.x - 8, bottomY, gateWidth + 16, 35);
-
-    // Topic icon on bottom
     ctx.font = '18px Arial';
     ctx.fillText(topic.icon, obs.x + gateWidth / 2, bottomY + 18);
 }
