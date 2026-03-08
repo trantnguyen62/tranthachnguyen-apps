@@ -141,8 +141,8 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
           className={`w-full h-full object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-40' : 'opacity-100'}`}
         />
         {isProcessing && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-900/10">
-            <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-900/10" role="status" aria-live="polite">
+            <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" aria-hidden="true" />
             <span className="text-sm font-medium text-slate-700 bg-white/80 px-3 py-1 rounded-full backdrop-blur-sm">
               Generating…
             </span>
@@ -171,11 +171,12 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
   if (isCameraOpen) {
     return (
       <div className="relative w-full h-64 sm:h-80 md:h-96 bg-black rounded-xl overflow-hidden flex flex-col items-center justify-center">
-        <video 
-          ref={videoRef} 
-          autoPlay 
-          playsInline 
-          muted 
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          aria-label="Camera preview"
           className="absolute inset-0 w-full h-full object-cover"
         />
         
@@ -194,6 +195,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
            <button
              onClick={stopCamera}
              className="text-white text-sm font-medium px-4 py-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm"
+             aria-label="Cancel and close camera"
            >
              Cancel
            </button>
@@ -267,15 +269,16 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
           <button
             onClick={(e) => { e.stopPropagation(); startCamera(); }}
             className="flex items-center gap-2 px-5 py-2.5 border border-slate-300 bg-white text-slate-700 rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-colors shadow-sm font-medium text-sm"
+            aria-label="Take a photo using your camera"
           >
-            <Camera className="w-4 h-4" />
+            <Camera className="w-4 h-4" aria-hidden="true" />
             Take a Photo
           </button>
         </div>
       </div>
       {error && (
-        <p className="mt-2 text-sm text-red-600 flex items-center">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-600 mr-2"></span>
+        <p role="alert" className="mt-2 text-sm text-red-600 flex items-center">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-600 mr-2" aria-hidden="true"></span>
           {error}
         </p>
       )}

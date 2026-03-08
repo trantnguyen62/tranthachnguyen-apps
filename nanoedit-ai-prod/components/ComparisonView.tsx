@@ -76,7 +76,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           </div>
 
           {/* Mobile separator */}
-          <div className="lg:hidden flex items-center gap-3 text-xs font-medium text-slate-400">
+          <div className="lg:hidden flex items-center gap-3 text-xs font-medium text-slate-400" aria-hidden="true">
             <div className="flex-1 h-px bg-slate-200" />
             <span className="flex items-center gap-1">
               <ArrowRight className="w-3 h-3" /> AI Result
@@ -104,8 +104,8 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                )}
 
                {isProcessing && (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                   <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" role="status" aria-live="polite">
+                   <Loader2 className="w-8 h-8 text-brand-600 animate-spin" aria-hidden="true" />
                    <span className="text-xs font-medium text-slate-600 bg-white/80 px-3 py-1 rounded-full backdrop-blur-sm">
                      Generating new edit…
                    </span>
@@ -119,7 +119,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
              </div>
              
              {/* Mobile Indicator arrow between images if stacked */}
-             <div className="hidden lg:block absolute top-1/2 -left-3 -translate-y-1/2 -translate-x-1/2 z-10 bg-white rounded-full p-1 shadow-md border border-slate-200">
+             <div className="hidden lg:block absolute top-1/2 -left-3 -translate-y-1/2 -translate-x-1/2 z-10 bg-white rounded-full p-1 shadow-md border border-slate-200" aria-hidden="true">
                 <ArrowRight className="w-4 h-4 text-slate-400" />
              </div>
           </div>

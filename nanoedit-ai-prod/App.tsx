@@ -134,7 +134,7 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
 
         {/* Intro Section - Only show if no history */}
         {history.length === 0 && (
@@ -243,8 +243,8 @@ const App: React.FC = () => {
                   </div>
                   <div className="px-2 pb-2 flex justify-between items-center gap-2">
                     {status === AppStatus.PROCESSING ? (
-                      <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5 animate-pulse">
-                        <Sparkles className="w-3.5 h-3.5" />
+                      <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5 animate-pulse" role="status" aria-live="polite">
+                        <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
                         Generating your edit…
                       </span>
                     ) : (
@@ -347,7 +347,7 @@ const App: React.FC = () => {
 
       {/* Download toast */}
       {downloadSuccess && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg animate-fadeIn text-sm font-medium">
+        <div role="status" aria-live="polite" className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg animate-fadeIn text-sm font-medium">
           <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
           Image downloaded!
         </div>
