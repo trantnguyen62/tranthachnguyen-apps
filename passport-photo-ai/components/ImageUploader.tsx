@@ -112,7 +112,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
 
   useEffect(() => {
     return () => { stopCamera(); };
-  }, []);
+  }, [stopCamera]);
 
   const onDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); }, []);
   const onDragLeave = useCallback((e: React.DragEvent) => { e.preventDefault(); setIsDragging(false); }, []);

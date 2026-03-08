@@ -83,6 +83,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
     } catch (e) {
       console.error(e);
       setStep('idle');
+      setProcessError('Background removal failed. Please try again with a different image.');
     }
   }, [image, bgColor, brightness, contrast]);
 
@@ -151,6 +152,12 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
               />
             </div>
             <p style={{ fontSize: 12, color: accentPurple, textAlign: 'center', fontWeight: 500 }}>Processing... {progress}%</p>
+          </div>
+        )}
+
+        {processError && (
+          <div role="alert" style={{ background: `${accentPink}15`, border: `1px solid ${accentPink}44`, borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: accentPink }}>
+            {processError}
           </div>
         )}
 
