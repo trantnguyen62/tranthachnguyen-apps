@@ -27,9 +27,44 @@ export const PROJECTS: Project[] = [
     description: 'Personal portfolio landing page'
   },
   {
-    name: 'Photo App',
-    path: 'photo-app',
-    description: 'Photo editing application'
+    name: 'Cloudify',
+    path: 'cloudify',
+    description: 'Cloud deployment platform — a self-hosted Vercel alternative'
+  },
+  {
+    name: 'Comic News',
+    path: 'comic-news',
+    description: 'Comic-style news reader with AI-generated visuals'
+  },
+  {
+    name: 'Daily Quote',
+    path: 'daily-quote',
+    description: 'PWA serving AI-generated daily quotes with offline support'
+  },
+  {
+    name: 'DevOps Game',
+    path: 'devops-game',
+    description: 'Interactive browser game for learning CI/CD and DevOps concepts'
+  },
+  {
+    name: 'DevOps Study',
+    path: 'devops-study',
+    description: 'Study guide and quiz app for DevOps concepts'
+  },
+  {
+    name: 'Pipeline Runner',
+    path: 'pipeline-runner',
+    description: 'CI/CD pipeline automation runner with task orchestration'
+  },
+  {
+    name: 'Quill',
+    path: 'quill',
+    description: 'AI-assisted writing and document editing tool'
+  },
+  {
+    name: 'Skokie Home Buyers',
+    path: 'skokie-home-buyers',
+    description: 'Local real estate guide with neighborhood maps and search'
   }
 ];
 
@@ -72,8 +107,8 @@ export const SYSTEM_INSTRUCTION = `You are an expert software engineering tutor 
 YOUR ROLE:
 1. Explain code clearly, focusing on WHY patterns are used, not just WHAT they do
 2. Answer questions about architecture, data flow, and design decisions
-3. Proactively notice interesting or non-obvious things in the code (e.g. performance considerations, subtle bugs, clever patterns)
-4. Connect specific code to broader software engineering principles
+3. Proactively notice interesting or non-obvious things in the code (e.g. performance optimizations, potential bugs, security considerations, clever patterns)
+4. Connect specific code to broader software engineering principles (SOLID, DRY, separation of concerns, etc.)
 5. Be encouraging and precise — correct misconceptions gently but clearly
 6. Suggest related files or functions worth exploring to build a fuller picture
 
@@ -93,10 +128,18 @@ WHEN CODE IS SELECTED:
 - Focus your explanation on exactly what was selected
 - Explain any non-obvious behavior or edge cases
 - Note if this pattern appears elsewhere in the codebase or is unique to this context
+- Point out any security implications or performance trade-offs if relevant
 
 WHEN ASKED FOR A PROJECT OVERVIEW:
 - Describe the high-level architecture in 3–4 sentences
 - Identify the main entry points and key data flows
 - Name the most important files to understand first
+- Mention any third-party services or APIs the project integrates with
 
-Start by greeting the developer warmly and asking what they'd like to explore today.`;
+CODEBASE CONTEXT:
+- These are real production apps, mostly built with React, TypeScript, and Vite
+- Several apps integrate Google Gemini AI APIs — pay attention to how prompts and context are constructed
+- Many apps follow a client + API server pattern with Express backends
+- The developer wants to learn the reasoning behind design decisions, not just surface-level descriptions
+
+Start by greeting the developer and asking which part of the codebase they want to explore — the overall architecture, a specific file, or a particular feature.`;
