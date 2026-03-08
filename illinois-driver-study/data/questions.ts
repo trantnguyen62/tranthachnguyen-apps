@@ -164,7 +164,7 @@ export const questionsEn: Question[] = [
   },
   {
     id: 17,
-    text: "You are waiting at an intersection and the traffic signal light changes to green. You should may then go ahead:",
+    text: "You are waiting at an intersection and the traffic signal light changes to green. You may then go ahead:",
     options: [
       "Immediately.",
       "When you think it is safe to do so.",
@@ -287,7 +287,7 @@ export const questionsEn: Question[] = [
     id: 29,
     text: "When a traffic light shows both a red light and a green arrow in the direction you wish to turn, you:",
     options: [
-      "Must stop and remain stopped until the red light has changes.",
+      "Must stop and remain stopped until the red light has changed.",
       "Have the right-of-way over pedestrians in turning in the direction of the arrow.",
       "May proceed in the direction of the arrow with caution."
     ],
@@ -829,7 +829,7 @@ export const questionsVi: Question[] = [
     options: [
       "Nộp đánh giá chuyên môn về việc sử dụng rượu và/hoặc ma túy và tham gia chương trình phục hồi.",
       "Mua bảo hiểm rủi ro cao trong ba năm.",
-      "Được chấp thuận khôi phục bởi Cán bộ Điều trần của Bộ trưởng Ngoại giao và nộp phí khôi phục.",
+      "Được chấp thuận khôi phục bởi Cán bộ Điều trần của Thư ký Nhà nước và nộp phí khôi phục.",
       "Chờ tối thiểu một năm.",
       "Tất cả các ý trên."
     ],
