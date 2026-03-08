@@ -15,6 +15,7 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
   // Refs for audio context and session management
   const audioContextsRef = useRef<{ input: AudioContext | null; output: AudioContext | null }>({ input: null, output: null });
   const sessionPromiseRef = useRef<Promise<any> | null>(null);
+  const messageCounterRef = useRef(0);
   const nextStartTimeRef = useRef<number>(0);
   const sourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
   const currentInputTranscriptionRef = useRef('');
@@ -197,7 +198,7 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
               let sum = 0;
               for (let i = 0; i < inputData.length; i++) sum += inputData[i] * inputData[i];
               const rms = Math.sqrt(sum / inputData.length);
-              setVolume(prev => ({ ...prev, input: rms * 5 })); // Boost for visibility
+              setVolume(prev => ({ ...prev, input: Math.min(rms * 5, 1) })); // Boost for visibility, clamped to [0,1]
 
               const pcmBlob = createBlob(inputData);
               if (sessionPromiseRef.current) {
@@ -223,8 +224,9 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
               const modelText = currentOutputTranscriptionRef.current.trim();
 
               if (userText) {
+                const id = `${++messageCounterRef.current}-user`;
                 setMessages(prev => [...prev, {
-                  id: Date.now().toString() + '-user',
+                  id,
                   role: 'user',
                   text: userText,
                   timestamp: new Date(),
@@ -232,8 +234,9 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
                 }]);
               }
               if (modelText) {
+                const id = `${++messageCounterRef.current}-model`;
                 setMessages(prev => [...prev, {
-                  id: Date.now().toString() + '-model',
+                  id,
                   role: 'model',
                   text: modelText,
                   timestamp: new Date(),
