@@ -4,7 +4,6 @@ WORKDIR /app
 RUN npm install -g serve && \
     addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --chown=appuser:appgroup index.html ./
-COPY --chown=appuser:appgroup styles.css ./
 COPY --chown=appuser:appgroup robots.txt ./
 COPY --chown=appuser:appgroup sitemap.xml ./
 USER appuser
