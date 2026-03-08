@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { ImageUploader } from './components/ImageUploader';
-import { PhotoEditor } from './components/PhotoEditor';
+const PhotoEditor = lazy(() => import('./components/PhotoEditor').then(m => ({ default: m.PhotoEditor })));
 import { PassportImage, PassportCheckResult, AppStatus } from './types';
 
 // Theme constants moved outside component
@@ -67,11 +67,13 @@ export default function App() {
       </div>
 
       {showEditor && image && (
-        <PhotoEditor
-          image={image}
-          onSave={handleEditorSave}
-          onCancel={handleEditorCancel}
-        />
+        <Suspense fallback={null}>
+          <PhotoEditor
+            image={image}
+            onSave={handleEditorSave}
+            onCancel={handleEditorCancel}
+          />
+        </Suspense>
       )}
 
       <div style={{ position: 'relative', zIndex: 1, padding: '40px 24px', maxWidth: 1200, margin: '0 auto' }}>

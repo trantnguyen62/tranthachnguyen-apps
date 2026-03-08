@@ -17,6 +17,7 @@ export default defineConfig({
         manualChunks: {
           react: ['react', 'react-dom'],
           'bg-removal': ['@imgly/background-removal'],
+          'google-genai': ['@google/genai'],
         },
       },
     },

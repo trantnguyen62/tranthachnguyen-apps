@@ -39,19 +39,15 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
       img.onload = () => {
         const MAX = 1500;
         let w = img.width, h = img.height;
-        if (w <= MAX && h <= MAX) {
-          onImageSelected({ data: dataUrl, mimeType: file.type || 'image/jpeg' });
-          return;
-        }
-        if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-        else { w = Math.round(w * MAX / h); h = MAX; }
+        if (w > h) { h = Math.round(h * Math.min(MAX, w) / w); w = Math.min(MAX, w); }
+        else { w = Math.round(w * Math.min(MAX, h) / h); h = Math.min(MAX, h); }
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         ctx.drawImage(img, 0, 0, w, h);
-        onImageSelected({ data: canvas.toDataURL('image/jpeg', 0.92), mimeType: 'image/jpeg' });
+        onImageSelected({ data: canvas.toDataURL('image/jpeg', 0.88), mimeType: 'image/jpeg' });
       };
       img.src = dataUrl;
     };
