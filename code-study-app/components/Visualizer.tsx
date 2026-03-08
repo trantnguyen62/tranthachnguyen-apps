@@ -38,11 +38,12 @@ const Visualizer = memo<VisualizerProps>(({ volume, isConnected, color = '#10B98
         return (
           <div
             key={i}
-            className="w-2 rounded-full transition-all duration-75"
+            className={`w-2 rounded-full transition-all duration-75${!isConnected ? ' visualizer-idle-bar' : ''}`}
             style={{
               height: `${Math.min(dynamicHeight, MAX_HEIGHT)}px`,
               backgroundColor: color,
               opacity,
+              animationDelay: !isConnected ? `${i * 120}ms` : undefined,
             }}
           />
         );

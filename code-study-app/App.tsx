@@ -225,9 +225,12 @@ function App() {
                   selectedPath={selectedFile?.path}
                 />
               ) : (
-                <div className="text-center text-slate-500 py-8">
-                  <FolderOpen className="w-12 h-12 mx-auto mb-2 opacity-50" aria-hidden="true" />
-                  <p>Select a project to browse files</p>
+                <div className="text-center text-slate-500 py-8 px-4">
+                  <div className="w-12 h-12 rounded-xl bg-slate-700/50 flex items-center justify-center mx-auto mb-3">
+                    <FolderOpen className="w-6 h-6 opacity-40" aria-hidden="true" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-400 mb-1">No project selected</p>
+                  <p className="text-xs">Choose a project above to browse its files</p>
                 </div>
               )
             ) : (
@@ -300,8 +303,8 @@ function App() {
           <div className="flex items-center gap-2">
             {error && (
               <div className="flex items-center gap-2 text-red-400 text-sm" role="alert">
-                <AlertCircle className="w-4 h-4" aria-hidden="true" />
-                <span>{error}</span>
+                <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                <span className="max-w-xs truncate" title={error}>{error}</span>
               </div>
             )}
             <button
@@ -364,14 +367,23 @@ function App() {
           <div className="w-96 bg-slate-800/30 border-l border-slate-700/50 flex flex-col">
             {/* Visualizer */}
             <div className="p-4 border-b border-slate-700/50">
-              <div className="flex items-center gap-2 mb-3">
-                <MessageSquare className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm font-medium">AI Tutor</span>
-                {isConnected && (
-                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-emerald-400" />
+                  <span className="text-sm font-medium">AI Tutor</span>
+                </div>
+                {isConnected ? (
+                  <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Live
                   </span>
+                ) : isConnecting ? (
+                  <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-slate-700/50 text-slate-400 rounded-full">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Connecting
+                  </span>
+                ) : (
+                  <span className="text-xs text-slate-600">Ready</span>
                 )}
               </div>
               <Visualizer volume={volume} isConnected={isConnected} color="#10B981" />
@@ -384,23 +396,31 @@ function App() {
 
             {/* Selected Code Context */}
             {selectedCode && (
-              <div className="p-4 border-t border-slate-700/50">
+              <div className="p-4 border-t border-slate-700/50 border-t-emerald-500/20">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-slate-400 font-medium">Code context</span>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                    <span className="text-xs text-emerald-400 font-medium">Context set</span>
+                    {selectedFile && (
+                      <span className="text-xs text-slate-500 code-font truncate max-w-[8rem]" title={selectedFile.name}>
+                        {selectedFile.name}
+                      </span>
+                    )}
+                  </div>
                   <button
                     onClick={() => setSelectedCode('')}
-                    className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+                    className="text-xs text-slate-500 hover:text-red-400 transition-colors px-1.5 py-0.5 rounded hover:bg-red-400/10"
                     aria-label="Clear selected code context"
                   >
                     ✕ Clear
                   </button>
                 </div>
-                <div className="bg-slate-700/40 rounded-lg p-2 text-xs code-font text-slate-300 max-h-20 overflow-auto border border-slate-600/30">
-                  {selectedCode.substring(0, 200)}
-                  {selectedCode.length > 200 && <span className="text-slate-500">…</span>}
+                <div className="bg-slate-900/60 rounded-lg p-3 text-xs code-font text-slate-300 max-h-28 overflow-auto border border-emerald-500/20">
+                  {selectedCode.substring(0, 400)}
+                  {selectedCode.length > 400 && <span className="text-slate-500">…</span>}
                 </div>
-                <p className="text-xs text-slate-500 mt-1">
-                  {selectedCode.split('\n').length} line{selectedCode.split('\n').length !== 1 ? 's' : ''} selected
+                <p className="text-xs text-slate-500 mt-1.5">
+                  {selectedCode.split('\n').length} line{selectedCode.split('\n').length !== 1 ? 's' : ''} · {selectedCode.length} chars · will be included in session context
                 </p>
               </div>
             )}

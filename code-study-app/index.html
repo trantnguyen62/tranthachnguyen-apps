@@ -48,6 +48,14 @@
       .code-font {
         font-family: 'JetBrains Mono', monospace;
       }
+      /* Visualizer idle wave animation */
+      @keyframes idle-wave {
+        0%, 100% { height: 4px; }
+        50% { height: 12px; }
+      }
+      .visualizer-idle-bar {
+        animation: idle-wave 2s ease-in-out infinite;
+      }
       /* Custom scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
