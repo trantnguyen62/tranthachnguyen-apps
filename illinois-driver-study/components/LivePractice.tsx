@@ -71,7 +71,7 @@ function decodeAudioData(data: Uint8Array, ctx: AudioContext): AudioBuffer {
 
 export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const [isActive, setIsActive] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'speaking'>('idle');
+  const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'speaking' | 'disconnected'>('idle');
   const [volume, setVolume] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   

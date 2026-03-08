@@ -121,6 +121,41 @@ body {
     opacity: 0.5;
 }
 
+.stars2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(1px 1px at 30px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 110px 20px, rgba(0,243,255,0.5), transparent),
+        radial-gradient(1px 1px at 60px 130px, rgba(255,255,255,0.6), transparent);
+    background-size: 160px 160px;
+    opacity: 0.35;
+    animation: twinkle 5s ease-in-out infinite alternate;
+}
+
+.stars3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(1.5px 1.5px at 90px 50px, rgba(255,215,0,0.5), transparent),
+        radial-gradient(1px 1px at 40px 100px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 150px 80px, rgba(0,243,255,0.3), transparent);
+    background-size: 220px 220px;
+    opacity: 0.4;
+    animation: twinkle 7s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.2; }
+    100% { opacity: 0.5; }
+}
+
 /* =====================================================
    Main Menu
    ===================================================== */
@@ -212,6 +247,11 @@ body {
     left: 100%;
 }
 
+.menu-btn:active {
+    transform: scale(0.97);
+    transition-duration: 0.05s;
+}
+
 .btn-icon {
     font-size: 1.5rem;
 }
@@ -222,10 +262,15 @@ body {
 }
 
 .btn-desc {
-    display: none;
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 400;
+    opacity: 0.6;
+    letter-spacing: 0.04em;
+    margin-top: 0.1rem;
+    color: inherit;
 }
-
-/* Hide desc for cleaner look */
 
 .menu-btn.secondary {
     border-color: var(--text-secondary);
@@ -267,6 +312,16 @@ body {
     justify-content: space-between;
     pointer-events: none;
     font-family: 'Orbitron', sans-serif;
+}
+
+/* HP Label */
+.health-label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--danger);
+    margin-bottom: 3px;
+    text-shadow: 0 0 6px rgba(255, 0, 60, 0.6);
 }
 
 /* Cyber Health Bar */
@@ -460,6 +515,11 @@ body {
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
 }
 
+.answer-btn:active:not(.disabled) {
+    transform: scale(0.98);
+    transition-duration: 0.05s;
+}
+
 .answer-key {
     background: var(--nano-yellow);
     color: #000;
@@ -500,6 +560,18 @@ body {
     height: 100%;
     background: var(--nano-yellow);
     box-shadow: 0 0 10px var(--nano-yellow);
+    transition: background 0.5s ease, box-shadow 0.5s ease;
+}
+
+.timer-fill.timer-danger {
+    background: var(--danger);
+    box-shadow: 0 0 10px var(--danger);
+    animation: timerPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes timerPulse {
+    0% { opacity: 1; }
+    100% { opacity: 0.5; }
 }
 
 @keyframes shake {

@@ -1347,7 +1347,9 @@ function updateHUD() {
 }
 
 function updateTimerDisplay() {
-    domCache.timerFill.style.width = `${(game.questionTimer / CONFIG.QUESTION_TIME) * 100}%`;
+    const pct = game.questionTimer / CONFIG.QUESTION_TIME;
+    domCache.timerFill.style.width = `${pct * 100}%`;
+    domCache.timerFill.classList.toggle('timer-danger', pct < 0.3);
 }
 
 // Game state management

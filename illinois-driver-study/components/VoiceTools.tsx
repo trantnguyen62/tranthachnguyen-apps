@@ -6,7 +6,7 @@ interface VoiceToolsProps {
   language: Language;
 }
 
-const translations = {
+const TRANSLATIONS = {
   en: {
     title: "Voice Study Notes",
     desc: "Record yourself explaining a rule or asking a question, and get it transcribed instantly.",
@@ -35,7 +35,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const startRecording = async () => {
     try {
