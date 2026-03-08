@@ -52,6 +52,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   const [step, setStep] = useState<'idle' | 'processing' | 'done'>('idle');
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<string | null>(null);
+  const [processError, setProcessError] = useState<string | null>(null);
   const [brightness, setBrightness] = useState(105);
   const [contrast, setContrast] = useState(108);
   const [bgColor, setBgColor] = useState('#FFFFFF');
@@ -59,6 +60,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
 
   const process = useCallback(async () => {
     setStep('processing');
+    setProcessError(null);
     setProgress(10);
     
     try {
