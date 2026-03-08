@@ -65,7 +65,7 @@ Conditions are expected to be worse to the south of the immediate Chicago area �
     author: "Anonymous",
     genre: "Non-Fiction",
     coverImage: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_1.png",
-    description: "Met his wife who I had sex with in my 20s. A story about unexpected reconnections and moral choices.",
+    description: "A trusted business friend turns complicated when his wife turns out to be someone from a distant past. A story about unexpected reconnections and moral choices.",
     rating: 4.6,
     chapters: 1,
     status: "Completed",
@@ -86,14 +86,14 @@ Not until that event. When introduced, I could tell by her eyes that she recogni
 
 About a week later she creeped me on social media. Then email. Inferring things. Basically she is nostalgic for those times and she wants to start an affair. I did not reply. I later received a call from her where I declined and stated my reasons. It is not good business, plus I got to know and respect her husband. For context: I am in my early 50s. Single. Never married or children.`,
     pages: [
-      { id: 1, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_1.png", caption: "Panel 1" },
-      { id: 2, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_2.png", caption: "Panel 2" },
-      { id: 3, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_3.png", caption: "Panel 3" },
-      { id: 4, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_4.png", caption: "Panel 4" },
-      { id: 5, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_5.png", caption: "Panel 5" },
-      { id: 6, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_6.png", caption: "Panel 6" },
-      { id: 7, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_7.png", caption: "Panel 7" },
-      { id: 8, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_8.png", caption: "Panel 8" }
+      { id: 1, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_1.png", caption: "A great business contact — reliable, punctual, and easy to like" },
+      { id: 2, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_2.png", caption: "Friendship grows beyond business — baseball games, bars, genuine connection" },
+      { id: 3, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_3.png", caption: "The Board of Trade function — an introduction that changes everything" },
+      { id: 4, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_4.png", caption: "A flash of recognition — she remembered, and so did I" },
+      { id: 5, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_5.png", caption: "Nearly 30 years ago — a brief chapter neither expected to revisit" },
+      { id: 6, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_6.png", caption: "Her request for silence — protecting 16 years of marriage" },
+      { id: 7, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_7.png", caption: "The messages arrive — nostalgia edging toward something reckless" },
+      { id: 8, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_8.png", caption: "The answer is no — integrity over temptation" }
     ],
     panels: [
       { id: 1, title: "The Beginning", description: "Five years ago, contacted by a guy for business services" },

@@ -144,8 +144,8 @@ function Home() {
             <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-7 h-7 text-red-500" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Daily Updates</h3>
-            <p className="text-gray-400">Fresh news stories transformed into comics every single day.</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Curated Stories</h3>
+            <p className="text-gray-400">Hand-picked news stories and real-life moments transformed into comics.</p>
           </div>
           <div className="glass-effect rounded-2xl p-6 text-center">
             <div className="w-14 h-14 bg-orange-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
