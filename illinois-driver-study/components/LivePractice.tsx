@@ -83,6 +83,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const nextStartTimeRef = useRef<number>(0);
   const sessionRef = useRef<any>(null);
   const resolvedSessionRef = useRef<any>(null);
+  const lastVolumeRef = useRef<number>(0);
   
   const t = TRANSLATIONS[language];
 
@@ -124,6 +125,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
     }
     
     resolvedSessionRef.current = null;
+    lastVolumeRef.current = 0;
     setIsActive(false);
     setStatus('idle');
     setVolume(0);
@@ -205,7 +207,11 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
                 sum += inputData[i] * inputData[i];
               }
               const rms = Math.sqrt(sum / inputData.length);
-              setVolume(Math.min(rms * 5, 1));
+              const newVolume = Math.min(rms * 5, 1);
+              if (Math.abs(newVolume - lastVolumeRef.current) > 0.05) {
+                lastVolumeRef.current = newVolume;
+                setVolume(newVolume);
+              }
 
               const pcmData = createPcmData(inputData);
               const uint8 = new Uint8Array(pcmData.buffer);

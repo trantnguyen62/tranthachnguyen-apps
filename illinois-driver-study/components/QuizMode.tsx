@@ -68,7 +68,10 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
       const source = audioContext.createBufferSource();
       source.buffer = buffer;
       source.connect(audioContext.destination);
-      source.onended = () => setIsPlayingAudio(false);
+      source.onended = () => {
+        setIsPlayingAudio(false);
+        audioContext.close();
+      };
       source.start();
     } catch (err) {
       console.error(err);
