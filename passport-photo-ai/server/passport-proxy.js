@@ -40,10 +40,10 @@ app.post('/api/passport/check', apiRateLimit, async (req, res) => {
     const { base64Image } = req.body;
     if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
 
-    const mimeMatch = base64Image.match(/^data:(image\/[a-z]+);base64,/);
-    const mimeType = mimeMatch ? mimeMatch[1] : null;
+    const mimeMatch = base64Image.match(/^data:(image\/[a-z]+);base64,/i);
+    const mimeType = mimeMatch ? mimeMatch[1].toLowerCase() : null;
     if (!mimeType || !ALLOWED_MIME_TYPES.has(mimeType)) return res.status(400).json({ error: 'Invalid image type' });
-    const clean = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+    const clean = base64Image.replace(/^data:image\/[a-z]+;base64,/i, '');
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
@@ -59,7 +59,8 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
     
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     const match = text.match(/\{[\s\S]*\}/);
-    const parsed = match ? JSON.parse(match[0]) : {};
+    let parsed = {};
+    try { parsed = match ? JSON.parse(match[0]) : {}; } catch { parsed = {}; }
     
     res.json({
       compliant: !!parsed.compliant,
@@ -77,10 +78,10 @@ app.post('/api/passport/analyze', apiRateLimit, async (req, res) => {
   try {
     const { base64Image } = req.body;
     if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
-    const mimeMatch2 = base64Image.match(/^data:(image\/[a-z]+);base64,/);
-    const mimeType2 = mimeMatch2 ? mimeMatch2[1] : null;
+    const mimeMatch2 = base64Image.match(/^data:(image\/[a-z]+);base64,/i);
+    const mimeType2 = mimeMatch2 ? mimeMatch2[1].toLowerCase() : null;
     if (!mimeType2 || !ALLOWED_MIME_TYPES.has(mimeType2)) return res.status(400).json({ error: 'Invalid image type' });
-    const clean = base64Image.replace(/^data:image\/[a-z]+;base64,/, '');
+    const clean = base64Image.replace(/^data:image\/[a-z]+;base64,/i, '');
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
@@ -96,7 +97,9 @@ adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }
     
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     const match = text.match(/\{[\s\S]*\}/);
-    res.json(match ? JSON.parse(match[0]) : { overallScore: 70, autoFixRecommendations: { adjustBrightness: 5, adjustContrast: 8 } });
+    let result = { overallScore: 70, autoFixRecommendations: { adjustBrightness: 5, adjustContrast: 8 } };
+    try { if (match) result = JSON.parse(match[0]); } catch { /* use default */ }
+    res.json(result);
   } catch (e) {
     res.json({ overallScore: 70, autoFixRecommendations: { adjustBrightness: 5, adjustContrast: 8 } });
   }

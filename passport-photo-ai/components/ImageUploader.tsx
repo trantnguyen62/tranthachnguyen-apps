@@ -48,7 +48,9 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
-        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, w, h);
         onImageSelected({ data: canvas.toDataURL('image/jpeg', 0.92), mimeType: 'image/jpeg' });
       };
       img.src = dataUrl;
