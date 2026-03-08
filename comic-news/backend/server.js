@@ -19,6 +19,8 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:");
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   next();
 });
 app.use('/images', express.static(join(__dirname, 'images'), { maxAge: '7d' }));
@@ -234,6 +236,7 @@ app.post('/api/bookmarks/:id', (req, res) => {
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   if (!comics.find(c => c.id === id)) return res.status(404).json({ error: 'Comic not found' });
   if (!bookmarks.includes(id)) {
+    if (bookmarks.length >= 500) return res.status(429).json({ error: 'Bookmark limit reached' });
     bookmarks.push(id);
   }
   res.json({ success: true, bookmarks });
@@ -257,7 +260,7 @@ app.post('/api/progress/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   const page = parseInt(req.body.page, 10);
-  if (isNaN(page) || page < 1) return res.status(400).json({ error: 'Invalid page' });
+  if (isNaN(page) || page < 1 || page > 10000) return res.status(400).json({ error: 'Invalid page' });
   readingProgress[id] = page;
   res.json({ success: true });
 });
@@ -283,6 +286,7 @@ app.get('/sitemap.xml', (req, res) => {
 
 // SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
