@@ -10,11 +10,13 @@ interface StudyModeProps {
 const TRANSLATIONS = {
   en: {
     title: "Review All Questions",
-    subtitle: "Browse through all practice questions and memorize the correct answers."
+    subtitle: "Browse through all practice questions and memorize the correct answers.",
+    correctAnswer: "(correct answer)"
   },
   vi: {
     title: "Xem Tất Cả Câu Hỏi",
-    subtitle: "Xem qua tất cả các câu hỏi thực hành và ghi nhớ các câu trả lời đúng."
+    subtitle: "Xem qua tất cả các câu hỏi thực hành và ghi nhớ các câu trả lời đúng.",
+    correctAnswer: "(đáp án đúng)"
   }
 } as const;
 
@@ -45,7 +47,7 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
                   <span aria-hidden="true" className={`w-6 h-6 rounded-full border flex-shrink-0 flex items-center justify-center mr-3 text-sm ${idx === q.correctIndex ? 'border-green-600 bg-green-600 text-white' : 'border-slate-300'}`}>
                     {idx === q.correctIndex ? '✓' : String.fromCharCode(65 + idx)}
                   </span>
-                  <span>{opt}{idx === q.correctIndex && <span className="sr-only"> (correct answer)</span>}</span>
+                  <span>{opt}{idx === q.correctIndex && <span className="sr-only"> {t.correctAnswer}</span>}</span>
                 </li>
               ))}
             </ul>

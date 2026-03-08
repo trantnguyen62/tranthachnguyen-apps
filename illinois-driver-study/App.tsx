@@ -95,7 +95,7 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-6 w-full flex-grow flex flex-col">
+      <main className="max-w-5xl mx-auto px-4 py-6 w-full flex-grow flex flex-col">
         <nav aria-label="Study modes" className="flex flex-wrap gap-3 mb-8 justify-center">
           <NavButton 
             targetMode={AppMode.QUIZ} 
@@ -124,13 +124,13 @@ const App: React.FC = () => {
           {mode === AppMode.QUIZ && <QuizMode language={language} />}
           {mode === AppMode.STUDY && <StudyMode language={language} />}
           {mode === AppMode.LIVE_PRACTICE && (
-            <Suspense fallback={<div className="flex justify-center py-16 text-slate-400">Loading...</div>}>
+            <Suspense fallback={<div role="status" className="flex justify-center py-16 text-slate-400">Loading...</div>}>
               <LivePractice language={language} />
             </Suspense>
           )}
         </div>
-      </div>
-      
+      </main>
+
       <footer className="bg-white border-t border-slate-200 py-6 mt-auto">
         <div className="max-w-5xl mx-auto px-4 text-center text-slate-400 text-sm">
           <p>© {new Date().getFullYear()} {t.footerText}</p>

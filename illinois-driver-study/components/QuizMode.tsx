@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { getQuestions } from '../data/questions';
 import { generateSpeech } from '../services/gemini';
 import { Language } from '../types';
@@ -31,6 +31,12 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const questionRef = useRef<HTMLHeadingElement>(null);
+
+  // Move focus to question heading when question changes
+  useEffect(() => {
+    questionRef.current?.focus();
+  }, [currentQuestionIndex]);
 
   // Reset quiz when language changes to avoid index mismatch if arrays were different lengths (though they are same here)
   useEffect(() => {
@@ -92,7 +98,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
         </div>
 
         <div className="flex gap-2 items-start mb-6">
-          <h2 className="text-xl font-bold text-slate-800 flex-grow">{question.text}</h2>
+          <h2 ref={questionRef} tabIndex={-1} className="text-xl font-bold text-slate-800 flex-grow outline-none">{question.text}</h2>
           <button
             onClick={playAudio}
             disabled={isPlayingAudio}
