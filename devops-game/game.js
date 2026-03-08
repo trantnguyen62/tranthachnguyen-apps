@@ -463,7 +463,7 @@ function init() {
 }
 
 function loadHighScore() {
-    game.highScore = parseInt(localStorage.getItem('devops-defender-highscore') || '0');
+    game.highScore = parseInt(localStorage.getItem('devops-defender-highscore') || '0') || 0;
     if (domCache.menuHighScore) domCache.menuHighScore.textContent = game.highScore;
 }
 
@@ -534,11 +534,19 @@ function renderTopicGrid() {
         card.setAttribute('role', 'button');
         card.setAttribute('tabindex', '0');
         card.setAttribute('aria-label', `${topic.name} - ${QUESTIONS[topic.id].length} questions`);
-        card.innerHTML = `
-            <div class="topic-card-icon" aria-hidden="true">${topic.icon}</div>
-            <div class="topic-card-name">${topic.name}</div>
-            <div class="topic-card-count">${QUESTIONS[topic.id].length} questions</div>
-        `;
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'topic-card-icon';
+        iconDiv.setAttribute('aria-hidden', 'true');
+        iconDiv.textContent = topic.icon;
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'topic-card-name';
+        nameDiv.textContent = topic.name;
+        const countDiv = document.createElement('div');
+        countDiv.className = 'topic-card-count';
+        countDiv.textContent = `${QUESTIONS[topic.id].length} questions`;
+        card.appendChild(iconDiv);
+        card.appendChild(nameDiv);
+        card.appendChild(countDiv);
         card.onclick = () => startGame('practice', topic.id);
         card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startGame('practice', topic.id); } };
         grid.appendChild(card);
@@ -977,10 +985,15 @@ function showQuestion(enemy) {
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
         btn.setAttribute('aria-label', `${i + 1}: ${answer.text}`);
-        btn.innerHTML = `
-            <span class="answer-key" aria-hidden="true">${i + 1}</span>
-            <span class="answer-text">${answer.text}</span>
-        `;
+        const keySpan = document.createElement('span');
+        keySpan.className = 'answer-key';
+        keySpan.setAttribute('aria-hidden', 'true');
+        keySpan.textContent = i + 1;
+        const textSpan = document.createElement('span');
+        textSpan.className = 'answer-text';
+        textSpan.textContent = answer.text;
+        btn.appendChild(keySpan);
+        btn.appendChild(textSpan);
         btn.onclick = () => selectAnswer(i);
         domCache.answerGrid.appendChild(btn);
     });
