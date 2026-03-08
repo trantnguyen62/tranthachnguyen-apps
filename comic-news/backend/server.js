@@ -9,8 +9,18 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5187;
 
-app.use(cors());
-app.use(express.json());
+const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://comic-news.tranthachnguyen.com';
+app.use(cors({ origin: allowedOrigin, optionsSuccessStatus: 200 }));
+app.use(express.json({ limit: '10kb' }));
+
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:");
+  next();
+});
 app.use('/images', express.static(join(__dirname, 'images'), { maxAge: '7d' }));
 
 // Serve static frontend (for Docker deployment)
@@ -169,8 +179,9 @@ app.get('/api/comics', (req, res) => {
   }
 
   if (search) {
-    const searchLower = search.toLowerCase();
-    result = result.filter(comic => 
+    const searchTrimmed = String(search).slice(0, 100);
+    const searchLower = searchTrimmed.toLowerCase();
+    result = result.filter(comic =>
       comic.title.toLowerCase().includes(searchLower) ||
       comic.author.toLowerCase().includes(searchLower)
     );
@@ -188,7 +199,9 @@ app.get('/api/comics', (req, res) => {
 
 // Get single comic with pages
 app.get('/api/comics/:id', (req, res) => {
-  const comic = comics.find(c => c.id === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
+  const comic = comics.find(c => c.id === id);
   if (!comic) {
     return res.status(404).json({ error: 'Comic not found' });
   }
