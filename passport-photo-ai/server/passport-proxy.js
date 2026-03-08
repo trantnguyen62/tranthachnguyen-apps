@@ -42,15 +42,22 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
+function parseBase64Image(base64Image) {
+  const mimeMatch = base64Image.match(/^data:(image\/[a-z]+);base64,/i);
+  const mimeType = mimeMatch ? mimeMatch[1].toLowerCase() : null;
+  if (!mimeType || !ALLOWED_MIME_TYPES.has(mimeType)) return null;
+  const data = base64Image.replace(/^data:image\/[a-z]+;base64,/i, '');
+  return { mimeType, data };
+}
+
 app.post('/api/passport/check', apiRateLimit, async (req, res) => {
   try {
     const { base64Image } = req.body;
     if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
 
-    const mimeMatch = base64Image.match(/^data:(image\/[a-z]+);base64,/i);
-    const mimeType = mimeMatch ? mimeMatch[1].toLowerCase() : null;
-    if (!mimeType || !ALLOWED_MIME_TYPES.has(mimeType)) return res.status(400).json({ error: 'Invalid image type' });
-    const clean = base64Image.replace(/^data:image\/[a-z]+;base64,/i, '');
+    const parsed = parseBase64Image(base64Image);
+    if (!parsed) return res.status(400).json({ error: 'Invalid image type' });
+    const { mimeType, data: clean } = parsed;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
@@ -85,16 +92,15 @@ app.post('/api/passport/analyze', apiRateLimit, async (req, res) => {
   try {
     const { base64Image } = req.body;
     if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
-    const mimeMatch2 = base64Image.match(/^data:(image\/[a-z]+);base64,/i);
-    const mimeType2 = mimeMatch2 ? mimeMatch2[1].toLowerCase() : null;
-    if (!mimeType2 || !ALLOWED_MIME_TYPES.has(mimeType2)) return res.status(400).json({ error: 'Invalid image type' });
-    const clean = base64Image.replace(/^data:image\/[a-z]+;base64,/i, '');
+    const parsed = parseBase64Image(base64Image);
+    if (!parsed) return res.status(400).json({ error: 'Invalid image type' });
+    const { mimeType, data: clean } = parsed;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: {
         parts: [
-          { inlineData: { data: clean, mimeType: mimeType2 } },
+          { inlineData: { data: clean, mimeType } },
           { text: `Analyze photo for passport. Return JSON:
 {"overallScore":number,"autoFixRecommendations":{"adjustBrightness":number,"adjustContrast":number}}
 adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }
@@ -108,6 +114,7 @@ adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }
     try { if (match) result = JSON.parse(match[0]); } catch { /* use default */ }
     res.json(result);
   } catch (e) {
+    console.error(e);
     res.json({ overallScore: 70, autoFixRecommendations: { adjustBrightness: 5, adjustContrast: 8 } });
   }
 });

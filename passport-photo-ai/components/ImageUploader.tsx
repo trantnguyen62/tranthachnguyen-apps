@@ -54,22 +54,21 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     reader.readAsDataURL(file);
   }, [onImageSelected]);
 
+  useEffect(() => {
+    if (cameraMode && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(console.error);
+    }
+  }, [cameraMode]);
+
   const startCamera = useCallback(async () => {
     setCameraError(null);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 960 } } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 960 } }
       });
       streamRef.current = stream;
       setCameraMode(true);
-      
-      // Wait for video element to mount
-      setTimeout(() => {
-        if (videoRef.current && streamRef.current) {
-          videoRef.current.srcObject = streamRef.current;
-          videoRef.current.play().catch(console.error);
-        }
-      }, 100);
     } catch (err: any) {
       console.error('Camera error:', err);
       if (err?.name === 'NotAllowedError') {

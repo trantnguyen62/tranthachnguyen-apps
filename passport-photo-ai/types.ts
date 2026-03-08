@@ -12,7 +12,6 @@ export interface PassportCheckResult {
 
 export enum AppStatus {
   IDLE = 'idle',
-  READY = 'ready',
   CHECKING = 'checking',
   COMPLETED = 'completed',
   ERROR = 'error',
