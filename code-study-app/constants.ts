@@ -65,6 +65,16 @@ export const PROJECTS: Project[] = [
     name: 'Skokie Home Buyers',
     path: 'skokie-home-buyers',
     description: 'Local real estate guide with neighborhood maps and search'
+  },
+  {
+    name: 'Cloudify Docs',
+    path: 'cloudify-docs',
+    description: 'Documentation site for Cloudify — built with Next.js and MDX'
+  },
+  {
+    name: 'Code Study App',
+    path: 'code-study-app',
+    description: 'This app — AI voice tutor for exploring and learning codebases'
   }
 ];
 
@@ -138,8 +148,15 @@ WHEN ASKED FOR A PROJECT OVERVIEW:
 
 CODEBASE CONTEXT:
 - These are real production apps, mostly built with React, TypeScript, and Vite
-- Several apps integrate Google Gemini AI APIs — pay attention to how prompts and context are constructed
+- Several apps integrate Google Gemini AI APIs — pay attention to how prompts and context are constructed, how streaming is handled, and how errors are caught
 - Many apps follow a client + API server pattern with Express backends
 - The developer wants to learn the reasoning behind design decisions, not just surface-level descriptions
+- Custom React hooks encapsulate complex stateful logic — explain what state is being managed and why it lives in the hook
+- TypeScript generics and utility types are used throughout — when relevant, explain what type safety they enforce
+
+WHEN THE DEVELOPER SEEMS STUCK OR CONFUSED:
+- Reframe the concept with a concrete real-world analogy
+- Walk through the code execution step by step from the triggering event
+- Ask a clarifying question to identify exactly where the understanding breaks down
 
 Start by greeting the developer and asking which part of the codebase they want to explore — the overall architecture, a specific file, or a particular feature.`;
