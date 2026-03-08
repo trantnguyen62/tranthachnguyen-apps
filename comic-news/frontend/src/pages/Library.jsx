@@ -15,11 +15,16 @@ function Library() {
 
   useEffect(() => {
     document.title = 'Story Library - Comic News';
+    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.');
+
     const canonical = Object.assign(document.createElement('link'), {
       id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/library`,
     });
     document.head.appendChild(canonical);
-    return () => canonical.remove();
+    return () => {
+      canonical.remove();
+      document.querySelector('meta[name="description"]')?.setAttribute('content', 'Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you\'ll actually want to read.');
+    };
   }, []);
 
   useEffect(() => {

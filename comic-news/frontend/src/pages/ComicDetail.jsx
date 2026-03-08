@@ -37,9 +37,18 @@ function ComicDetail() {
         setMeta('meta[property="og:description"]', comicData.description);
         setMeta('meta[property="og:image"]', imgUrl);
         setMeta('meta[property="og:type"]', 'article');
+        setMeta('meta[property="og:url"]', window.location.href);
         setMeta('meta[name="twitter:title"]', pageTitle);
         setMeta('meta[name="twitter:description"]', comicData.description);
         setMeta('meta[name="twitter:image"]', imgUrl);
+
+        // Canonical link
+        document.getElementById('canonical-link')?.remove();
+        const canonical = document.createElement('link');
+        canonical.id = 'canonical-link';
+        canonical.rel = 'canonical';
+        canonical.href = window.location.href;
+        document.head.appendChild(canonical);
 
         // JSON-LD structured data
         document.getElementById('page-jsonld')?.remove();
@@ -66,6 +75,7 @@ function ComicDetail() {
     fetchData();
     return () => {
       document.getElementById('page-jsonld')?.remove();
+      document.getElementById('canonical-link')?.remove();
     };
   }, [id]);
 

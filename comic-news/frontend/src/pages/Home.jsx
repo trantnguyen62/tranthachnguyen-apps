@@ -10,6 +10,37 @@ function Home() {
 
   useEffect(() => {
     document.title = 'Comic News - Daily News Turned Into Comics';
+
+    // Canonical link
+    document.getElementById('canonical-link')?.remove();
+    const canonical = Object.assign(document.createElement('link'), {
+      id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/`,
+    });
+    document.head.appendChild(canonical);
+
+    // WebSite structured data
+    document.getElementById('page-jsonld')?.remove();
+    const ld = document.createElement('script');
+    ld.id = 'page-jsonld';
+    ld.type = 'application/ld+json';
+    ld.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Comic News',
+      url: `${window.location.origin}/`,
+      description: 'Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you\'ll actually want to read.',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${window.location.origin}/library?search={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
+    });
+    document.head.appendChild(ld);
+
+    return () => {
+      canonical.remove();
+      document.getElementById('page-jsonld')?.remove();
+    };
   }, []);
 
   useEffect(() => {
