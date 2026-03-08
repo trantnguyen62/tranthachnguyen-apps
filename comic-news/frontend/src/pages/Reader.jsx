@@ -130,8 +130,8 @@ function Reader() {
   return (
     <div className="min-h-screen bg-black flex flex-col">
       {/* Progress Bar - Fixed at top */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-gray-800">
-        <div 
+      <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-gray-800" role="progressbar" aria-label="Reading progress" aria-valuenow={Math.round(scrollProgress)} aria-valuemin={0} aria-valuemax={100}>
+        <div
           className="h-full bg-red-500 transition-all duration-150"
           style={{ width: `${scrollProgress}%` }}
         />
@@ -148,9 +148,10 @@ function Reader() {
             <div className="flex items-center gap-4">
               <Link
                 to={`/comic/${id}`}
+                aria-label="Close reader"
                 className="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
               >
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6" aria-hidden="true" />
               </Link>
               <div>
                 <h1 className="text-white font-semibold truncate max-w-xs md:max-w-md">

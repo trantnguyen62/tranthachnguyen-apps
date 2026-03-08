@@ -23,39 +23,42 @@ function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 glass-effect">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <BookOpen className="w-8 h-8 text-red-500" />
+          <Link to="/" className="flex items-center gap-2" aria-label="ComicNews home">
+            <BookOpen className="w-8 h-8 text-red-500" aria-hidden="true" />
             <span className="text-xl font-bold gradient-text">ComicNews</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
             <Link
               to="/"
+              aria-current={isActive('/') ? 'page' : undefined}
               className={`flex items-center gap-2 transition-colors relative pb-1 ${
                 isActive('/') ? 'text-red-500' : 'text-gray-300 hover:text-white'
               }`}
             >
-              <Home className="w-4 h-4" />
+              <Home className="w-4 h-4" aria-hidden="true" />
               <span>Home</span>
               {isActive('/') && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full" />}
             </Link>
             <Link
               to="/library"
+              aria-current={isActive('/library') ? 'page' : undefined}
               className={`flex items-center gap-2 transition-colors relative pb-1 ${
                 isActive('/library') ? 'text-red-500' : 'text-gray-300 hover:text-white'
               }`}
             >
-              <Library className="w-4 h-4" />
+              <Library className="w-4 h-4" aria-hidden="true" />
               <span>Library</span>
               {isActive('/library') && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full" />}
             </Link>
             <Link
               to="/bookmarks"
+              aria-current={isActive('/bookmarks') ? 'page' : undefined}
               className={`flex items-center gap-2 transition-colors relative pb-1 ${
                 isActive('/bookmarks') ? 'text-red-500' : 'text-gray-300 hover:text-white'
               }`}
             >
-              <Bookmark className="w-4 h-4" />
+              <Bookmark className="w-4 h-4" aria-hidden="true" />
               <span>Bookmarks</span>
               {isActive('/bookmarks') && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500 rounded-full" />}
             </Link>
@@ -77,21 +80,22 @@ function Navbar() {
             ) : (
               <button
                 onClick={() => setShowSearch(true)}
+                aria-label="Open search"
                 className="p-2 text-gray-300 hover:text-white transition-colors rounded-lg hover:bg-white/10"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-5 h-5" aria-hidden="true" />
               </button>
             )}
 
             <div className="flex md:hidden items-center gap-1 ml-1">
-              <Link to="/" className={`p-2 rounded-lg transition-colors ${isActive('/') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
-                <Home className="w-5 h-5" />
+              <Link to="/" aria-label="Home" aria-current={isActive('/') ? 'page' : undefined} className={`p-2 rounded-lg transition-colors ${isActive('/') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+                <Home className="w-5 h-5" aria-hidden="true" />
               </Link>
-              <Link to="/library" className={`p-2 rounded-lg transition-colors ${isActive('/library') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
-                <Library className="w-5 h-5" />
+              <Link to="/library" aria-label="Library" aria-current={isActive('/library') ? 'page' : undefined} className={`p-2 rounded-lg transition-colors ${isActive('/library') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+                <Library className="w-5 h-5" aria-hidden="true" />
               </Link>
-              <Link to="/bookmarks" className={`p-2 rounded-lg transition-colors ${isActive('/bookmarks') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
-                <Bookmark className="w-5 h-5" />
+              <Link to="/bookmarks" aria-label="Bookmarks" aria-current={isActive('/bookmarks') ? 'page' : undefined} className={`p-2 rounded-lg transition-colors ${isActive('/bookmarks') ? 'text-red-500' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+                <Bookmark className="w-5 h-5" aria-hidden="true" />
               </Link>
             </div>
           </div>
