@@ -1199,7 +1199,16 @@ spec:
                 { term: 'Route 53', definition: 'A scalable Domain Name System (DNS) web service for routing end users to applications and managing domain registrations.' },
                 { term: 'ELB', definition: 'Elastic Load Balancing - Automatically distributes incoming application traffic across multiple targets like EC2 instances.' },
                 { term: 'CloudWatch', definition: 'A monitoring and observability service for AWS resources and applications, providing metrics, logs, and alarms.' },
-                { term: 'ECR', definition: 'Elastic Container Registry - A fully managed Docker container registry for storing, managing, and deploying container images.' }
+                { term: 'ECR', definition: 'Elastic Container Registry - A fully managed Docker container registry for storing, managing, and deploying container images.' },
+                { term: 'ECS', definition: 'Elastic Container Service - A fully managed container orchestration service that runs Docker containers on AWS without managing servers.' },
+                { term: 'Fargate', definition: 'A serverless compute engine for containers that works with ECS and EKS, removing the need to provision or manage EC2 instances.' },
+                { term: 'DynamoDB', definition: 'A fully managed NoSQL database service offering single-digit millisecond latency at any scale, with automatic replication across regions.' },
+                { term: 'SQS', definition: 'Simple Queue Service - A fully managed message queuing service that decouples and scales microservices, distributed systems, and serverless applications.' },
+                { term: 'SNS', definition: 'Simple Notification Service - A fully managed pub/sub messaging service for fan-out to multiple subscribers including SQS, Lambda, and email.' },
+                { term: 'API Gateway', definition: 'A fully managed service for creating, publishing, and securing APIs at any scale. Commonly fronts Lambda functions for serverless REST APIs.' },
+                { term: 'CodePipeline', definition: 'A fully managed CI/CD service that automates build, test, and deploy phases each time code is changed, integrating with CodeBuild, CodeDeploy, and third-party tools.' },
+                { term: 'Secrets Manager', definition: 'A service to store, rotate, and retrieve secrets like database credentials and API keys, with automatic rotation support.' },
+                { term: 'CloudTrail', definition: 'Records API calls and account activity across your AWS infrastructure, providing audit logs for compliance and security analysis.' }
             ],
             quiz: [
                 {
@@ -1231,6 +1240,31 @@ spec:
                     question: 'What is Route 53 used for?',
                     options: ['Load balancing', 'Container orchestration', 'DNS and domain routing', 'Serverless functions'],
                     correct: 2
+                },
+                {
+                    question: 'What is the difference between ECS and EKS?',
+                    options: ['ECS is for VMs, EKS is for containers', 'ECS uses AWS-native orchestration, EKS runs managed Kubernetes', 'EKS is serverless, ECS requires EC2', 'No difference'],
+                    correct: 1
+                },
+                {
+                    question: 'What does AWS Fargate eliminate?',
+                    options: ['The need for VPCs', 'The need to manage EC2 instances for containers', 'The need for IAM roles', 'The need for load balancers'],
+                    correct: 1
+                },
+                {
+                    question: 'What is SQS used for?',
+                    options: ['DNS routing', 'Decoupling services with a message queue', 'Container storage', 'Logging'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the difference between SQS and SNS?',
+                    options: ['No difference', 'SQS is a queue for point-to-point; SNS is pub/sub for fan-out to multiple subscribers', 'SNS is a database, SQS is a queue', 'SQS is synchronous, SNS is asynchronous'],
+                    correct: 1
+                },
+                {
+                    question: 'What does AWS CloudTrail provide?',
+                    options: ['Network routing', 'API call audit logs for security and compliance', 'Container deployment', 'Load balancing'],
+                    correct: 1
                 }
             ],
             codebase: [
@@ -1456,7 +1490,15 @@ echo "Deployed \$ECR_REPO:\$IMAGE_TAG to \$SERVICE_NAME"`
                 { term: 'Terraform Apply', definition: 'A command that executes the actions proposed in a Terraform plan to create, update, or delete infrastructure.' },
                 { term: 'Variable', definition: 'Input parameters that make Terraform configurations flexible and reusable, defined using variable blocks.' },
                 { term: 'Output', definition: 'Values exported from a Terraform module, useful for passing data between modules or displaying to users.' },
-                { term: 'Backend', definition: 'Determines how state is stored and how operations are executed. Remote backends enable team collaboration.' }
+                { term: 'Backend', definition: 'Determines how state is stored and how operations are executed. Remote backends enable team collaboration.' },
+                { term: 'Workspace', definition: 'A named state slice that allows managing multiple environments (dev, staging, prod) with the same configuration. Each workspace has its own state file.' },
+                { term: 'Data Source', definition: 'Fetches read-only information about existing infrastructure defined outside of Terraform, used to reference resources not managed by the current configuration.' },
+                { term: 'Local Values', definition: 'Named expressions computed once and referenced multiple times within a module, useful for avoiding repetition in configuration.' },
+                { term: 'count and for_each', definition: 'Meta-arguments that create multiple resource instances from a single block. count uses an integer; for_each iterates over a map or set for named instances.' },
+                { term: 'terraform import', definition: 'A command that brings existing infrastructure under Terraform management by mapping real resources to configuration blocks and updating state.' },
+                { term: 'terraform destroy', definition: 'A command that removes all infrastructure managed by the current Terraform configuration, with a confirmation prompt before execution.' },
+                { term: 'depends_on', definition: 'An explicit dependency meta-argument that forces Terraform to create or destroy resources in a specific order when implicit dependency detection is insufficient.' },
+                { term: 'Remote State', definition: 'Sharing Terraform state stored in a remote backend (e.g., S3) between configurations using the terraform_remote_state data source to access outputs.' }
             ],
             quiz: [
                 {
@@ -1482,6 +1524,26 @@ echo "Deployed \$ECR_REPO:\$IMAGE_TAG to \$SERVICE_NAME"`
                 {
                     question: 'What is a Terraform module?',
                     options: ['A single resource', 'A container for reusable resources', 'A variable', 'A provider'],
+                    correct: 1
+                },
+                {
+                    question: 'What does a Terraform workspace allow you to do?',
+                    options: ['Edit code online', 'Manage multiple environments with separate state files', 'Share providers between teams', 'Run containers'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the purpose of a data source in Terraform?',
+                    options: ['Create new resources', 'Fetch read-only information about existing infrastructure', 'Store secrets', 'Define variables'],
+                    correct: 1
+                },
+                {
+                    question: 'What does "terraform import" do?',
+                    options: ['Downloads modules', 'Brings existing infrastructure under Terraform management', 'Exports state to JSON', 'Initializes the backend'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the difference between count and for_each?',
+                    options: ['No difference', 'count uses an integer; for_each iterates over a map or set for named instances', 'for_each is deprecated', 'count only works with modules'],
                     correct: 1
                 }
             ],
@@ -1962,7 +2024,20 @@ save_work() {
                 { term: 'systemd', definition: 'A system and service manager for Linux, responsible for initializing and managing system services.' },
                 { term: 'Package Manager', definition: 'Tools like apt, yum, or dnf that automate installing, updating, configuring, and removing software packages.' },
                 { term: 'Cron', definition: 'A time-based job scheduler that runs commands or scripts automatically at specified times or intervals.' },
-                { term: 'File Permissions', definition: 'Linux uses read (r), write (w), and execute (x) permissions for owner, group, and others to control access.' }
+                { term: 'File Permissions', definition: 'Linux uses read (r), write (w), and execute (x) permissions for owner, group, and others to control access.' },
+                { term: 'inode', definition: 'A data structure storing metadata about a file (permissions, ownership, timestamps, disk blocks) but not its name or content. Each file has a unique inode number.' },
+                { term: 'Process', definition: 'A running instance of a program with its own memory space, identified by a PID. Managed with commands like ps, top, kill, and systemctl.' },
+                { term: 'Signal', definition: 'A software interrupt sent to a process. Common signals: SIGTERM (graceful stop), SIGKILL (force kill, cannot be caught), SIGHUP (reload config).' },
+                { term: 'Pipe', definition: 'A mechanism to chain commands by passing stdout of one command as stdin of the next, using the | operator (e.g., ps aux | grep nginx).' },
+                { term: 'Environment Variable', definition: 'A named value stored in the shell environment and passed to child processes. Set with export VAR=value; listed with env or printenv.' },
+                { term: 'Soft Link (symlink)', definition: 'A symbolic link is a file pointing to another file or directory by path. Created with ln -s. Breaks if the target is deleted.' },
+                { term: 'Hard Link', definition: 'A directory entry pointing directly to the same inode as another file. Deleting the original does not remove the data as long as the hard link exists.' },
+                { term: 'chown', definition: 'Changes the owner and/or group of a file or directory (e.g., chown user:group file). Requires root to change ownership to another user.' },
+                { term: '/proc filesystem', definition: 'A virtual filesystem exposing kernel and process information as files (e.g., /proc/cpuinfo, /proc/meminfo, /proc/<PID>/status).' },
+                { term: 'awk', definition: 'A text-processing tool for pattern scanning and report generation. Operates on fields within lines (e.g., awk \'{print $1}\' to print the first column).' },
+                { term: 'sed', definition: 'Stream Editor - processes text line by line, commonly used for find-and-replace (e.g., sed \'s/old/new/g\' file).' },
+                { term: 'ulimit', definition: 'Sets resource limits for user processes such as max open file descriptors, max processes, and max memory. Important for tuning high-load servers.' },
+                { term: 'journalctl', definition: 'Queries and displays logs from the systemd journal. Use -u to filter by service, -f to follow in real time, and --since to filter by time.' }
             ],
             quiz: [
                 {
@@ -1988,6 +2063,36 @@ save_work() {
                 {
                     question: 'What does grep do?',
                     options: ['Manages packages', 'Searches for text patterns', 'Compresses files', 'Creates directories'],
+                    correct: 1
+                },
+                {
+                    question: 'Which signal gracefully terminates a process?',
+                    options: ['SIGKILL', 'SIGHUP', 'SIGTERM', 'SIGINT'],
+                    correct: 2
+                },
+                {
+                    question: 'What does the pipe operator (|) do in Linux?',
+                    options: ['Creates a file', 'Passes the output of one command as input to another', 'Runs commands in parallel', 'Redirects to a file'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the difference between a hard link and a symlink?',
+                    options: ['No difference', 'Hard link points to the same inode; symlink points to a path and breaks if target is deleted', 'Symlinks are faster', 'Hard links only work on directories'],
+                    correct: 1
+                },
+                {
+                    question: 'What does chown do?',
+                    options: ['Changes file permissions', 'Changes file owner and group', 'Creates a new user', 'Changes the hostname'],
+                    correct: 1
+                },
+                {
+                    question: 'What is journalctl used for?',
+                    options: ['Editing cron jobs', 'Querying systemd logs', 'Managing users', 'Monitoring disk usage'],
+                    correct: 1
+                },
+                {
+                    question: 'What does an inode store?',
+                    options: ['The file name and contents', 'File metadata like permissions and disk location (not the file name)', 'User login information', 'Network configuration'],
                     correct: 1
                 }
             ],
