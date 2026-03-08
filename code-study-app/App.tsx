@@ -33,6 +33,7 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [activeTab, setActiveTab] = useState<'files' | 'search'>('files');
   const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const [fileLoadError, setFileLoadError] = useState<string | null>(null);
   const fileCache = useRef<Map<string, { content: string; language: string }>>(new Map());
 
   // Study context for AI - memoized to prevent unnecessary re-renders
@@ -83,13 +84,16 @@ function App() {
 
     const cached = fileCache.current.get(filePath);
     if (cached) {
+      setFileLoadError(null);
       setSelectedFile({ ...file, content: cached.content, language: cached.language });
       return;
     }
 
     setIsLoadingFile(true);
+    setFileLoadError(null);
     try {
       const res = await fetch(`${API_URL}/api/file?path=${encodeURIComponent(filePath)}`);
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
 
       fileCache.current.set(filePath, { content: data.content, language: data.language });
@@ -103,6 +107,7 @@ function App() {
       });
     } catch (err) {
       console.error('Failed to load file:', err);
+      setFileLoadError(file.name);
     } finally {
       setIsLoadingFile(false);
     }
@@ -246,6 +251,9 @@ function App() {
                     {isSearching ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Search className="w-4 h-4" aria-hidden="true" />}
                   </button>
                 </div>
+                <p className="text-xs text-slate-600 px-1">
+                  {selectedProject ? `Searching in ${selectedProject.name}` : 'Searching all projects'}
+                </p>
                 {searchResults.length > 0 ? (
                   <>
                     <p className="text-xs text-slate-500 px-2">
@@ -335,6 +343,17 @@ function App() {
               <div className="flex-1 flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
               </div>
+            ) : fileLoadError ? (
+              <div className="flex-1 flex items-center justify-center bg-slate-800/50 rounded-lg">
+                <div className="text-center space-y-3">
+                  <AlertCircle className="w-10 h-10 text-red-400/70 mx-auto" />
+                  <div>
+                    <p className="text-slate-300 font-medium">Failed to load file</p>
+                    <p className="text-slate-500 text-sm mt-1 code-font">{fileLoadError}</p>
+                  </div>
+                  <p className="text-xs text-slate-600">Check that the API server is running</p>
+                </div>
+              </div>
             ) : (
               <CodeViewer file={selectedFile} onCodeSelect={handleCodeSelect} />
             )}
@@ -379,7 +398,7 @@ function App() {
                   {selectedCode.substring(0, 200)}
                   {selectedCode.length > 200 && <span className="text-slate-500">…</span>}
                 </div>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   {selectedCode.split('\n').length} line{selectedCode.split('\n').length !== 1 ? 's' : ''} selected
                 </p>
               </div>

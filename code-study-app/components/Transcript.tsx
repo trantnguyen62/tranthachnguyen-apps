@@ -77,6 +77,13 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
             }`}
           >
             <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+            {message.role === 'model' && !message.isFinal && (
+              <span className="inline-flex items-center gap-0.5 mt-1" aria-label="AI is responding">
+                <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '300ms' }} />
+              </span>
+            )}
           </div>
           {message.role === 'user' && (
             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
