@@ -1,3 +1,8 @@
+/**
+ * Side-by-side before/after comparison view for AI-edited images.
+ * Supports fullscreen mode, a loading overlay while a new edit is generating,
+ * and video output when the processed result is a video MIME type.
+ */
 import React, { useState, memo } from 'react';
 import { Download, Maximize2, Minimize2, ArrowRight, Play, Loader2 } from 'lucide-react';
 

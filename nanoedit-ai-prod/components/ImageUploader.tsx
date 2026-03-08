@@ -1,3 +1,11 @@
+/**
+ * Image uploader component with three view states:
+ * 1. **Upload** – drag & drop or file picker (default)
+ * 2. **Camera** – live camera preview for capturing a photo
+ * 3. **Loaded** – displays the selected image with a remove button
+ *
+ * Accepts PNG, JPEG, and WebP files up to 10 MB.
+ */
 import React, { useRef, useState, useCallback, useEffect, memo } from 'react';
 import { Upload, X, Camera } from 'lucide-react';
 import { ProcessedImage } from '../types';

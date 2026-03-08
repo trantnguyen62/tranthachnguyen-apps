@@ -1,3 +1,7 @@
+/**
+ * Reusable button component with loading state and icon support.
+ * Extends native button attributes with `variant`, `isLoading`, and `leftIcon` props.
+ */
 import React, { memo } from 'react';
 import { Loader2 } from 'lucide-react';
 

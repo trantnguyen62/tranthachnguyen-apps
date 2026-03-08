@@ -34,6 +34,7 @@ const App: React.FC = () => {
   const canUndo = historyIndex > 0 && status !== AppStatus.PROCESSING;
   const canRedo = historyIndex < history.length - 1 && status !== AppStatus.PROCESSING;
 
+  /** Resets history to a single entry when a new image is selected, or clears state when removed. */
   const handleImageSelected = useCallback((image: ProcessedImage | null) => {
     if (image) {
       setHistory([image]);
@@ -48,6 +49,10 @@ const App: React.FC = () => {
     setPrompt('');
   }, []);
 
+  /**
+   * Sends the current image and prompt to the AI service.
+   * On success, appends the result to history (truncating any future redo states).
+   */
   const handleGenerate = useCallback(async () => {
     if (!currentImage) return;
     if (!prompt.trim()) return;
@@ -98,6 +103,7 @@ const App: React.FC = () => {
     }
   }, [canRedo]);
 
+  /** Triggers a browser download of the current image and briefly shows a success toast. */
   const handleDownload = useCallback(() => {
     if (!currentImage) return;
     const link = document.createElement('a');

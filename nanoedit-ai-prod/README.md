@@ -5,11 +5,12 @@ A simple yet powerful AI-assisted photo editor for quick touch-ups and enhanceme
 ## 🎯 Features
 
 - **AI Image Editing** - Describe what you want to change in natural language
-- **Quick Touch-ups** - Remove objects, fix blemishes, adjust colors
-- **Image Enhancement** - Upscale, sharpen, and improve image quality
-- **Multiple Operations** - Crop, rotate, filters, and more
-- **Before/After Preview** - Compare your edits instantly
-- **Download Results** - Save your edited images
+- **Preset Quick Actions** - Background removal, color enhancement, sketches, vintage filters, skin retouching
+- **Passport Photo Generation** - One-click professional passport photo conversion
+- **Edit History** - Undo/redo through multiple AI edits in a session
+- **Camera Capture** - Take a photo directly from your device camera
+- **Before/After Preview** - Compare your edits side-by-side with fullscreen support
+- **Download Results** - Save your edited images as PNG
 
 ## 🚀 Quick Start
 
@@ -82,14 +83,15 @@ nanoedit-ai-prod/
 - **Frontend**: React, TypeScript, Vite
 - **Backend**: Node.js, Express
 - **AI**: Google Gemini API (Image Generation/Editing)
-- **Styling**: Custom CSS
+- **Styling**: Tailwind CSS
 
 ## 💡 Usage
 
-1. Upload an image or take a photo
-2. Enter a prompt describing your desired edit (e.g., "Remove the person in the background")
-3. Click "Apply" to generate the edit
-4. Preview, compare, and download your result
+1. Upload an image (drag & drop, file picker, or camera)
+2. Describe your desired edit (e.g., "Remove the person in the background")
+3. Press **Enter** or click **Generate** to apply the AI edit
+4. Use undo/redo to navigate your edit history
+5. Preview before/after, then download your result
 
 ## 🌐 Live Demo
 
