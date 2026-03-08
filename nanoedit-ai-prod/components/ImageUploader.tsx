@@ -263,14 +263,14 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
             <p className="text-lg font-semibold text-slate-700">
               {isDragging ? 'Drop it here!' : 'Drag & drop or click to upload'}
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               PNG, JPG, WebP (Max 10MB)
             </p>
           </div>
 
           <div className="flex items-center w-full max-w-xs">
             <div className="flex-grow h-px bg-slate-200"></div>
-            <span className="px-3 text-xs font-medium text-slate-400 uppercase">Or</span>
+            <span className="px-3 text-xs font-medium text-slate-500 uppercase">Or</span>
             <div className="flex-grow h-px bg-slate-200"></div>
           </div>
 

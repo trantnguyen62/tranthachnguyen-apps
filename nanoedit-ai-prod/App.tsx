@@ -336,7 +336,7 @@ const App: React.FC = () => {
             <div className="lg:col-span-8 animate-fadeIn">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 h-full">
                 <div className="flex items-center gap-2 mb-4 text-slate-500 text-sm">
-                  <History className="w-4 h-4" />
+                  <History className="w-4 h-4" aria-hidden="true" />
                   <span>Edit {historyIndex} of {history.length - 1}</span>
                 </div>
                 <ComparisonView

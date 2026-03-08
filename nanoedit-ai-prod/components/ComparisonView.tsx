@@ -53,11 +53,12 @@ export const ComparisonView = memo<ComparisonViewProps>(({
               >
                 <Maximize2 className="w-5 h-5" aria-hidden="true" />
               </button>
-              <button 
+              <button
                 onClick={onDownload}
+                aria-label="Download edited image"
                 className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors shadow-sm text-sm font-medium"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4" aria-hidden="true" />
                 Download
               </button>
             </div>
@@ -81,7 +82,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           </div>
 
           {/* Mobile separator */}
-          <div className="lg:hidden flex items-center gap-3 text-xs font-medium text-slate-400" aria-hidden="true">
+          <div className="lg:hidden flex items-center gap-3 text-xs font-medium text-slate-500" aria-hidden="true">
             <div className="flex-1 h-px bg-slate-200" />
             <span className="flex items-center gap-1">
               <ArrowRight className="w-3 h-3" /> AI Result
@@ -98,6 +99,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                     controls
                     autoPlay
                     loop
+                    aria-label="AI-processed result video"
                     className="w-full h-full object-contain bg-black"
                  />
                ) : (
