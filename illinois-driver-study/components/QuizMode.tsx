@@ -14,14 +14,16 @@ const TRANSLATIONS = {
     of: "of",
     score: "Score",
     next: "Next Question",
-    finish: "Finish Quiz"
+    finish: "Finish Quiz",
+    explanation: "Why:"
   },
   vi: {
     questionLabel: "Câu hỏi",
     of: "trên",
     score: "Điểm",
     next: "Câu Tiếp Theo",
-    finish: "Hoàn Thành"
+    finish: "Hoàn Thành",
+    explanation: "Giải thích:"
   }
 } as const;
 
@@ -177,6 +179,11 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
               : (language === 'vi'
                   ? `Sai. Đáp án đúng là: ${question.options[question.correctIndex]}`
                   : `Incorrect. The correct answer is: ${question.options[question.correctIndex]}`)}
+          </div>
+        )}
+        {showResult && question.explanation && (
+          <div className={`mt-4 p-4 rounded-lg border-l-4 text-sm ${selectedOption === question.correctIndex ? 'border-green-500 bg-green-50 text-green-900' : 'border-red-400 bg-red-50 text-red-900'}`}>
+            <span className="font-semibold">{t.explanation}</span>{' '}{question.explanation}
           </div>
         )}
       </div>
