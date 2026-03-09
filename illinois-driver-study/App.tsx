@@ -69,7 +69,13 @@ const App: React.FC = () => {
       [AppMode.STUDY]: 'Study IL Traffic Laws & Road Signs - Illinois Driver Study',
       [AppMode.LIVE_PRACTICE]: 'AI-Powered Illinois Driving Practice - Illinois Driver Study',
     };
+    const descriptions: Record<AppMode, string> = {
+      [AppMode.QUIZ]: 'Take a free Illinois DMV practice quiz with instant feedback. 52 official questions covering traffic laws, road signs, and safe driving rules for the IL written knowledge test.',
+      [AppMode.STUDY]: 'Study all Illinois driver\'s license test topics: traffic laws, road signs, right-of-way rules, speed limits, and Illinois-specific regulations. Free study list with explanations.',
+      [AppMode.LIVE_PRACTICE]: 'Practice for the Illinois DMV written test with an AI-powered instructor. Ask questions, get explanations, and learn Illinois traffic laws through interactive voice conversation.',
+    };
     document.title = titles[mode];
+    document.querySelector('meta[name="description"]')?.setAttribute('content', descriptions[mode]);
   }, [mode]);
 
   const toggleLanguage = useCallback(() => {
@@ -151,6 +157,11 @@ const App: React.FC = () => {
         <div className="max-w-5xl mx-auto px-4 text-center text-slate-400 text-sm">
           <p>© {new Date().getFullYear()} {t.footerText}</p>
           <p className="mt-1">{t.footerSub}</p>
+          {language === 'en' && (
+            <p className="mt-2 text-xs text-slate-300 max-w-xl mx-auto">
+              Free Illinois driver&apos;s license practice test for the IL Secretary of State written knowledge exam. Covers traffic laws, road signs, right-of-way rules, and safe driving — in English and Vietnamese.
+            </p>
+          )}
         </div>
       </footer>
     </div>
