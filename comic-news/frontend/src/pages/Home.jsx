@@ -101,8 +101,8 @@ function Home() {
               <span className="text-white">Turned Into Comics</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-              Experience the news like never before. We transform trending stories
-              into engaging visual comics you'll actually want to read.
+              Real news events. Real-life moments. All brought to life through comics —
+              from weather alerts to everyday awkwardness, one panel at a time.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link
@@ -183,7 +183,7 @@ function Home() {
               <Monitor className="w-7 h-7 text-yellow-500" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Visual Storytelling</h3>
-            <p className="text-gray-400">Complex news made simple through engaging comic illustrations.</p>
+            <p className="text-gray-400">From breaking weather alerts to everyday mishaps — every story gets the comic treatment it deserves.</p>
           </div>
         </div>
       </section>

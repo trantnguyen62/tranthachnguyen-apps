@@ -38,7 +38,7 @@ function Bookmarks() {
           <Bookmark className="w-8 h-8 text-red-500" />
           <h1 className="text-3xl font-bold text-white">My Bookmarks</h1>
         </div>
-        <p className="text-gray-400">Your saved stories for easy access</p>
+        <p className="text-gray-400">Stories you've saved to read again</p>
       </div>
 
       {/* Content */}
@@ -48,7 +48,7 @@ function Bookmarks() {
             <BookOpen className="w-12 h-12 text-gray-500" />
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">No bookmarks yet</h2>
-          <p className="text-gray-400 mb-6">Start exploring and save your favorite stories!</p>
+          <p className="text-gray-400 mb-6">Find a story you love and bookmark it to come back any time.</p>
           <Link
             to="/library"
             className="inline-flex items-center gap-2 px-6 py-3 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 transition-colors"

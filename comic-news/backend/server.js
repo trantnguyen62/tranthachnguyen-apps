@@ -54,8 +54,8 @@ Conditions are expected to be worse to the south of the immediate Chicago area �
     panels: [
       { id: 1, title: "Saturday Noon", description: "10°F - National Weather Service: It's 10 degrees now... but just wait!" },
       { id: 2, title: "Overnight", description: "Evanston: 0°F - Substantially worse! Wind chill -8°F! Gusts to 25 MPH!" },
-      { id: 3, title: "Unusually Cold", description: "Unusually cold until Monday - calendar showing Sunday crossed out" },
-      { id: 4, title: "Monday", description: "26°F - 'Relatively balmy' - 26 degrees? I'll believe it when I feel it." },
+      { id: 3, title: "Unusually Cold", description: "Sunday circled in dread — one more freezing night before any relief" },
+      { id: 4, title: "Monday", description: "26°F — the forecast calls it 'relatively balmy.' Nobody is convinced." },
       { id: 5, title: "South of I-80", description: "Hazardous travel - Accumulating snow! Stay home!" }
     ]
   },
