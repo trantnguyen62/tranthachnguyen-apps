@@ -855,7 +855,10 @@ function render() {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         for (let i = 0; i < obstacles.length; i++) {
-            drawObstacle(ctx, obstacles[i]);
+            const obs = obstacles[i];
+            if (obs.x > game.width) break; // sorted ascending; rest are off-screen right
+            if (obs.x + CONFIG.OBSTACLE_WIDTH < 0) continue; // off-screen left
+            drawObstacle(ctx, obs);
         }
     }
 
@@ -1013,13 +1016,19 @@ function checkCollision() {
         return true;
     }
 
+    const playerRight = p.x + playerRadius;
+    const playerLeft = p.x - playerRadius;
+    const playerTop = p.y - playerRadius;
+    const playerBottom = p.y + playerRadius;
     const obstacles = game.obstacles;
+    // Obstacles are sorted ascending by x (oldest/leftmost first).
+    // Break early once an obstacle is beyond the player's right edge.
     for (let i = 0; i < obstacles.length; i++) {
         const obs = obstacles[i];
-        if (p.x + playerRadius > obs.x && p.x - playerRadius < obs.x + CONFIG.OBSTACLE_WIDTH) {
-            if (p.y - playerRadius < obs.gapY || p.y + playerRadius > obs.gapY + CONFIG.OBSTACLE_GAP) {
-                return true;
-            }
+        if (obs.x > playerRight) break;
+        if (obs.x + CONFIG.OBSTACLE_WIDTH < playerLeft) continue;
+        if (playerTop < obs.gapY || playerBottom > obs.gapY + CONFIG.OBSTACLE_GAP) {
+            return true;
         }
     }
 
