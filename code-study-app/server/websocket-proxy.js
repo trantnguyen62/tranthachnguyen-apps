@@ -93,7 +93,9 @@ wss.on('connection', (clientWs, req) => {
 
   connectionTimeout = setTimeout(() => {
     console.log(`[Timeout] Session timeout for ${ip}`);
-    clientWs.send(JSON.stringify({ type: 'error', error: 'Session timeout. Please reconnect.' }));
+    if (clientWs.readyState === clientWs.OPEN) {
+      clientWs.send(JSON.stringify({ type: 'error', error: 'Session timeout. Please reconnect.' }));
+    }
     clientWs.close();
   }, 30 * 60 * 1000);
 
@@ -142,12 +144,16 @@ wss.on('connection', (clientWs, req) => {
               },
               onclose: (event) => {
                 console.log(`[Gemini] Closed for ${ip}`);
-                clientWs.send(JSON.stringify({ type: 'close', code: event?.code, reason: event?.reason }));
+                if (clientWs.readyState === clientWs.OPEN) {
+                  clientWs.send(JSON.stringify({ type: 'close', code: event?.code, reason: event?.reason }));
+                }
                 geminiSession = null;
               },
               onerror: (err) => {
                 console.error(`[Gemini] Error for ${ip}:`, err?.message || err);
-                clientWs.send(JSON.stringify({ type: 'error', error: 'AI service error' }));
+                if (clientWs.readyState === clientWs.OPEN) {
+                  clientWs.send(JSON.stringify({ type: 'error', error: 'AI service error' }));
+                }
                 isConnecting = false;
               }
             }
@@ -175,7 +181,9 @@ wss.on('connection', (clientWs, req) => {
 
     } catch (error) {
       console.error(`[Error] Message handling for ${ip}:`, error.message);
-      clientWs.send(JSON.stringify({ type: 'error', error: 'An error occurred' }));
+      if (clientWs.readyState === clientWs.OPEN) {
+        clientWs.send(JSON.stringify({ type: 'error', error: 'An error occurred' }));
+      }
     }
   });
 

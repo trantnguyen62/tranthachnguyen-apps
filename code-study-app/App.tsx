@@ -55,7 +55,7 @@ function App() {
   // Load projects on mount
   useEffect(() => {
     fetch(`${API_URL}/api/projects`)
-      .then(res => res.json())
+      .then(res => { if (!res.ok) throw new Error(`Server returned ${res.status}`); return res.json(); })
       .then(data => setProjects(data))
       .catch(err => console.error('Failed to load projects:', err));
   }, []);
