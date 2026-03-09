@@ -113,7 +113,7 @@ export default function App() {
         </header>
 
         {/* Main Content */}
-        <main style={{ 
+        <main id="main-content" style={{
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', 
           gap: 32,
@@ -158,7 +158,7 @@ export default function App() {
                   fontFamily: "'Space Grotesk', sans-serif"
                 }}
               >
-                <span>✨</span> Auto-Fix
+                <span aria-hidden="true">✨</span> Auto-Fix
               </button>
               <button
                 onClick={handleCheck}
@@ -182,7 +182,7 @@ export default function App() {
                     Analyzing...
                   </>
                 ) : (
-                  <>🔍 Analyze</>
+                  <><span aria-hidden="true">🔍</span> Analyze</>
                 )}
               </button>
             </div>
@@ -352,6 +352,13 @@ export default function App() {
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
       `}</style>
     </div>
   );

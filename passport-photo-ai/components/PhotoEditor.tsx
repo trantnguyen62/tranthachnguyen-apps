@@ -56,6 +56,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   const [contrast, setContrast] = useState(108);
   const [bgColor, setBgColor] = useState('#FFFFFF');
   const removedBgRef = useRef<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const process = useCallback(async () => {
     setStep('processing');
@@ -101,6 +102,34 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
 
   useEffect(() => () => { if (removedBgRef.current) URL.revokeObjectURL(removedBgRef.current); }, []);
 
+  // Focus management: focus close button on open, return focus on close
+  useEffect(() => {
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const closeBtn = dialogRef.current?.querySelector<HTMLElement>('button[aria-label="Close editor"]');
+    closeBtn?.focus();
+    return () => { previousFocus?.focus(); };
+  }, []);
+
+  // Tab trap within dialog
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { onCancel(); return; }
+      if (e.key !== 'Tab') return;
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), input:not([disabled])'
+      );
+      if (!focusable || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel]);
+
   const handleSave = useCallback(() => {
     if (result) onSave({ data: result, mimeType: 'image/jpeg' });
   }, [result, onSave]);
@@ -118,7 +147,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   const accentPurple = '#9D4EDD';
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="editor-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="editor-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
       <div style={{ background: 'rgba(17,17,17,0.95)', borderRadius: 24, width: '90%', maxWidth: 700, padding: 28, border: '1px solid rgba(255,255,255,0.08)', boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)` }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <h2 id="editor-title" style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 700, background: `linear-gradient(135deg, #fff 0%, ${accentGold} 60%, ${accentPink} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Photo Studio</h2>

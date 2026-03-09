@@ -43,6 +43,22 @@
       ::-webkit-scrollbar { width: 8px; }
       ::-webkit-scrollbar-track { background: #1A1A2E; }
       ::-webkit-scrollbar-thumb { background: #E94560; border-radius: 4px; }
+      .skip-link {
+        position: absolute;
+        top: -100%;
+        left: 16px;
+        z-index: 9999;
+        padding: 10px 18px;
+        background: #E94560;
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        border-radius: 0 0 8px 8px;
+        text-decoration: none;
+        transition: top 0.2s;
+      }
+      .skip-link:focus { top: 0; }
     </style>
     <script type="application/ld+json">
     {
@@ -75,6 +91,7 @@
     </script>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
