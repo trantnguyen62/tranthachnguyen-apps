@@ -62,6 +62,15 @@ const App: React.FC = () => {
     document.documentElement.lang = language;
   }, [language]);
 
+  useEffect(() => {
+    const titles: Record<AppMode, string> = {
+      [AppMode.QUIZ]: 'Illinois DMV Practice Quiz - Free IL Written Test | Illinois Driver Study',
+      [AppMode.STUDY]: 'Study IL Traffic Laws & Road Signs - Illinois Driver Study',
+      [AppMode.LIVE_PRACTICE]: 'AI-Powered Illinois Driving Practice - Illinois Driver Study',
+    };
+    document.title = titles[mode];
+  }, [mode]);
+
   const toggleLanguage = useCallback(() => {
     setLanguage(l => l === 'en' ? 'vi' : 'en');
   }, []);
