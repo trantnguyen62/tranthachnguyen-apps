@@ -9,7 +9,7 @@ const Transcript = memo<Props>(({ messages }) => {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'auto' });
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   if (messages.length === 0) {
@@ -25,7 +25,7 @@ const Transcript = memo<Props>(({ messages }) => {
   }
 
   return (
-    <div role="log" aria-live="polite" aria-label="Conversation transcript" className="flex flex-col gap-4 p-4 overflow-y-auto h-full">
+    <div role="log" aria-live="polite" aria-label="Conversation transcript" className="flex flex-col gap-3 p-4 overflow-y-auto h-full">
       {messages.map((msg) => (
         <div
           key={msg.id}
@@ -33,15 +33,15 @@ const Transcript = memo<Props>(({ messages }) => {
           className={`msg-fade-in flex flex-col max-w-[85%] ${msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'}`}
         >
           <div className={`
-            px-4 py-2 rounded-2xl text-sm leading-relaxed
+            px-4 py-2.5 rounded-2xl text-sm leading-relaxed
             ${msg.role === 'user'
-              ? 'bg-blue-600 text-white rounded-br-none'
-              : 'bg-slate-700 text-slate-200 rounded-bl-none'}
+              ? 'bg-blue-600 text-white rounded-br-sm'
+              : 'bg-slate-700/80 text-slate-200 rounded-bl-sm'}
           `}>
             {msg.text}
           </div>
           <span className="text-[10px] text-slate-500 mt-1 px-1">
-            {msg.role === 'user' ? 'You' : 'AI Tutor'} • {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {msg.role === 'user' ? 'You' : 'AI Tutor'} · {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
       ))}
