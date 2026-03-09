@@ -65,10 +65,11 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
         
         <div className="p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="scenario-prompt" className="block text-sm font-medium text-slate-700 mb-2">
               {t.promptLabel}
             </label>
             <textarea
+              id="scenario-prompt"
               className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow"
               rows={3}
               placeholder={t.promptPlaceholder}
@@ -77,8 +78,8 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">{t.quality}</label>
+          <fieldset>
+            <legend className="block text-sm font-medium text-slate-700 mb-2">{t.quality}</legend>
             <div className="flex gap-4">
               {[ImageSize.SIZE_1K, ImageSize.SIZE_2K, ImageSize.SIZE_4K].map((s) => (
                 <label key={s} className="flex items-center cursor-pointer">
@@ -94,7 +95,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
                 </label>
               ))}
             </div>
-          </div>
+          </fieldset>
 
           <button
             onClick={handleGenerate}
@@ -107,7 +108,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
           >
             {loading ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -119,7 +120,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
           </button>
 
           {error && (
-            <div className="p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+            <div role="alert" className="p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
               {error}
             </div>
           )}

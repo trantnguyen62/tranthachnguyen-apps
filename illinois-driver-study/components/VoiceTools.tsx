@@ -95,33 +95,37 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
         <div className="p-8 flex flex-col items-center">
           <div className="mb-8 relative">
             {processing ? (
-               <div className="w-24 h-24 rounded-full border-4 border-teal-200 border-t-teal-600 animate-spin"></div>
+              <div role="status" aria-label={language === 'en' ? 'Processing recording...' : 'Đang xử lý...'} className="w-24 h-24 rounded-full border-4 border-teal-200 border-t-teal-600 animate-spin"></div>
             ) : (
               <button
                 onClick={isRecording ? stopRecording : startRecording}
+                aria-label={isRecording ? (language === 'en' ? 'Stop recording' : 'Dừng ghi âm') : (language === 'en' ? 'Start recording' : 'Bắt đầu ghi âm')}
+                aria-pressed={isRecording}
                 className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg ${
-                  isRecording 
-                    ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                  isRecording
+                    ? 'bg-red-500 hover:bg-red-600 animate-pulse'
                     : 'bg-teal-600 hover:bg-teal-700 hover:scale-105'
                 }`}
               >
                 {isRecording ? (
-                  <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <rect x="6" y="6" width="12" height="12" rx="2" />
                   </svg>
                 ) : (
-                  <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
                     <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
                   </svg>
                 )}
               </button>
             )}
-            {isRecording && (
-                <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-red-500 font-semibold animate-pulse whitespace-nowrap">
-                    {t.recording}
+            <div aria-live="polite" aria-atomic="true" className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+              {isRecording && (
+                <span className="text-red-500 font-semibold animate-pulse">
+                  {t.recording}
                 </span>
-            )}
+              )}
+            </div>
           </div>
 
           {!isRecording && !processing && !transcription && (
@@ -131,7 +135,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
           )}
 
           {transcription && (
-            <div className="w-full bg-slate-50 rounded-lg p-6 border border-slate-200">
+            <div aria-live="polite" aria-atomic="true" className="w-full bg-slate-50 rounded-lg p-6 border border-slate-200">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">{t.transcription}</h3>
               <p className="text-slate-800 text-lg leading-relaxed whitespace-pre-wrap">{transcription}</p>
             </div>

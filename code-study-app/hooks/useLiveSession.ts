@@ -39,7 +39,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
     sessionPromiseRef.current = null;
 
     sourcesRef.current.forEach(source => {
-      try { source.stop(); } catch (e) { }
+      try { source.stop(); } catch (e) { console.warn('Error stopping audio source:', e); }
     });
     sourcesRef.current.clear();
 
@@ -275,7 +275,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
             if (message.serverContent?.interrupted) {
               console.log("Interrupted!");
               sourcesRef.current.forEach(src => {
-                try { src.stop(); } catch (e) { }
+                try { src.stop(); } catch (e) { console.warn('Error stopping audio source:', e); }
               });
               sourcesRef.current.clear();
               nextStartTimeRef.current = 0;
