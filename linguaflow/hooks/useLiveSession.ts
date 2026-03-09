@@ -279,7 +279,7 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
                 for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
                 const avg = sum / dataArray.length;
                 setVolume(prev => ({ ...prev, output: avg / 255 }));
-              }, 50);
+              }, 100);
 
               source.addEventListener('ended', () => {
                 sourcesRef.current.delete(source);

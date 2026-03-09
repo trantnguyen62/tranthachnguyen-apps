@@ -41,10 +41,11 @@ export function createBlob(data: Float32Array): Blob {
  * Used to serialise raw PCM bytes for JSON transport over WebSocket.
  */
 export function encode(bytes: Uint8Array): string {
+  // Chunked to avoid call stack overflow on large buffers while avoiding O(n²) string concat
+  const chunkSize = 0x8000;
   let binary = '';
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
   }
   return btoa(binary);
 }
@@ -54,13 +55,7 @@ export function encode(bytes: Uint8Array): string {
  * Used to deserialise PCM audio received from the Gemini API response.
  */
 export function decode(base64: string): Uint8Array {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
+  return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
 }
 
 /**
