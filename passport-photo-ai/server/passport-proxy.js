@@ -9,8 +9,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: `${__dirname}/../.env.local` });
 
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: '20mb' }));
+app.set('trust proxy', 1);
+app.use(cors({
+  origin: ['https://passportphoto.tranthachnguyen.com', 'http://localhost:5186', 'http://localhost:5173'],
+  methods: ['POST'],
+  allowedHeaders: ['Content-Type'],
+}));
+app.use(express.json({ limit: '5mb' }));
+
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
 
 // Simple in-memory rate limiter: max 10 AI requests per IP per minute
 const _rateMap = new Map();
@@ -54,6 +67,7 @@ app.post('/api/passport/check', apiRateLimit, async (req, res) => {
   try {
     const { base64Image } = req.body;
     if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
+    if (base64Image.length > 4 * 1024 * 1024 * 1.4) return res.status(400).json({ error: 'Image too large' }); // ~4MB decoded
 
     const parsed = parseBase64Image(base64Image);
     if (!parsed) return res.status(400).json({ error: 'Invalid image type' });
@@ -92,6 +106,7 @@ app.post('/api/passport/analyze', apiRateLimit, async (req, res) => {
   try {
     const { base64Image } = req.body;
     if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
+    if (base64Image.length > 4 * 1024 * 1024 * 1.4) return res.status(400).json({ error: 'Image too large' }); // ~4MB decoded
     const parsed = parseBase64Image(base64Image);
     if (!parsed) return res.status(400).json({ error: 'Invalid image type' });
     const { mimeType, data: clean } = parsed;
