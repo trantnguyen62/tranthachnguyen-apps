@@ -18,6 +18,10 @@ const PRESET_PROMPTS = [
 
 const PASSPORT_PROMPT = "Convert this into a professional passport photo: solid white background, center the subject, crop to head and shoulders, ensure even lighting, and make it look professional.";
 
+const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement"];
+
+const CURRENT_YEAR = new Date().getFullYear();
+
 const App: React.FC = () => {
   // History management
   const [history, setHistory] = useState<ProcessedImage[]>([]);
@@ -130,6 +134,21 @@ const App: React.FC = () => {
     setPrompt(text);
   }, []);
 
+  const handlePromptChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPrompt(e.target.value);
+  }, []);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleGenerate();
+    }
+  }, [handleGenerate]);
+
+  const handleClearPrompt = useCallback(() => {
+    setPrompt('');
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50 selection:bg-brand-200 selection:text-brand-900">
       {/* Header */}
@@ -162,7 +181,7 @@ const App: React.FC = () => {
               Upload any photo and describe what you want. Remove backgrounds, enhance colors, create passport photos, retouch portraits, or apply artistic effects — all in seconds with Google Gemini AI.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
-              {["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement"].map((feat) => (
+              {FEATURES.map((feat) => (
                 <span key={feat} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-medium shadow-sm">
                   {feat}
                 </span>
@@ -232,15 +251,10 @@ const App: React.FC = () => {
                   <div className="relative">
                     <textarea
                       value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
+                      onChange={handlePromptChange}
                       aria-label="Describe the image changes you want"
                       aria-describedby="prompt-hint"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleGenerate();
-                        }
-                      }}
+                      onKeyDown={handleKeyDown}
                       placeholder={historyIndex === 0
                         ? "E.g., 'Remove the person in the background' or 'Make it look vintage'"
                         : "Describe the next change..."}
@@ -249,7 +263,7 @@ const App: React.FC = () => {
                     />
                     {prompt && (
                       <button
-                        onClick={() => setPrompt('')}
+                        onClick={handleClearPrompt}
                         className="absolute top-3 right-3 p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
                         aria-label="Clear prompt"
                         tabIndex={-1}
@@ -379,7 +393,7 @@ const App: React.FC = () => {
             NanoEdit AI is a free AI-powered image editor. Remove backgrounds, retouch portraits, create passport photos, and apply artistic filters — all with simple text prompts.
           </p>
           <p className="text-slate-400 text-xs">
-            &copy; {new Date().getFullYear()} NanoEdit AI &middot; Powered by Google Gemini &middot; Free online photo editor
+            &copy; {CURRENT_YEAR} NanoEdit AI &middot; Powered by Google Gemini &middot; Free online photo editor
           </p>
         </div>
       </footer>
