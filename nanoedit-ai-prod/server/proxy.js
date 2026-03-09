@@ -36,17 +36,25 @@ app.post('/api/gemini/edit-image', async (req, res) => {
     console.log(`[edit-image] Prompt: ${prompt.substring(0, 100)}...`);
 
     // Call the gemini-web-proxy /api/edit-image endpoint
-    const response = await fetch(`${GEMINI_PROXY_URL}/api/edit-image`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        prompt,
-        base64Image,
-        mimeType: mimeType || 'image/png'
-      }),
-    });
+    const upstreamController = new AbortController();
+    const upstreamTimeout = setTimeout(() => upstreamController.abort(), 110_000);
+    let response;
+    try {
+      response = await fetch(`${GEMINI_PROXY_URL}/api/edit-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt,
+          base64Image,
+          mimeType: mimeType || 'image/png'
+        }),
+        signal: upstreamController.signal,
+      });
+    } finally {
+      clearTimeout(upstreamTimeout);
+    }
 
     const data = await response.json();
 
