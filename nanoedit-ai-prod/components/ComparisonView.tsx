@@ -56,7 +56,10 @@ export const ComparisonView = memo<ComparisonViewProps>(({
         
         {!isExpanded && (
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-xl font-bold text-slate-800">Result</h3>
+            <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-brand-500" aria-hidden="true" />
+              AI Result
+            </h3>
             <div className="flex gap-2">
                <button
                 onClick={() => setIsExpanded(true)}
