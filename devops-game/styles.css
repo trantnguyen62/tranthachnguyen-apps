@@ -756,3 +756,46 @@ body {
     justify-content: center;
     margin-bottom: 0.5rem;
 }
+
+/* =====================================================
+   Screen Reader Only (visually hidden)
+   ===================================================== */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =====================================================
+   Reduced Motion Support
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .menu-background::before {
+        animation: none;
+    }
+
+    .stars2,
+    .stars3 {
+        animation: none;
+    }
+
+    .answer-btn.incorrect {
+        animation: none;
+    }
+
+    .timer-fill.timer-danger {
+        animation: none;
+    }
+
+    * {
+        transition-duration: 0.01ms !important;
+    }
+}

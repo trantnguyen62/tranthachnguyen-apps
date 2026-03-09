@@ -453,12 +453,22 @@ function init() {
         domCache.pauseMenu     = document.getElementById('pauseMenu');
         domCache.gameOver      = document.getElementById('gameOver');
         domCache.levelComplete = document.getElementById('levelComplete');
-        domCache.globalMenuBtn = document.getElementById('globalMenuBtn');
-        domCache.newHighScore  = document.getElementById('newHighScore');
-        domCache.menuHighScore = document.getElementById('menuHighScore');
+        domCache.globalMenuBtn  = document.getElementById('globalMenuBtn');
+        domCache.newHighScore   = document.getElementById('newHighScore');
+        domCache.menuHighScore  = document.getElementById('menuHighScore');
+        domCache.ariaAnnouncer  = document.getElementById('ariaAnnouncer');
 
         loadHighScore();
         window.addEventListener('resize', resizeCanvas);
+    });
+}
+
+function announce(message) {
+    if (!domCache.ariaAnnouncer) return;
+    // Clear first so repeated messages re-trigger screen readers
+    domCache.ariaAnnouncer.textContent = '';
+    requestAnimationFrame(() => {
+        domCache.ariaAnnouncer.textContent = message;
     });
 }
 
@@ -1028,8 +1038,11 @@ function checkAnswer(index) {
     game.questionsAnswered++;
 
     if (correct) {
+        announce('Correct!');
         handleCorrectAnswer();
     } else {
+        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
+        announce(`Wrong. The correct answer is: ${correctText}`);
         handleWrongAnswer();
     }
 
@@ -1332,6 +1345,9 @@ function completeZone() {
             : '0%';
 
     domCache.levelComplete.classList.remove('hidden');
+    const firstBtn = domCache.levelComplete.querySelector('button');
+    if (firstBtn) firstBtn.focus();
+    announce(`Zone complete: ${topic.name}!`);
 }
 
 function nextZone() {
@@ -1375,11 +1391,16 @@ function updateTimerDisplay() {
 function togglePause() {
     game.paused = !game.paused;
     domCache.pauseMenu.classList.toggle('hidden', !game.paused);
+    if (game.paused) {
+        const firstBtn = domCache.pauseMenu.querySelector('button');
+        if (firstBtn) firstBtn.focus();
+    }
 }
 
 function resumeGame() {
     game.paused = false;
     domCache.pauseMenu.classList.add('hidden');
+    domCache.globalMenuBtn.focus();
 }
 
 function restartGame() {
@@ -1422,6 +1443,10 @@ function gameOver(victory = false) {
     }
 
     domCache.gameOver.classList.remove('hidden');
+    const firstBtn = domCache.gameOver.querySelector('button');
+    if (firstBtn) firstBtn.focus();
+    const resultMsg = victory ? 'Victory!' : 'Game Over.';
+    announce(`${resultMsg} Final score: ${game.score}.`);
 }
 
 // Add CSS for shake animation

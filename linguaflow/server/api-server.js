@@ -125,6 +125,9 @@ app.post('/api/users', async (req, res) => {
     if (!name || typeof name !== 'string' || name.trim().length < 1) {
       return res.status(400).json({ error: 'Valid name is required' });
     }
+    if (name.trim().length > 100) {
+      return res.status(400).json({ error: 'Name must be 100 characters or fewer' });
+    }
 
     const data = await readUsers();
     const normalizedName = name.trim();
@@ -212,9 +215,9 @@ app.post('/api/users/:id/words', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Add new words (avoid duplicates)
+    // Add new words (avoid duplicates, skip non-strings)
     const existingWords = new Set(user.wordsLearned);
-    words.forEach(word => existingWords.add(word.toLowerCase()));
+    words.forEach(word => { if (typeof word === 'string') existingWords.add(word.toLowerCase()); });
     user.wordsLearned = Array.from(existingWords);
     user.lastSessionDate = new Date().toISOString();
 
@@ -251,7 +254,7 @@ app.post('/api/users/:id/session', async (req, res) => {
 
     if (wordsLearned && Array.isArray(wordsLearned)) {
       const existingWords = new Set(user.wordsLearned);
-      wordsLearned.forEach(word => existingWords.add(word.toLowerCase()));
+      wordsLearned.forEach(word => { if (typeof word === 'string') existingWords.add(word.toLowerCase()); });
       user.wordsLearned = Array.from(existingWords);
     }
 

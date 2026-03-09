@@ -216,7 +216,7 @@
                 <div class="question-container">
                     <div class="question-topic" id="questionTopic">Docker</div>
                     <div class="question-text" id="questionText">Loading question...</div>
-                    <div class="answer-grid" id="answerGrid"></div>
+                    <div class="answer-grid" id="answerGrid" role="group" aria-label="Answer options"></div>
                     <div class="question-timer">
                         <div class="timer-fill" id="timerFill"></div>
                     </div>
@@ -278,6 +278,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Screen reader announcer for dynamic game events -->
+    <div id="ariaAnnouncer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
 
     <script src="game.js"></script>
 </body>

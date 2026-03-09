@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLiveSession } from './hooks/useLiveSession';
 import { LANGUAGES } from './constants';
 import { ConnectionState, UserProfile } from './types';
@@ -43,6 +43,7 @@ function App() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [difficultyLevel, setDifficultyLevel] = useState(3); // 1-5 scale
   const [vietnameseRatio, setVietnameseRatio] = useState(70); // percentage of Vietnamese
+  const sessionRecordedRef = useRef(false);
   
   const { 
     connectionState, 
@@ -68,9 +69,17 @@ function App() {
     sendInstruction(`[HỆ THỐNG] Học viên muốn thay đổi tỷ lệ ngôn ngữ. Từ giờ hãy nói ${newRatio}% tiếng Việt và ${englishRatio}% tiếng Anh.`);
   }, [vietnameseRatio, sendInstruction]);
 
-  // Record session when disconnecting
+  // Reset session recorded flag when a new session starts
   useEffect(() => {
-    if (connectionState === ConnectionState.DISCONNECTED && userProfile && messages.length > 0) {
+    if (connectionState === ConnectionState.CONNECTING) {
+      sessionRecordedRef.current = false;
+    }
+  }, [connectionState]);
+
+  // Record session once when disconnecting after a conversation
+  useEffect(() => {
+    if (connectionState === ConnectionState.DISCONNECTED && userProfile && messages.length > 0 && !sessionRecordedRef.current) {
+      sessionRecordedRef.current = true;
       fetch(`${API_URL}/api/users/${userProfile.id}/session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

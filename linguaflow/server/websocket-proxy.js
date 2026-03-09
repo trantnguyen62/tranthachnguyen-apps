@@ -11,7 +11,7 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: `${__dirname}/../.env.local` });
 
 const PORT = 3001;
-const MODEL_NAME = 'gemini-2.5-flash-native-audio-preview-09-2025';
+const MODEL_NAME = 'gemini-2.5-flash-native-audio-dialog';
 
 // ============================================================================
 // SECURITY CONFIGURATION
@@ -62,8 +62,9 @@ let totalActiveConnections = 0;
 
 // Extract IP address from request
 function getClientIP(req) {
-  return req.socket.remoteAddress ||
+  return req.headers['cf-connecting-ip'] ||
     req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    req.socket.remoteAddress ||
     'unknown';
 }
 
