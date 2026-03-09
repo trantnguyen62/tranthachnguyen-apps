@@ -100,7 +100,7 @@
                     </ul>
                 </nav>
                 <div class="sidebar-footer">
-                    <button class="mode-toggle" id="modeToggle">
+                    <button class="mode-toggle" id="modeToggle" aria-label="Toggle study mode">
                         <span class="mode-icon" aria-hidden="true">📚</span>
                         <span class="mode-text">Study Mode</span>
                     </button>
@@ -131,28 +131,28 @@
                             <h2 id="currentTopicName"></h2>
                         </div>
                         <div class="study-tabs" role="tablist" aria-label="Study modes">
-                            <button class="tab-btn active" data-tab="flashcards" role="tab" aria-selected="true" aria-controls="flashcardView">
+                            <button class="tab-btn active" id="tab-flashcards" data-tab="flashcards" role="tab" aria-selected="true" aria-controls="flashcardView">
                                 <span aria-hidden="true">📇</span> Flashcards
                             </button>
-                            <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" aria-controls="quizView">
+                            <button class="tab-btn" id="tab-quiz" data-tab="quiz" role="tab" aria-selected="false" aria-controls="quizView">
                                 <span aria-hidden="true">❓</span> Quiz
                             </button>
-                            <button class="tab-btn" data-tab="match" role="tab" aria-selected="false" aria-controls="matchView">
+                            <button class="tab-btn" id="tab-match" data-tab="match" role="tab" aria-selected="false" aria-controls="matchView">
                                 <span aria-hidden="true">🎯</span> Match
                             </button>
-                            <button class="tab-btn" data-tab="codebase" role="tab" aria-selected="false" aria-controls="codebaseView">
+                            <button class="tab-btn" id="tab-codebase" data-tab="codebase" role="tab" aria-selected="false" aria-controls="codebaseView">
                                 <span aria-hidden="true">📝</span> Codebase
                             </button>
-                            <button class="tab-btn" data-tab="commands" role="tab" aria-selected="false" aria-controls="commandsView">
+                            <button class="tab-btn" id="tab-commands" data-tab="commands" role="tab" aria-selected="false" aria-controls="commandsView">
                                 <span aria-hidden="true">💻</span> Commands
                             </button>
                         </div>
                     </div>
 
                     <!-- Flashcard View -->
-                    <div class="flashcard-view" id="flashcardView">
+                    <div class="flashcard-view" id="flashcardView" role="tabpanel" aria-labelledby="tab-flashcards" tabindex="-1">
                         <div class="flashcard-container">
-                            <div class="flashcard" id="flashcard">
+                            <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Flashcard. Press Space or Enter to flip.">
                                 <div class="flashcard-inner">
                                     <div class="flashcard-front">
                                         <span class="card-label">Term</span>
@@ -186,7 +186,7 @@
                     </div>
 
                     <!-- Quiz View -->
-                    <div class="quiz-view hidden" id="quizView">
+                    <div class="quiz-view hidden" id="quizView" role="tabpanel" aria-labelledby="tab-quiz" tabindex="-1">
                         <div class="quiz-container">
                             <div class="quiz-header">
                                 <div class="quiz-progress-text">
@@ -214,7 +214,7 @@
                     </div>
 
                     <!-- Codebase View -->
-                    <div class="codebase-view hidden" id="codebaseView">
+                    <div class="codebase-view hidden" id="codebaseView" role="tabpanel" aria-labelledby="tab-codebase" tabindex="-1">
                         <div class="codebase-container">
                             <h3 class="codebase-title">📝 Code Examples & Templates</h3>
                             <p class="codebase-subtitle">Practical code snippets and configuration files</p>
@@ -225,7 +225,7 @@
                     </div>
 
                     <!-- Match Game View -->
-                    <div class="match-view hidden" id="matchView">
+                    <div class="match-view hidden" id="matchView" role="tabpanel" aria-labelledby="tab-match" tabindex="-1">
                         <div class="match-container">
                             <div class="match-header">
                                 <div class="match-stats">
@@ -262,7 +262,7 @@
                     </div>
 
                     <!-- Commands View -->
-                    <div class="commands-view hidden" id="commandsView">
+                    <div class="commands-view hidden" id="commandsView" role="tabpanel" aria-labelledby="tab-commands" tabindex="-1">
                         <div class="commands-container">
                             <h3 class="commands-title">📋 Command Cheat Sheet</h3>
                             <p class="commands-subtitle">Essential commands for quick reference</p>

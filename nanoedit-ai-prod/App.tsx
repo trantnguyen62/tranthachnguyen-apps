@@ -152,7 +152,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 selection:bg-brand-200 selection:text-brand-900">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
+      <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white shadow-sm">
@@ -199,9 +199,10 @@ const App: React.FC = () => {
             {/* Upload Area */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
-                  1. Upload Image
-                </h2>
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" aria-hidden="true">1</span>
+                  <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Upload Image</h2>
+                </div>
                 {history.length > 0 && (
                   <span className="text-xs text-slate-500">Original Source</span>
                 )}
@@ -217,9 +218,10 @@ const App: React.FC = () => {
             {originalImage && (
               <div className="space-y-4 animate-fadeIn">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
-                    2. Describe Changes
-                  </h2>
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" aria-hidden="true">2</span>
+                    <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Describe Changes</h2>
+                  </div>
 
                   {/* History Controls */}
                   <div className="flex items-center gap-1">

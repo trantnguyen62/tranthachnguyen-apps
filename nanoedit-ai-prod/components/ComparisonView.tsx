@@ -4,7 +4,7 @@
  * and video output when the processed result is a video MIME type.
  */
 import React, { useState, memo } from 'react';
-import { Download, Maximize2, Minimize2, ArrowRight, Play, Loader2 } from 'lucide-react';
+import { Download, Maximize2, Minimize2, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
 
 interface ComparisonViewProps {
   originalImage: string;
@@ -123,7 +123,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                )}
 
                <div className="absolute bottom-4 left-4 px-3 py-1 bg-brand-600/90 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide shadow-lg flex items-center gap-1" aria-hidden="true">
-                 {isVideo && <Play className="w-3 h-3 fill-current" />}
+                 {isVideo ? <Play className="w-3 h-3 fill-current" /> : <Sparkles className="w-3 h-3" />}
                  {isVideo ? 'VIDEO RESULT' : 'AFTER'}
                </div>
              </div>

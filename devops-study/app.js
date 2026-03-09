@@ -3522,14 +3522,20 @@ function renderSidebarTopics() {
         li.className = `topic-item ${state.currentTopic?.id === topic.id ? 'active' : ''}`;
         li.dataset.id = topic.id;
         li.style.setProperty('--topic-color', topic.color);
+        li.setAttribute('tabindex', '0');
+        li.setAttribute('role', 'button');
+        li.setAttribute('aria-label', `${topic.name}, ${progress}% complete`);
         li.innerHTML = `
-            <span class="topic-icon">${topic.icon}</span>
+            <span class="topic-icon" aria-hidden="true">${topic.icon}</span>
             <span class="topic-name">${topic.name}</span>
-            <div class="topic-progress">
+            <div class="topic-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${topic.name} progress">
                 <div class="topic-progress-fill" style="width: ${progress}%"></div>
             </div>
         `;
         li.addEventListener('click', () => selectTopic(topic));
+        li.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectTopic(topic); }
+        });
         fragment.appendChild(li);
     });
     topicList.appendChild(fragment);
@@ -3548,18 +3554,24 @@ function createTopicCard(topic) {
     const card = document.createElement('div');
     card.className = 'topic-card';
     card.style.setProperty('--card-color', topic.color);
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `${topic.name}: ${topic.flashcards.length} flashcards, ${topic.quiz.length} quiz questions, ${progress}% complete`);
     card.innerHTML = `
-        <span class="topic-card-icon">${topic.icon}</span>
+        <span class="topic-card-icon" aria-hidden="true">${topic.icon}</span>
         <h3 class="topic-card-name">${topic.name}</h3>
-        <div class="topic-card-stats">
+        <div class="topic-card-stats" aria-hidden="true">
             <span>📇 ${topic.flashcards.length} cards</span>
             <span>❓ ${topic.quiz.length} questions</span>
         </div>
-        <div class="topic-card-progress">
+        <div class="topic-card-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${topic.name} progress">
             <div class="topic-card-progress-fill" style="width: ${progress}%"></div>
         </div>
     `;
     card.addEventListener('click', () => selectTopic(topic));
+    card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectTopic(topic); }
+    });
     return card;
 }
 
@@ -3697,7 +3709,7 @@ function renderCodebase() {
             </div>
             <div class="codebase-item-description">${escapeHtml(item.description)}</div>
             <div class="codebase-item-code">
-                <button class="codebase-copy-btn">📋 Copy</button>
+                <button class="codebase-copy-btn" aria-label="Copy code for ${escapeHtml(item.filename)}">📋 Copy</button>
                 <pre><code>${escapeHtml(item.code)}</code></pre>
             </div>
         `;
@@ -3749,7 +3761,7 @@ function renderCommands() {
         item.innerHTML = `
             <div class="command-item-header">
                 <code class="command-code">${escapeHtml(cmd.command)}</code>
-                <button class="command-copy-btn">📋 Copy</button>
+                <button class="command-copy-btn" aria-label="Copy command: ${escapeHtml(cmd.command)}">📋 Copy</button>
             </div>
             <p class="command-description">${escapeHtml(cmd.description)}</p>
         `;
