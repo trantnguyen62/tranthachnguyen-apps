@@ -201,7 +201,7 @@ export const questionsEn: Question[] = [
       "There is no penalty."
     ],
     correctIndex: 0,
-    explanation: "Under Illinois implied consent law, refusing a chemical sobriety test (blood, breath, or urine) results in an automatic 6-month driver's license suspension."
+    explanation: "Under Illinois implied consent law, refusing a chemical sobriety test (blood, breath, or urine) results in an automatic 6-month driver's license suspension for a first refusal. A second or subsequent refusal within 5 years results in a 3-year suspension."
   },
   {
     id: 21,
@@ -501,6 +501,50 @@ export const questionsEn: Question[] = [
     correctIndex: 1,
     image: "/images/intersection.svg",
     explanation: "A yellow diamond sign with a black cross or plus-sign shape warns that an intersection is ahead. Reduce speed and watch for cross traffic, pedestrians, and turning vehicles."
+  },
+  {
+    id: 49,
+    text: "Illinois law on the use of a handheld cell phone while driving states that:",
+    options: [
+      "You may use a handheld phone as long as you keep both eyes on the road.",
+      "Handheld cell phone use is permitted only at speeds below 30 mph.",
+      "Using a handheld electronic device while driving is illegal and subject to a fine."
+    ],
+    correctIndex: 2,
+    explanation: "Illinois prohibits the use of handheld electronic devices while operating a motor vehicle. Drivers must use hands-free technology (such as a Bluetooth headset or a phone mount) to make calls. A first offense carries a $75 fine, and subsequent violations result in higher fines."
+  },
+  {
+    id: 50,
+    text: "Under Illinois' Scott's Law (Move Over Law), when you approach a stationary emergency, maintenance, or tow truck displaying flashing lights on the roadside, you must:",
+    options: [
+      "Come to a complete stop until all lights are off.",
+      "Move to a non-adjacent lane if safely possible, or reduce speed to at least 20 mph below the posted limit if a lane change is not possible.",
+      "Slow down to 10 mph and sound your horn as a warning."
+    ],
+    correctIndex: 1,
+    explanation: "Illinois' Scott's Law requires drivers approaching any stationary authorized vehicle with flashing lights on the roadside to (1) move to a lane not adjacent to that vehicle if it is safe and possible to do so, or (2) if a lane change is not safely possible, reduce speed to at least 20 mph below the posted speed limit. Violating Scott's Law can result in fines, license suspension, and even felony charges if injury or death results."
+  },
+  {
+    id: 51,
+    text: "When a traffic signal turns yellow (amber), you should:",
+    options: [
+      "Speed up to clear the intersection before the light turns red.",
+      "Stop before the intersection if you can do so safely.",
+      "Maintain your current speed and proceed through the intersection."
+    ],
+    correctIndex: 1,
+    explanation: "A yellow signal warns that the light is about to turn red. You must stop before entering the intersection if you can do so safely. Only continue through if stopping would require sudden braking that could cause a rear-end collision. Speeding up to beat a red light is dangerous and illegal."
+  },
+  {
+    id: 52,
+    text: "When two vehicles arrive at an uncontrolled intersection (no signs or signals) at the same time, who has the right-of-way?",
+    options: [
+      "The vehicle traveling at a higher speed.",
+      "The vehicle on the left.",
+      "The vehicle on the right."
+    ],
+    correctIndex: 2,
+    explanation: "At an uncontrolled intersection where two vehicles arrive simultaneously, the driver on the left must yield to the driver on the right. This 'yield to the right' rule helps prevent collisions when no traffic control devices are present. Always slow down and be prepared to yield when approaching uncontrolled intersections."
   }
 ];
 
@@ -705,7 +749,7 @@ export const questionsVi: Question[] = [
       "Không bị phạt."
     ],
     correctIndex: 0,
-    explanation: "Theo luật đồng ý ngụ ý của Illinois, từ chối xét nghiệm nồng độ cồn (máu, hơi thở hoặc nước tiểu) dẫn đến đình chỉ bằng lái tự động 6 tháng."
+    explanation: "Theo luật đồng ý ngụ ý của Illinois, từ chối xét nghiệm nồng độ cồn (máu, hơi thở hoặc nước tiểu) dẫn đến đình chỉ bằng lái tự động 6 tháng cho lần đầu từ chối. Lần từ chối thứ hai trở đi trong vòng 5 năm dẫn đến đình chỉ 3 năm."
   },
   {
     id: 21,
@@ -1005,6 +1049,50 @@ export const questionsVi: Question[] = [
     correctIndex: 1,
     image: "/images/intersection.svg",
     explanation: "Biển báo hình thoi màu vàng với dấu cộng hoặc hình chữ thập màu đen cảnh báo rằng có một giao lộ phía trước. Giảm tốc và chú ý giao thông cắt ngang, người đi bộ và xe rẽ."
+  },
+  {
+    id: 49,
+    text: "Luật Illinois về việc sử dụng điện thoại cầm tay khi lái xe quy định:",
+    options: [
+      "Bạn có thể dùng điện thoại cầm tay miễn là mắt vẫn nhìn đường.",
+      "Được phép dùng điện thoại cầm tay khi tốc độ dưới 30 mph.",
+      "Sử dụng thiết bị điện tử cầm tay khi lái xe là bất hợp pháp và bị phạt tiền."
+    ],
+    correctIndex: 2,
+    explanation: "Illinois cấm sử dụng thiết bị điện tử cầm tay khi điều khiển xe cơ giới. Tài xế phải dùng công nghệ rảnh tay (như tai nghe Bluetooth hoặc giá đỡ điện thoại) khi gọi điện. Vi phạm lần đầu bị phạt $75, các lần tiếp theo bị phạt cao hơn."
+  },
+  {
+    id: 50,
+    text: "Theo Luật Scott (Move Over Law) của Illinois, khi bạn đến gần xe khẩn cấp, bảo trì hoặc xe kéo đang đứng yên với đèn nhấp nháy bên lề đường, bạn phải:",
+    options: [
+      "Dừng hoàn toàn cho đến khi tất cả đèn tắt.",
+      "Chuyển sang làn không kề cận nếu an toàn, hoặc giảm tốc độ ít nhất 20 mph so với giới hạn nếu không thể đổi làn.",
+      "Giảm xuống 10 mph và bóp còi cảnh báo."
+    ],
+    correctIndex: 1,
+    explanation: "Luật Scott của Illinois yêu cầu tài xế khi đến gần phương tiện có thẩm quyền đang đứng yên với đèn nhấp nháy bên lề: (1) chuyển sang làn không kề cận nếu an toàn và có thể, hoặc (2) nếu không đổi làn được, giảm tốc độ ít nhất 20 mph so với giới hạn đăng. Vi phạm Luật Scott có thể bị phạt tiền, đình chỉ bằng lái, thậm chí bị truy tố hình sự nếu gây thương tích hoặc tử vong."
+  },
+  {
+    id: 51,
+    text: "Khi đèn giao thông chuyển sang màu vàng (amber), bạn nên:",
+    options: [
+      "Tăng tốc để qua giao lộ trước khi đèn chuyển đỏ.",
+      "Dừng lại trước giao lộ nếu có thể làm an toàn.",
+      "Giữ nguyên tốc độ và tiếp tục qua giao lộ."
+    ],
+    correctIndex: 1,
+    explanation: "Đèn vàng cảnh báo đèn sắp chuyển đỏ. Bạn phải dừng lại trước giao lộ nếu có thể làm an toàn. Chỉ tiếp tục đi nếu dừng lại sẽ phải phanh gấp có thể gây tai nạn đuôi xe. Tăng tốc để 'qua kịp' đèn đỏ là nguy hiểm và bất hợp pháp."
+  },
+  {
+    id: 52,
+    text: "Khi hai xe đến giao lộ không có biển báo hay tín hiệu giao thông cùng lúc, ai có quyền ưu tiên?",
+    options: [
+      "Xe đang đi với tốc độ cao hơn.",
+      "Xe ở bên trái.",
+      "Xe ở bên phải."
+    ],
+    correctIndex: 2,
+    explanation: "Tại giao lộ không có thiết bị kiểm soát giao thông, khi hai xe đến cùng lúc, tài xế bên trái phải nhường đường cho tài xế bên phải. Quy tắc 'nhường bên phải' này giúp ngăn va chạm khi không có thiết bị điều tiết giao thông. Luôn giảm tốc và sẵn sàng nhường đường khi tiếp cận giao lộ không có kiểm soát."
   }
 ];
 
