@@ -448,7 +448,26 @@ function init() {
     initStars();
     updateTopicCache();
 
-    window.addEventListener('resize', resizeCanvas);
+    // Debounce resize to avoid repeatedly recreating offscreen canvases
+    let _resizeTimer = null;
+    window.addEventListener('resize', () => {
+        if (_resizeTimer) clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(() => { _resizeTimer = null; resizeCanvas(); }, 150);
+    });
+
+    // Suspend the rAF loop when the tab is hidden to save CPU
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            if (game.animationId) {
+                cancelAnimationFrame(game.animationId);
+                game.animationId = null;
+                game._loopSuspended = true;
+            }
+        } else if (game._loopSuspended) {
+            game._loopSuspended = false;
+            if (game.running && !game.questionActive) gameLoop();
+        }
+    });
 }
 
 function loadProgress() {
@@ -687,7 +706,14 @@ function startGame() {
 function gameLoop() {
     if (!game.running) return;
 
-    if (!game.paused && !game.questionActive) {
+    // When a question is active the modal fully covers the canvas.
+    // Stop the loop here; closeQuestion() will restart it.
+    if (game.questionActive) {
+        game.animationId = null;
+        return;
+    }
+
+    if (!game.paused) {
         update();
     }
     render();
@@ -1140,6 +1166,8 @@ function closeQuestion() {
     game.paused = false;
     game.currentQuestion = null;
     document.getElementById('questionModal').classList.add('hidden');
+    // Restart the render loop that was suspended during the question
+    if (game.running) gameLoop();
 }
 
 // Tips
