@@ -2,6 +2,25 @@
    Pipeline Runner - DevOps Learning Game Engine
    ===================================================== */
 
+// Polyfill for CanvasRenderingContext2D.roundRect (not available in older browsers)
+if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radii) {
+        const r = typeof radii === 'number' ? radii : (Array.isArray(radii) ? radii[0] : 0);
+        const clampedR = Math.min(r, width / 2, height / 2);
+        this.moveTo(x + clampedR, y);
+        this.lineTo(x + width - clampedR, y);
+        this.arcTo(x + width, y, x + width, y + clampedR, clampedR);
+        this.lineTo(x + width, y + height - clampedR);
+        this.arcTo(x + width, y + height, x + width - clampedR, y + height, clampedR);
+        this.lineTo(x + clampedR, y + height);
+        this.arcTo(x, y + height, x, y + height - clampedR, clampedR);
+        this.lineTo(x, y + clampedR);
+        this.arcTo(x, y, x + clampedR, y, clampedR);
+        this.closePath();
+        return this;
+    };
+}
+
 // Cached math constants
 const TWO_PI = Math.PI * 2;
 const DEG_TO_RAD = Math.PI / 180;
@@ -362,30 +381,37 @@ const RANKS = [
 ];
 
 // Game State
+// Properties prefixed with _ or set dynamically by init/resize are not listed here
+// but are documented at their point of assignment.
 let game = {
-    running: false,
-    paused: false,
+    // Loop control
+    running: false,          // True while a game session is in progress
+    paused: false,           // True when waiting for player input (e.g. after extra life)
     canvas: null,
     ctx: null,
-    animationId: null,
-    obstacleInterval: null,
+    animationId: null,       // rAF handle; null when loop is not running
+    obstacleInterval: null,  // setInterval handle for obstacle spawning
 
+    // Topic & content rotation
     selectedTopic: 'docker',
-    usedContentIndices: new Set(),
+    contentQueue: [], // Pre-shuffled indices for LEARNABLE_CONTENT; refills when empty
 
+    // Player physics
     player: {
         x: 100,
         y: 0,
-        velocity: 0,
-        rotation: 0
+        velocity: 0,   // Vertical velocity (negative = upward)
+        rotation: 0    // Visual tilt angle in degrees, clamped to [-20, 60]
     },
 
-    obstacles: [],
-    particles: [],
-    stars: [],
-    learnedItems: [],
-    floatingTexts: [],
+    // Active game objects
+    obstacles: [],       // Array of { x, gapY, passed, content }
+    particles: [],       // Boost/collision particle effects
+    stars: [],           // Background parallax stars
+    learnedItems: [],    // Content items passed this session (used on game-over screen)
+    floatingTexts: [],   // Transient "+cmd" labels shown near the player
 
+    // Scoring
     score: 0,
     bestScore: 0,
     streak: 0,
@@ -393,18 +419,30 @@ let game = {
     lives: 0,
     questionsAnswered: 0,
     correctAnswers: 0,
-    totalLearned: 0,
+    totalLearned: 0,  // Cumulative across all sessions (persisted to localStorage)
 
-    lastLearnedFact: '',
-    respawnInvincible: false,
+    // Session state
+    lastLearnedFact: '',     // Fact shown on game-over when learnedItems is empty
+    respawnInvincible: false, // True during the brief grace period after losing a life
+    // respawnInvincibleTimeout: <set by useLife/AdManager.continueGame>
+    // gameOverTimeout: <setTimeout handle set in gameOver(); cancelled on extra-life continue>
+    // _loopSuspended: <set by visibilitychange handler to resume loop on tab focus>
 
-    currentQuestion: null,
+    // Question modal state
+    currentQuestion: null,   // Active question object (shuffled answers + correctIndex)
     questionActive: false,
-    questionTimer: 0,
+    questionTimer: 0,        // Seconds remaining on the countdown
     questionTimerInterval: null,
 
+    // Canvas dimensions (logical pixels, updated on resize)
     width: 0,
     height: 0
+    // Dynamically set by init/resizeCanvas/updateTopicCache:
+    //   elScore, elLives, elStreak, elTipBanner, elTipText, elTimer  — cached DOM nodes
+    //   cachedBgGradient   — LinearGradient rebuilt on resize
+    //   pipelineCanvas     — offscreen canvas with static lane lines
+    //   starGroups         — Map<fillStyle, star[]> for batched star drawing
+    //   topicCache         — { topic, obstacleCanvas, playerCanvas, playerOX, playerOY, … }
 };
 
 // Initialize
@@ -414,6 +452,14 @@ function init() {
     game.canvas = document.getElementById('gameCanvas');
     game.ctx = game.canvas.getContext('2d');
 
+    // Cache frequently accessed DOM elements to avoid repeated lookups
+    game.elScore   = document.getElementById('currentScore');
+    game.elLives   = document.getElementById('livesCount');
+    game.elStreak  = document.getElementById('streakCount');
+    game.elTipBanner = document.getElementById('tipBanner');
+    game.elTipText   = document.getElementById('tipText');
+    game.elTimer     = document.getElementById('questionTimer');
+
     loadProgress();
     renderTopicButtons();
     setupEventListeners();
@@ -421,7 +467,26 @@ function init() {
     initStars();
     updateTopicCache();
 
-    window.addEventListener('resize', resizeCanvas);
+    // Debounce resize to avoid repeatedly recreating offscreen canvases
+    let _resizeTimer = null;
+    window.addEventListener('resize', () => {
+        if (_resizeTimer) clearTimeout(_resizeTimer);
+        _resizeTimer = setTimeout(() => { _resizeTimer = null; resizeCanvas(); }, 150);
+    });
+
+    // Suspend the rAF loop when the tab is hidden to save CPU
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            if (game.animationId) {
+                cancelAnimationFrame(game.animationId);
+                game.animationId = null;
+                game._loopSuspended = true;
+            }
+        } else if (game._loopSuspended) {
+            game._loopSuspended = false;
+            if (game.running && !game.questionActive) gameLoop();
+        }
+    });
 }
 
 function loadProgress() {
@@ -446,21 +511,47 @@ function renderTopicButtons() {
     const container = document.getElementById('topicButtons');
     container.innerHTML = '';
 
-    TOPICS.forEach(topic => {
+    TOPICS.forEach((topic, index) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = `topic-btn ${topic.id === game.selectedTopic ? 'selected' : ''}`;
         btn.setAttribute('aria-pressed', topic.id === game.selectedTopic ? 'true' : 'false');
         btn.setAttribute('aria-label', `${topic.name} topic`);
+        // Roving tabindex: only the selected button is in the tab order
+        btn.tabIndex = topic.id === game.selectedTopic ? 0 : -1;
         btn.innerHTML = `${topic.icon} ${topic.name}`;
         btn.onclick = () => selectTopic(topic.id);
+        btn.addEventListener('keydown', handleTopicKeydown);
         container.appendChild(btn);
     });
+}
+
+function handleTopicKeydown(e) {
+    const btns = Array.from(document.querySelectorAll('.topic-btn'));
+    const currentIndex = btns.indexOf(e.currentTarget);
+    let nextIndex = -1;
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        nextIndex = (currentIndex + 1) % btns.length;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        nextIndex = (currentIndex - 1 + btns.length) % btns.length;
+    } else if (e.key === 'Home') {
+        nextIndex = 0;
+    } else if (e.key === 'End') {
+        nextIndex = btns.length - 1;
+    }
+
+    if (nextIndex >= 0) {
+        e.preventDefault();
+        const topic = TOPICS[nextIndex];
+        selectTopic(topic.id);
+    }
 }
 
 function selectTopic(topicId) {
     if (!TOPICS.some(t => t.id === topicId)) return;
     game.selectedTopic = topicId;
+    game.contentQueue = []; // reset queue so it refills for the new topic
     updateTopicCache();
     renderTopicButtons();
     document.querySelector('.icon-preview').textContent = game.topicCache.topic.icon;
@@ -491,24 +582,22 @@ function initStars() {
         if (!group) { group = []; groups.set(star.fillStyle, group); }
         group.push(star);
     }
-    game.starGroups = groups;
+    game.starGroups = Array.from(groups);
 }
 
 // Returns the next learnable content item for the current topic.
-// Cycles through all items without repetition before reshuffling.
+// Cycles through all items without repetition using a pre-shuffled queue.
 function getNextLearnableContent() {
     const content = LEARNABLE_CONTENT[game.selectedTopic];
-    if (game.usedContentIndices.size >= content.length) {
-        game.usedContentIndices.clear();
+    if (game.contentQueue.length === 0) {
+        const indices = Array.from({ length: content.length }, (_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+        }
+        game.contentQueue = indices;
     }
-
-    let index;
-    do {
-        index = Math.floor(Math.random() * content.length);
-    } while (game.usedContentIndices.has(index));
-
-    game.usedContentIndices.add(index);
-    return content[index];
+    return content[game.contentQueue.pop()];
 }
 
 function setupEventListeners() {
@@ -593,10 +682,13 @@ function startGame() {
     game.particles = [];
     game.floatingTexts = [];
     game.learnedItems = [];
-    game.usedContentIndices = new Set();
+    game.contentQueue = [];
     game.questionActive = false;
     game.currentQuestion = null;
-    game.questionTimerInterval = null;
+    if (game.questionTimerInterval) {
+        clearInterval(game.questionTimerInterval);
+        game.questionTimerInterval = null;
+    }
     game.lastLearnedFact = '';
 
     game.player.x = game.width * 0.12;
@@ -607,9 +699,9 @@ function startGame() {
     updateTopicCache();
     const topic = game.topicCache.topic;
     document.getElementById('currentTopicBadge').textContent = `${topic.icon} ${topic.name}`;
-    document.getElementById('currentScore').textContent = '0';
-    document.getElementById('streakCount').textContent = '0';
-    document.getElementById('livesCount').textContent = '0';
+    game.elScore.textContent = '0';
+    game.elStreak.textContent = '0';
+    game.elLives.textContent = '0';
 
     showScreen('gameScreen');
     hideTipBanner();
@@ -627,7 +719,14 @@ function startGame() {
 function gameLoop() {
     if (!game.running) return;
 
-    if (!game.paused && !game.questionActive) {
+    // When a question is active the modal fully covers the canvas.
+    // Stop the loop here; closeQuestion() will restart it.
+    if (game.questionActive) {
+        game.animationId = null;
+        return;
+    }
+
+    if (!game.paused) {
         update();
     }
     render();
@@ -651,14 +750,14 @@ function update() {
     }
 
     const obstacles = game.obstacles;
-    for (let oi = 0; oi < obstacles.length; oi++) {
-        const obs = obstacles[oi];
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
         obs.x -= CONFIG.OBSTACLE_SPEED;
 
         if (!obs.passed && obs.x + CONFIG.OBSTACLE_WIDTH < game.player.x) {
             obs.passed = true;
             game.score++;
-            document.getElementById('currentScore').textContent = game.score;
+            game.elScore.textContent = game.score;
 
             // Show learned content as floating text
             game.learnedItems.push(obs.content);
@@ -668,10 +767,8 @@ function update() {
                 showQuestion();
             }
         }
-    }
 
-    for (let i = game.obstacles.length - 1; i >= 0; i--) {
-        if (game.obstacles[i].x <= -CONFIG.OBSTACLE_WIDTH * 2) game.obstacles.splice(i, 1);
+        if (obs.x <= -CONFIG.OBSTACLE_WIDTH * 2) obstacles.splice(i, 1);
     }
 
     // Update floating texts
@@ -721,7 +818,9 @@ function render() {
     ctx.fillRect(0, 0, game.width, game.height);
 
     // Batch stars by pre-grouped fillStyle to minimise canvas state changes
-    for (const [fillStyle, group] of game.starGroups) {
+    const starGroups = game.starGroups;
+    for (let g = 0; g < starGroups.length; g++) {
+        const [fillStyle, group] = starGroups[g];
         ctx.fillStyle = fillStyle;
         ctx.beginPath();
         for (let i = 0; i < group.length; i++) {
@@ -735,17 +834,32 @@ function render() {
     drawPipelineBackground(ctx);
 
     const particles = game.particles;
-    for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        ctx.fillStyle = `rgba(${p.color}, ${p.life})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * p.life, 0, TWO_PI);
-        ctx.fill();
+    if (particles.length > 0) {
+        // All particles share the same color; set fillStyle once and vary globalAlpha
+        ctx.save();
+        ctx.fillStyle = 'rgb(255, 200, 100)';
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * p.life, 0, TWO_PI);
+            ctx.fill();
+        }
+        ctx.restore();
     }
 
     const obstacles = game.obstacles;
-    for (let i = 0; i < obstacles.length; i++) {
-        drawObstacle(ctx, obstacles[i]);
+    if (obstacles.length > 0) {
+        // Set shared obstacle state once per frame
+        ctx.lineWidth = 2;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i < obstacles.length; i++) {
+            const obs = obstacles[i];
+            if (obs.x > game.width) break; // sorted ascending; rest are off-screen right
+            if (obs.x + CONFIG.OBSTACLE_WIDTH < 0) continue; // off-screen left
+            drawObstacle(ctx, obs);
+        }
     }
 
     // Draw floating learned texts with a single save/restore block
@@ -808,14 +922,11 @@ function drawObstacle(ctx, obs) {
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(obs.x - 8, obs.gapY - 35, gateWidth + 16, 35);
     ctx.strokeStyle = gateColor;
-    ctx.lineWidth = 2;
     ctx.strokeRect(obs.x - 8, obs.gapY - 35, gateWidth + 16, 35);
 
     // Command text on top gate
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 11px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
     ctx.fillText(obs.content.cmd, obs.x + gateWidth / 2, obs.gapY - 17);
 
     // Bottom gate - blit from prerendered obstacle canvas
@@ -825,13 +936,11 @@ function drawObstacle(ctx, obs) {
         ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, bottomH, obs.x, bottomY, gateWidth, bottomH);
     }
 
-    // Bottom gate cap with description hint
+    // Bottom gate cap with topic icon
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(obs.x - 8, bottomY, gateWidth + 16, 35);
     ctx.strokeStyle = gateColor;
     ctx.strokeRect(obs.x - 8, bottomY, gateWidth + 16, 35);
-
-    // Topic icon on bottom
     ctx.font = '18px Arial';
     ctx.fillText(topic.icon, obs.x + gateWidth / 2, bottomY + 18);
 }
@@ -883,7 +992,7 @@ function spawnObstacle() {
     if (!game.running || game.questionActive) return;
 
     const minGapY = 120;
-    const maxGapY = Math.max(minGapY, game.height - CONFIG.OBSTACLE_GAP - 120);
+    const maxGapY = Math.max(minGapY + 1, game.height - CONFIG.OBSTACLE_GAP - 120);
     const gapY = Math.random() * (maxGapY - minGapY) + minGapY;
 
     const content = getNextLearnableContent();
@@ -896,6 +1005,9 @@ function spawnObstacle() {
     });
 }
 
+// Circular hitbox collision: treats the player as a circle of radius 20 px.
+// Checks screen boundary first, then axis-aligned bounding-box overlap with each
+// obstacle gate (top column: y < gapY, bottom column: y > gapY + GAP).
 function checkCollision() {
     const p = game.player;
     const playerRadius = 20;
@@ -904,11 +1016,19 @@ function checkCollision() {
         return true;
     }
 
-    for (let obs of game.obstacles) {
-        if (p.x + playerRadius > obs.x && p.x - playerRadius < obs.x + CONFIG.OBSTACLE_WIDTH) {
-            if (p.y - playerRadius < obs.gapY || p.y + playerRadius > obs.gapY + CONFIG.OBSTACLE_GAP) {
-                return true;
-            }
+    const playerRight = p.x + playerRadius;
+    const playerLeft = p.x - playerRadius;
+    const playerTop = p.y - playerRadius;
+    const playerBottom = p.y + playerRadius;
+    const obstacles = game.obstacles;
+    // Obstacles are sorted ascending by x (oldest/leftmost first).
+    // Break early once an obstacle is beyond the player's right edge.
+    for (let i = 0; i < obstacles.length; i++) {
+        const obs = obstacles[i];
+        if (obs.x > playerRight) break;
+        if (obs.x + CONFIG.OBSTACLE_WIDTH < playerLeft) continue;
+        if (playerTop < obs.gapY || playerBottom > obs.gapY + CONFIG.OBSTACLE_GAP) {
+            return true;
         }
     }
 
@@ -933,26 +1053,34 @@ function showQuestion() {
     game.questionTimer = CONFIG.QUESTION_TIME;
     game.paused = true;
 
-    const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    const topic = TOPICS.find(t => t.id === game.selectedTopic) || TOPICS[0];
     document.getElementById('questionTopic').textContent = `${topic.icon} ${topic.name}`;
     document.getElementById('questionText').textContent = question.q;
     document.getElementById('questionTimer').textContent = CONFIG.QUESTION_TIME;
 
     const answerGrid = document.getElementById('answerGrid');
-    answerGrid.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
     answers.forEach((answer, i) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'answer-btn';
-        btn.innerHTML = `
-            <span class="answer-key" aria-hidden="true">${i + 1}</span>
-            <span class="answer-text">${answer.text}</span>
-        `;
+        const keySpan = document.createElement('span');
+        keySpan.className = 'answer-key';
+        keySpan.setAttribute('aria-hidden', 'true');
+        keySpan.textContent = i + 1;
+        const textSpan = document.createElement('span');
+        textSpan.className = 'answer-text';
+        textSpan.textContent = answer.text;
+        btn.appendChild(keySpan);
+        btn.appendChild(textSpan);
         btn.setAttribute('aria-label', `Option ${i + 1}: ${answer.text}`);
         btn.onclick = () => selectAnswer(i);
-        answerGrid.appendChild(btn);
+        fragment.appendChild(btn);
     });
+
+    answerGrid.innerHTML = '';
+    answerGrid.appendChild(fragment);
 
     document.getElementById('questionModal').classList.remove('hidden');
     startQuestionTimer();
@@ -974,9 +1102,15 @@ function startQuestionTimer() {
         }
 
         game.questionTimer--;
-        const timerEl = document.getElementById('questionTimer');
-        timerEl.textContent = game.questionTimer;
-        timerEl.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
+        game.elTimer.textContent = game.questionTimer;
+        game.elTimer.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
+        game.elTimer.classList.toggle('timer-urgent', game.questionTimer <= 5);
+
+        // Announce only at key thresholds to avoid flooding screen readers
+        if (game.questionTimer === 5 || game.questionTimer === 3) {
+            const feedbackEl = document.getElementById('answerFeedback');
+            if (feedbackEl) feedbackEl.textContent = `${game.questionTimer} seconds remaining`;
+        }
 
         if (game.questionTimer <= 0) {
             clearInterval(game.questionTimerInterval);
@@ -1026,20 +1160,20 @@ function checkAnswer(index) {
         game.correctAnswers++;
         game.streak++;
         game.bestStreak = Math.max(game.bestStreak, game.streak);
-        document.getElementById('streakCount').textContent = game.streak;
+        game.elStreak.textContent = game.streak;
 
         game.score += 5;
-        document.getElementById('currentScore').textContent = game.score;
+        game.elScore.textContent = game.score;
 
         // Award a life for correct answer!
         game.lives++;
-        document.getElementById('livesCount').textContent = game.lives;
+        game.elLives.textContent = game.lives;
         showTip(`+1 Life! ❤️ You now have ${game.lives} lives!`);
 
         game.lastLearnedFact = game.currentQuestion.fact || "Great job! Keep learning!";
     } else {
         game.streak = 0;
-        document.getElementById('streakCount').textContent = '0';
+        game.elStreak.textContent = '0';
         game.lastLearnedFact = game.currentQuestion.fact || "Remember this for next time!";
     }
 
@@ -1049,7 +1183,7 @@ function checkAnswer(index) {
 function handleTimeout() {
     game.questionsAnswered++;
     game.streak = 0;
-    document.getElementById('streakCount').textContent = '0';
+    game.elStreak.textContent = '0';
 
     const btns = document.querySelectorAll('.answer-btn');
     btns[game.currentQuestion.correctIndex].classList.add('correct');
@@ -1074,19 +1208,21 @@ function closeQuestion() {
     game.paused = false;
     game.currentQuestion = null;
     document.getElementById('questionModal').classList.add('hidden');
+    // Restart the render loop that was suspended during the question
+    if (game.running) gameLoop();
 }
 
 // Tips
+let _tipHideTimer = null;
 function showTip(text) {
-    const banner = document.getElementById('tipBanner');
-    document.getElementById('tipText').textContent = text;
-    banner.classList.remove('hidden');
-
-    setTimeout(() => hideTipBanner(), 3000);
+    if (_tipHideTimer) { clearTimeout(_tipHideTimer); _tipHideTimer = null; }
+    game.elTipText.textContent = text;
+    game.elTipBanner.classList.remove('hidden');
+    _tipHideTimer = setTimeout(() => { hideTipBanner(); _tipHideTimer = null; }, 3000);
 }
 
 function hideTipBanner() {
-    document.getElementById('tipBanner').classList.add('hidden');
+    game.elTipBanner.classList.add('hidden');
 }
 
 // Game Over
@@ -1125,7 +1261,7 @@ function gameOver() {
 // Use a life to respawn
 function useLife() {
     game.lives--;
-    document.getElementById('livesCount').textContent = game.lives;
+    game.elLives.textContent = game.lives;
 
     game.respawnInvincible = true;
     showTip(`❤️ Used 1 life! ${game.lives} remaining. Keep going!`);
@@ -1139,8 +1275,10 @@ function useLife() {
     game.obstacles = game.obstacles.filter(obs => obs.x > game.player.x + 150 || obs.x < game.player.x - 100);
 
     // Invincibility for 1.5 seconds
-    setTimeout(() => {
+    if (game.respawnInvincibleTimeout) clearTimeout(game.respawnInvincibleTimeout);
+    game.respawnInvincibleTimeout = setTimeout(() => {
         game.respawnInvincible = false;
+        game.respawnInvincibleTimeout = null;
     }, 1500);
 }
 
@@ -1166,6 +1304,10 @@ function darkenColor(hex, percent) {
 // Rebuilds the topic-specific offscreen canvases for the player sprite and
 // obstacle columns. Call this whenever the selected topic or canvas size changes.
 // Pre-rendering avoids expensive per-frame gradient and shadow operations.
+// Prerenders per-topic graphics (obstacle column and player sprite) to offscreen
+// canvases so the hot render path can blit with drawImage instead of recomputing
+// gradients and shadows each frame.  Must be called whenever selectedTopic changes
+// or after a canvas resize (height change invalidates the obstacle canvas height).
 function updateTopicCache() {
     const topic = TOPICS.find(t => t.id === game.selectedTopic);
     const lightColor20 = lightenColor(topic.color, 20);
@@ -1297,7 +1439,7 @@ const AdManager = {
     // Grant extra life and continue game
     grantExtraLife: function () {
         game.lives++;
-        document.getElementById('livesCount').textContent = game.lives;
+        game.elLives.textContent = game.lives;
 
         // Disable the watch ad button
         const watchAdBtn = document.getElementById('watchAdBtn');
@@ -1365,8 +1507,10 @@ const AdManager = {
 
             // Enable invincibility for 3 seconds (longer to give player time)
             game.respawnInvincible = true;
-            setTimeout(() => {
+            if (game.respawnInvincibleTimeout) clearTimeout(game.respawnInvincibleTimeout);
+            game.respawnInvincibleTimeout = setTimeout(() => {
                 game.respawnInvincible = false;
+                game.respawnInvincibleTimeout = null;
                 showTip('⚠️ Invincibility ended - stay alert!');
             }, 3000);
 
@@ -1379,6 +1523,7 @@ const AdManager = {
             // Start spawning obstacles after a delay
             setTimeout(() => {
                 if (game.running) {
+                    if (game.obstacleInterval) clearInterval(game.obstacleInterval);
                     game.obstacleInterval = setInterval(spawnObstacle, CONFIG.OBSTACLE_SPAWN_RATE);
                 }
             }, 1500);

@@ -1104,6 +1104,7 @@ function startQuestionTimer() {
         game.questionTimer--;
         game.elTimer.textContent = game.questionTimer;
         game.elTimer.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
+        game.elTimer.classList.toggle('timer-urgent', game.questionTimer <= 5);
 
         // Announce only at key thresholds to avoid flooding screen readers
         if (game.questionTimer === 5 || game.questionTimer === 3) {
