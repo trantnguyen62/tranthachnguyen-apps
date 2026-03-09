@@ -3856,11 +3856,16 @@ function renderMatchItems() {
         item.dataset.type = 'term';
         item.textContent = pair.term;
         if (!pair.matched) {
+            item.setAttribute('tabindex', '0');
+            item.setAttribute('role', 'button');
             item.addEventListener('click', () => selectMatchItem(item, pair.id, 'term'));
+            item.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMatchItem(item, pair.id, 'term'); }
+            });
         }
         termsContainer.appendChild(item);
     });
-    
+
     shuffledDefs.forEach(pair => {
         const item = document.createElement('div');
         item.className = `match-item definition ${pair.matched ? 'matched' : ''}`;
@@ -3868,7 +3873,12 @@ function renderMatchItems() {
         item.dataset.type = 'definition';
         item.textContent = pair.definition;
         if (!pair.matched) {
+            item.setAttribute('tabindex', '0');
+            item.setAttribute('role', 'button');
             item.addEventListener('click', () => selectMatchItem(item, pair.id, 'definition'));
+            item.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMatchItem(item, pair.id, 'definition'); }
+            });
         }
         defsContainer.appendChild(item);
     });

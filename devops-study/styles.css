@@ -319,7 +319,7 @@ body {
 }
 
 .search-input::placeholder {
-    color: var(--text-muted);
+    color: var(--text-tertiary);
 }
 
 .search-input:focus {

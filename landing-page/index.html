@@ -165,12 +165,12 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            contain: layout style;
+            contain: layout style paint;
             overflow: hidden;
-            will-change: transform;
             transition: transform 0.3s ease, box-shadow 0.3s ease !important;
         }
         .glass-card:hover, .glass-card:focus-within {
+            will-change: transform;
             box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15), 0 12px 40px rgba(0, 0, 0, 0.4);
         }
         .gradient-text {
@@ -219,7 +219,7 @@
                 transition-duration: 0.01ms !important;
                 animation-duration: 0.01ms !important;
             }
-            .glass-card, .blob { will-change: auto; }
+            .blob { will-change: auto; }
             [data-card] { animation: none; }
         }
     </style>
