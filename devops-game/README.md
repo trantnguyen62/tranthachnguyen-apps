@@ -6,7 +6,7 @@ A 2D space shooter game that teaches DevOps concepts through gameplay. Answer qu
 
 | Mode | Description |
 |------|-------------|
-| **Adventure** | Progress through 8 DevOps topic zones, 5 waves each |
+| **Adventure** | Progress through all 12 DevOps topic zones, 5 waves each |
 | **Endless** | Survive as long as possible with increasing difficulty |
 | **Speed Quiz** | Race against the clock — answer fast for maximum points |
 | **Practice** | Choose a specific topic zone to drill |
@@ -23,6 +23,10 @@ A 2D space shooter game that teaches DevOps concepts through gameplay. Answer qu
 | 🌿 Git | Branching, merging, rebase, workflows, hooks |
 | 🐧 Linux | Commands, permissions, processes, scripting, networking |
 | 📊 Monitoring | Prometheus, Grafana, alerting, logging, SLOs |
+| 🔧 Ansible | Playbooks, roles, inventory, idempotency, modules |
+| 🔷 Azure | AKS, Azure Functions, Azure DevOps, ARM templates |
+| 🔒 DevSecOps | SAST, DAST, container scanning, secrets management, zero trust |
+| 🌐 Networking | DNS, load balancing, TCP/IP, proxies, service mesh |
 
 ## 🕹️ Controls & Scoring
 
