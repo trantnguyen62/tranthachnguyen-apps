@@ -70,6 +70,7 @@ function Navbar() {
                 <input
                   type="text"
                   placeholder="Search stories..."
+                  aria-label="Search comics"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-40 md:w-64 px-4 py-2 bg-dark-200 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"

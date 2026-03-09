@@ -11,12 +11,13 @@ const Reader = lazy(() => import('./pages/Reader'));
 function App() {
   return (
     <Router>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       <div className="min-h-screen bg-dark-300">
         <Navbar />
-        <main className="pt-16">
+        <main id="main-content" className="pt-16">
           <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="min-h-screen flex items-center justify-center" role="status" aria-label="Loading page">
+              <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
             </div>
           }>
             <Routes>
