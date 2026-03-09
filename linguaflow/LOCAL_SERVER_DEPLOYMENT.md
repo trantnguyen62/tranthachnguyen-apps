@@ -436,4 +436,4 @@ That's it! Your app will be live at your domain.
 
 ---
 
-Let me know if you need help with any of these steps!
+For additional help, see `TROUBLESHOOTING.md`.

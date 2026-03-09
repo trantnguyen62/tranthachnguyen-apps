@@ -68,7 +68,7 @@ Create `.env.local` in the project root:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `GEMINI_API_KEY` | Yes | Google Gemini API key (get one at [aistudio.google.com](https://aistudio.google.com)) |
-| `VITE_PROXY_URL` | Yes | WebSocket proxy URL. Use `ws://localhost:3001` for local dev, `/ws` for production |
+| `VITE_PROXY_URL` | Yes | WebSocket proxy URL. Use `ws://localhost:3001` for local dev; set to `/ws` in `.env.production` for production builds |
 
 ## 📜 Scripts
 

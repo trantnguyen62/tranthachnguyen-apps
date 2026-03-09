@@ -413,4 +413,4 @@ Remember to set your `GEMINI_API_KEY` in:
 5. ✅ Easy custom domain configuration
 6. ✅ Good for React/Vite apps
 
-Let me know which option you'd like to proceed with, and I can provide more specific guidance!
+For this project, **Cloudflare Tunnel** (see `LOCAL_SERVER_DEPLOYMENT.md`) is the current production setup.
