@@ -4,77 +4,77 @@ export const PROJECTS: Project[] = [
   {
     name: 'NanoEdit AI',
     path: 'nanoedit-ai-prod',
-    description: 'AI-powered photo editing with Gemini'
+    description: 'AI-powered photo editing using the Gemini API — good example of multimodal image input, canvas manipulation, and streaming AI responses in a React app'
   },
   {
     name: 'LinguaFlow',
     path: 'linguaflow',
-    description: 'AI language learning with Gemini Live voice'
+    description: 'AI language learning app using Gemini Live for real-time voice conversation — demonstrates bidirectional audio streaming, PCM encoding, and session management'
   },
   {
     name: 'Illinois Driver Study',
     path: 'illinois-driver-study',
-    description: 'DMV practice test application'
+    description: 'DMV practice test app with question banks, scoring logic, and progress tracking — clean example of state-driven quiz UI in React'
   },
   {
     name: 'Passport Photo AI',
     path: 'passport-photo-ai',
-    description: 'AI passport photo generator'
+    description: 'AI passport photo generator — covers image processing, crop/resize logic, and background removal via AI, with file upload and download flows'
   },
   {
     name: 'Landing Page',
     path: 'landing-page',
-    description: 'Personal portfolio landing page'
+    description: 'Personal portfolio site — good reference for layout composition, animation, and responsive design without a heavy framework'
   },
   {
     name: 'Cloudify',
     path: 'cloudify',
-    description: 'Cloud deployment platform — a self-hosted Vercel alternative'
+    description: 'Self-hosted deployment platform (Vercel alternative) — demonstrates shell execution, process management, reverse proxy config, and a real-time dashboard'
   },
   {
     name: 'Comic News',
     path: 'comic-news',
-    description: 'Comic-style news reader with AI-generated visuals'
+    description: 'News reader that generates comic-style visuals with AI — combines RSS ingestion, Gemini image generation, and a card-based UI'
   },
   {
     name: 'Daily Quote',
     path: 'daily-quote',
-    description: 'PWA serving AI-generated daily quotes with offline support'
+    description: 'PWA delivering AI-generated daily quotes — good study in service workers, offline caching strategies, and push notifications'
   },
   {
     name: 'DevOps Game',
     path: 'devops-game',
-    description: 'Interactive browser game for learning CI/CD and DevOps concepts'
+    description: 'Browser game for learning CI/CD and DevOps concepts — interesting for its game loop, state machines, and how it maps real DevOps workflows to game mechanics'
   },
   {
     name: 'DevOps Study',
     path: 'devops-study',
-    description: 'Study guide and quiz app for DevOps concepts'
+    description: 'Study guide and quiz app for DevOps topics — structured content model, spaced repetition logic, and clean separation of quiz engine from UI'
   },
   {
     name: 'Pipeline Runner',
     path: 'pipeline-runner',
-    description: 'CI/CD pipeline automation runner with task orchestration'
+    description: 'CI/CD pipeline runner with task orchestration — demonstrates async job queues, real-time log streaming, and sequential/parallel task execution'
   },
   {
     name: 'Quill',
     path: 'quill',
-    description: 'AI-assisted writing and document editing tool'
+    description: 'AI-assisted writing tool — covers rich text editing, AI text completion/insertion, document state management, and autosave patterns'
   },
   {
     name: 'Skokie Home Buyers',
     path: 'skokie-home-buyers',
-    description: 'Local real estate guide with neighborhood maps and search'
+    description: 'Local real estate guide with maps and neighborhood search — good example of map integration, geospatial filtering, and content-driven UI'
   },
   {
     name: 'Cloudify Docs',
     path: 'cloudify-docs',
-    description: 'Documentation site for Cloudify — built with Next.js and MDX'
+    description: 'Documentation site for Cloudify using Next.js and MDX — shows static site generation, MDX content pipeline, and docs-specific navigation patterns'
   },
   {
     name: 'Code Study App',
     path: 'code-study-app',
-    description: 'This app — AI voice tutor for exploring and learning codebases'
+    description: 'This app — AI voice tutor for exploring codebases, using Gemini Live. Key patterns: WebSocket proxy, real-time PCM audio pipeline, virtual scroll code viewer, and dynamic system prompt construction'
   }
 ];
 
@@ -148,15 +148,22 @@ WHEN ASKED FOR A PROJECT OVERVIEW:
 
 CODEBASE CONTEXT:
 - These are real production apps, mostly built with React, TypeScript, and Vite
-- Several apps integrate Google Gemini AI APIs — pay attention to how prompts and context are constructed, how streaming is handled, and how errors are caught
-- Many apps follow a client + API server pattern with Express backends
-- The developer wants to learn the reasoning behind design decisions, not just surface-level descriptions
-- Custom React hooks encapsulate complex stateful logic — explain what state is being managed and why it lives in the hook
-- TypeScript generics and utility types are used throughout — when relevant, explain what type safety they enforce
+- Several apps integrate Google Gemini AI APIs — pay close attention to how system prompts are constructed and injected, how streaming responses are consumed, and how errors from the API are caught and surfaced to the user
+- Apps that use Gemini Live (real-time voice) share a common pattern: a WebSocket proxy server handles the API connection server-side, the frontend uses the Web Audio API to capture microphone input, converts float32 samples to 16-bit PCM, and sends audio chunks over the WebSocket; model audio arrives as base64-encoded PCM and is decoded and scheduled through an AudioContext
+- Many apps follow a client + Express API server pattern — the API server handles file I/O, external API calls, or data transformation that should not happen in the browser
+- Custom React hooks encapsulate complex stateful logic — when you see a hook, explain what state it owns, what side effects it manages, and why that logic was extracted from the component
+- TypeScript generics and utility types are used throughout — when relevant, explain what type safety they enforce and what class of bugs they prevent
+- Vite is used as the bundler — be ready to explain vite.config.ts settings like proxy rules, build targets, and plugin choices
+
+SHARED PATTERNS WORTH HIGHLIGHTING:
+- System prompt construction: dynamic context (current file, selected code, project description) is injected into a base system instruction at session start — explain why this is done at connection time rather than per-message
+- LRU file cache in App.tsx prevents redundant API calls while bounding memory use — a common pattern worth understanding
+- Virtual scrolling in the code viewer renders only visible lines, which is important for large files; explain the math behind buffer + scroll offset calculations
+- WebSocket proxy servers add a security layer: they validate origins, apply rate limiting, and keep API keys server-side rather than exposing them to the browser
 
 WHEN THE DEVELOPER SEEMS STUCK OR CONFUSED:
 - Reframe the concept with a concrete real-world analogy
 - Walk through the code execution step by step from the triggering event
 - Ask a clarifying question to identify exactly where the understanding breaks down
 
-Start by greeting the developer and asking which part of the codebase they want to explore — the overall architecture, a specific file, or a particular feature.`;
+Start by greeting the developer warmly and asking which part of the codebase they want to explore — the overall architecture, a specific file, or a particular feature.`;

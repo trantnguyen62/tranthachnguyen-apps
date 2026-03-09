@@ -394,7 +394,7 @@ let game = {
 
     // Topic & content rotation
     selectedTopic: 'docker',
-    usedContentIndices: new Set(), // Tracks shown LEARNABLE_CONTENT indices to avoid repeats
+    contentQueue: [], // Pre-shuffled indices for LEARNABLE_CONTENT; refills when empty
 
     // Player physics
     player: {
@@ -551,6 +551,7 @@ function handleTopicKeydown(e) {
 function selectTopic(topicId) {
     if (!TOPICS.some(t => t.id === topicId)) return;
     game.selectedTopic = topicId;
+    game.contentQueue = []; // reset queue so it refills for the new topic
     updateTopicCache();
     renderTopicButtons();
     document.querySelector('.icon-preview').textContent = game.topicCache.topic.icon;
@@ -585,25 +586,18 @@ function initStars() {
 }
 
 // Returns the next learnable content item for the current topic.
-// Cycles through all items without repetition before reshuffling.
+// Cycles through all items without repetition using a pre-shuffled queue.
 function getNextLearnableContent() {
     const content = LEARNABLE_CONTENT[game.selectedTopic];
-    if (game.usedContentIndices.size >= content.length) {
-        game.usedContentIndices.clear();
+    if (game.contentQueue.length === 0) {
+        const indices = Array.from({ length: content.length }, (_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+        }
+        game.contentQueue = indices;
     }
-
-    if (content.length === 1) {
-        game.usedContentIndices.add(0);
-        return content[0];
-    }
-
-    let index;
-    do {
-        index = Math.floor(Math.random() * content.length);
-    } while (game.usedContentIndices.has(index));
-
-    game.usedContentIndices.add(index);
-    return content[index];
+    return content[game.contentQueue.pop()];
 }
 
 function setupEventListeners() {
@@ -688,7 +682,7 @@ function startGame() {
     game.particles = [];
     game.floatingTexts = [];
     game.learnedItems = [];
-    game.usedContentIndices = new Set();
+    game.contentQueue = [];
     game.questionActive = false;
     game.currentQuestion = null;
     if (game.questionTimerInterval) {
@@ -840,12 +834,18 @@ function render() {
     drawPipelineBackground(ctx);
 
     const particles = game.particles;
-    for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        ctx.fillStyle = `rgba(${p.color}, ${p.life})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * p.life, 0, TWO_PI);
-        ctx.fill();
+    if (particles.length > 0) {
+        // All particles share the same color; set fillStyle once and vary globalAlpha
+        ctx.save();
+        ctx.fillStyle = 'rgb(255, 200, 100)';
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * p.life, 0, TWO_PI);
+            ctx.fill();
+        }
+        ctx.restore();
     }
 
     const obstacles = game.obstacles;
@@ -1048,7 +1048,7 @@ function showQuestion() {
     document.getElementById('questionTimer').textContent = CONFIG.QUESTION_TIME;
 
     const answerGrid = document.getElementById('answerGrid');
-    answerGrid.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
     answers.forEach((answer, i) => {
         const btn = document.createElement('button');
@@ -1060,8 +1060,11 @@ function showQuestion() {
         `;
         btn.setAttribute('aria-label', `Option ${i + 1}: ${answer.text}`);
         btn.onclick = () => selectAnswer(i);
-        answerGrid.appendChild(btn);
+        fragment.appendChild(btn);
     });
+
+    answerGrid.innerHTML = '';
+    answerGrid.appendChild(fragment);
 
     document.getElementById('questionModal').classList.remove('hidden');
     startQuestionTimer();
