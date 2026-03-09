@@ -1,9 +1,25 @@
+/**
+ * Visualizer — canvas-based audio animation that provides visual feedback
+ * during a live conversation session.
+ *
+ * Two visual states:
+ *   - Idle (isActive=false): a slow-pulsing ring drawn with requestAnimationFrame.
+ *   - Active (isActive=true): a radial gradient glow whose size is driven by the
+ *     current audio volume, plus 20 particles that bounce around the canvas and
+ *     draw lines to the centre when the volume exceeds a threshold.
+ *
+ * The component is memoised to avoid unnecessary re-renders from parent state
+ * updates that do not affect its props.
+ */
 import React, { useEffect, useRef, useCallback, memo } from 'react';
 import { AudioVolume } from '../types';
 
 interface VisualizerProps {
+  /** Normalised [0, 1] volume for microphone input and speaker output. */
   volume: AudioVolume;
+  /** Whether a live session is currently running. Controls idle vs. active animation. */
   isActive: boolean;
+  /** CSS colour string for the active glow (passed from the selected language theme). */
   color: string;
 }
 
@@ -61,8 +77,12 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
     const centerY = canvas.height / 2;
     const maxRadius = 100;
 
-    // Use input volume if user is talking, else output volume
+    // Prefer input volume (user speaking) over output volume (AI speaking).
+    // The 0.05 threshold ignores microphone noise floor so the visualizer
+    // reacts to the AI when the user is silent.
     const currentVol = volume.input > 0.05 ? volume.input : volume.output;
+    // Scale ranges from 1× (silence) to 2.5× (max volume), capped to avoid
+    // the glow exceeding the canvas bounds at high volumes.
     const scale = 1 + Math.min(currentVol * 2, 1.5); // Cap scale
 
     // Draw main glow
@@ -92,7 +112,8 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
         ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(0.5 + currentVol, 1)})`;
         ctx.fill();
         
-        // Connect to center if loud enough
+        // Draw spokes from each particle to the centre when volume is loud
+        // enough (> 0.3) to add a dynamic "active" feel at higher volumes.
         if (currentVol > 0.3) {
              ctx.beginPath();
              ctx.moveTo(centerX, centerY);

@@ -1,10 +1,27 @@
+/**
+ * UserProfileModal — shown before starting a Vietnamese-to-English session so
+ * the AI tutor can greet the learner by name and personalise instruction based
+ * on prior progress.
+ *
+ * Profile persistence strategy:
+ *   1. On mount the modal checks localStorage for a saved `linguaflow_user_id`.
+ *   2. If found, it fetches the full profile from `/api/users/:id` and shows a
+ *      "Welcome back" summary so the user can continue or start fresh.
+ *   3. If not found (or the backend returns 404), a new-user form is shown.
+ *      Submitting creates a profile via POST `/api/users` and saves the
+ *      returned `id` to localStorage for future sessions.
+ *   4. In both cases `onProfileReady` is called with the resolved UserProfile,
+ *      which the parent passes into useLiveSession to include in the system prompt.
+ */
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { UserProfile } from '../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  /** Called once a profile has been resolved (new or returning). */
   onProfileReady: (profile: UserProfile) => void;
+  /** Base URL of the REST API server (e.g. https://api.example.com). */
   apiUrl: string;
 }
 
