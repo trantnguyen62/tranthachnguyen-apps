@@ -25,10 +25,13 @@ Automatically crop and format your photos to meet strict passport and visa requi
 npm install
 
 # Set up environment
-cp .env.example .env.local
+cp .env.local.example .env.local
 # Add your GEMINI_API_KEY to .env.local
 
-# Start development server
+# Terminal 1 — start the API server
+npm run server
+
+# Terminal 2 — start the frontend dev server
 npm run dev
 ```
 
@@ -36,28 +39,43 @@ npm run dev
 
 ```bash
 docker build -t passport-photo-ai .
-docker run -p 5185:5185 passport-photo-ai
+docker run -p 5185:5185 -e GEMINI_API_KEY=your_key_here passport-photo-ai
 ```
 
 ## 📁 Project Structure
 
 ```
 passport-photo-ai/
-├── App.tsx             # Main React component
-├── index.html          # Entry HTML file
-├── index.tsx           # React entry point
-├── components/         # UI components (uploader, preview, etc.)
-├── server/             # API server for image processing
-├── public/             # Static assets
-└── Dockerfile          # Docker configuration
+├── App.tsx                        # Main React component
+├── types.ts                       # Shared TypeScript types and enums
+├── index.html                     # Entry HTML file
+├── index.tsx                      # React entry point
+├── components/
+│   ├── ImageUploader.tsx          # Drag-and-drop / camera capture UI
+│   └── PhotoEditor.tsx            # AI auto-fix and crop editor
+├── server/
+│   └── passport-proxy.js          # Express API server (Gemini integration)
+├── public/                        # Static assets
+└── Dockerfile                     # Docker configuration
 ```
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, TypeScript, Vite
+- **Frontend**: React 19, TypeScript, Vite
+- **Backend**: Node.js, Express 5
 - **Styling**: Custom CSS with gradients
 - **Fonts**: Space Grotesk, Syne
-- **AI**: Google Gemini API for image processing
+- **AI**: Google Gemini 2.0 Flash for compliance analysis
+- **Image Processing**: `@imgly/background-removal` for client-side background removal
+
+## 🔌 API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/passport/check` | Analyze a photo and return a compliance report |
+| `POST` | `/api/passport/analyze` | Return an overall score and auto-fix recommendations |
+
+Both endpoints accept `{ base64Image: string }` (data URL) and are rate-limited to 10 requests per IP per minute.
 
 ## 🌐 Live Demo
 
