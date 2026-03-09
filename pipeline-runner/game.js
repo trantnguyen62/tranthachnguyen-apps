@@ -381,30 +381,37 @@ const RANKS = [
 ];
 
 // Game State
+// Properties prefixed with _ or set dynamically by init/resize are not listed here
+// but are documented at their point of assignment.
 let game = {
-    running: false,
-    paused: false,
+    // Loop control
+    running: false,          // True while a game session is in progress
+    paused: false,           // True when waiting for player input (e.g. after extra life)
     canvas: null,
     ctx: null,
-    animationId: null,
-    obstacleInterval: null,
+    animationId: null,       // rAF handle; null when loop is not running
+    obstacleInterval: null,  // setInterval handle for obstacle spawning
 
+    // Topic & content rotation
     selectedTopic: 'docker',
-    usedContentIndices: new Set(),
+    usedContentIndices: new Set(), // Tracks shown LEARNABLE_CONTENT indices to avoid repeats
 
+    // Player physics
     player: {
         x: 100,
         y: 0,
-        velocity: 0,
-        rotation: 0
+        velocity: 0,   // Vertical velocity (negative = upward)
+        rotation: 0    // Visual tilt angle in degrees, clamped to [-20, 60]
     },
 
-    obstacles: [],
-    particles: [],
-    stars: [],
-    learnedItems: [],
-    floatingTexts: [],
+    // Active game objects
+    obstacles: [],       // Array of { x, gapY, passed, content }
+    particles: [],       // Boost/collision particle effects
+    stars: [],           // Background parallax stars
+    learnedItems: [],    // Content items passed this session (used on game-over screen)
+    floatingTexts: [],   // Transient "+cmd" labels shown near the player
 
+    // Scoring
     score: 0,
     bestScore: 0,
     streak: 0,
@@ -412,18 +419,30 @@ let game = {
     lives: 0,
     questionsAnswered: 0,
     correctAnswers: 0,
-    totalLearned: 0,
+    totalLearned: 0,  // Cumulative across all sessions (persisted to localStorage)
 
-    lastLearnedFact: '',
-    respawnInvincible: false,
+    // Session state
+    lastLearnedFact: '',     // Fact shown on game-over when learnedItems is empty
+    respawnInvincible: false, // True during the brief grace period after losing a life
+    // respawnInvincibleTimeout: <set by useLife/AdManager.continueGame>
+    // gameOverTimeout: <setTimeout handle set in gameOver(); cancelled on extra-life continue>
+    // _loopSuspended: <set by visibilitychange handler to resume loop on tab focus>
 
-    currentQuestion: null,
+    // Question modal state
+    currentQuestion: null,   // Active question object (shuffled answers + correctIndex)
     questionActive: false,
-    questionTimer: 0,
+    questionTimer: 0,        // Seconds remaining on the countdown
     questionTimerInterval: null,
 
+    // Canvas dimensions (logical pixels, updated on resize)
     width: 0,
     height: 0
+    // Dynamically set by init/resizeCanvas/updateTopicCache:
+    //   elScore, elLives, elStreak, elTipBanner, elTipText, elTimer  — cached DOM nodes
+    //   cachedBgGradient   — LinearGradient rebuilt on resize
+    //   pipelineCanvas     — offscreen canvas with static lane lines
+    //   starGroups         — Map<fillStyle, star[]> for batched star drawing
+    //   topicCache         — { topic, obstacleCanvas, playerCanvas, playerOX, playerOY, … }
 };
 
 // Initialize
@@ -983,6 +1002,9 @@ function spawnObstacle() {
     });
 }
 
+// Circular hitbox collision: treats the player as a circle of radius 20 px.
+// Checks screen boundary first, then axis-aligned bounding-box overlap with each
+// obstacle gate (top column: y < gapY, bottom column: y > gapY + GAP).
 function checkCollision() {
     const p = game.player;
     const playerRadius = 20;
@@ -1262,6 +1284,10 @@ function darkenColor(hex, percent) {
 // Rebuilds the topic-specific offscreen canvases for the player sprite and
 // obstacle columns. Call this whenever the selected topic or canvas size changes.
 // Pre-rendering avoids expensive per-frame gradient and shadow operations.
+// Prerenders per-topic graphics (obstacle column and player sprite) to offscreen
+// canvases so the hot render path can blit with drawImage instead of recomputing
+// gradients and shadows each frame.  Must be called whenever selectedTopic changes
+// or after a canvas resize (height change invalidates the obstacle canvas height).
 function updateTopicCache() {
     const topic = TOPICS.find(t => t.id === game.selectedTopic);
     const lightColor20 = lightenColor(topic.color, 20);
