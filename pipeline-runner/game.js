@@ -1056,10 +1056,15 @@ function showQuestion() {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'answer-btn';
-        btn.innerHTML = `
-            <span class="answer-key" aria-hidden="true">${i + 1}</span>
-            <span class="answer-text">${answer.text}</span>
-        `;
+        const keySpan = document.createElement('span');
+        keySpan.className = 'answer-key';
+        keySpan.setAttribute('aria-hidden', 'true');
+        keySpan.textContent = i + 1;
+        const textSpan = document.createElement('span');
+        textSpan.className = 'answer-text';
+        textSpan.textContent = answer.text;
+        btn.appendChild(keySpan);
+        btn.appendChild(textSpan);
         btn.setAttribute('aria-label', `Option ${i + 1}: ${answer.text}`);
         btn.onclick = () => selectAnswer(i);
         fragment.appendChild(btn);
