@@ -374,7 +374,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
 
       <div className="w-full min-h-[200px] flex items-center justify-center">
         {currentQuestion ? (
-          <div className="w-full bg-white rounded-xl shadow-lg border border-slate-200 p-6 animate-fade-in-up">
+          <div aria-live="polite" aria-atomic="true" className="w-full bg-white rounded-xl shadow-lg border border-slate-200 p-6 animate-fade-in-up">
             <div className="flex justify-between items-center mb-4">
                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wide">
                   {t.current_question}

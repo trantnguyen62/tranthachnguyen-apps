@@ -115,7 +115,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
           <span aria-live="polite" aria-atomic="true" className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
             {t.questionLabel} {currentQuestionIndex + 1} {t.of} {questions.length}
           </span>
-          <span className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+          <span aria-live="polite" aria-atomic="true" className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
             {t.score}: {score}
           </span>
         </div>
