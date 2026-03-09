@@ -237,7 +237,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
                 const responses = message.toolCall.functionCalls.map(fc => {
                   if (fc.name === 'displayQuestion') {
                     const id = fc.args['id'] as number;
-                    const q = allQuestions.find(q => q.id === id);
+                    const q = questionsMap.get(id);
                     if (q) {
                       setCurrentQuestion(q);
                       return {
