@@ -100,14 +100,14 @@ export default function App() {
               PassportLens
             </h1>
           </div>
-          <p style={{ 
-            color: 'rgba(255,255,255,0.6)', 
-            fontSize: '1.1rem', 
-            maxWidth: 500, 
+          <p style={{
+            color: 'rgba(255,255,255,0.6)',
+            fontSize: '1.1rem',
+            maxWidth: 520,
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Free AI check for passport &amp; visa photos — instant results, any country.<br/>
+            Get your passport photo right the first time — free AI compliance check for any country, any document type.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Analyze</span> · <span style={{ color: accentPurple }}>Download</span>
           </p>
         </header>
@@ -316,17 +316,22 @@ export default function App() {
                 <div aria-hidden="true" style={{
                   fontSize: 64, marginBottom: 16, opacity: 0.3,
                   filter: 'grayscale(100%)'
-                }}>🖼️</div>
-                <p style={{ fontSize: 15, maxWidth: 220, lineHeight: 1.6, marginBottom: 20 }}>
-                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> to get your full compliance report
+                }}>🪪</div>
+                <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20 }}>
+                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> — our AI will check it against official passport requirements
                 </p>
-                <ul style={{ listStyle: 'none', textAlign: 'left', fontSize: 12, color: 'rgba(255,255,255,0.2)', lineHeight: 2 }}>
-                  <li>✓ Look directly into the camera</li>
-                  <li>✓ Neutral expression, both eyes open</li>
-                  <li>✓ Face should fill 70–80% of the frame</li>
-                  <li>✓ Plain white or off-white background</li>
-                  <li>✓ Even lighting — no harsh shadows</li>
-                </ul>
+                <div style={{ textAlign: 'left' }}>
+                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.2)', marginBottom: 8, fontWeight: 600 }}>
+                    What we check
+                  </p>
+                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.25)', lineHeight: 2.1 }}>
+                    <li>✓ Face position &amp; size in frame</li>
+                    <li>✓ Expression &amp; eyes open</li>
+                    <li>✓ Background color &amp; uniformity</li>
+                    <li>✓ Lighting &amp; shadow quality</li>
+                    <li>✓ Image sharpness &amp; resolution</li>
+                  </ul>
+                </div>
               </div>
             )}
             </div>
@@ -341,10 +346,10 @@ export default function App() {
           color: 'rgba(255,255,255,0.3)', fontSize: 13
         }}>
           <p>
-            Crafted with <span style={{ color: accentPink }}>♥</span> by PassportLens Studio · {new Date().getFullYear()}
+            Made with <span style={{ color: accentPink }}>♥</span> by PassportLens · {new Date().getFullYear()}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
-            Your photos are analyzed privately and deleted immediately — never stored on our servers.
+            100% private — your photos are processed in the moment and never stored or shared.
           </p>
         </footer>
       </div>
