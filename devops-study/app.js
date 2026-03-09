@@ -3624,7 +3624,9 @@ let _cachedTabBtns = null;
 function updateTabs() {
     const tabBtns = _cachedTabBtns || (_cachedTabBtns = document.querySelectorAll('.tab-btn'));
     tabBtns.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === state.currentTab);
+        const isActive = btn.dataset.tab === state.currentTab;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
 
     const flashcardView = document.getElementById('flashcardView');
@@ -4254,12 +4256,15 @@ function init() {
         sidebar.classList.add('open');
         sidebarOverlay.classList.add('active');
         hamburgerBtn.setAttribute('aria-expanded', 'true');
+        const firstFocusable = sidebar.querySelector('a, button, [tabindex]');
+        if (firstFocusable) firstFocusable.focus();
     }
 
     function closeSidebar() {
         sidebar.classList.remove('open');
         sidebarOverlay.classList.remove('active');
         hamburgerBtn.setAttribute('aria-expanded', 'false');
+        hamburgerBtn.focus();
     }
 
     hamburgerBtn.addEventListener('click', () => {
@@ -4271,6 +4276,12 @@ function init() {
     });
 
     sidebarOverlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+            closeSidebar();
+        }
+    });
 
     // Close sidebar on topic selection (mobile)
     document.getElementById('topicList').addEventListener('click', () => {
@@ -4298,6 +4309,14 @@ function init() {
             if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
                 flipCard();
+            }
+        }
+
+        if (state.currentTab === 'quiz' && !state.quizAnswered) {
+            const keyIndex = { '1': 0, '2': 1, '3': 2, '4': 3 }[e.key];
+            if (keyIndex !== undefined) {
+                e.preventDefault();
+                selectAnswer(keyIndex);
             }
         }
     });
