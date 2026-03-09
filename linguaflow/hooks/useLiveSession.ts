@@ -22,6 +22,8 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
   const currentOutputTranscriptionRef = useRef('');
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const outputVolumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const disconnect = useCallback(() => {
     // 1. Close session if possible (wrapper doesn't expose close explicitly on promise, but we stop sending)
@@ -48,7 +50,17 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
       streamRef.current = null;
     }
 
-    // 4. Disconnect ScriptProcessor
+    // 4. Stop output volume polling and disconnect analyser
+    if (outputVolumeIntervalRef.current) {
+      clearInterval(outputVolumeIntervalRef.current);
+      outputVolumeIntervalRef.current = null;
+    }
+    if (analyserRef.current) {
+      analyserRef.current.disconnect();
+      analyserRef.current = null;
+    }
+
+    // 5. Disconnect ScriptProcessor
     if (scriptProcessorRef.current) {
       scriptProcessorRef.current.disconnect();
       scriptProcessorRef.current = null;
@@ -186,6 +198,21 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
             console.log("Connection opened successfully");
             setConnectionState(ConnectionState.CONNECTED);
 
+            // Setup shared analyser for output volume — created once per session
+            const analyser = outputCtx.createAnalyser();
+            analyser.fftSize = 256;
+            analyser.connect(outputCtx.destination);
+            analyserRef.current = analyser;
+
+            // Single polling interval for output volume visualisation
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            outputVolumeIntervalRef.current = setInterval(() => {
+              analyser.getByteFrequencyData(dataArray);
+              let sum = 0;
+              for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+              setVolume(prev => ({ ...prev, output: sum / dataArray.length / 255 }));
+            }, 100);
+
             // Setup Audio Processing
             const source = inputCtx.createMediaStreamSource(stream);
             const scriptProcessor = inputCtx.createScriptProcessor(4096, 1, 1);
@@ -265,26 +292,18 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
               const source = outputCtx.createBufferSource();
               source.buffer = audioBuffer;
 
-              // Analyzer for output visualization
-              const analyser = outputCtx.createAnalyser();
-              analyser.fftSize = 256;
-              source.connect(analyser);
-              analyser.connect(outputCtx.destination);
-
-              // Update volume state periodically for output
-              const volumeInterval = setInterval(() => {
-                const dataArray = new Uint8Array(analyser.frequencyBinCount);
-                analyser.getByteFrequencyData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-                const avg = sum / dataArray.length;
-                setVolume(prev => ({ ...prev, output: avg / 255 }));
-              }, 100);
+              // Route through the shared analyser (created once in onopen)
+              if (analyserRef.current) {
+                source.connect(analyserRef.current);
+              } else {
+                source.connect(outputCtx.destination);
+              }
 
               source.addEventListener('ended', () => {
                 sourcesRef.current.delete(source);
-                clearInterval(volumeInterval);
-                setVolume(prev => ({ ...prev, output: 0 }));
+                if (sourcesRef.current.size === 0) {
+                  setVolume(prev => ({ ...prev, output: 0 }));
+                }
               });
 
               source.start(nextStartTimeRef.current);

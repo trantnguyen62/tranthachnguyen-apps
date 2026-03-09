@@ -25,6 +25,7 @@ interface VisualizerProps {
 
 const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const requestRef = useRef<number | null>(null);
   const particlesRef = useRef<Array<{x: number, y: number, r: number, vx: number, vy: number}>>([]);
   const volumeRef = useRef<AudioVolume>(volume);
@@ -53,7 +54,8 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
     }
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    if (!ctxRef.current) ctxRef.current = canvas.getContext('2d');
+    const ctx = ctxRef.current;
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
