@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { LANGUAGES, FEMALE_VOICES, CONVERSATION_TOPICS } from '../constants';
 import { LanguageConfig, DifficultyLevel } from '../types';
 
@@ -17,7 +17,7 @@ const LEVEL_COLORS: Record<DifficultyLevel, { bg: string; border: string; text: 
 };
 
 const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
-  const handleLevelSelect = (level: DifficultyLevel) => {
+  const handleLevelSelect = useCallback((level: DifficultyLevel) => {
     const levelConfig = selected.levels?.find(l => l.level === level);
     if (levelConfig) {
       onSelect({
@@ -26,21 +26,21 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
         systemInstruction: levelConfig.systemInstruction
       });
     }
-  };
+  }, [selected, onSelect]);
 
-  const handleVoiceSelect = (voiceId: string) => {
+  const handleVoiceSelect = useCallback((voiceId: string) => {
     onSelect({
       ...selected,
       voiceName: voiceId
     });
-  };
+  }, [selected, onSelect]);
 
-  const handleTopicSelect = (topicId: string) => {
+  const handleTopicSelect = useCallback((topicId: string) => {
     onSelect({
       ...selected,
       selectedTopic: topicId
     });
-  };
+  }, [selected, onSelect]);
 
   return (
     <div className="flex flex-col gap-4">

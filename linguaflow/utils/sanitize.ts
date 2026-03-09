@@ -1,5 +1,11 @@
 // Input sanitization utilities for XSS prevention
 
+// Pre-compiled regex patterns to avoid recompilation on every call
+const SCRIPT_TAG_RE = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+const EVENT_HANDLER_RE = /on\w+\s*=\s*["'][^"']*["']/gi;
+const JAVASCRIPT_PROTO_RE = /javascript:/gi;
+const HTML_CHARS_RE = /[&<>"'/]/g;
+
 /**
  * Escapes HTML special characters to prevent XSS attacks
  * @param {string} text - The text to sanitize
@@ -17,7 +23,7 @@ export function escapeHtml(text: string): string {
         '/': '&#x2F;',
     };
 
-    return text.replace(/[&<>"'/]/g, (char) => htmlEscapeMap[char] || char);
+    return text.replace(HTML_CHARS_RE, (char) => htmlEscapeMap[char] || char);
 }
 
 /**
@@ -30,13 +36,13 @@ export function sanitizeText(text: string): string {
     if (!text) return '';
 
     // Remove any script tags
-    let sanitized = text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    let sanitized = text.replace(SCRIPT_TAG_RE, '');
 
     // Remove any event handlers
-    sanitized = sanitized.replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
+    sanitized = sanitized.replace(EVENT_HANDLER_RE, '');
 
     // Remove javascript: protocol
-    sanitized = sanitized.replace(/javascript:/gi, '');
+    sanitized = sanitized.replace(JAVASCRIPT_PROTO_RE, '');
 
     // Escape HTML
     sanitized = escapeHtml(sanitized);

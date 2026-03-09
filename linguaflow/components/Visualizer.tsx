@@ -11,7 +11,7 @@
  * The component is memoised to avoid unnecessary re-renders from parent state
  * updates that do not affect its props.
  */
-import React, { useEffect, useRef, useCallback, memo } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import { AudioVolume } from '../types';
 
 interface VisualizerProps {
@@ -27,6 +27,13 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number | null>(null);
   const particlesRef = useRef<Array<{x: number, y: number, r: number, vx: number, vy: number}>>([]);
+  const volumeRef = useRef<AudioVolume>(volume);
+  const colorRef = useRef<string>(color);
+
+  // Sync volume and color into refs so the animation loop reads latest values
+  // without being restarted on every volume update.
+  useEffect(() => { volumeRef.current = volume; }, [volume]);
+  useEffect(() => { colorRef.current = color; }, [color]);
 
   // Initialize particles
   useEffect(() => {
@@ -80,14 +87,15 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
     // Prefer input volume (user speaking) over output volume (AI speaking).
     // The 0.05 threshold ignores microphone noise floor so the visualizer
     // reacts to the AI when the user is silent.
-    const currentVol = volume.input > 0.05 ? volume.input : volume.output;
+    const vol = volumeRef.current;
+    const currentVol = vol.input > 0.05 ? vol.input : vol.output;
     // Scale ranges from 1× (silence) to 2.5× (max volume), capped to avoid
     // the glow exceeding the canvas bounds at high volumes.
     const scale = 1 + Math.min(currentVol * 2, 1.5); // Cap scale
 
     // Draw main glow
     const gradient = ctx.createRadialGradient(centerX, centerY, 20 * scale, centerX, centerY, 60 * scale);
-    gradient.addColorStop(0, color);
+    gradient.addColorStop(0, colorRef.current);
     gradient.addColorStop(1, 'rgba(0,0,0,0)');
     
     ctx.fillStyle = gradient;
@@ -127,12 +135,15 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
     requestRef.current = requestAnimationFrame(animate);
   };
 
+  // Only restart the animation loop when isActive changes, not on every volume update.
+  // Volume and color are read via refs inside animate(), keeping them current without
+  // triggering a loop restart.
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => {
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
-  }, [isActive, volume, color]);
+  }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative w-64 h-64 flex items-center justify-center">
