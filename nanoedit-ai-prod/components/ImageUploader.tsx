@@ -16,6 +16,8 @@ interface ImageUploaderProps {
   isProcessing?: boolean;
 }
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
 export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, currentImage, isProcessing = false }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -48,7 +50,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+    if (file.size > MAX_FILE_SIZE) {
       setError("File size too large. Please upload an image under 10MB.");
       return;
     }

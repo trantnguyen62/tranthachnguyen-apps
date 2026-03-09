@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
 import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2, Scissors, Sun, PenLine, Zap, Film, X, CheckCircle2 } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { Button } from './components/Button';
@@ -27,6 +27,15 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (downloadTimerRef.current !== null) {
+        clearTimeout(downloadTimerRef.current);
+      }
+    };
+  }, []);
 
   // Derived state
   const currentImage = history[historyIndex] || null;
@@ -113,7 +122,8 @@ const App: React.FC = () => {
     link.click();
     document.body.removeChild(link);
     setDownloadSuccess(true);
-    setTimeout(() => setDownloadSuccess(false), 2500);
+    if (downloadTimerRef.current !== null) clearTimeout(downloadTimerRef.current);
+    downloadTimerRef.current = setTimeout(() => setDownloadSuccess(false), 2500);
   }, [currentImage]);
 
   const handlePresetClick = useCallback((text: string) => {

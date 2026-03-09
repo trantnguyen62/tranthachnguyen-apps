@@ -97,8 +97,9 @@ app.post('/api/gemini/edit-image', async (req, res) => {
     res.status(500).json({ error: 'No image generated' });
 
   } catch (error) {
-    console.error('[edit-image] Error:', error.message);
-    res.status(500).json({ error: error.message });
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[edit-image] Error:', message);
+    res.status(500).json({ error: message });
   }
 });
 
@@ -123,7 +124,7 @@ app.get('/api/status', async (req, res) => {
   } catch (error) {
     res.json({
       proxyStatus: 'disconnected',
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
       note: 'Make sure gemini-web-proxy is running on ' + GEMINI_PROXY_URL
     });
   }
