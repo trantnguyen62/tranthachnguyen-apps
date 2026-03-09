@@ -86,7 +86,7 @@ export default function App() {
               borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 24, boxShadow: `0 8px 32px ${accentPink}44`
             }}>
-              <span aria-hidden="true">🎨</span>
+              <span aria-hidden="true">🪪</span>
             </div>
             <h1 style={{ 
               fontFamily: "'Syne', sans-serif", 
@@ -107,7 +107,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Instantly verify your passport photo meets official requirements — for any country.<br/>
+            Free AI check for passport &amp; visa photos — instant results, any country.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Analyze</span> · <span style={{ color: accentPurple }}>Download</span>
           </p>
         </header>
@@ -323,8 +323,9 @@ export default function App() {
                 <ul style={{ listStyle: 'none', textAlign: 'left', fontSize: 12, color: 'rgba(255,255,255,0.2)', lineHeight: 2 }}>
                   <li>✓ Look directly into the camera</li>
                   <li>✓ Neutral expression, both eyes open</li>
-                  <li>✓ Use a plain white or light background</li>
-                  <li>✓ Even, natural lighting — no harsh shadows</li>
+                  <li>✓ Face should fill 70–80% of the frame</li>
+                  <li>✓ Plain white or off-white background</li>
+                  <li>✓ Even lighting — no harsh shadows</li>
                 </ul>
               </div>
             )}
