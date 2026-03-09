@@ -13,7 +13,16 @@
         "devops",
         "game",
         "learning",
-        "ios"
+        "ios",
+        "android",
+        "docker",
+        "kubernetes",
+        "cicd",
+        "webapp",
+        "html5",
+        "canvas",
+        "capacitor",
+        "education"
     ],
     "author": "Pipeline Runner Team",
     "license": "MIT",

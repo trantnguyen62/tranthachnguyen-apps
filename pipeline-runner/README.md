@@ -27,14 +27,17 @@ An endless runner game that teaches DevOps concepts through gameplay. Navigate t
 npm install
 
 # Build web assets into www/
+# Note: this copies *.html, *.css, *.js to www/ — images must be copied separately
 npm run build
 
-# Serve locally
+# Serve built assets (requires build step first)
 npm start
 
-# Or just open in browser directly
+# Or open the source directly in a browser (no build needed)
 open index.html
 ```
+
+> **Tip:** During development, opening `index.html` directly in a browser is the fastest workflow. The `npm start` command serves from `www/` (post-build assets), so changes to source files require a `npm run build` before they are reflected.
 
 ### Build for iOS (with Capacitor)
 
@@ -110,6 +113,14 @@ Progress is persisted in the browser's `localStorage` under two keys:
 | `pipeline-runner-learned` | Cumulative count of commands learned across all sessions |
 
 To reset progress, run `localStorage.clear()` in the browser console.
+
+## 🗒️ Development Notes
+
+- **Build script scope:** `npm run build` copies `*.html`, `*.css`, and `*.js` to `www/`. Image assets (e.g. `og-image.png`) must be copied to `www/` manually or added to the build script.
+- **Favicon files:** `index.html` references `favicon-32x32.png`, `favicon-16x16.png`, and `apple-touch-icon.png`. These files are not yet included in the repository and must be generated (e.g. via [realfavicongenerator.net](https://realfavicongenerator.net)) before deployment.
+- **AdSense integration:** The AdSense `<script>` tag in `index.html` is commented out. Replace `ca-pub-XXXXXXXXXXXXXXXX` with your publisher ID and uncomment when ready.
+- **Content Security Policy:** The CSP in `index.html` is set for `'self'` + Google Fonts. If you add third-party scripts (e.g. AdSense, analytics), update the `script-src` and `connect-src` directives accordingly.
+- **Reset progress in dev:** Run `localStorage.clear()` in the browser console to wipe all stored scores and progress.
 
 ## 📄 License
 
