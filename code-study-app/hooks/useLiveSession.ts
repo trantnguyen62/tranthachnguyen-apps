@@ -5,6 +5,11 @@ import { createBlob, decode, decodeAudioData } from '../utils/audio';
 import { ConnectionState, ChatMessage, StudyContext } from '../types';
 import { MODEL_NAME, SYSTEM_INSTRUCTION } from '../constants';
 
+const MAX_FILE_CHARS = 12000;
+
+let messageCounter = 0;
+const nextMessageId = (role: string) => `${++messageCounter}-${role}`;
+
 export const useLiveSession = (studyContext: StudyContext) => {
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -127,7 +132,6 @@ export const useLiveSession = (studyContext: StudyContext) => {
       if (ctx.currentFile) {
         systemInstruction += `\n\nCURRENT FILE: ${ctx.currentFile.path}\nLANGUAGE: ${ctx.currentFile.language || 'unknown'}`;
         if (ctx.currentFile.content) {
-          const MAX_FILE_CHARS = 12000;
           const content = ctx.currentFile.content.length > MAX_FILE_CHARS
             ? ctx.currentFile.content.slice(0, MAX_FILE_CHARS) + '\n... [truncated]'
             : ctx.currentFile.content;
@@ -220,7 +224,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
 
               if (userText) {
                 setMessages(prev => [...prev, {
-                  id: Date.now().toString() + '-user',
+                  id: nextMessageId('user'),
                   role: 'user',
                   text: userText,
                   timestamp: new Date(),
@@ -229,7 +233,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
               }
               if (modelText) {
                 setMessages(prev => [...prev, {
-                  id: Date.now().toString() + '-model',
+                  id: nextMessageId('model'),
                   role: 'model',
                   text: modelText,
                   timestamp: new Date(),

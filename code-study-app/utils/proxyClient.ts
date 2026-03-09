@@ -1,5 +1,17 @@
 // WebSocket proxy client for Gemini Live API
 
+interface SessionCallbacks {
+  onopen?: () => void;
+  onmessage?: (data: unknown) => void;
+  onclose?: () => void;
+  onerror?: (error: Error | Event) => void;
+}
+
+interface QueuedMessage {
+  type: string;
+  [key: string]: unknown;
+}
+
 function getProxyUrl(): string {
   const configuredUrl = import.meta.env.VITE_PROXY_URL || 'ws://localhost:3005';
   
@@ -18,11 +30,11 @@ console.log('[ProxyClient] Configured PROXY_URL:', PROXY_URL);
 
 export class ProxyLiveSession {
   private ws: WebSocket | null = null;
-  private callbacks: any = {};
-  private messageQueue: any[] = [];
+  private callbacks: SessionCallbacks = {};
+  private messageQueue: QueuedMessage[] = [];
   private isOpen = false;
 
-  async connect(config: any): Promise<void> {
+  async connect(config: { config: unknown; callbacks?: SessionCallbacks }): Promise<void> {
     console.log('[ProxyClient] Attempting to connect to:', PROXY_URL);
     return new Promise((resolve, reject) => {
       this.callbacks = config.callbacks || {};
@@ -108,10 +120,10 @@ export class ProxyLiveSession {
     });
   }
 
-  async sendRealtimeInput(input: any): Promise<void> {
-    const message = {
+  async sendRealtimeInput(input: unknown): Promise<void> {
+    const message: QueuedMessage = {
       type: 'realtimeInput',
-      input: input
+      input,
     };
     
     if (this.isOpen && this.ws) {
@@ -122,9 +134,9 @@ export class ProxyLiveSession {
   }
 
   async sendText(text: string): Promise<void> {
-    const message = {
+    const message: QueuedMessage = {
       type: 'sendText',
-      text: text
+      text,
     };
     
     if (this.isOpen && this.ws) {
@@ -150,7 +162,7 @@ export class ProxyLiveSession {
 
 export class ProxyGoogleGenAI {
   live = {
-    connect: async (config: any) => {
+    connect: async (config: { config: unknown; callbacks?: SessionCallbacks }) => {
       const session = new ProxyLiveSession();
       await session.connect(config);
       return session;
