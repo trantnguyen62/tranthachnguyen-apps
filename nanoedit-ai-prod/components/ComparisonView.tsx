@@ -25,7 +25,10 @@ export const ComparisonView = memo<ComparisonViewProps>(({
   const isVideo = processedMimeType.startsWith('video/');
 
   return (
-    <div className={`transition-all duration-500 ease-in-out ${isExpanded ? 'fixed inset-0 z-50 bg-slate-900/95 p-4 overflow-y-auto' : 'w-full'}`}>
+    <div
+      className={`transition-all duration-500 ease-in-out ${isExpanded ? 'fixed inset-0 z-50 bg-slate-900/95 p-4 overflow-y-auto' : 'w-full'}`}
+      {...(isExpanded ? { role: 'dialog', 'aria-modal': true, 'aria-label': 'Fullscreen image comparison' } : {})}
+    >
       
       {isExpanded && (
         <div className="fixed top-4 right-4 z-50">
@@ -75,7 +78,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                  alt="Original image before editing"
                  className="w-full h-full object-contain"
                />
-               <div className="absolute bottom-4 left-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide">
+               <div className="absolute bottom-4 left-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide" aria-hidden="true">
                  BEFORE
                </div>
              </div>
@@ -119,7 +122,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                  </div>
                )}
 
-               <div className="absolute bottom-4 left-4 px-3 py-1 bg-brand-600/90 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide shadow-lg flex items-center gap-1">
+               <div className="absolute bottom-4 left-4 px-3 py-1 bg-brand-600/90 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide shadow-lg flex items-center gap-1" aria-hidden="true">
                  {isVideo && <Play className="w-3 h-3 fill-current" />}
                  {isVideo ? 'VIDEO RESULT' : 'AFTER'}
                </div>
@@ -134,8 +137,9 @@ export const ComparisonView = memo<ComparisonViewProps>(({
 
         {isExpanded && (
            <div className="flex justify-center mt-6">
-             <button 
+             <button
                 onClick={onDownload}
+                aria-label="Download edited image"
                 className="flex items-center gap-2 px-6 py-3 bg-brand-600 text-white rounded-xl hover:bg-brand-500 transition-colors shadow-lg text-lg font-medium"
               >
                 <Download className="w-5 h-5" />

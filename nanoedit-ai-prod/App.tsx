@@ -224,6 +224,7 @@ const App: React.FC = () => {
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
                       aria-label="Describe the image changes you want"
+                      aria-describedby="prompt-hint"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -254,7 +255,7 @@ const App: React.FC = () => {
                         Generating your edit…
                       </span>
                     ) : (
-                      <span className="text-xs text-slate-500 pl-2 hidden sm:block">
+                      <span id="prompt-hint" className="text-xs text-slate-500 pl-2 hidden sm:block">
                         <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate · Shift+Enter for new line
                       </span>
                     )}
@@ -273,9 +274,9 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Presets */}
-                <div className="space-y-3">
+                <div className="space-y-3" role="group" aria-label="Quick action prompts">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-medium text-slate-500 flex items-center gap-1">
+                    <p className="text-xs font-medium text-slate-500 flex items-center gap-1" aria-hidden="true">
                       <Command className="w-3 h-3" aria-hidden="true" /> Quick actions:
                     </p>
                   </div>

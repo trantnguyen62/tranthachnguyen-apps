@@ -235,7 +235,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
         onDragLeave={onDragLeave}
         onDrop={onDrop}
         className={`
-          group relative w-full h-64 sm:h-80 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 ease-in-out cursor-pointer
+          group relative w-full h-64 sm:h-80 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 ease-in-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
           ${isDragging
             ? 'border-brand-500 bg-brand-50'
             : 'border-slate-300 bg-white hover:border-brand-400 hover:bg-brand-50/40'

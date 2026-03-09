@@ -13,3 +13,13 @@
 .animate-fadeIn {
   animation: fadeIn 0.4s ease-out forwards;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn {
+    animation: none;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
