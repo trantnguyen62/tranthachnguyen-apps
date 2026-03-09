@@ -84,6 +84,9 @@ function App() {
 
     const cached = fileCache.current.get(filePath);
     if (cached) {
+      // Refresh position in Map so LRU eviction keeps recently accessed files
+      fileCache.current.delete(filePath);
+      fileCache.current.set(filePath, cached);
       setFileLoadError(null);
       setSelectedFile({ ...file, content: cached.content, language: cached.language });
       return;

@@ -79,17 +79,6 @@ export const useLiveSession = (studyContext: StudyContext) => {
     setVolume({ input: 0, output: 0 });
   }, []);
 
-  // Send code context to the AI
-  const sendCodeContext = useCallback(async (context: string) => {
-    if (sessionRef.current) {
-      try {
-        await sessionRef.current.sendText(context);
-      } catch (e) {
-        console.error("Error sending code context:", e);
-      }
-    }
-  }, []);
-
   const connect = useCallback(async () => {
     if (connectionState === ConnectionState.CONNECTED || connectionState === ConnectionState.CONNECTING) return;
 
@@ -301,9 +290,12 @@ export const useLiveSession = (studyContext: StudyContext) => {
       });
 
       sessionPromiseRef.current = sessionPromise;
-      
+
       sessionPromise.then(session => {
-        sessionRef.current = session;
+        // Only assign if this promise is still the active one (guard against disconnect race)
+        if (sessionPromiseRef.current === sessionPromise) {
+          sessionRef.current = session;
+        }
       }).catch((err: any) => {
         console.error("Session promise rejected:", err);
       });
@@ -337,6 +329,5 @@ export const useLiveSession = (studyContext: StudyContext) => {
     messages,
     volume,
     error,
-    sendCodeContext
   };
 };
