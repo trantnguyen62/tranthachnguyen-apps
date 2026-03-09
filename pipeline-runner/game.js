@@ -582,7 +582,7 @@ function initStars() {
         if (!group) { group = []; groups.set(star.fillStyle, group); }
         group.push(star);
     }
-    game.starGroups = groups;
+    game.starGroups = Array.from(groups);
 }
 
 // Returns the next learnable content item for the current topic.
@@ -750,8 +750,8 @@ function update() {
     }
 
     const obstacles = game.obstacles;
-    for (let oi = 0; oi < obstacles.length; oi++) {
-        const obs = obstacles[oi];
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
         obs.x -= CONFIG.OBSTACLE_SPEED;
 
         if (!obs.passed && obs.x + CONFIG.OBSTACLE_WIDTH < game.player.x) {
@@ -767,10 +767,8 @@ function update() {
                 showQuestion();
             }
         }
-    }
 
-    for (let i = game.obstacles.length - 1; i >= 0; i--) {
-        if (game.obstacles[i].x <= -CONFIG.OBSTACLE_WIDTH * 2) game.obstacles.splice(i, 1);
+        if (obs.x <= -CONFIG.OBSTACLE_WIDTH * 2) obstacles.splice(i, 1);
     }
 
     // Update floating texts
@@ -820,7 +818,9 @@ function render() {
     ctx.fillRect(0, 0, game.width, game.height);
 
     // Batch stars by pre-grouped fillStyle to minimise canvas state changes
-    for (const [fillStyle, group] of game.starGroups) {
+    const starGroups = game.starGroups;
+    for (let g = 0; g < starGroups.length; g++) {
+        const [fillStyle, group] = starGroups[g];
         ctx.fillStyle = fillStyle;
         ctx.beginPath();
         for (let i = 0; i < group.length; i++) {
@@ -1013,7 +1013,9 @@ function checkCollision() {
         return true;
     }
 
-    for (let obs of game.obstacles) {
+    const obstacles = game.obstacles;
+    for (let i = 0; i < obstacles.length; i++) {
+        const obs = obstacles[i];
         if (p.x + playerRadius > obs.x && p.x - playerRadius < obs.x + CONFIG.OBSTACLE_WIDTH) {
             if (p.y - playerRadius < obs.gapY || p.y + playerRadius > obs.gapY + CONFIG.OBSTACLE_GAP) {
                 return true;
