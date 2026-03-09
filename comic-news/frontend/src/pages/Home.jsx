@@ -54,7 +54,27 @@ function Home() {
         const featuredData = await featuredRes.json();
         const comicsData = await comicsRes.json();
         setFeatured(featuredData);
-        setComics(comicsData.slice(0, 8));
+        const topComics = comicsData.slice(0, 8);
+        setComics(topComics);
+
+        // ItemList structured data for comic collection
+        document.getElementById('page-itemlist-jsonld')?.remove();
+        const ldList = document.createElement('script');
+        ldList.id = 'page-itemlist-jsonld';
+        ldList.type = 'application/ld+json';
+        ldList.textContent = JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: 'Trending Comics',
+          url: `${window.location.origin}/library`,
+          itemListElement: topComics.map((comic, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: comic.title,
+            url: `${window.location.origin}/comic/${comic.id}`,
+          })),
+        });
+        document.head.appendChild(ldList);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -62,6 +82,7 @@ function Home() {
       }
     };
     fetchData();
+    return () => { document.getElementById('page-itemlist-jsonld')?.remove(); };
   }, []);
 
   return (

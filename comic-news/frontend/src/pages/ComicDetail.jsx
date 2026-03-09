@@ -42,12 +42,20 @@ function ComicDetail() {
         setMeta('meta[name="twitter:description"]', comicData.description);
         setMeta('meta[name="twitter:image"]', imgUrl);
 
+        // Keywords meta
+        document.getElementById('meta-keywords')?.remove();
+        const kwMeta = document.createElement('meta');
+        kwMeta.id = 'meta-keywords';
+        kwMeta.name = 'keywords';
+        kwMeta.content = [comicData.genre, 'comic news', 'news comic', comicData.author].filter(Boolean).join(', ');
+        document.head.appendChild(kwMeta);
+
         // Canonical link
         document.getElementById('canonical-link')?.remove();
         const canonical = document.createElement('link');
         canonical.id = 'canonical-link';
         canonical.rel = 'canonical';
-        canonical.href = window.location.href;
+        canonical.href = `${window.location.origin}/comic/${id}`;
         document.head.appendChild(canonical);
 
         // JSON-LD structured data
@@ -61,6 +69,7 @@ function ComicDetail() {
           headline: comicData.title,
           description: comicData.description,
           author: { '@type': 'Person', name: comicData.author },
+          publisher: { '@type': 'Organization', name: 'Comic News', url: window.location.origin },
           image: imgUrl,
           genre: comicData.genre,
           url: window.location.href,
@@ -76,6 +85,7 @@ function ComicDetail() {
     return () => {
       document.getElementById('page-jsonld')?.remove();
       document.getElementById('canonical-link')?.remove();
+      document.getElementById('meta-keywords')?.remove();
     };
   }, [id]);
 
