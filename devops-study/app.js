@@ -4060,7 +4060,7 @@ function renderQuizQuestion() {
         btn.className = 'quiz-option';
         btn.innerHTML = `
             <span class="option-letter">${letters[index]}</span>
-            <span>${option}</span>
+            <span>${escapeHtml(option)}</span>
         `;
         btn.addEventListener('click', () => selectAnswer(index));
         dom.quizOptions.appendChild(btn);
