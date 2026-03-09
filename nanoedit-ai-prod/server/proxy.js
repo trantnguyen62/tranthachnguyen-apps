@@ -19,8 +19,22 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
 /**
- * Image editing endpoint - routes to gemini-web-proxy
- * Uses Puppeteer automation instead of paid Google API
+ * POST /api/gemini/edit-image
+ *
+ * Routes an image-editing request to gemini-web-proxy (Puppeteer automation).
+ *
+ * Request body:
+ *   @param {string}  prompt      - Required. Natural language edit instruction.
+ *   @param {string}  [base64Image] - Optional. Base64 data URI of the source image.
+ *   @param {string}  [mimeType]  - MIME type of the image (default: `'image/png'`).
+ *
+ * Response (200):
+ *   @returns {{ success: true, imageData: string }} Base64 data URI or URL of the edited image.
+ *
+ * Errors:
+ *   - 400 Missing `prompt`.
+ *   - 500 gemini-web-proxy returned no image or an upstream error.
+ *   - 500 Upstream request timed out (110 s limit).
  */
 app.post('/api/gemini/edit-image', async (req, res) => {
   try {

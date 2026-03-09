@@ -6,8 +6,11 @@ import React, { memo } from 'react';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Shows a spinner and disables the button while true. */
   isLoading?: boolean;
+  /** Visual style. Defaults to `'primary'`. */
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  /** Optional icon rendered to the left of the label (hidden during loading). */
   leftIcon?: React.ReactNode;
 }
 
