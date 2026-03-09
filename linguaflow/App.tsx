@@ -148,13 +148,13 @@ function App() {
               <p className="text-xs text-slate-400">Speak, listen, and learn with AI</p>
             </div>
           </div>
-          <div className="flex items-center gap-3" aria-live="polite">
+          <div className="flex items-center gap-3">
             {userProfile && (
-              <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0" title={userProfile.name}>
+              <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0" aria-label={userProfile.name}>
                 {userProfile.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-xs" aria-live="polite" aria-atomic="true">
               {isConnected ? (
                 <>
                   <span className="relative flex h-2 w-2">

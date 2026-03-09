@@ -200,6 +200,8 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
                 </button>
                 <button
                   onClick={handleContinue}
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
                   className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-colors font-semibold"
                 >
                   Tiếp tục học →
@@ -210,10 +212,11 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
             /* New user form */
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label htmlFor="user-name-input" className="block text-sm font-medium text-slate-300 mb-2">
                   Tên của bạn là gì?
                 </label>
                 <input
+                  id="user-name-input"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
