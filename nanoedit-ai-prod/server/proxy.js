@@ -102,7 +102,7 @@ app.post('/api/gemini/edit-image', async (req, res) => {
     }
 
     console.error('[edit-image] No images in response');
-    res.status(500).json({ error: 'No image generated' });
+    return res.status(500).json({ error: 'No image generated' });
 
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
