@@ -15,7 +15,7 @@ const TRANSLATIONS = {
     score: "Score",
     next: "Next Question",
     finish: "Finish Quiz",
-    explanation: "Why:"
+    explanation: "Explanation:"
   },
   vi: {
     questionLabel: "Câu hỏi",
