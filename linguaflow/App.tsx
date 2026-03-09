@@ -145,7 +145,7 @@ function App() {
               <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
                 LinguaFlow
               </h1>
-              <p className="text-xs text-slate-400">Real-time AI conversation partner</p>
+              <p className="text-xs text-slate-400">Speak, listen, and learn with AI</p>
             </div>
           </div>
           <div className="flex items-center gap-3" aria-live="polite">
@@ -201,7 +201,7 @@ function App() {
              <p className="text-slate-400 text-sm max-w-md mx-auto">
                {isConnected
                  ? `Speaking ${activeLanguage.name} — your AI tutor is listening. Speak clearly for best results.`
-                 : 'Choose a language below, then press Start Conversation to speak with your AI tutor.'}
+                 : 'Select a language, then press Start Conversation to practice speaking with your AI tutor.'}
              </p>
            </div>
         </div>

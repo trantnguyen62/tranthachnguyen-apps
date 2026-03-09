@@ -45,7 +45,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
   return (
     <div className="flex flex-col gap-4">
       <div role="group" aria-labelledby="lang-selector-label" className="flex flex-col gap-2">
-        <span id="lang-selector-label" className="text-sm font-medium text-slate-400">Target Language</span>
+        <span id="lang-selector-label" className="text-sm font-medium text-slate-400">Choose a Language</span>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
           {LANGUAGES.map((lang) => (
             <button

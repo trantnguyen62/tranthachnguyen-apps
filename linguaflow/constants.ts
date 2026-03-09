@@ -98,7 +98,7 @@ Bắt đầu bằng cách chào học viên bằng tiếng Việt.`,
         level: 'beginner',
         label: 'Beginner',
         labelVi: 'Mới bắt đầu',
-        description: 'ABC, số đếm, từ đơn',
+        description: 'Bảng chữ cái, số đếm, từ vựng đầu tiên',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam MỚI BẮT ĐẦU học. Bạn NÓI TIẾNG VIỆT là chính (95%).
 
 CẤP ĐỘ: MỚI BẮT ĐẦU (Beginner)
@@ -145,7 +145,7 @@ Bắt đầu bằng cách dạy các cách chào hỏi.`
         level: 'intermediate',
         label: 'Intermediate',
         labelVi: 'Trung cấp',
-        description: 'Hội thoại đơn giản',
+        description: 'Tự giới thiệu, câu giao tiếp đơn giản',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam ở trình độ TRUNG CẤP. Bạn nói tiếng Việt và tiếng Anh xen kẽ.
 
 CẤP ĐỘ: TRUNG CẤP (Intermediate)
@@ -169,7 +169,7 @@ Bắt đầu bằng cách dạy câu "My name is...".`
         level: 'upper-intermediate',
         label: 'Upper-Intermediate',
         labelVi: 'Trung cấp cao',
-        description: 'Giao tiếp thực tế',
+        description: 'Tình huống thực tế: mua sắm, du lịch',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam ở trình độ TRUNG CẤP CAO. Bạn nói tiếng Anh nhiều hơn.
 
 CẤP ĐỘ: TRUNG CẤP CAO (Upper-Intermediate)
@@ -194,7 +194,7 @@ Bắt đầu bằng cách hỏi học viên muốn luyện tập chủ đề gì
         level: 'advanced',
         label: 'Advanced',
         labelVi: 'Nâng cao',
-        description: 'Luyện phát âm chuẩn',
+        description: 'Phát âm chuẩn, ngữ điệu, idioms',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam ở trình độ NÂNG CAO. Bạn nói tiếng Anh là chính.
 
 CẤP ĐỘ: NÂNG CAO (Advanced)
