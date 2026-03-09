@@ -34,6 +34,15 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   const [score, setScore] = useState(0);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const questionRef = useRef<HTMLHeadingElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
+
+  useEffect(() => {
+    return () => {
+      currentSourceRef.current?.stop();
+      audioContextRef.current?.close();
+    };
+  }, []);
 
   // Move focus to question heading when question changes
   useEffect(() => {
@@ -68,24 +77,34 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   }, [currentQuestionIndex, questions.length]);
 
   const playAudio = useCallback(async () => {
-    let audioContext: AudioContext | null = null;
     try {
+      // Stop any currently playing audio
+      currentSourceRef.current?.stop();
+      currentSourceRef.current = null;
+
       setIsPlayingAudio(true);
       const audioBuffer = await generateSpeech(question.text);
-      audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const buffer = await audioContext.decodeAudioData(audioBuffer);
-      const source = audioContext.createBufferSource();
+
+      // Reuse audio context across calls
+      if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioContextRef.current;
+      if (ctx.state === 'suspended') await ctx.resume();
+
+      const buffer = await ctx.decodeAudioData(audioBuffer);
+      const source = ctx.createBufferSource();
+      currentSourceRef.current = source;
       source.buffer = buffer;
-      source.connect(audioContext.destination);
+      source.connect(ctx.destination);
       source.onended = () => {
         setIsPlayingAudio(false);
-        audioContext?.close();
+        currentSourceRef.current = null;
       };
       source.start();
     } catch (err) {
       console.error(err);
       setIsPlayingAudio(false);
-      audioContext?.close();
     }
   }, [question.text]);
 

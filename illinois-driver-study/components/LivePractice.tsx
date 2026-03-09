@@ -97,6 +97,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   // Update questions list when language changes, effectively resetting the session context conceptually
   // though the session itself needs manual restart to pick up new system instructions.
   const allQuestions = useMemo(() => getQuestions(language), [language]);
+  const questionsMap = useMemo(() => new Map(allQuestions.map(q => [q.id, q])), [allQuestions]);
 
   const stopSession = () => {
     if (streamRef.current) {

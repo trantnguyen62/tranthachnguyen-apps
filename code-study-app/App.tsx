@@ -191,10 +191,10 @@ function App() {
               role="tab"
               aria-selected={activeTab === 'files'}
               onClick={handleTabFiles}
-              className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 ${
+              className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 activeTab === 'files'
                   ? 'text-emerald-400 border-b-2 border-emerald-400'
-                  : 'text-slate-400 hover:text-slate-300'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/30'
               }`}
             >
               <FolderOpen className="w-4 h-4" aria-hidden="true" />
@@ -204,10 +204,10 @@ function App() {
               role="tab"
               aria-selected={activeTab === 'search'}
               onClick={handleTabSearch}
-              className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 ${
+              className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 activeTab === 'search'
                   ? 'text-emerald-400 border-b-2 border-emerald-400'
-                  : 'text-slate-400 hover:text-slate-300'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/30'
               }`}
             >
               <Search className="w-4 h-4" aria-hidden="true" />
@@ -269,7 +269,11 @@ function App() {
                     />
                   </>
                 ) : searchQuery && !isSearching ? (
-                  <p className="text-center text-slate-500 py-4">No results found</p>
+                  <div className="text-center text-slate-500 py-6 space-y-2">
+                    <Search className="w-6 h-6 mx-auto opacity-30" aria-hidden="true" />
+                    <p className="text-sm">No results found</p>
+                    <p className="text-xs text-slate-600">Try a different search term</p>
+                  </div>
                 ) : null}
               </div>
             )}
@@ -290,11 +294,13 @@ function App() {
             <ChevronLeft className={`w-5 h-5 transition-transform ${showSidebar ? '' : 'rotate-180'}`} aria-hidden="true" />
           </button>
           
-          {selectedFile && (
+          {selectedFile ? (
             <div className="flex items-center gap-2 text-sm">
               <Code2 className="w-4 h-4 text-emerald-400" />
               <span className="text-slate-300 code-font">{selectedFile.path}</span>
             </div>
+          ) : (
+            <span className="text-xs text-slate-600 italic">Select a file to begin</span>
           )}
 
           <div className="flex-1" />
@@ -383,7 +389,7 @@ function App() {
                     Connecting
                   </span>
                 ) : (
-                  <span className="text-xs text-slate-600">Ready</span>
+                  <span className="text-xs text-slate-400">Ready</span>
                 )}
               </div>
               <Visualizer volume={volume} isConnected={isConnected} color="#10B981" />

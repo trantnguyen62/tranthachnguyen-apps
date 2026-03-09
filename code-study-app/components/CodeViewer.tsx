@@ -72,8 +72,8 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
             <p className="text-base font-medium text-slate-400">No file selected</p>
             <p className="text-sm mt-1">Pick a file from the sidebar to view it here</p>
           </div>
-          <p className="text-xs text-slate-600 bg-slate-800/60 rounded-lg px-3 py-2 inline-block">
-            Tip: select code text to add it as AI context
+          <p className="text-xs text-slate-500 bg-slate-800/60 border border-slate-700/50 rounded-lg px-3 py-2 inline-block">
+            Tip: select any code text to add it as AI context
           </p>
         </div>
       </div>
