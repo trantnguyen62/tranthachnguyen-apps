@@ -65,7 +65,7 @@ function App() {
     fileCache.current.clear();
     if (selectedProject) {
       fetch(`${API_URL}/api/projects/${encodeURIComponent(selectedProject.path)}/tree`)
-        .then(res => res.json())
+        .then(res => { if (!res.ok) throw new Error(`Server returned ${res.status}`); return res.json(); })
         .then(data => setFileTree(data))
         .catch(err => console.error('Failed to load file tree:', err));
     } else {
@@ -125,8 +125,9 @@ function App() {
 
     setIsSearching(true);
     try {
-      const projectParam = selectedProject ? `&project=${selectedProject.path}` : '';
+      const projectParam = selectedProject ? `&project=${encodeURIComponent(selectedProject.path)}` : '';
       const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchQuery)}${projectParam}`);
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       setSearchResults(data);
     } catch (err) {

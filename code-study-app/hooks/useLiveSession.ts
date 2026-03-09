@@ -201,10 +201,10 @@ export const useLiveSession = (studyContext: StudyContext) => {
           onmessage: async (message: LiveServerMessage) => {
             if (message.serverContent?.outputTranscription) {
               const text = message.serverContent.outputTranscription.text;
-              currentOutputTranscriptionRef.current += text;
+              if (text) currentOutputTranscriptionRef.current += text;
             } else if (message.serverContent?.inputTranscription) {
               const text = message.serverContent.inputTranscription.text;
-              currentInputTranscriptionRef.current += text;
+              if (text) currentInputTranscriptionRef.current += text;
             }
 
             if (message.serverContent?.turnComplete) {
