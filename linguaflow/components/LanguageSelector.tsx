@@ -140,7 +140,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                       {levelConfig.level === 'advanced' && '🎯'}
                     </span>
                     <div>
-                      <div className="font-semibold text-sm">{levelConfig.labelVi}</div>
+                      <div className="font-semibold text-sm">{levelConfig.labelVi} · {levelConfig.label}</div>
                       <div className="text-xs opacity-70">{levelConfig.description}</div>
                     </div>
                   </div>

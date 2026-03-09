@@ -1,9 +1,9 @@
 import { LanguageConfig, VoiceOption, TopicOption } from './types';
 
 export const FEMALE_VOICES: VoiceOption[] = [
-  { id: 'Zephyr', name: 'Zephyr', gender: 'female', description: 'Rõ ràng, tự nhiên' },
-  { id: 'Kore', name: 'Kore', gender: 'female', description: 'Nhẹ nhàng, dịu dàng' },
-  { id: 'Aoede', name: 'Aoede', gender: 'female', description: 'Vui tươi, năng động' },
+  { id: 'Zephyr', name: 'Zephyr', gender: 'female', description: 'Rõ ràng, tự nhiên · Clear & natural' },
+  { id: 'Kore', name: 'Kore', gender: 'female', description: 'Nhẹ nhàng, dịu dàng · Soft & gentle' },
+  { id: 'Aoede', name: 'Aoede', gender: 'female', description: 'Vui tươi, năng động · Lively & expressive' },
 ];
 
 export const CONVERSATION_TOPICS: TopicOption[] = [
@@ -98,7 +98,7 @@ Bắt đầu bằng cách chào học viên bằng tiếng Việt.`,
         level: 'beginner',
         label: 'Beginner',
         labelVi: 'Mới bắt đầu',
-        description: 'Bảng chữ cái, số đếm, từ vựng đầu tiên',
+        description: 'Bảng chữ cái, số đếm, từ vựng đầu tiên · ABC, numbers, first words',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam MỚI BẮT ĐẦU học. Bạn NÓI TIẾNG VIỆT là chính (95%).
 
 CẤP ĐỘ: MỚI BẮT ĐẦU (Beginner)
@@ -121,7 +121,7 @@ Bắt đầu bằng cách chào và dạy chữ cái A, B, C.`
         level: 'elementary',
         label: 'Elementary',
         labelVi: 'Sơ cấp',
-        description: 'Chào hỏi, cảm ơn, xin lỗi',
+        description: 'Chào hỏi, cảm ơn, xin lỗi · Greetings, thanks, apologies',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam ở trình độ SƠ CẤP. Bạn NÓI TIẾNG VIỆT là chính (85%).
 
 CẤP ĐỘ: SƠ CẤP (Elementary)
@@ -145,7 +145,7 @@ Bắt đầu bằng cách dạy các cách chào hỏi.`
         level: 'intermediate',
         label: 'Intermediate',
         labelVi: 'Trung cấp',
-        description: 'Tự giới thiệu, câu giao tiếp đơn giản',
+        description: 'Tự giới thiệu, câu giao tiếp đơn giản · Introductions, basic conversations',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam ở trình độ TRUNG CẤP. Bạn nói tiếng Việt và tiếng Anh xen kẽ.
 
 CẤP ĐỘ: TRUNG CẤP (Intermediate)
@@ -169,7 +169,7 @@ Bắt đầu bằng cách dạy câu "My name is...".`
         level: 'upper-intermediate',
         label: 'Upper-Intermediate',
         labelVi: 'Trung cấp cao',
-        description: 'Tình huống thực tế: mua sắm, du lịch',
+        description: 'Tình huống thực tế: mua sắm, du lịch · Real-life: shopping, travel',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam ở trình độ TRUNG CẤP CAO. Bạn nói tiếng Anh nhiều hơn.
 
 CẤP ĐỘ: TRUNG CẤP CAO (Upper-Intermediate)
@@ -194,7 +194,7 @@ Bắt đầu bằng cách hỏi học viên muốn luyện tập chủ đề gì
         level: 'advanced',
         label: 'Advanced',
         labelVi: 'Nâng cao',
-        description: 'Phát âm chuẩn, ngữ điệu, idioms',
+        description: 'Phát âm chuẩn, ngữ điệu, idioms · Accent, intonation, idioms',
         systemInstruction: `Bạn là giáo viên tiếng Anh dạy cho người Việt Nam ở trình độ NÂNG CAO. Bạn nói tiếng Anh là chính.
 
 CẤP ĐỘ: NÂNG CAO (Advanced)

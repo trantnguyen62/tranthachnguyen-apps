@@ -154,7 +154,7 @@ function App() {
               <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
                 LinguaFlow
               </h1>
-              <p className="text-xs text-slate-400">Speak, listen, and learn with AI</p>
+              <p className="text-xs text-slate-400">AI voice tutor for real conversation practice</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -209,12 +209,12 @@ function App() {
                    <span role="img" aria-hidden="true">{activeLanguage.flag}</span>
                    <span>Listening...</span>
                  </>
-               ) : 'Start speaking, start learning'}
+               ) : 'Practice real conversations with AI'}
              </h2>
              <p className="text-slate-400 text-sm max-w-md mx-auto">
                {isConnected
-                 ? `Speaking ${activeLanguage.name} — your AI tutor is listening. Speak clearly for best results.`
-                 : 'Select a language, then press Start Conversation to practice speaking with your AI tutor.'}
+                 ? `Your AI tutor is listening. Speak naturally — mispronunciations will be corrected in real time.`
+                 : 'Choose a language below, then press Start Conversation. Your AI tutor will speak with you, correct your pronunciation, and help you improve.'}
              </p>
            </div>
         </div>
