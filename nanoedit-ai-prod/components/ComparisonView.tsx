@@ -3,7 +3,7 @@
  * Supports fullscreen mode, a loading overlay while a new edit is generating,
  * and video output when the processed result is a video MIME type.
  */
-import React, { useState, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Download, Maximize2, Minimize2, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
 
 interface ComparisonViewProps {
@@ -23,6 +23,16 @@ export const ComparisonView = memo<ComparisonViewProps>(({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isVideo = processedMimeType.startsWith('video/');
+
+  // Close fullscreen on Escape key press
+  useEffect(() => {
+    if (!isExpanded) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsExpanded(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isExpanded]);
 
   return (
     <div

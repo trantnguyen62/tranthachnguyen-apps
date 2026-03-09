@@ -117,7 +117,11 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
 
   const onDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(false);
+    // Only clear the drag state when leaving the dropzone entirely, not when
+    // moving between child elements inside it.
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsDragging(false);
+    }
   }, []);
 
   const onDrop = useCallback((e: React.DragEvent) => {
