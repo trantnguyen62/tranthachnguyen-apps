@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo, useMemo } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } from '@google/genai';
 import { Language, Question } from '../types';
 import { getQuestions } from '../data/questions';
@@ -96,7 +96,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
 
   // Update questions list when language changes, effectively resetting the session context conceptually
   // though the session itself needs manual restart to pick up new system instructions.
-  const allQuestions = getQuestions(language);
+  const allQuestions = useMemo(() => getQuestions(language), [language]);
 
   const stopSession = () => {
     if (streamRef.current) {

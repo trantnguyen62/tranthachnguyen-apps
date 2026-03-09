@@ -33,7 +33,7 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
 
       <div className="grid gap-4">
         {questions.map((q) => (
-          <div key={q.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+          <div key={q.id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow" style={{ contain: 'content' }}>
             <h3 className="font-bold text-lg text-slate-800 mb-4">
               <span className="text-slate-500 mr-2">#{q.id}.</span>
               {q.text}

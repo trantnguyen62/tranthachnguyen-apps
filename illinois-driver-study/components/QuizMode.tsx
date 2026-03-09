@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 import { getQuestions } from '../data/questions';
 import { generateSpeech } from '../services/gemini';
 import { Language } from '../types';
@@ -46,7 +46,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
     setShowResult(false);
   }, [language]);
 
-  const questions = getQuestions(language);
+  const questions = useMemo(() => getQuestions(language), [language]);
   const question = questions[currentQuestionIndex];
   const t = TRANSLATIONS[language];
 
