@@ -405,12 +405,9 @@ Remember to set your `GEMINI_API_KEY` in:
 
 ## Recommended Approach
 
-**For your use case, I recommend AWS Amplify** because:
-1. ✅ Easiest setup and deployment
-2. ✅ Automatic SSL certificates
-3. ✅ Built-in CI/CD from Git
-4. ✅ Automatic builds on code push
-5. ✅ Easy custom domain configuration
-6. ✅ Good for React/Vite apps
+**For this project, Cloudflare Tunnel is the recommended and current production setup** (see `LOCAL_SERVER_DEPLOYMENT.md`). It handles all three services (frontend, WebSocket proxy, API) behind a single domain with HTTPS — which is required for microphone access.
 
-For this project, **Cloudflare Tunnel** (see `LOCAL_SERVER_DEPLOYMENT.md`) is the current production setup.
+The AWS options above are available alternatives if you prefer cloud-managed infrastructure:
+- **Amplify**: Easiest for frontend-only hosting with CI/CD from Git
+- **S3 + CloudFront**: Cost-effective for static assets, low traffic
+- **EC2**: Full server control for running the Node.js backend services

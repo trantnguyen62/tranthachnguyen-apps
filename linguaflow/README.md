@@ -6,7 +6,7 @@ An AI-powered language learning partner that helps you practice conversation wit
 
 - **Voice Conversation** - Practice speaking with AI using WebSocket audio streaming
 - **Real-time Feedback** - Get instant corrections and suggestions
-- **Multiple Languages** - Practice various languages
+- **Multiple Languages** - Practice Spanish, French, German, Japanese, Vietnamese, and English; includes a dedicated Vietnamese-to-English bilingual course
 - **Natural Dialogue** - AI responds naturally like a conversation partner
 - **Progress Tracking** - Track your learning journey
 - **Transcription** - See what you and the AI are saying
