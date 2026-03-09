@@ -198,8 +198,6 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
             processorRef.current = scriptProcessor;
             
             scriptProcessor.onaudioprocess = (e) => {
-              if (!isActive) return;
-              
               const inputData = e.inputBuffer.getChannelData(0);
               
               let sum = 0;

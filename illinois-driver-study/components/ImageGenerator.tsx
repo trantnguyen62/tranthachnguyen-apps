@@ -6,7 +6,7 @@ interface ImageGeneratorProps {
   language: Language;
 }
 
-const translations = {
+const TRANSLATIONS = {
   en: {
     title: "Visual Aid Generator",
     desc: "Create custom visual scenarios to help you understand driving rules better.",
@@ -36,7 +36,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const t = translations[language];
+  const t = TRANSLATIONS[language];
 
   const handleGenerate = async () => {
     if (!prompt) return;

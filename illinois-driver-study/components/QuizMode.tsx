@@ -68,22 +68,24 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   }, [currentQuestionIndex, questions.length]);
 
   const playAudio = useCallback(async () => {
+    let audioContext: AudioContext | null = null;
     try {
       setIsPlayingAudio(true);
       const audioBuffer = await generateSpeech(question.text);
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const buffer = await audioContext.decodeAudioData(audioBuffer);
       const source = audioContext.createBufferSource();
       source.buffer = buffer;
       source.connect(audioContext.destination);
       source.onended = () => {
         setIsPlayingAudio(false);
-        audioContext.close();
+        audioContext?.close();
       };
       source.start();
     } catch (err) {
       console.error(err);
       setIsPlayingAudio(false);
+      audioContext?.close();
     }
   }, [question.text]);
 
