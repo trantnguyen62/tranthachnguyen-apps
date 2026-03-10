@@ -21,6 +21,7 @@ function Bookmarks() {
     const fetchBookmarks = async () => {
       try {
         const res = await fetch('/api/bookmarks');
+        if (!res.ok) return;
         const data = await res.json();
         setBookmarks(data);
       } catch (error) {

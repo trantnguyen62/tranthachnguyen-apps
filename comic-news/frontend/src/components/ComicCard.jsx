@@ -16,6 +16,7 @@ function ComicCard({ comic }) {
             src={comic.coverImage}
             alt={comic.title}
             onLoad={() => setImgLoaded(true)}
+            onError={() => setImgLoaded(true)}
             loading="lazy"
             decoding="async"
             className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}

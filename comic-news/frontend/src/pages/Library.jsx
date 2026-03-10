@@ -63,6 +63,7 @@ function Library() {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchComics = async () => {
       setLoading(true);
       try {
@@ -71,16 +72,18 @@ function Library() {
         if (sortBy) params.append('sort', sortBy);
         if (searchQuery) params.append('search', searchQuery);
 
-        const res = await fetch(`/api/comics?${params.toString()}`);
+        const res = await fetch(`/api/comics?${params.toString()}`, { signal: controller.signal });
+        if (!res.ok) return;
         const data = await res.json();
         setComics(data);
       } catch (error) {
-        console.error('Error fetching comics:', error);
+        if (error.name !== 'AbortError') console.error('Error fetching comics:', error);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
     fetchComics();
+    return () => controller.abort();
   }, [selectedGenre, sortBy, searchQuery]);
 
   return (

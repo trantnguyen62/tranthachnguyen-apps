@@ -51,6 +51,7 @@ function Home() {
           fetch('/api/featured'),
           fetch('/api/comics?sort=rating')
         ]);
+        if (!featuredRes.ok || !comicsRes.ok) return;
         const featuredData = await featuredRes.json();
         const comicsData = await comicsRes.json();
         setFeatured(featuredData);
