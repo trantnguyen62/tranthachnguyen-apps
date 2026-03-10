@@ -208,6 +208,8 @@ let readingProgress = {};
 // Precomputed static data
 const genreList = ['All', ...new Set(comics.map(c => c.genre))];
 const comicsListDefault = comics.map(({ pages, ...comic }) => comic);
+const comicsSortedByRating = [...comicsListDefault].sort((a, b) => b.rating - a.rating);
+const comicsSortedByTitle = [...comicsListDefault].sort((a, b) => a.title.localeCompare(b.title));
 const featuredComics = [...comics]
   .sort((a, b) => b.rating - a.rating)
   .slice(0, 4)
@@ -229,8 +231,10 @@ app.get('/api/comics', (req, res) => {
   res.set('Cache-Control', 'public, max-age=60');
   const { genre, search, sort } = req.query;
 
-  // Fast path: no filters applied
-  if (!genre && !search && !sort) {
+  // Fast path: no filters applied — serve precomputed results
+  if (!genre && !search) {
+    if (!sort || sort === 'rating') return res.json(comicsSortedByRating);
+    if (sort === 'title') return res.json(comicsSortedByTitle);
     return res.json(comicsListDefault);
   }
 

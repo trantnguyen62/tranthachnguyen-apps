@@ -4,6 +4,8 @@ import { Filter, SortAsc, SearchX } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 import SkeletonCard from '../components/SkeletonCard';
 
+let cachedGenres = null;
+
 function Library() {
   const [searchParams] = useSearchParams();
   const [comics, setComics] = useState([]);
@@ -42,10 +44,15 @@ function Library() {
   }, []);
 
   useEffect(() => {
+    if (cachedGenres) {
+      setGenres(cachedGenres);
+      return;
+    }
     const fetchGenres = async () => {
       try {
         const res = await fetch('/api/genres');
         const data = await res.json();
+        cachedGenres = data;
         setGenres(data);
       } catch (error) {
         console.error('Error fetching genres:', error);

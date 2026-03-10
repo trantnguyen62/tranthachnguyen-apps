@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Star, BookOpen } from 'lucide-react';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 function ComicCard({ comic }) {
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -56,4 +56,4 @@ function ComicCard({ comic }) {
   );
 }
 
-export default ComicCard;
+export default memo(ComicCard);
