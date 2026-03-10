@@ -1,3 +1,4 @@
+import compression from 'compression';
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
@@ -10,6 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 5187;
 
 const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://comic-news.tranthachnguyen.com';
+app.use(compression());
 app.use(cors({ origin: allowedOrigin, optionsSuccessStatus: 200 }));
 app.use(express.json({ limit: '10kb' }));
 
@@ -26,7 +28,16 @@ app.use((req, res, next) => {
 app.use('/images', express.static(join(__dirname, 'images'), { maxAge: '7d' }));
 
 // Serve static frontend (for Docker deployment)
-app.use(express.static(join(__dirname, 'dist'), { maxAge: '1h', index: false }));
+// Vite hashes JS/CSS filenames, so they can be cached immutably for 1 year
+app.use(express.static(join(__dirname, 'dist'), {
+  maxAge: '1h',
+  index: false,
+  setHeaders: (res, filePath) => {
+    if (/\.(js|css)$/.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
+}));
 
 // Comic data
 const comics = [
@@ -196,6 +207,7 @@ let readingProgress = {};
 
 // Precomputed static data
 const genreList = ['All', ...new Set(comics.map(c => c.genre))];
+const comicsListDefault = comics.map(({ pages, ...comic }) => comic);
 const featuredComics = [...comics]
   .sort((a, b) => b.rating - a.rating)
   .slice(0, 4)
@@ -216,15 +228,18 @@ ${comics.map(c =>
 app.get('/api/comics', (req, res) => {
   res.set('Cache-Control', 'public, max-age=60');
   const { genre, search, sort } = req.query;
-  let result = [...comics];
 
-  if (genre && genre !== 'All') {
-    result = result.filter(comic => comic.genre === genre);
+  // Fast path: no filters applied
+  if (!genre && !search && !sort) {
+    return res.json(comicsListDefault);
   }
 
+  let result = genre && genre !== 'All'
+    ? comics.filter(comic => comic.genre === genre)
+    : [...comics];
+
   if (search) {
-    const searchTrimmed = String(search).slice(0, 100);
-    const searchLower = searchTrimmed.toLowerCase();
+    const searchLower = String(search).slice(0, 100).toLowerCase();
     result = result.filter(comic =>
       comic.title.toLowerCase().includes(searchLower) ||
       comic.author.toLowerCase().includes(searchLower)
