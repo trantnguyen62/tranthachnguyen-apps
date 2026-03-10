@@ -299,9 +299,16 @@ function App() {
           </button>
           
           {selectedFile ? (
-            <div className="flex items-center gap-2 text-sm">
-              <Code2 className="w-4 h-4 text-emerald-400" />
-              <span className="text-slate-300 code-font">{selectedFile.path}</span>
+            <div className="flex items-center gap-1.5 text-sm min-w-0">
+              <Code2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <div className="flex items-center min-w-0 code-font">
+                {selectedFile.path.includes('/') && (
+                  <span className="text-slate-500 truncate text-xs hidden sm:block">
+                    {selectedFile.path.split('/').slice(0, -1).join('/')}/
+                  </span>
+                )}
+                <span className="text-slate-200 font-medium flex-shrink-0 text-sm">{selectedFile.name}</span>
+              </div>
             </div>
           ) : (
             <span className="text-xs text-slate-600 italic">Select a file to begin</span>

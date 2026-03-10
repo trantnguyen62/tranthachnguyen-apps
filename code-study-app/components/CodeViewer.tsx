@@ -2,6 +2,20 @@ import { useState, useCallback, memo, useMemo, useRef, useEffect } from 'react';
 import { FileNode } from '../types';
 import { Copy, Check, Code2 } from 'lucide-react';
 
+const LANG_COLORS: Record<string, string> = {
+  typescript: 'bg-blue-500/20 text-blue-400',
+  javascript: 'bg-yellow-500/20 text-yellow-400',
+  python: 'bg-green-500/20 text-green-400',
+  html: 'bg-orange-500/20 text-orange-400',
+  css: 'bg-pink-500/20 text-pink-400',
+  json: 'bg-amber-500/20 text-amber-400',
+  markdown: 'bg-slate-500/30 text-slate-300',
+  shell: 'bg-green-500/20 text-green-400',
+  yaml: 'bg-purple-500/20 text-purple-400',
+  rust: 'bg-orange-600/20 text-orange-400',
+  go: 'bg-cyan-500/20 text-cyan-400',
+};
+
 interface CodeViewerProps {
   file: FileNode | null;
   onCodeSelect?: (code: string) => void;
@@ -86,7 +100,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
       <div className="flex items-center justify-between px-4 py-2 bg-slate-700/50 border-b border-slate-600/50">
         <div className="flex items-center gap-2">
           <span className="text-sm text-slate-300 code-font">{file.path}</span>
-          <span className="text-xs px-2 py-0.5 bg-slate-600/50 rounded text-slate-400">
+          <span className={`text-xs px-2 py-0.5 rounded font-medium ${LANG_COLORS[file.language] || 'bg-slate-600/50 text-slate-400'}`}>
             {file.language}
           </span>
           <span className="text-xs text-slate-500">{lines.length} lines</span>
