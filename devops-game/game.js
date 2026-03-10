@@ -814,20 +814,31 @@ function render() {
 
     // Draw stars (keep them as they add nice depth over the background)
     ctx.fillStyle = '#ffffff';
+    ctx.globalAlpha = 0.7;
     game.stars.forEach(star => {
-        ctx.globalAlpha = 0.3 + star.size / 3;
         const d = star.size * 2;
         ctx.fillRect(star.x - star.size, star.y - star.size, d, d);
     });
     ctx.globalAlpha = 1.0;
 
-    // Draw particles
-    game.particles.forEach(p => {
-        ctx.fillStyle = `rgba(${p.color}, ${p.life})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-        ctx.fill();
-    });
+    // Draw particles, batched by color to reduce fillStyle changes per frame
+    if (game.particles.length > 0) {
+        const colorGroups = {};
+        for (const p of game.particles) {
+            if (!colorGroups[p.color]) colorGroups[p.color] = [];
+            colorGroups[p.color].push(p);
+        }
+        for (const [color, group] of Object.entries(colorGroups)) {
+            ctx.fillStyle = `rgb(${color})`;
+            for (const p of group) {
+                ctx.globalAlpha = p.life;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        ctx.globalAlpha = 1.0;
+    }
 
     // Draw powerups
     game.powerups.forEach(p => {
@@ -1005,6 +1016,7 @@ function showQuestion(enemy) {
     game.questionActive = true;
     game.questionTimer = CONFIG.QUESTION_TIME;
     game.selectedAnswer = -1;
+    game._lastTimerWidth = 101; // force first timer update
 
     // Show question panel
     domCache.questionPanel.classList.remove('hidden');
@@ -1406,7 +1418,10 @@ function updateHUD() {
 
 function updateTimerDisplay() {
     const pct = game.questionTimer / CONFIG.QUESTION_TIME;
-    domCache.timerFill.style.width = `${pct * 100}%`;
+    const w = Math.round(pct * 100);
+    if (w === game._lastTimerWidth) return;
+    game._lastTimerWidth = w;
+    domCache.timerFill.style.width = `${w}%`;
     domCache.timerFill.classList.toggle('timer-danger', pct < 0.3);
 }
 
