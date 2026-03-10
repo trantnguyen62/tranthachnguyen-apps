@@ -1,9 +1,9 @@
 import { LanguageConfig, VoiceOption, TopicOption } from './types';
 
 export const FEMALE_VOICES: VoiceOption[] = [
-  { id: 'Zephyr', name: 'Zephyr', gender: 'female', description: 'Rõ ràng, tự nhiên · Clear & natural' },
-  { id: 'Kore', name: 'Kore', gender: 'female', description: 'Nhẹ nhàng, dịu dàng · Soft & gentle' },
-  { id: 'Aoede', name: 'Aoede', gender: 'female', description: 'Vui tươi, năng động · Lively & expressive' },
+  { id: 'Zephyr', name: 'Zephyr', gender: 'female', description: 'Rõ ràng, tự nhiên • Clear & natural' },
+  { id: 'Kore', name: 'Kore', gender: 'female', description: 'Nhẹ nhàng, dịu dàng • Soft & gentle' },
+  { id: 'Aoede', name: 'Aoede', gender: 'female', description: 'Vui tươi, năng động • Lively & expressive' },
 ];
 
 export const CONVERSATION_TOPICS: TopicOption[] = [

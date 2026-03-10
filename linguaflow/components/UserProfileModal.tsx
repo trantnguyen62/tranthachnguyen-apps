@@ -131,7 +131,7 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
           </h2>
           <p className="text-blue-100 text-sm mt-1">
             {existingProfile 
-              ? 'Chúng tôi nhớ bạn rồi!' 
+              ? 'Tiến độ của bạn đã được lưu lại. Hãy tiếp tục!'
               : 'Hãy cho tôi biết tên của bạn để bắt đầu học'}
           </p>
         </div>
@@ -232,7 +232,7 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
               </div>
 
               <p className="text-xs text-slate-400">
-                💡 Tên của bạn sẽ được lưu lại để giáo viên có thể nhớ bạn và theo dõi tiến độ học.
+                💡 Tên của bạn sẽ được lưu để giáo viên cá nhân hóa bài học và theo dõi tiến độ.
               </p>
 
               <div className="flex gap-3">

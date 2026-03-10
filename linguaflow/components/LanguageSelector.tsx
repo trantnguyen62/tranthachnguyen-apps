@@ -173,7 +173,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                   `}
                 >
                   <span className="text-base" aria-hidden="true">{topic.icon}</span>
-                  <span className="text-sm">{topic.labelVi}</span>
+                  <span className="text-sm">{topic.labelVi} · {topic.labelEn}</span>
                 </button>
               );
             })}

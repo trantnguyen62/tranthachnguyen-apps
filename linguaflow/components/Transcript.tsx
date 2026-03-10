@@ -18,8 +18,8 @@ const Transcript = memo<Props>(({ messages }) => {
         <svg className="w-8 h-8 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
         </svg>
-        <p className="text-sm">No messages yet.</p>
-        <p className="text-xs text-slate-600">Press Start Conversation and speak — your dialogue will appear here in real time.</p>
+        <p className="text-sm">Your conversation will appear here.</p>
+        <p className="text-xs text-slate-600">Start a conversation and speak — your dialogue will show up in real time.</p>
       </div>
     );
   }
