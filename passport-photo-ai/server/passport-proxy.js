@@ -195,7 +195,3 @@ app.get(/(.*)/, (req, res) => {
 });
 
 app.listen(5185, () => console.log('API on port 5185, Key:', process.env.GEMINI_API_KEY ? 'Yes' : 'No'));
-
-
-
-
