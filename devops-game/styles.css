@@ -68,6 +68,15 @@ body {
     display: none;
 }
 
+@keyframes screenFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.screen:not(.hidden) {
+    animation: screenFadeIn 0.25s ease;
+}
+
 /* =====================================================
    Animated Star Background (Nano Grid)
    ===================================================== */
@@ -401,6 +410,14 @@ body {
     margin-top: 0.5rem;
 }
 
+.multiplier {
+    color: var(--nano-yellow);
+    font-weight: 900;
+    text-shadow: 0 0 10px var(--nano-yellow-glow);
+    margin-left: 0.4rem;
+    transition: transform 0.15s ease, text-shadow 0.15s ease;
+}
+
 /* Game Menu Button (Outside HUD for clickability) */
 .game-menu-btn {
     position: fixed;
@@ -479,6 +496,21 @@ body {
     display: none;
 }
 
+@keyframes panelSlideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.question-panel:not(.hidden) {
+    animation: panelSlideUp 0.22s ease;
+}
+
 .question-topic {
     color: var(--nano-cyan);
     font-size: 0.9rem;
@@ -546,6 +578,13 @@ body {
     font-weight: bold;
     font-size: 0.8rem;
     clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 20%);
+}
+
+.answer-btn.selected {
+    background: rgba(255, 215, 0, 0.12);
+    border-color: var(--nano-yellow);
+    color: var(--nano-yellow);
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.25);
 }
 
 .answer-btn.correct {
@@ -730,6 +769,17 @@ body {
     margin-bottom: 0.25rem;
 }
 
+@keyframes overlayEntrance {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
 .pause-menu,
 .game-over,
 .level-complete {
@@ -737,14 +787,20 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(5, 5, 10, 0.95);
+    background: rgba(5, 5, 10, 0.97);
     border: 2px solid var(--nano-yellow);
-    box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 0 60px rgba(255, 215, 0, 0.35), 0 0 0 1000px rgba(0, 0, 0, 0.45);
     padding: 3rem;
     text-align: center;
     color: #fff;
     min-width: 400px;
     z-index: 100;
+}
+
+.pause-menu:not(.hidden),
+.game-over:not(.hidden),
+.level-complete:not(.hidden) {
+    animation: overlayEntrance 0.2s ease;
 }
 
 .game-over-title {
@@ -799,6 +855,14 @@ body {
     }
 
     .timer-fill.timer-danger {
+        animation: none;
+    }
+
+    .screen:not(.hidden),
+    .question-panel:not(.hidden),
+    .pause-menu:not(.hidden),
+    .game-over:not(.hidden),
+    .level-complete:not(.hidden) {
         animation: none;
     }
 
