@@ -72,9 +72,11 @@ nanoedit-ai-prod/
 ├── App.tsx             # Main React component
 ├── index.html          # Entry HTML file
 ├── index.tsx           # React entry point
-├── components/         # UI components
-├── services/           # Gemini API service
-├── server/             # Proxy server for API calls
+├── index.css           # Global styles (Tailwind)
+├── types.ts            # Shared TypeScript types (ProcessedImage, AppStatus)
+├── components/         # UI components (ImageUploader, ComparisonView, Button)
+├── services/           # Gemini proxy service (geminiService.ts)
+├── server/             # Express proxy server (proxy.js)
 └── Dockerfile*         # Docker configurations
 ```
 
@@ -82,16 +84,24 @@ nanoedit-ai-prod/
 
 - **Frontend**: React, TypeScript, Vite
 - **Backend**: Node.js, Express
-- **AI**: Google Gemini API (Image Generation/Editing)
+- **AI**: Google Gemini (via [gemini-web-proxy](https://github.com/tranthachnguyen/gemini-web-proxy) — Puppeteer automation, no paid API key required)
 - **Styling**: Tailwind CSS
 
 ## 💡 Usage
 
 1. Upload an image (drag & drop, file picker, or camera)
 2. Describe your desired edit (e.g., "Remove the person in the background")
-3. Press **Enter** or click **Generate** to apply the AI edit
+3. Press **Enter** or click **Generate** to apply the AI edit (`Shift+Enter` for a newline)
 4. Use undo/redo to navigate your edit history
 5. Preview before/after, then download your result
+
+### Proxy Server Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/gemini/edit-image` | Edit an image with a text prompt |
+| `GET` | `/api/status` | Check connectivity to gemini-web-proxy |
+| `GET` | `/health` | Proxy server health check |
 
 ## 🌐 Live Demo
 
