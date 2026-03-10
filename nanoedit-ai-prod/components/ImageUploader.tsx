@@ -17,11 +17,45 @@ interface ImageUploaderProps {
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_DIMENSION = 2048; // Max px on longest side before compressing
+
+/** Resize + compress an image file using canvas, capping the longest side at MAX_DIMENSION. */
+const compressImage = (file: File): Promise<{ data: string; mimeType: string }> =>
+  new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let { width, height } = img;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        if (width >= height) {
+          height = Math.round((height * MAX_DIMENSION) / width);
+          width = MAX_DIMENSION;
+        } else {
+          width = Math.round((width * MAX_DIMENSION) / height);
+          height = MAX_DIMENSION;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('Canvas unavailable')); return; }
+      ctx.drawImage(img, 0, 0, width, height);
+      const outMime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+      const data = outMime === 'image/jpeg'
+        ? canvas.toDataURL('image/jpeg', 0.85)
+        : canvas.toDataURL('image/png');
+      resolve({ data, mimeType: outMime });
+    };
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('Failed to load image')); };
+    img.src = objectUrl;
+  });
 
 export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, currentImage, isProcessing = false }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -43,7 +77,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
     }
   }, [isCameraOpen, stream]);
 
-  const handleFile = useCallback((file: File) => {
+  const handleFile = useCallback(async (file: File) => {
     setError(null);
     if (!file.type.startsWith('image/')) {
       setError("Please upload a valid image file (PNG, JPEG, WebP).");
@@ -55,18 +89,12 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = e.target?.result as string;
-      onImageSelected({
-        data,
-        mimeType: file.type
-      });
-    };
-    reader.onerror = () => {
+    try {
+      const { data, mimeType } = await compressImage(file);
+      onImageSelected({ data, mimeType });
+    } catch {
       setError("Failed to read file.");
-    };
-    reader.readAsDataURL(file);
+    }
   }, [onImageSelected]);
 
   const startCamera = useCallback(async () => {

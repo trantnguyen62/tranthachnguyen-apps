@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2, Scissors, Sun, PenLine, Zap, Film, X, CheckCircle2 } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { Button } from './components/Button';
@@ -54,10 +54,16 @@ const App: React.FC = () => {
   }, []);
 
   // Derived state
-  const currentImage = history[historyIndex] || null;
-  const originalImage = history[0] || null;
-  const canUndo = historyIndex > 0 && status !== AppStatus.PROCESSING;
-  const canRedo = historyIndex < history.length - 1 && status !== AppStatus.PROCESSING;
+  const currentImage = history[historyIndex] ?? null;
+  const originalImage = history[0] ?? null;
+  const canUndo = useMemo(
+    () => historyIndex > 0 && status !== AppStatus.PROCESSING,
+    [historyIndex, status]
+  );
+  const canRedo = useMemo(
+    () => historyIndex < history.length - 1 && status !== AppStatus.PROCESSING,
+    [historyIndex, history.length, status]
+  );
 
   /** Resets history to a single entry when a new image is selected, or clears state when removed. */
   const handleImageSelected = useCallback((image: ProcessedImage | null) => {

@@ -46,8 +46,7 @@ app.post('/api/gemini/edit-image', async (req, res) => {
 
     // base64Image is now optional - gemini-web-proxy uses text-only generation
 
-    console.log(`[edit-image] Routing to gemini-web-proxy...`);
-    console.log(`[edit-image] Prompt: ${prompt.substring(0, 100)}...`);
+    console.log(`[edit-image] prompt="${prompt.substring(0, 80)}"`);
 
     // Call the gemini-web-proxy /api/edit-image endpoint
     const upstreamController = new AbortController();
