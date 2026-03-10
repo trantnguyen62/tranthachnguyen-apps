@@ -139,7 +139,7 @@ const App: React.FC = () => {
     document.body.removeChild(link);
     setDownloadSuccess(true);
     if (downloadTimerRef.current !== null) clearTimeout(downloadTimerRef.current);
-    downloadTimerRef.current = setTimeout(() => setDownloadSuccess(false), 2500);
+    downloadTimerRef.current = setTimeout(() => setDownloadSuccess(false), 3500);
   }, [currentImage]);
 
   const handlePresetClick = useCallback((text: string) => {
@@ -237,26 +237,26 @@ const App: React.FC = () => {
                   </div>
 
                   {/* History Controls */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0.5">
                     <button
                       onClick={handleUndo}
                       disabled={!canUndo}
-                      className="p-2 rounded-md hover:bg-slate-100 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                      title="Undo"
+                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                      title="Undo (go back one version)"
                       aria-label="Undo"
                     >
                       <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
                     {history.length > 1 && (
-                      <span className="text-xs text-slate-400 select-none" aria-label={`Step ${historyIndex + 1} of ${history.length}`}>
-                        {historyIndex + 1} of {history.length}
+                      <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full select-none mx-0.5" aria-label={`Version ${historyIndex + 1} of ${history.length}`}>
+                        {historyIndex + 1}/{history.length}
                       </span>
                     )}
                     <button
                       onClick={handleRedo}
                       disabled={!canRedo}
-                      className="p-2 rounded-md hover:bg-slate-100 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                      title="Redo"
+                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                      title="Redo (go forward one version)"
                       aria-label="Redo"
                     >
                       <RotateCw className="w-4 h-4" aria-hidden="true" />
@@ -272,9 +272,7 @@ const App: React.FC = () => {
                       aria-label="Describe the image changes you want"
                       aria-describedby="prompt-hint"
                       onKeyDown={handleKeyDown}
-                      placeholder={historyIndex === 0
-                        ? "E.g., 'Remove the person in the background' or 'Make it look vintage'"
-                        : "Describe the next change..."}
+                      placeholder="E.g., 'Remove the background' or 'Make it look vintage'"
                       className="w-full p-4 pr-10 text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent rounded-lg text-base"
                       rows={3}
                     />
@@ -362,6 +360,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleGenerate}
                       disabled={!prompt.trim()}
+                      title={!prompt.trim() ? "Enter a prompt above to retry" : undefined}
                       className="flex-shrink-0 text-xs font-medium px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Retry

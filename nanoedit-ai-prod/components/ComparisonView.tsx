@@ -130,7 +130,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" role="status" aria-live="polite">
                    <Loader2 className="w-8 h-8 text-brand-600 animate-spin" aria-hidden="true" />
                    <span className="text-xs font-medium text-slate-600 bg-white/80 px-3 py-1 rounded-full backdrop-blur-sm">
-                     Generating new edit…
+                     Generating your edit…
                    </span>
                  </div>
                )}

@@ -71,7 +71,11 @@ export default function App() {
       </div>
 
       {showEditor && image && (
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
+            <div style={{ width: 20, height: 20, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+          </div>
+        }>
           <PhotoEditor
             image={image}
             onSave={handleEditorSave}
@@ -118,8 +122,8 @@ export default function App() {
 
         {/* Main Content */}
         <main id="main-content" style={{
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', 
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))',
           gap: 32,
           alignItems: 'start'
         }}>
@@ -187,7 +191,7 @@ export default function App() {
                     Checking...
                   </>
                 ) : (
-                  <><span aria-hidden="true">🔍</span> Check Photo</>
+                  <><span aria-hidden="true">🔍</span> {result ? 'Re-check Photo' : 'Check Photo'}</>
                 )}
               </button>
             </div>
@@ -221,7 +225,7 @@ export default function App() {
                     <div key={i} style={{ height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.03)', width: `${w * 100}%`, animation: `pulse 1.5s ease-in-out ${0.4 + i * 0.2}s infinite` }} />
                   ))}
                 </div>
-                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.25)', marginTop: 16 }}>
+                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 16 }}>
                   Analyzing · usually under 15 seconds
                 </p>
               </div>
@@ -361,20 +365,27 @@ export default function App() {
                   fontSize: 64, marginBottom: 16, opacity: 0.3,
                   filter: 'grayscale(100%)'
                 }}>🪪</div>
-                <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20 }}>
-                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Check Photo</strong> — catch compliance issues before submitting your passport or visa application
+                <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.4)' }}>
+                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to catch compliance issues before submitting your passport or visa application.
                 </p>
                 <div style={{ textAlign: 'left' }}>
-                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.2)', marginBottom: 8, fontWeight: 600 }}>
+                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: 10, fontWeight: 600 }}>
                     What we check
                   </p>
-                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.25)', lineHeight: 2.1 }}>
-                    <li>✓ Face centered, 70–80% of frame height</li>
-                    <li>✓ Neutral expression, eyes open &amp; visible</li>
-                    <li>✓ Plain white or off-white background</li>
-                    <li>✓ Even lighting, no harsh shadows on face</li>
-                    <li>✓ Sharp focus, sufficient resolution</li>
-                    <li>✓ No glasses or lens reflections</li>
+                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1 }}>
+                    {[
+                      'Face centered, 70–80% of frame height',
+                      'Neutral expression, eyes open & visible',
+                      'Plain white or off-white background',
+                      'Even lighting, no harsh shadows on face',
+                      'Sharp focus, sufficient resolution',
+                      'No glasses or lens reflections',
+                    ].map((item, i) => (
+                      <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                        <span style={{ flexShrink: 0, width: 16, height: 16, borderRadius: '50%', background: `${accentGold}18`, border: `1px solid ${accentGold}44`, color: accentGold, fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>
+                        {item}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
