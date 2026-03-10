@@ -77,8 +77,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
       setStream(mediaStream);
       setIsCameraOpen(true);
       setError(null);
-    } catch (err) {
-      console.error("Camera access error:", err);
+    } catch {
       setError("Unable to access camera. Please allow camera permissions.");
     }
   }, []);

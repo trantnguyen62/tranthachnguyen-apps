@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef, memo } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2, Scissors, Sun, PenLine, Zap, Film, X, CheckCircle2 } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { Button } from './components/Button';
@@ -321,11 +321,11 @@ const App: React.FC = () => {
                   </button>
 
                   <div className="flex flex-wrap gap-2">
-                    {PRESET_PROMPTS.map(({ text, Icon }, i) => {
+                    {PRESET_PROMPTS.map(({ text, Icon }) => {
                       const isActive = prompt === text;
                       return (
                         <button
-                          key={i}
+                          key={text}
                           onClick={() => handlePresetClick(text)}
                           aria-pressed={isActive}
                           className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border rounded-full transition-colors ${isActive ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200'}`}

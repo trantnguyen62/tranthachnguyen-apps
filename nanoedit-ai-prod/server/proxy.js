@@ -70,6 +70,10 @@ app.post('/api/gemini/edit-image', async (req, res) => {
       clearTimeout(upstreamTimeout);
     }
 
+    if (!response) {
+      return res.status(500).json({ error: 'Upstream request timed out' });
+    }
+
     const data = await response.json();
 
     if (!response.ok || !data.success) {
@@ -121,7 +125,7 @@ app.post('/api/gemini/edit-image', async (req, res) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error('[edit-image] Error:', message);
-    res.status(500).json({ error: message });
+    return res.status(500).json({ error: message });
   }
 });
 
