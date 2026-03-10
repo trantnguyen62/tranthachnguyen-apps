@@ -19,6 +19,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   const streamRef = useRef<MediaStream | null>(null);
 
   const [isDragging, setIsDragging] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
   const [cameraMode, setCameraMode] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
@@ -224,11 +225,13 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
         style={{
-          border: isDragging ? `2px dashed ${accentGold}` : '2px dashed rgba(255,255,255,0.15)',
+          border: isDragging ? `2px dashed ${accentGold}` : isHovering ? `2px dashed ${accentPink}88` : '2px dashed rgba(255,255,255,0.15)',
           borderRadius: 20, padding: '48px 20px',
           textAlign: 'center', cursor: 'pointer',
-          background: isDragging ? `${accentGold}08` : 'rgba(255,255,255,0.02)',
+          background: isDragging ? `${accentGold}08` : isHovering ? `${accentPink}06` : 'rgba(255,255,255,0.02)',
           transition: 'all 0.3s ease',
         }}
       >

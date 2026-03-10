@@ -205,7 +205,21 @@ export default function App() {
             </div>
             
             <div aria-live="polite" aria-atomic="true">
-            {status === AppStatus.ERROR ? (
+            {status === AppStatus.CHECKING ? (
+              <div style={{ height: 350, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16, padding: '0 4px' }} aria-label="Analyzing photo…">
+                <div style={{ height: 72, borderRadius: 16, background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[1, 0.75, 0.55].map((w, i) => (
+                    <div key={i} style={{ height: 14, borderRadius: 7, background: 'rgba(255,255,255,0.04)', width: `${w * 100}%`, animation: `pulse 1.5s ease-in-out ${i * 0.2}s infinite` }} />
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+                  {[1, 0.85].map((w, i) => (
+                    <div key={i} style={{ height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.03)', width: `${w * 100}%`, animation: `pulse 1.5s ease-in-out ${0.4 + i * 0.2}s infinite` }} />
+                  ))}
+                </div>
+              </div>
+            ) : status === AppStatus.ERROR ? (
               <div style={{
                 height: 350,
                 display: 'flex', flexDirection: 'column',
@@ -214,9 +228,23 @@ export default function App() {
               }}>
                 <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
                 <p style={{ color: accentPink, fontWeight: 600, marginBottom: 8 }}>Analysis failed</p>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', maxWidth: 220 }}>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', maxWidth: 220, marginBottom: 20 }}>
                   Check your connection and try again. If the issue persists, try a smaller image.
                 </p>
+                <button
+                  onClick={handleCheck}
+                  disabled={!image}
+                  style={{
+                    padding: '10px 24px', borderRadius: 12,
+                    border: `1px solid ${accentPink}44`,
+                    background: `${accentPink}18`,
+                    color: accentPink, fontWeight: 600, cursor: 'pointer',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: 13, transition: 'all 0.2s ease'
+                  }}
+                >
+                  Try Again
+                </button>
               </div>
             ) : result ? (
               <div style={{ animation: 'fadeSlideIn 0.5s ease' }}>
