@@ -28,9 +28,9 @@ const CONFIG = {
 // DevOps Questions Database
 const QUESTIONS = {
     docker: [
-        { q: "What command creates a new container from an image?", a: ["docker run", "docker start", "docker create", "docker build"], c: 0 },
+        { q: "What command creates AND starts a container from an image?", a: ["docker run", "docker start", "docker create", "docker build"], c: 0 },
         { q: "Which file defines a Docker image's build instructions?", a: ["Dockerfile", "docker-compose.yml", "config.json", "image.yaml"], c: 0 },
-        { q: "What is a Docker container?", a: ["A lightweight isolated environment", "A virtual machine", "A programming language", "A database"], c: 0 },
+        { q: "What is a Docker container?", a: ["A lightweight isolated environment", "A full virtual machine with its own kernel", "A static binary compiled for one OS", "A cloud VM instance"], c: 0 },
         { q: "Which command lists all running containers?", a: ["docker ps", "docker list", "docker show", "docker containers"], c: 0 },
         { q: "What does 'docker pull' do?", a: ["Downloads an image from a registry", "Uploads an image", "Creates a container", "Removes a container"], c: 0 },
         { q: "What is Docker Compose used for?", a: ["Multi-container applications", "Building images", "Network configuration", "Security scanning"], c: 0 },
@@ -80,7 +80,7 @@ const QUESTIONS = {
         { q: "What is a build artifact?", a: ["Output of build process", "Source code", "Configuration file", "Log file"], c: 0 },
         { q: "What is GitOps?", a: ["Git as source of truth for infrastructure", "Git hosting service", "Git GUI tool", "Git branching strategy"], c: 0 },
         { q: "What is a deployment environment?", a: ["Where application runs", "Code editor", "Build tool", "Testing framework"], c: 0 },
-        { q: "What does 'shift left' mean?", a: ["Earlier testing in pipeline", "Code formatting", "Branch merging", "Log rotation"], c: 0 },
+        { q: "What does 'fail fast' mean in CI/CD?", a: ["Detect failures early in the pipeline", "Deploy quickly to production", "Skip non-critical tests for speed", "Fail silently without blocking deploys"], c: 0 },
         { q: "What is blue-green deployment?", a: ["Two identical environments", "Color-coded logs", "Branch naming", "Error highlighting"], c: 0 },
         { q: "What is a canary deployment?", a: ["Gradual rollout to subset", "Fast deployment", "Rollback strategy", "Testing approach"], c: 0 },
         { q: "What is GitHub Actions?", a: ["CI/CD platform", "Code review tool", "Issue tracker", "Wiki system"], c: 0 },
@@ -168,7 +168,7 @@ const QUESTIONS = {
         { q: "What does 'ps' show?", a: ["Running processes", "File permissions", "Network connections", "Disk space"], c: 0 },
         { q: "What does 'kill' command do?", a: ["Terminates processes", "Deletes files", "Stops services", "Ends sessions"], c: 0 },
         { q: "What is systemd?", a: ["System and service manager", "File system", "Network manager", "Package manager"], c: 0 },
-        { q: "What does 'cat' command do?", a: ["Displays file contents", "Creates files", "Concatenates commands", "Copies files"], c: 0 },
+        { q: "What does 'cat' command do?", a: ["Displays or concatenates file contents", "Creates empty files only", "Compresses and archives files", "Copies files recursively"], c: 0 },
         { q: "What does 'df' show?", a: ["Disk space usage", "Directory files", "Data format", "Device info"], c: 0 },
         { q: "What does 'top' display?", a: ["System processes", "File contents", "Network status", "User list"], c: 0 },
         { q: "What does 'ssh' do?", a: ["Secure remote connection", "File transfer", "Service start", "System shutdown"], c: 0 },
