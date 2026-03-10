@@ -98,12 +98,19 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
     <div className="flex-1 flex flex-col bg-slate-800/50 rounded-lg overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-slate-700/50 border-b border-slate-600/50">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-300 code-font">{file.path}</span>
-          <span className={`text-xs px-2 py-0.5 rounded font-medium ${LANG_COLORS[file.language] || 'bg-slate-600/50 text-slate-400'}`}>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="code-font text-sm min-w-0 flex items-baseline gap-0">
+            {file.path.includes('/') && (
+              <span className="text-slate-500 text-xs truncate hidden sm:inline">
+                {file.path.split('/').slice(0, -1).join('/')}/
+              </span>
+            )}
+            <span className="text-slate-200 font-medium flex-shrink-0">{file.name}</span>
+          </span>
+          <span className={`text-xs px-2 py-0.5 rounded font-medium flex-shrink-0 ${LANG_COLORS[file.language] || 'bg-slate-600/50 text-slate-400'}`}>
             {file.language}
           </span>
-          <span className="text-xs text-slate-500">{lines.length} lines</span>
+          <span className="text-xs text-slate-500 flex-shrink-0">{lines.length.toLocaleString()} lines</span>
         </div>
         <button
           onClick={handleCopy}

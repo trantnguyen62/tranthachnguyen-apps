@@ -278,6 +278,9 @@ function App() {
                   <>
                     <p className="text-xs text-slate-500 px-2">
                       {searchResults.length} file{searchResults.length !== 1 ? 's' : ''} found
+                      {searchResults.length === 50 && (
+                        <span className="text-amber-500/80 ml-1">(limit reached — refine your query)</span>
+                      )}
                     </p>
                     <FileTree
                       nodes={searchResults}
