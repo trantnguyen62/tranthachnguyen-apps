@@ -1,6 +1,10 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import { ImageSize } from "../types";
 
+const MODEL_TTS = "gemini-2.5-flash-preview-tts";
+const MODEL_IMAGE = "gemini-3-pro-image-preview";
+const MODEL_FLASH = "gemini-2.5-flash";
+
 /**
  * Returns a GoogleGenAI client configured with the environment API key.
  * When `requireSelection` is true (e.g. for paid image generation models),
@@ -38,7 +42,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
 export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
   const ai = await getAI(false);
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash-preview-tts",
+    model: MODEL_TTS,
     contents: [{ parts: [{ text }] }],
     config: {
       responseModalities: [Modality.AUDIO],
@@ -73,7 +77,7 @@ export const generateStudyImage = async (prompt: string, size: ImageSize): Promi
   // This model requires the user to select their own API key.
   const ai = await getAI(true);
   const response = await ai.models.generateContent({
-    model: 'gemini-3-pro-image-preview',
+    model: MODEL_IMAGE,
     contents: {
       parts: [
         {
@@ -110,7 +114,7 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
   const base64Data = arrayBufferToBase64(arrayBuffer);
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: MODEL_FLASH,
     contents: {
       parts: [
         {

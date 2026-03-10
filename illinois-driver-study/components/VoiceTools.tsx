@@ -77,7 +77,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
       const text = await transcribeAudio(blob);
       setTranscription(text);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to transcribe audio:", err);
       setTranscription(t.error);
     } finally {
       setProcessing(false);

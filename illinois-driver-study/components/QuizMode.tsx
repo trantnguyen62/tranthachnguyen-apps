@@ -3,6 +3,9 @@ import { getQuestions } from '../data/questions';
 import { generateSpeech } from '../services/gemini';
 import { Language } from '../types';
 
+// Illinois DMV requires 80% to pass
+const PASSING_SCORE = 80;
+
 interface QuizModeProps {
   language: Language;
 }
@@ -128,14 +131,14 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
       };
       source.start();
     } catch (err) {
-      console.error(err);
+      console.error("Failed to play audio:", err);
       setIsPlayingAudio(false);
     }
   }, [question.text]);
 
   if (quizCompleted) {
     const pct = Math.round((score / questions.length) * 100);
-    const passed = pct >= 80;
+    const passed = pct >= PASSING_SCORE;
     return (
       <div className="max-w-2xl mx-auto p-4 animate-fade-in">
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">

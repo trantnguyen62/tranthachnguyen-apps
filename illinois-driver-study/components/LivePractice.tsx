@@ -3,6 +3,10 @@ import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } f
 import { Language, Question } from '../types';
 import { getQuestions } from '../data/questions';
 
+const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-09-2025';
+// Tolerance (in seconds) when detecting that all queued audio has finished playing.
+const AUDIO_END_TOLERANCE = 0.1;
+
 interface LivePracticeProps {
   language: Language;
 }
@@ -45,9 +49,9 @@ const TRANSLATIONS = {
  * Clamps values to avoid overflow before scaling.
  */
 function createPcmData(data: Float32Array): Int16Array {
-  const l = data.length;
-  const int16 = new Int16Array(l);
-  for (let i = 0; i < l; i++) {
+  const length = data.length;
+  const int16 = new Int16Array(length);
+  for (let i = 0; i < length; i++) {
     const s = Math.max(-1, Math.min(1, data[i]));
     int16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
   }
@@ -60,9 +64,9 @@ function createPcmData(data: Float32Array): Int16Array {
  */
 function decodeBase64(base64: string): Uint8Array {
   const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
+  const length = binaryString.length;
+  const bytes = new Uint8Array(length);
+  for (let i = 0; i < length; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
   return bytes;
@@ -195,7 +199,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       ).join('\n---\n');
 
       const config = {
-        model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+        model: LIVE_MODEL,
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -309,7 +313,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
                nextStartTimeRef.current += audioBuffer.duration;
                
                source.onended = () => {
-                 if (outputAudioContext.currentTime >= nextStartTimeRef.current - 0.1) {
+                 if (outputAudioContext.currentTime >= nextStartTimeRef.current - AUDIO_END_TOLERANCE) {
                     setStatus('connected');
                  }
                };
