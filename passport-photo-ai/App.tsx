@@ -2,16 +2,9 @@ import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { ImageUploader } from './components/ImageUploader';
 const PhotoEditor = lazy(() => import('./components/PhotoEditor').then(m => ({ default: m.PhotoEditor })));
 import { PassportImage, PassportCheckResult, AppStatus } from './types';
+import { THEME } from './theme';
 
 const CURRENT_YEAR = new Date().getFullYear();
-
-// Theme constants moved outside component
-const THEME = {
-  accentPink: '#E94560',
-  accentGold: '#F4A261',
-  accentPurple: '#9D4EDD',
-  darkBg: 'rgba(13, 13, 13, 0.6)',
-} as const;
 
 export default function App() {
   const [image, setImage] = useState<PassportImage | null>(null);
@@ -54,7 +47,8 @@ export default function App() {
       const data = await res.json();
       setResult(data);
       setStatus(AppStatus.COMPLETED);
-    } catch {
+    } catch (e) {
+      console.error('Passport check failed:', e);
       setStatus(AppStatus.ERROR);
     }
   }, [image]);
@@ -426,7 +420,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
-

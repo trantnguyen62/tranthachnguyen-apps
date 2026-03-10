@@ -213,7 +213,7 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
               let sum = 0;
               for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
               setVolume(prev => ({ ...prev, output: sum / dataArray.length / 255 }));
-            }, 100);
+            }, 150);
 
             // Setup Audio Processing
             const source = inputCtx.createMediaStreamSource(stream);

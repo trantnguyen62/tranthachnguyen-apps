@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import { PassportImage } from '../types';
+import { THEME } from '../theme';
 
 interface Props {
   image: PassportImage;
@@ -147,9 +148,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
     setContrast(+e.target.value);
   }, []);
 
-  const accentPink = '#E94560';
-  const accentGold = '#F4A261';
-  const accentPurple = '#9D4EDD';
+  const { accentPink, accentGold, accentPurple } = THEME;
 
   return (
     <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="editor-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
@@ -248,5 +247,3 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
 });
 
 PhotoEditor.displayName = 'PhotoEditor';
-
-

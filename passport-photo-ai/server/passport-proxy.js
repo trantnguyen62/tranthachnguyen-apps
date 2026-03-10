@@ -79,6 +79,7 @@ function setCache(key, result) {
 }
 
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const MAX_BASE64_LENGTH = 4 * 1024 * 1024 * 1.4; // ~4 MB decoded
 
 function parseBase64Image(base64Image) {
   const mimeMatch = base64Image.match(/^data:(image\/[a-z0-9][a-z0-9!#$&\-^_]*);base64,/);
@@ -88,14 +89,32 @@ function parseBase64Image(base64Image) {
   return { mimeType, data };
 }
 
+/**
+ * Validates the base64Image from a request body.
+ * Returns parsed { mimeType, data } on success, or sends an error response and returns null.
+ */
+function validateImageRequest(req, res) {
+  const { base64Image } = req.body;
+  if (!base64Image || typeof base64Image !== 'string') {
+    res.status(400).json({ error: 'No image' });
+    return null;
+  }
+  if (base64Image.length > MAX_BASE64_LENGTH) {
+    res.status(400).json({ error: 'Image too large' });
+    return null;
+  }
+  const parsed = parseBase64Image(base64Image);
+  if (!parsed) {
+    res.status(400).json({ error: 'Invalid image type' });
+    return null;
+  }
+  return parsed;
+}
+
 app.post('/api/passport/check', apiRateLimit, async (req, res) => {
   try {
-    const { base64Image } = req.body;
-    if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
-    if (base64Image.length > 4 * 1024 * 1024 * 1.4) return res.status(400).json({ error: 'Image too large' }); // ~4MB decoded
-
-    const parsed = parseBase64Image(base64Image);
-    if (!parsed) return res.status(400).json({ error: 'Invalid image type' });
+    const parsed = validateImageRequest(req, res);
+    if (!parsed) return;
     const { mimeType, data: clean } = parsed;
 
     const cacheKey = getCacheKey(clean);
@@ -136,11 +155,8 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
 
 app.post('/api/passport/analyze', apiRateLimit, async (req, res) => {
   try {
-    const { base64Image } = req.body;
-    if (!base64Image || typeof base64Image !== 'string') return res.status(400).json({ error: 'No image' });
-    if (base64Image.length > 4 * 1024 * 1024 * 1.4) return res.status(400).json({ error: 'Image too large' }); // ~4MB decoded
-    const parsed = parseBase64Image(base64Image);
-    if (!parsed) return res.status(400).json({ error: 'Invalid image type' });
+    const parsed = validateImageRequest(req, res);
+    if (!parsed) return;
     const { mimeType, data: clean } = parsed;
 
     const response = await ai.models.generateContent({

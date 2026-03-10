@@ -1,17 +1,11 @@
 import React, { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { PassportImage } from '../types';
+import { THEME } from '../theme';
 
 interface Props {
   onImageSelected: (img: PassportImage | null) => void;
   currentImage: PassportImage | null;
 }
-
-// Theme constants
-const THEME = {
-  accentPink: '#E94560',
-  accentGold: '#F4A261',
-  accentPurple: '#9D4EDD',
-} as const;
 
 export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => {
   const inputRef = useRef<HTMLInputElement>(null);

@@ -24,6 +24,7 @@ export class ProxyLiveSession {
   private ws: WebSocket | null = null;
   private callbacks: any = {};
   private messageQueue: any[] = [];
+  private readonly MAX_QUEUE_SIZE = 50;
   private isOpen = false;
 
   async connect(config: any): Promise<void> {
@@ -127,7 +128,7 @@ export class ProxyLiveSession {
 
     if (this.isOpen && this.ws) {
       this.ws.send(JSON.stringify(message));
-    } else {
+    } else if (this.messageQueue.length < this.MAX_QUEUE_SIZE) {
       this.messageQueue.push(message);
     }
   }
@@ -140,7 +141,7 @@ export class ProxyLiveSession {
 
     if (this.isOpen && this.ws) {
       this.ws.send(JSON.stringify(message));
-    } else {
+    } else if (this.messageQueue.length < this.MAX_QUEUE_SIZE) {
       this.messageQueue.push(message);
     }
   }
