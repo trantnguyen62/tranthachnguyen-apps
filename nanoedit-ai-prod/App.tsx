@@ -22,6 +22,18 @@ const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+/**
+ * Root application component for NanoEdit AI.
+ *
+ * Manages a linear edit history (undo/redo) so each AI generation appends a
+ * new `ProcessedImage` entry. The first entry is always the original upload;
+ * subsequent entries are AI-generated PNG results.
+ *
+ * Key state:
+ * - `history` / `historyIndex` — navigable list of image versions
+ * - `prompt` — current textarea value
+ * - `status` — `AppStatus` enum driving UI state (idle → ready → processing → completed/error)
+ */
 const App: React.FC = () => {
   // History management
   const [history, setHistory] = useState<ProcessedImage[]>([]);

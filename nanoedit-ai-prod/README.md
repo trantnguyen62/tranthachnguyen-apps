@@ -103,6 +103,16 @@ nanoedit-ai-prod/
 | `GET` | `/api/status` | Check connectivity to gemini-web-proxy |
 | `GET` | `/health` | Proxy server health check |
 
+## 🔧 Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| `Failed to generate image` | gemini-web-proxy unreachable | Confirm `GEMINI_PROXY_URL` is correct and the proxy is running |
+| Blank/unchanged result | Gemini produced no image | Rephrase the prompt to be more specific |
+| Request timeout (>110 s) | Gemini took too long | Try a simpler edit or a smaller image |
+| Camera not available | Browser permission denied | Allow camera access in your browser site settings |
+| CORS error in browser | Frontend hitting wrong proxy port | Ensure `VITE_PROXY_URL` matches the port where `proxy.js` is running |
+
 ## 🌐 Live Demo
 
 [photoedit.tranthachnguyen.com](https://photoedit.tranthachnguyen.com)
