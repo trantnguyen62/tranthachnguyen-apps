@@ -325,6 +325,12 @@ function App() {
             <div className="flex items-center gap-1.5 text-sm min-w-0">
               <Code2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
               <div className="flex items-center min-w-0 code-font">
+                {selectedProject && (
+                  <span className="text-slate-500 text-xs hidden sm:inline flex-shrink-0">
+                    {selectedProject.name}
+                    <span className="mx-1 text-slate-600">/</span>
+                  </span>
+                )}
                 {selectedFile.path.includes('/') && (
                   <span className="text-slate-500 truncate text-xs hidden sm:block">
                     {selectedFile.path.split('/').slice(0, -1).join('/')}/
