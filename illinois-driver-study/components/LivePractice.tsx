@@ -38,6 +38,12 @@ const TRANSLATIONS = {
 } as const;
 
 // Utility functions moved outside component
+
+/**
+ * Converts a Float32Array of audio samples (Web Audio API format, range [-1, 1])
+ * into a signed 16-bit PCM Int16Array for transmission to the Gemini Live API.
+ * Clamps values to avoid overflow before scaling.
+ */
 function createPcmData(data: Float32Array): Int16Array {
   const l = data.length;
   const int16 = new Int16Array(l);
@@ -48,6 +54,10 @@ function createPcmData(data: Float32Array): Int16Array {
   return int16;
 }
 
+/**
+ * Decodes a base64 string into a raw Uint8Array.
+ * Used to convert base64-encoded PCM audio chunks received from the Gemini Live API.
+ */
 function decodeBase64(base64: string): Uint8Array {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -58,6 +68,11 @@ function decodeBase64(base64: string): Uint8Array {
   return bytes;
 }
 
+/**
+ * Converts raw 16-bit PCM bytes (24 kHz, mono) into a Web Audio API AudioBuffer.
+ * Normalizes Int16 values to the [-1, 1] float range expected by Web Audio.
+ * The output AudioContext must be initialized at 24 kHz to match the API's output rate.
+ */
 function decodeAudioData(data: Uint8Array, ctx: AudioContext): AudioBuffer {
   const dataInt16 = new Int16Array(data.buffer);
   const frameCount = dataInt16.length;
@@ -75,11 +90,17 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const [volume, setVolume] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   
+  // Two separate AudioContexts are required: one for microphone capture at 16 kHz
+  // (the rate expected by the Gemini Live API input) and one for playback at 24 kHz
+  // (the rate of PCM audio returned by the API). Sharing a single context would
+  // force resampling and degrade quality on at least one path.
   const audioContextRef = useRef<AudioContext | null>(null);
   const outputAudioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  // Tracks the scheduled end time of the last audio buffer so consecutive chunks
+  // are queued back-to-back without gaps or overlap.
   const nextStartTimeRef = useRef<number>(0);
   const sessionRef = useRef<any>(null);
   const resolvedSessionRef = useRef<any>(null);
@@ -201,6 +222,9 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
             scriptProcessor.onaudioprocess = (e) => {
               const inputData = e.inputBuffer.getChannelData(0);
               
+              // Compute RMS (root mean square) loudness of the captured frame,
+              // scaled by 5 to amplify the visualizer response. The 0.05 dead-band
+              // prevents excessive React re-renders from small fluctuations.
               let sum = 0;
               for(let i=0; i<inputData.length; i++) {
                 sum += inputData[i] * inputData[i];

@@ -1,7 +1,12 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import { ImageSize } from "../types";
 
-// Helper to get AI instance. Handles key selection for paid models if needed.
+/**
+ * Returns a GoogleGenAI client configured with the environment API key.
+ * When `requireSelection` is true (e.g. for paid image generation models),
+ * prompts the user to select an API key via the AI Studio key picker before
+ * proceeding. Throws if the user cancels the selection.
+ */
 const getAI = async (requireSelection: boolean = false) => {
   if (requireSelection) {
     if ('aistudio' in window) {
@@ -15,6 +20,7 @@ const getAI = async (requireSelection: boolean = false) => {
   return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
+/** Encodes an ArrayBuffer as a base64 string for use in Gemini API inline data payloads. */
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
