@@ -3,10 +3,19 @@ import { PassportImage } from '../types';
 import { THEME } from '../theme';
 
 interface Props {
+  /** Callback fired when the user selects, captures, or removes a photo. Pass `null` to clear. */
   onImageSelected: (img: PassportImage | null) => void;
+  /** Currently active image, or `null` when no photo has been selected yet. */
   currentImage: PassportImage | null;
 }
 
+/**
+ * Handles photo input via file upload, drag-and-drop, or live camera capture.
+ *
+ * Images are downscaled to a maximum of 1500 px on the longest edge and
+ * re-encoded as JPEG (quality 0.88) before being passed to `onImageSelected`,
+ * keeping payloads small enough for the AI compliance check.
+ */
 export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -17,6 +26,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   const [cameraMode, setCameraMode] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
+  /** Validates, resizes (max 1500 px), and converts a File to a JPEG data URL. */
   const handleFile = useCallback((file: File | null) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) return;
@@ -56,6 +66,11 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     }
   }, [cameraMode]);
 
+  /**
+   * Requests camera access (front-facing, 720×960 preferred) and switches to
+   * camera mode. Sets `cameraError` on NotAllowedError, NotFoundError, or if
+   * the page is not served over HTTPS.
+   */
   const startCamera = useCallback(async () => {
     setCameraError(null);
     try {
@@ -85,6 +100,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     setCameraMode(false);
   }, []);
 
+  /** Draws the current video frame onto a canvas, converts it to JPEG, and stops the stream. */
   const capturePhoto = useCallback(() => {
     if (!videoRef.current) return;
     
