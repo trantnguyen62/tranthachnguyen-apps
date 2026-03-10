@@ -181,7 +181,7 @@ export default function App() {
                 {status === AppStatus.CHECKING ? (
                   <>
                     <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-                    Analyzing...
+                    Checking...
                   </>
                 ) : (
                   <><span aria-hidden="true">🔍</span> Check Photo</>
@@ -206,7 +206,7 @@ export default function App() {
             
             <div aria-live="polite" aria-atomic="true">
             {status === AppStatus.CHECKING ? (
-              <div style={{ height: 350, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16, padding: '0 4px' }} aria-label="Analyzing photo…">
+              <div style={{ height: 350, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16, padding: '0 4px' }} aria-label="Checking photo compliance…">
                 <div style={{ height: 72, borderRadius: 16, background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {[1, 0.75, 0.55].map((w, i) => (
@@ -229,7 +229,7 @@ export default function App() {
                 <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
                 <p style={{ color: accentPink, fontWeight: 600, marginBottom: 8 }}>Analysis failed</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', maxWidth: 220, marginBottom: 20 }}>
-                  Check your connection and try again. If the issue persists, try a smaller image.
+                  Could not reach the server. Check your connection and try again. For large images, try reducing the file size below 4 MB.
                 </p>
                 <button
                   onClick={handleCheck}
@@ -274,7 +274,7 @@ export default function App() {
                         color: result.compliant ? '#10B981' : accentPink,
                         marginBottom: 4
                       }}>
-                        {result.compliant ? 'Photo Approved!' : 'Issues Detected'}
+                        {result.compliant ? 'Photo Meets Standards' : 'Issues Detected'}
                       </h3>
                       <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
                         {result.summary}
@@ -356,19 +356,19 @@ export default function App() {
                   filter: 'grayscale(100%)'
                 }}>🪪</div>
                 <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20 }}>
-                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> — catch issues that could get your passport rejected before you apply
+                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Check Photo</strong> — catch compliance issues before submitting your passport or visa application
                 </p>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.2)', marginBottom: 8, fontWeight: 600 }}>
                     What we check
                   </p>
                   <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.25)', lineHeight: 2.1 }}>
-                    <li>✓ Face position &amp; size in frame</li>
-                    <li>✓ Expression &amp; eyes open</li>
-                    <li>✓ Background color &amp; uniformity</li>
-                    <li>✓ Lighting &amp; shadow quality</li>
-                    <li>✓ Image sharpness &amp; resolution</li>
-                    <li>✓ Glasses &amp; lens reflections</li>
+                    <li>✓ Face centered, 70–80% of frame height</li>
+                    <li>✓ Neutral expression, eyes open &amp; visible</li>
+                    <li>✓ Plain white or off-white background</li>
+                    <li>✓ Even lighting, no harsh shadows on face</li>
+                    <li>✓ Sharp focus, sufficient resolution</li>
+                    <li>✓ No glasses or lens reflections</li>
                   </ul>
                 </div>
               </div>
@@ -388,7 +388,7 @@ export default function App() {
             Made with <span style={{ color: accentPink }}>♥</span> by PassportLens · {CURRENT_YEAR}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
-            100% private — photos are analyzed instantly and never stored, uploaded to a server, or shared.
+            100% private — your photos are processed instantly and never stored, logged, or shared with third parties.
           </p>
         </footer>
       </div>
