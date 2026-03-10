@@ -73,11 +73,11 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     } catch (err: any) {
       console.error('Camera error:', err);
       if (err?.name === 'NotAllowedError') {
-        setCameraError('Camera access denied. Please allow camera permissions.');
+        setCameraError('Camera access denied. Click the camera icon in your browser address bar to allow access, then try again.');
       } else if (err?.name === 'NotFoundError') {
-        setCameraError('No camera found on this device.');
+        setCameraError('No camera found on this device. Try uploading a photo instead.');
       } else {
-        setCameraError('Unable to access camera.');
+        setCameraError('Unable to access camera. Make sure you are on a secure (HTTPS) connection.');
       }
     }
   }, []);

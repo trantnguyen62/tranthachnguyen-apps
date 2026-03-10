@@ -170,14 +170,15 @@ export default function App() {
                 aria-busy={status === AppStatus.CHECKING}
                 style={{
                   padding: '16px 12px', borderRadius: 14,
-                  border: 'none', 
+                  border: 'none',
                   background: image ? `linear-gradient(135deg, ${accentPink}, ${accentGold})` : 'rgba(255,255,255,0.03)',
-                  color: image ? '#fff' : 'rgba(255,255,255,0.2)', 
+                  color: image ? '#fff' : 'rgba(255,255,255,0.2)',
                   fontWeight: 600, cursor: image ? 'pointer' : 'not-allowed',
                   transition: 'all 0.3s ease',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   boxShadow: image ? `0 8px 24px ${accentPink}33` : 'none',
-                  fontFamily: "'Space Grotesk', sans-serif"
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  animation: image && status === AppStatus.IDLE ? 'ctaPulse 2.5s ease-in-out infinite' : 'none'
                 }}
               >
                 {status === AppStatus.CHECKING ? (
@@ -220,6 +221,9 @@ export default function App() {
                     <div key={i} style={{ height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.03)', width: `${w * 100}%`, animation: `pulse 1.5s ease-in-out ${0.4 + i * 0.2}s infinite` }} />
                   ))}
                 </div>
+                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.25)', marginTop: 16 }}>
+                  Analyzing · usually under 15 seconds
+                </p>
               </div>
             ) : status === AppStatus.ERROR ? (
               <div style={{
@@ -399,6 +403,7 @@ export default function App() {
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes ctaPulse { 0%, 100% { box-shadow: 0 8px 24px #E9456033; } 50% { box-shadow: 0 8px 32px #E9456066, 0 0 0 4px #E9456018; } }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
             animation-duration: 0.01ms !important;
