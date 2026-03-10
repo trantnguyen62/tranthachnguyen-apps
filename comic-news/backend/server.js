@@ -198,6 +198,134 @@ I still tip 25%. It feels like the right thing to do.`,
       { id: 5, title: "Thank You", description: "He accepts it with extraordinary dignity and walks away" },
       { id: 6, title: "Three Years Later", description: "He still works there. He still remembers. I still tip 25%." }
     ]
+  },
+  {
+    id: 5,
+    title: "I Waved Back at Someone Who Wasn't Waving at Me",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    coverImage: "/images/wave-back.svg",
+    description: "Full commitment. Meaningful eye contact. A warm smile. They were waving at the person standing three feet behind me.",
+    rating: 4.7,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I waved back at someone who wasn't waving at me.
+
+It was a Sunday morning. I was walking to the coffee shop, feeling good, sun out, birds doing bird things.
+
+Someone across the street raised their hand in my direction. Big, warm wave. Very deliberate.
+
+I raised my hand. Waved back. Smiled. Made meaningful eye contact.
+
+Immediately, the person walked past me to embrace the actual human being standing three feet behind me.
+
+They had not seen me at all. They had never seen me. I did not exist to them in any meaningful way.
+
+I kept walking as if nothing had happened. I entered the coffee shop. I ordered my coffee. I sat down in the corner facing the wall.
+
+I think about this sometimes. Specifically, I think about the window of time between when I committed to the wave and when I understood what I had done. That half-second of pure, unearned confidence.
+
+It was the best I have ever felt.`,
+    pages: [
+      { id: 1, image: "/images/wave-back.svg", caption: "A warm wave across the street that was meant for absolutely nobody I know" }
+    ],
+    panels: [
+      { id: 1, title: "Sunday Morning", description: "Sun out, birds doing bird things — a genuinely pleasant walk" },
+      { id: 2, title: "The Wave", description: "Big, warm, deliberate. Raised hand. Aimed directly at me. Or so I thought." },
+      { id: 3, title: "I Waved Back", description: "Full commitment. Meaningful eye contact. A warm smile. Peak confidence." },
+      { id: 4, title: "The Hug", description: "They walked past me to embrace the person standing three feet behind me" },
+      { id: 5, title: "I Kept Walking", description: "Like absolutely nothing had occurred. Corner seat. Facing the wall." },
+      { id: 6, title: "The Half-Second", description: "That moment between commitment and comprehension — the best I have ever felt." }
+    ]
+  },
+  {
+    id: 6,
+    title: "My Autocorrect Changed 'Meeting' to 'Mating' at Work",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    coverImage: "/images/autocorrect-mating.svg",
+    description: "I typed quickly. I hit send. My manager replied in forty seconds. My colleague said he'd bring snacks.",
+    rating: 4.8,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `My autocorrect changed "meeting" to "mating" in a work email.
+
+It was a Tuesday. I had a quarterly review to schedule with my manager and two senior colleagues. I was busy. I typed quickly.
+
+"Just wanted to confirm our quarterly mating is still on for Thursday at 2pm."
+
+I hit send before reading it back.
+
+My phone had autocorrected "meeting" to "mating" and I did not notice.
+
+My manager replied within forty seconds. The email read: "Ha. Yes. Confirmed."
+
+One colleague replied: "Looking forward to our mating."
+
+The other wrote: "Can't wait for the mating. Will bring snacks."
+
+I considered not going. I considered going but pretending to be a different person. I considered a new career entirely.
+
+I went. I sat down. On the conference table was a small bowl of mixed nuts.
+
+Nobody said anything directly. They didn't have to.
+
+I now proofread every email three times. Sometimes four. I read them aloud. I have my wife read them. I am considering a proofreading service.`,
+    pages: [
+      { id: 1, image: "/images/autocorrect-mating.svg", caption: "SENT. One word different. Forty seconds to the first reply." }
+    ],
+    panels: [
+      { id: 1, title: "A Busy Tuesday", description: "Quarterly review to schedule. Typing fast. No time to reread." },
+      { id: 2, title: "Autocorrect Strikes", description: "\"meeting\" becomes \"mating.\" The phone is very confident about this." },
+      { id: 3, title: "SENT", description: "It is gone. It is out there. It cannot be recalled." },
+      { id: 4, title: "40 Seconds Later", description: "\"Ha. Yes. Confirmed.\" — Manager. Bless him." },
+      { id: 5, title: "The Replies", description: "\"Looking forward to our mating. Will bring snacks.\" — Colleague." },
+      { id: 6, title: "The Nuts", description: "Thursday, 2pm. A bowl of mixed nuts on the conference table. No explanation given." }
+    ]
+  },
+  {
+    id: 7,
+    title: "I Held the Door for Someone Way Too Far Away",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    coverImage: "/images/held-door.svg",
+    description: "I had committed. There was no graceful exit. I held that door for approximately twenty-seven seconds.",
+    rating: 4.6,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I held the door open for someone who was way too far away.
+
+It was a Wednesday. The grocery store. I reached the entrance a few steps ahead of someone and, in a burst of misguided goodwill, held the door open.
+
+They were roughly thirty feet away.
+
+I had committed. There was no graceful exit. I stood there, holding the door, smiling at an approaching stranger from a significant distance.
+
+They walked faster. Not a jog — but a slightly accelerated, uncomfortable walk. The walk of someone who knows exactly what has happened and is now obligated to participate in it against their will.
+
+They reached the door. "Thanks." They went inside.
+
+I let go of the door. It swung shut. I stood outside for a moment.
+
+I had been holding that door for approximately twenty-seven seconds. It felt like three to five business days.
+
+I have since developed a precise system. Eight feet or fewer: hold the door. Nine to fifteen feet: make eye contact, nod toward the door, and go in first. Sixteen feet or more: go inside. You don't know them. They don't need your help. Everyone is fine.
+
+I run drills.`,
+    pages: [
+      { id: 1, image: "/images/held-door.svg", caption: "Twenty-seven seconds. Approximately thirty feet. One very specific kind of eye contact." }
+    ],
+    panels: [
+      { id: 1, title: "Wednesday. Grocery Store.", description: "A burst of goodwill. A door. An approaching stranger — at distance." },
+      { id: 2, title: "The Commitment", description: "I had started. There was no undoing it. The door was open. I was holding it." },
+      { id: 3, title: "Thirty Feet Away", description: "They saw me. I saw them see me. We both understood what this was now." },
+      { id: 4, title: "The Walk", description: "Not a jog. A very specific, slightly accelerated, deeply reluctant walk." },
+      { id: 5, title: "Thanks", description: "One word. They went inside. The door swung shut behind them." },
+      { id: 6, title: "The System", description: "Eight feet: hold. Sixteen feet: go in. I have a system now. I run drills." }
+    ]
   }
 ];
 

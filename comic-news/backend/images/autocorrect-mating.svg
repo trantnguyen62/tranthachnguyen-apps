@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="header" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#f97316"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a5a"/>
+      <stop offset="100%" style="stop-color:#0a1a2a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="600" fill="url(#bg)"/>
+
+  <!-- Header bar -->
+  <rect x="0" y="0" width="400" height="75" fill="url(#header)"/>
+  <text x="200" y="32" text-anchor="middle" fill="white" font-size="14" font-family="Georgia, serif" font-weight="bold">My Autocorrect Changed</text>
+  <text x="200" y="55" text-anchor="middle" fill="rgba(255,255,255,0.88)" font-size="13" font-family="Georgia, serif">"Meeting" to "Mating" at Work</text>
+
+  <!-- Desk background -->
+  <rect x="0" y="75" width="400" height="415" fill="#0f1a2a"/>
+
+  <!-- Laptop/monitor shape -->
+  <rect x="60" y="110" width="280" height="185" rx="8" fill="#1a1a2a" stroke="#3a3a5a" stroke-width="2"/>
+  <rect x="72" y="120" width="256" height="162" rx="4" fill="url(#screen)"/>
+
+  <!-- Email composition screen -->
+  <rect x="80" y="126" width="240" height="24" fill="#1a2a3a"/>
+  <text x="90" y="142" fill="#6a9aca" font-size="9" font-family="monospace">To: manager@company.com; alice@company.com; bob@company.com</text>
+  <rect x="80" y="150" width="240" height="18" fill="#162030"/>
+  <text x="90" y="162" fill="#6a9aca" font-size="9" font-family="monospace">Subject: Thursday Confirmation</text>
+
+  <!-- Email body -->
+  <rect x="80" y="168" width="240" height="106" fill="#0d1a2a"/>
+  <text x="90" y="184" fill="#c0d0e0" font-size="9" font-family="Georgia, serif">Hi all,</text>
+  <text x="90" y="200" fill="#c0d0e0" font-size="9" font-family="Georgia, serif">Just wanted to confirm our</text>
+  <!-- The word "mating" highlighted in red -->
+  <rect x="90" y="203" width="240" height="14" fill="transparent"/>
+  <text x="90" y="216" fill="#c0d0e0" font-size="9" font-family="Georgia, serif">quarterly </text>
+  <rect x="134" y="205" width="32" height="13" rx="2" fill="#ef4444" opacity="0.3"/>
+  <text x="135" y="216" fill="#ef4444" font-size="9" font-family="Georgia, serif" font-weight="bold">mating</text>
+  <text x="166" y="216" fill="#c0d0e0" font-size="9" font-family="Georgia, serif"> is still on</text>
+  <text x="90" y="232" fill="#c0d0e0" font-size="9" font-family="Georgia, serif">for Thursday at 2pm.</text>
+  <text x="90" y="250" fill="#c0d0e0" font-size="9" font-family="Georgia, serif">Best,</text>
+  <text x="90" y="264" fill="#c0d0e0" font-size="9" font-family="Georgia, serif">Me</text>
+
+  <!-- SENT stamp -->
+  <rect x="236" y="236" width="70" height="28" rx="3" fill="transparent" stroke="#ef4444" stroke-width="2" transform="rotate(-12, 271, 250)"/>
+  <text x="271" y="253" text-anchor="middle" fill="#ef4444" font-size="13" font-family="Georgia, serif" font-weight="bold" transform="rotate(-12, 271, 250)">SENT</text>
+
+  <!-- Laptop base -->
+  <rect x="40" y="295" width="320" height="14" rx="4" fill="#2a2a3a"/>
+  <rect x="140" y="309" width="120" height="8" rx="4" fill="#1a1a2a"/>
+
+  <!-- Person at desk (horrified reaction) -->
+  <!-- Chair -->
+  <rect x="158" y="390" width="84" height="8" rx="3" fill="#2a2a4a"/>
+  <rect x="186" y="398" width="8" height="50" rx="2" fill="#2a2a4a"/>
+  <rect x="170" y="448" width="60" height="8" rx="4" fill="#2a2a4a"/>
+  <!-- Body -->
+  <rect x="162" y="340" width="76" height="55" rx="5" fill="#4a5a8a"/>
+  <!-- Head -->
+  <circle cx="200" cy="320" r="22" fill="#d4a06a"/>
+  <!-- Hair -->
+  <ellipse cx="200" cy="303" rx="20" ry="9" fill="#3a2a1a"/>
+  <!-- Mouth open in horror -->
+  <ellipse cx="200" cy="328" rx="7" ry="5" fill="#2a1010"/>
+  <!-- Eyes wide -->
+  <circle cx="192" cy="316" r="4" fill="white"/>
+  <circle cx="208" cy="316" r="4" fill="white"/>
+  <circle cx="193" cy="317" r="2" fill="#1a1a2a"/>
+  <circle cx="209" cy="317" r="2" fill="#1a1a2a"/>
+  <!-- Hands on head -->
+  <line x1="162" y1="355" x2="178" y2="310" stroke="#4a5a8a" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="177" cy="307" r="7" fill="#d4a06a"/>
+  <line x1="238" y1="355" x2="222" y2="310" stroke="#4a5a8a" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="223" cy="307" r="7" fill="#d4a06a"/>
+
+  <!-- Reply notification bubble -->
+  <rect x="245" y="140" width="120" height="55" rx="8" fill="#1a3a1a" stroke="#4a8a4a" stroke-width="1.5"/>
+  <polygon points="255,195 242,210 268,198" fill="#1a3a1a"/>
+  <text x="305" y="162" text-anchor="middle" fill="#a0dca0" font-size="8.5" font-family="Georgia, serif">Manager replied:</text>
+  <text x="305" y="176" text-anchor="middle" fill="white" font-size="9" font-family="Georgia, serif" font-style="italic">"Ha. Yes. Confirmed."</text>
+  <text x="305" y="190" text-anchor="middle" fill="#a0dca0" font-size="8" font-family="Georgia, serif">— 40 seconds later</text>
+
+  <!-- Sweat drops -->
+  <ellipse cx="222" cy="295" rx="4" ry="6" fill="#4a8aca" opacity="0.7"/>
+  <ellipse cx="234" cy="302" rx="3" ry="5" fill="#4a8aca" opacity="0.5"/>
+  <ellipse cx="176" cy="298" rx="3" ry="5" fill="#4a8aca" opacity="0.6"/>
+
+  <!-- Bottom panel -->
+  <rect x="0" y="490" width="400" height="110" fill="rgba(0,0,0,0.35)"/>
+
+  <!-- Genre badge -->
+  <rect x="20" y="502" width="100" height="22" rx="11" fill="rgba(239,68,68,0.2)"/>
+  <text x="70" y="517" text-anchor="middle" fill="#ef4444" font-size="10" font-family="Georgia, serif" font-weight="bold" letter-spacing="1">SLICE OF LIFE</text>
+
+  <!-- Stars -->
+  <text x="20" y="549" fill="#f59e0b" font-size="15">★★★★★</text>
+  <text x="103" y="548" fill="#9ca3af" font-size="12" font-family="sans-serif"> 4.8</text>
+
+  <!-- Author -->
+  <text x="20" y="572" fill="#6b7280" font-size="11" font-family="Georgia, serif">Anonymous</text>
+
+  <!-- Decorative dots -->
+  <circle cx="372" cy="510" r="3" fill="#ef4444" opacity="0.35"/>
+  <circle cx="360" cy="530" r="2" fill="#f97316" opacity="0.25"/>
+  <circle cx="382" cy="555" r="4" fill="#ef4444" opacity="0.18"/>
+</svg>

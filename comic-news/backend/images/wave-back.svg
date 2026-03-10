@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="header" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#f97316"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a4a7a"/>
+      <stop offset="100%" style="stop-color:#1a2a4a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="600" fill="url(#bg)"/>
+
+  <!-- Header bar -->
+  <rect x="0" y="0" width="400" height="75" fill="url(#header)"/>
+  <text x="200" y="32" text-anchor="middle" fill="white" font-size="14" font-family="Georgia, serif" font-weight="bold">I Waved Back at Someone</text>
+  <text x="200" y="55" text-anchor="middle" fill="rgba(255,255,255,0.88)" font-size="13" font-family="Georgia, serif">Who Wasn't Waving at Me</text>
+
+  <!-- Sky background -->
+  <rect x="0" y="75" width="400" height="320" fill="url(#sky)"/>
+
+  <!-- Sun -->
+  <circle cx="330" cy="130" r="28" fill="#f59e0b" opacity="0.9"/>
+  <line x1="330" y1="93" x2="330" y2="83" stroke="#f59e0b" stroke-width="2.5" opacity="0.7"/>
+  <line x1="330" y1="167" x2="330" y2="177" stroke="#f59e0b" stroke-width="2.5" opacity="0.7"/>
+  <line x1="293" y1="130" x2="283" y2="130" stroke="#f59e0b" stroke-width="2.5" opacity="0.7"/>
+  <line x1="367" y1="130" x2="377" y2="130" stroke="#f59e0b" stroke-width="2.5" opacity="0.7"/>
+
+  <!-- Sidewalk -->
+  <rect x="0" y="340" width="400" height="160" fill="#2a2a3a"/>
+  <line x1="0" y1="360" x2="400" y2="360" stroke="#3a3a4a" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Person waving (left side, protagonist) -->
+  <!-- Body -->
+  <rect x="80" y="260" width="36" height="70" rx="4" fill="#3a5a8a"/>
+  <!-- Head -->
+  <circle cx="98" cy="242" r="19" fill="#d4a06a"/>
+  <!-- Hair -->
+  <ellipse cx="98" cy="227" rx="17" ry="8" fill="#3a2a1a"/>
+  <!-- Arm waving up -->
+  <line x1="116" y1="275" x2="148" y2="240" stroke="#3a5a8a" stroke-width="8" stroke-linecap="round"/>
+  <!-- Hand -->
+  <circle cx="151" cy="237" r="8" fill="#d4a06a"/>
+  <!-- Legs -->
+  <rect x="84" y="328" width="12" height="30" rx="3" fill="#2a3a5a"/>
+  <rect x="100" y="328" width="12" height="30" rx="3" fill="#2a3a5a"/>
+
+  <!-- Smile on protagonist -->
+  <path d="M 90 248 Q 98 255 106 248" stroke="#a06040" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Person being waved at (right side, the one who is NOT waving) -->
+  <!-- Body -->
+  <rect x="248" y="258" width="36" height="72" rx="4" fill="#5a3a6a"/>
+  <!-- Head -->
+  <circle cx="266" cy="239" r="19" fill="#c8956a"/>
+  <!-- Hair -->
+  <ellipse cx="266" cy="224" rx="17" ry="9" fill="#1a1a1a"/>
+  <!-- Arm raised (actually waving at someone behind the protagonist) -->
+  <line x1="248" y1="272" x2="216" y2="242" stroke="#5a3a6a" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="213" cy="239" r="8" fill="#c8956a"/>
+  <!-- Legs -->
+  <rect x="252" y="328" width="12" height="30" rx="3" fill="#3a2a4a"/>
+  <rect x="268" y="328" width="12" height="30" rx="3" fill="#3a2a4a"/>
+
+  <!-- The ACTUAL target of the wave (far right, barely visible) -->
+  <rect x="342" y="276" width="28" height="58" rx="4" fill="#4a6a4a"/>
+  <circle cx="356" cy="260" r="15" fill="#c8a06a"/>
+  <ellipse cx="356" cy="248" rx="14" ry="7" fill="#2a1a0a"/>
+
+  <!-- Protagonist speech bubble -->
+  <ellipse cx="145" cy="190" rx="72" ry="28" fill="white" opacity="0.95"/>
+  <polygon points="120,218 100,232 128,222" fill="white" opacity="0.95"/>
+  <text x="145" y="185" text-anchor="middle" fill="#1a1a2e" font-size="13" font-family="Georgia, serif" font-style="italic">Oh hey!</text>
+  <text x="145" y="202" text-anchor="middle" fill="#1a1a2e" font-size="11" font-family="Georgia, serif" font-style="italic">*waves enthusiastically*</text>
+
+  <!-- Right person's speech bubble (directed off to right) -->
+  <ellipse cx="295" cy="190" rx="68" ry="26" fill="#1a3a1a" opacity="0.9" stroke="#4a8a4a" stroke-width="1.5"/>
+  <polygon points="315,216 330,230 308,218" fill="#1a3a1a" opacity="0.9"/>
+  <text x="295" y="186" text-anchor="middle" fill="#a0dca0" font-size="12" font-family="Georgia, serif" font-style="italic">Dave!</text>
+  <text x="295" y="203" text-anchor="middle" fill="#a0dca0" font-size="10" font-family="Georgia, serif" font-style="italic">(not at you)</text>
+
+  <!-- Awkward motion lines from protagonist -->
+  <line x1="58" y1="248" x2="44" y2="238" stroke="#6a6a9a" stroke-width="1.5" opacity="0.5"/>
+  <line x1="52" y1="258" x2="38" y2="258" stroke="#6a6a9a" stroke-width="1.5" opacity="0.5"/>
+  <line x1="58" y1="268" x2="44" y2="278" stroke="#6a6a9a" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Bottom panel -->
+  <rect x="0" y="490" width="400" height="110" fill="rgba(0,0,0,0.35)"/>
+
+  <!-- Genre badge -->
+  <rect x="20" y="502" width="100" height="22" rx="11" fill="rgba(239,68,68,0.2)"/>
+  <text x="70" y="517" text-anchor="middle" fill="#ef4444" font-size="10" font-family="Georgia, serif" font-weight="bold" letter-spacing="1">SLICE OF LIFE</text>
+
+  <!-- Stars -->
+  <text x="20" y="549" fill="#f59e0b" font-size="15">★★★★★</text>
+  <text x="103" y="548" fill="#9ca3af" font-size="12" font-family="sans-serif"> 4.7</text>
+
+  <!-- Author -->
+  <text x="20" y="572" fill="#6b7280" font-size="11" font-family="Georgia, serif">Anonymous</text>
+
+  <!-- Decorative dots -->
+  <circle cx="372" cy="510" r="3" fill="#ef4444" opacity="0.35"/>
+  <circle cx="360" cy="530" r="2" fill="#f97316" opacity="0.25"/>
+  <circle cx="382" cy="555" r="4" fill="#ef4444" opacity="0.18"/>
+</svg>
