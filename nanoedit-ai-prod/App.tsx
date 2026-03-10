@@ -241,7 +241,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleUndo}
                       disabled={!canUndo}
-                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      className="p-2 rounded-md hover:bg-slate-100 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       title="Undo"
                       aria-label="Undo"
                     >
@@ -255,7 +255,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleRedo}
                       disabled={!canRedo}
-                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                      className="p-2 rounded-md hover:bg-slate-100 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                       title="Redo"
                       aria-label="Redo"
                     >
@@ -300,9 +300,7 @@ const App: React.FC = () => {
                         <span className="hidden sm:inline">
                           <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate
                         </span>
-                        {prompt.length > 0 && (
-                          <span className="tabular-nums">{prompt.length} chars</span>
-                        )}
+                        <span className={`tabular-nums transition-opacity ${prompt.length > 0 ? 'opacity-100' : 'opacity-0'}`}>{prompt.length} chars</span>
                       </span>
                     )}
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
@@ -329,7 +327,7 @@ const App: React.FC = () => {
                   <button
                     onClick={() => handlePresetClick(PASSPORT_PROMPT)}
                     aria-pressed={prompt === PASSPORT_PROMPT}
-                    className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 border rounded-lg transition-colors text-sm font-medium ${prompt === PASSPORT_PROMPT ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'}`}
+                    className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 border rounded-lg transition-colors text-sm font-medium ${prompt === PASSPORT_PROMPT ? 'bg-brand-600 border-brand-600 text-white' : 'bg-brand-50 border-brand-200 text-brand-700 hover:bg-brand-100'}`}
                   >
                     <UserSquare2 className="w-4 h-4" />
                     Passport Photo
@@ -355,7 +353,7 @@ const App: React.FC = () => {
 
                 {/* Error Message */}
                 {errorMsg && (
-                  <div role="alert" className="p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
+                  <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">Unable to generate — try again</p>
