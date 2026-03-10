@@ -9,6 +9,7 @@ const CONFIG = {
     PLAYER_SPEED: 5,
     ENEMY_SPEED: 1,
     QUESTION_TIME: 15,
+    SPEEDQUIZ_QUESTION_TIME: 8,
     BASE_SCORE: 100,
     SPEED_BONUS: 50,
     STREAK_MULTIPLIER: 0.5,
@@ -1014,7 +1015,7 @@ function showQuestion(enemy) {
 
     game.currentQuestion = { ...question, enemy, correctIndex: correctShuffledIndex, shuffledAnswers: answers };
     game.questionActive = true;
-    game.questionTimer = CONFIG.QUESTION_TIME;
+    game.questionTimer = game.mode === 'speedquiz' ? CONFIG.SPEEDQUIZ_QUESTION_TIME : CONFIG.QUESTION_TIME;
     game.selectedAnswer = -1;
     game._lastTimerWidth = 101; // force first timer update
 
@@ -1359,8 +1360,20 @@ function spawnWave() {
 function completeWave() {
     game.currentWave++;
 
-    if (game.currentWave > CONFIG.WAVES_PER_ZONE && game.mode === 'adventure') {
-        completeZone();
+    if (game.currentWave > CONFIG.WAVES_PER_ZONE) {
+        if (game.mode === 'adventure') {
+            completeZone();
+        } else if (game.mode === 'endless') {
+            // Rotate to next topic, cycling back to start
+            game.currentZone = (game.currentZone + 1) % TOPICS.length;
+            game.currentWave = 1;
+            updateHUD();
+            setTimeout(() => spawnWave(), 2000);
+        } else {
+            // Next wave
+            domCache.waveNumber.textContent = game.currentWave;
+            setTimeout(() => spawnWave(), 2000);
+        }
     } else {
         // Next wave
         domCache.waveNumber.textContent = game.currentWave;
@@ -1417,7 +1430,8 @@ function updateHUD() {
 }
 
 function updateTimerDisplay() {
-    const pct = game.questionTimer / CONFIG.QUESTION_TIME;
+    const maxTime = game.mode === 'speedquiz' ? CONFIG.SPEEDQUIZ_QUESTION_TIME : CONFIG.QUESTION_TIME;
+    const pct = game.questionTimer / maxTime;
     const w = Math.round(pct * 100);
     if (w === game._lastTimerWidth) return;
     game._lastTimerWidth = w;
