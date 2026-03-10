@@ -103,7 +103,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     if (!ctx) return;
     
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
     
     onImageSelected({ data: dataUrl, mimeType: 'image/jpeg' });
     stopCamera();

@@ -101,6 +101,7 @@ app.post('/api/passport/check', apiRateLimit, async (req, res) => {
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
+      config: { maxOutputTokens: 512 },
       contents: {
         parts: [
           { inlineData: { data: clean, mimeType } },
