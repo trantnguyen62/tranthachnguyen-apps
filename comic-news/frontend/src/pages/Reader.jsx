@@ -26,6 +26,7 @@ function Reader() {
     const fetchComic = async () => {
       try {
         const comicRes = await fetch(`/api/comics/${id}`);
+        if (!comicRes.ok) return;
         const comicData = await comicRes.json();
         setComic(comicData);
         document.title = `Reading: ${comicData.title} - Comic News`;

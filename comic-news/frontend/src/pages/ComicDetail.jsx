@@ -17,14 +17,16 @@ function ComicDetail() {
           fetch(`/api/bookmarks/check/${id}`),
           fetch(`/api/progress/${id}`)
         ]);
-        
+
+        if (!comicRes.ok) return;
+
         const comicData = await comicRes.json();
-        const bookmarkData = await bookmarkRes.json();
-        const progressData = await progressRes.json();
-        
+        const bookmarkData = bookmarkRes.ok ? await bookmarkRes.json() : {};
+        const progressData = progressRes.ok ? await progressRes.json() : {};
+
         setComic(comicData);
-        setIsBookmarked(bookmarkData.isBookmarked);
-        setProgress(progressData.page);
+        setIsBookmarked(bookmarkData.isBookmarked || false);
+        setProgress(progressData.page || 1);
 
         const pageTitle = `${comicData.title} - Comic News`;
         document.title = pageTitle;
@@ -108,12 +110,11 @@ function ComicDetail() {
 
   const toggleBookmark = async () => {
     try {
-      if (isBookmarked) {
-        await fetch(`/api/bookmarks/${id}`, { method: 'DELETE' });
-      } else {
-        await fetch(`/api/bookmarks/${id}`, { method: 'POST' });
+      const method = isBookmarked ? 'DELETE' : 'POST';
+      const res = await fetch(`/api/bookmarks/${id}`, { method });
+      if (res.ok) {
+        setIsBookmarked(!isBookmarked);
       }
-      setIsBookmarked(!isBookmarked);
     } catch (error) {
       console.error('Error toggling bookmark:', error);
     }
