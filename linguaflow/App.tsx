@@ -29,7 +29,7 @@ const VISUALIZER_COLORS: Record<string, string> = {
 const extractWordsFromMessages = (msgs: { text: string }[]): string[] => {
   const words: string[] = [];
   msgs.forEach(msg => {
-    const matches = msg.text.match(/"([a-zA-Z]+)"/g);
+    const matches = msg.text.match(/"([\p{L}\p{N}'-]+)"/gu);
     if (matches) {
       matches.forEach(m => words.push(m.replace(/"/g, '').toLowerCase()));
     }
@@ -86,6 +86,8 @@ function App() {
         body: JSON.stringify({
           wordsLearned: extractWordsFromMessages(messages)
         })
+      }).then(res => {
+        if (!res.ok) console.error('Failed to record session:', res.status, res.statusText);
       }).catch(console.error);
     }
   }, [connectionState, userProfile, messages]);
