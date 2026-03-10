@@ -7,7 +7,7 @@ Automatically crop and format your photos to meet strict passport and visa requi
 - **Auto Face Detection** - Automatically detects and centers your face
 - **Smart Cropping** - Crops to exact passport size specifications
 - **Background Removal** - AI-powered background removal for clean photos
-- **Multi-Country Support** - Supports passport sizes for different countries
+- **Compliance Checks** - Verifies background, lighting, expression, and face centering against standard passport requirements
 - **Instant Download** - Get your photo immediately after processing
 - **Print Ready** - Output formatted for standard print sizes
 
@@ -48,6 +48,7 @@ docker run -p 5185:5185 -e GEMINI_API_KEY=your_key_here passport-photo-ai
 passport-photo-ai/
 ├── App.tsx                        # Main React component
 ├── types.ts                       # Shared TypeScript types and enums
+├── theme.ts                       # Shared color constants
 ├── index.html                     # Entry HTML file
 ├── index.tsx                      # React entry point
 ├── components/
