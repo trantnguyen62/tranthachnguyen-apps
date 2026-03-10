@@ -176,7 +176,7 @@ const App: React.FC = () => {
           </div>
           <div className="flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
             <Info className="w-3.5 h-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline">Powered by </span><span>Gemini</span>
+            <span>Powered by Google Gemini</span>
           </div>
         </div>
       </header>
@@ -190,7 +190,7 @@ const App: React.FC = () => {
               AI Image Editor — Edit Photos with <span className="text-brand-600">Natural Language</span>
             </h2>
             <p className="text-lg text-slate-600 mb-6">
-              Upload any photo and describe what you want. Remove backgrounds, enhance colors, create passport photos, retouch portraits, or apply artistic effects — all in seconds with Google Gemini AI.
+              Upload a photo and describe what you want — remove backgrounds, enhance colors, create passport photos, retouch portraits, or apply artistic effects. Instant results powered by Google Gemini.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {FEATURES.map((feat) => (
@@ -318,7 +318,7 @@ const App: React.FC = () => {
                 {/* Presets */}
                 <div className="space-y-2.5" role="group" aria-label="Quick action prompts">
                   <p className="text-xs font-medium text-slate-500 flex items-center gap-1">
-                    <Command className="w-3 h-3" aria-hidden="true" /> Try a quick action:
+                    <Command className="w-3 h-3" aria-hidden="true" /> Popular edits:
                   </p>
 
                   {/* Passport Photo — full-width featured action */}
@@ -377,7 +377,7 @@ const App: React.FC = () => {
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 h-full">
                 <div className="flex items-center gap-2 mb-4 text-slate-500 text-sm">
                   <History className="w-4 h-4" aria-hidden="true" />
-                  <span>Version {historyIndex} of {history.length - 1}</span>
+                  <span>Edit {historyIndex} of {history.length - 1}</span>
                 </div>
                 <ComparisonView
                   originalImage={originalImage.data}
