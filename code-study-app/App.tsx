@@ -5,17 +5,18 @@ import FileTree from './components/FileTree';
 import CodeViewer from './components/CodeViewer';
 import Visualizer from './components/Visualizer';
 import Transcript from './components/Transcript';
-import { 
-  Mic, 
-  MicOff, 
-  FolderOpen, 
-  Code2, 
+import {
+  Mic,
+  MicOff,
+  FolderOpen,
+  Code2,
   MessageSquare,
   Search,
   ChevronLeft,
   Loader2,
   AlertCircle,
-  BookOpen
+  BookOpen,
+  X
 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -34,6 +35,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<'files' | 'search'>('files');
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [fileLoadError, setFileLoadError] = useState<string | null>(null);
+  const [dismissedError, setDismissedError] = useState<string | null>(null);
   const fileCache = useRef<Map<string, { content: string; language: string }>>(new Map());
 
   // Study context for AI - memoized to prevent unnecessary re-renders
@@ -43,14 +45,19 @@ function App() {
     selectedCode
   }), [selectedFile, selectedProject, selectedCode]);
 
-  const { 
-    connectionState, 
-    connect, 
-    disconnect, 
-    messages, 
-    volume, 
-    error 
+  const {
+    connectionState,
+    connect,
+    disconnect,
+    messages,
+    volume,
+    error
   } = useLiveSession(studyContext);
+
+  // Reset dismissed error when a new error arrives
+  useEffect(() => {
+    if (error) setDismissedError(null);
+  }, [error]);
 
   // Load projects on mount
   useEffect(() => {
@@ -334,12 +341,6 @@ function App() {
 
           {/* Connection Status */}
           <div className="flex items-center gap-2">
-            {error && (
-              <div className="flex items-center gap-2 text-red-400 text-sm" role="alert">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                <span className="max-w-xs truncate" title={error}>{error}</span>
-              </div>
-            )}
             <button
               onClick={isConnected ? disconnect : connect}
               disabled={isConnecting}
@@ -371,6 +372,21 @@ function App() {
             </button>
           </div>
         </div>
+
+        {/* Error Banner */}
+        {error && error !== dismissedError && (
+          <div role="alert" className="flex items-center gap-3 px-4 py-2.5 bg-red-500/10 border-b border-red-500/20 text-red-300 text-sm">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" aria-hidden="true" />
+            <span className="flex-1">{error}</span>
+            <button
+              onClick={() => setDismissedError(error)}
+              aria-label="Dismiss error"
+              className="p-0.5 hover:bg-red-500/20 rounded transition-colors flex-shrink-0"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
+        )}
 
         {/* Content Area */}
         <div className="flex-1 flex overflow-hidden">
@@ -428,35 +444,49 @@ function App() {
             </div>
 
             {/* Selected Code Context */}
-            {selectedCode && (
-              <div className="p-4 border-t border-slate-700/50 border-t-emerald-500/20">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
-                    <span className="text-xs text-emerald-400 font-medium">Context set</span>
-                    {selectedFile && (
-                      <span className="text-xs text-slate-500 code-font truncate max-w-[8rem]" title={selectedFile.name}>
-                        {selectedFile.name}
+            {selectedCode && (() => {
+              const codeLines = selectedCode.split('\n');
+              const MAX_PREVIEW_LINES = 8;
+              const previewLines = codeLines.slice(0, MAX_PREVIEW_LINES);
+              const hiddenLines = codeLines.length - MAX_PREVIEW_LINES;
+              return (
+                <div className="p-4 border-t border-slate-700/50 border-t-emerald-500/20">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                      <span className="text-xs text-emerald-400 font-medium">Context</span>
+                      <span className="text-xs px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded border border-emerald-500/20">
+                        {codeLines.length} line{codeLines.length !== 1 ? 's' : ''}
                       </span>
+                      {selectedFile && (
+                        <span className="text-xs text-slate-500 code-font truncate max-w-[6rem]" title={selectedFile.name}>
+                          {selectedFile.name}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => setSelectedCode('')}
+                      className="text-xs text-slate-500 hover:text-red-400 transition-colors p-1 rounded hover:bg-red-400/10"
+                      aria-label="Clear selected code context"
+                    >
+                      <X className="w-3 h-3" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <div className="bg-slate-900/60 rounded-lg text-xs code-font text-slate-300 border border-emerald-500/20 overflow-hidden">
+                    <div className="p-3 overflow-x-auto">
+                      {previewLines.map((line, i) => (
+                        <div key={i} className="whitespace-pre leading-5">{line || ' '}</div>
+                      ))}
+                    </div>
+                    {hiddenLines > 0 && (
+                      <div className="px-3 py-1.5 bg-slate-800/50 border-t border-emerald-500/10 text-slate-500">
+                        +{hiddenLines} more line{hiddenLines !== 1 ? 's' : ''}
+                      </div>
                     )}
                   </div>
-                  <button
-                    onClick={() => setSelectedCode('')}
-                    className="text-xs text-slate-500 hover:text-red-400 transition-colors px-1.5 py-0.5 rounded hover:bg-red-400/10"
-                    aria-label="Clear selected code context"
-                  >
-                    ✕ Clear
-                  </button>
                 </div>
-                <div className="bg-slate-900/60 rounded-lg p-3 text-xs code-font text-slate-300 max-h-28 overflow-auto border border-emerald-500/20">
-                  {selectedCode.substring(0, 400)}
-                  {selectedCode.length > 400 && <span className="text-slate-500">…</span>}
-                </div>
-                <p className="text-xs text-slate-500 mt-1.5">
-                  {selectedCode.split('\n').length} line{selectedCode.split('\n').length !== 1 ? 's' : ''} · {selectedCode.length} chars · will be included in session context
-                </p>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       </div>

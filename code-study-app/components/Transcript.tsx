@@ -18,7 +18,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       onClick={handle}
       aria-label={copied ? 'Copied' : 'Copy message'}
-      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-slate-600/50 flex-shrink-0 self-start mt-0.5"
+      className="opacity-30 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded hover:bg-slate-600/50 flex-shrink-0 self-start mt-0.5"
     >
       {copied
         ? <Check className="w-3 h-3 text-green-400" />
