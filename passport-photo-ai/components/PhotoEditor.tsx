@@ -3,8 +3,11 @@ import { PassportImage } from '../types';
 import { THEME } from '../theme';
 
 interface Props {
+  /** The original photo to process. */
   image: PassportImage;
+  /** Called with the processed passport photo when the user clicks "Use Photo". */
   onSave: (img: PassportImage) => void;
+  /** Called when the user cancels without saving. */
   onCancel: () => void;
 }
 
@@ -17,6 +20,20 @@ const BG_COLOR_NAMES: Record<string, string> = {
   '#DCE8F0': 'Light blue',
 };
 
+/**
+ * Renders a passport-sized image (600×750 px) from a source URL.
+ *
+ * The source is center-cropped to the 4:5 aspect ratio. When the source is
+ * taller than wide, the crop window is shifted 25% down from the top
+ * (`sy = (h - sh) * 0.25`) so the face stays centred rather than being cut
+ * off at the chin.
+ *
+ * @param imgUrl - Object URL or data URL of the (background-removed) photo.
+ * @param bg     - CSS fill colour for the passport background (e.g. `"#FFFFFF"`).
+ * @param b      - Brightness percentage applied via `ctx.filter` (90–120).
+ * @param c      - Contrast percentage applied via `ctx.filter` (90–120).
+ * @returns JPEG data URL at quality 0.95 suitable for download or re-use.
+ */
 const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promise<string> =>
   new Promise((resolve, reject) => {
     const img = new Image();
@@ -48,6 +65,14 @@ const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promi
     img.src = imgUrl;
   });
 
+/**
+ * Modal dialog for AI-powered background removal and passport photo formatting.
+ *
+ * State machine: `idle` → (click Auto-Fix) → `processing` → `done`.
+ * In the `done` state the user can tweak background colour, brightness, and
+ * contrast; every change re-renders the canvas preview via a 150 ms debounce.
+ * Background removal runs entirely in the browser via `@imgly/background-removal`.
+ */
 export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   const [step, setStep] = useState<'idle' | 'processing' | 'done'>('idle');
   const [progress, setProgress] = useState(0);
@@ -59,6 +84,12 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   const removedBgRef = useRef<string | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * Runs the full processing pipeline:
+   * 1. Fetch the image blob from the data URL.
+   * 2. Remove the background (tracks library progress at 30–80%).
+   * 3. Call `createPassport` with the current settings to produce the result.
+   */
   const process = useCallback(async () => {
     setStep('processing');
     setProcessError(null);

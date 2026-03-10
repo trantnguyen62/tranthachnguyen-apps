@@ -77,6 +77,37 @@ passport-photo-ai/
 
 Both endpoints accept `{ base64Image: string }` (data URL) and are rate-limited to 10 requests per IP per minute.
 
+**`/api/passport/check` response:**
+```json
+{
+  "compliant": false,
+  "summary": "Photo has a non-plain background and slight shadow under chin.",
+  "issues": ["Background is not plain white or off-white", "Shadow visible under chin"],
+  "suggestions": ["Shoot against a plain white wall", "Use diffuse lighting to eliminate chin shadows"]
+}
+```
+
+**`/api/passport/analyze` response:**
+```json
+{
+  "overallScore": 72,
+  "autoFixRecommendations": {
+    "adjustBrightness": 5,
+    "adjustContrast": 8
+  }
+}
+```
+
+## 🔧 Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| "Camera access denied" | Allow camera permission in the browser address bar, then try again |
+| "Unable to access camera" | Camera requires a secure (HTTPS) connection; `localhost` is exempt |
+| "Image too large" error | Resize the image to under 4 MB before uploading |
+| Analysis returns no result | Verify `GEMINI_API_KEY` is set and the API server is running on port 5185 |
+| Background removal stalls | The first run downloads ML model weights (~20 MB); wait for the progress bar to complete |
+
 ## 🌐 Live Demo
 
 [passportphoto.tranthachnguyen.com](https://passportphoto.tranthachnguyen.com)

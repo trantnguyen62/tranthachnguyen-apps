@@ -31,6 +31,12 @@ app.use((req, res, next) => {
 
 // Simple in-memory rate limiter: max 10 AI requests per IP per minute
 const _rateMap = new Map();
+
+/**
+ * Express middleware that allows up to 10 requests per IP per 60-second window.
+ * Counters reset automatically; stale entries are pruned every 60 seconds by
+ * the `setInterval` below to prevent unbounded memory growth.
+ */
 function apiRateLimit(req, res, next) {
   const ip = req.ip || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
@@ -61,15 +67,23 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const _checkCache = new Map(); // hash -> { result, expires }
 const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 const CACHE_MAX = 50;
+/** Returns a 16-character hex prefix of the SHA-256 hash of the base64 image data. */
 function getCacheKey(data) {
   return crypto.createHash('sha256').update(data).digest('hex').slice(0, 16);
 }
+
+/** Returns the cached result for `key`, or `null` if missing or expired. */
 function getCached(key) {
   const entry = _checkCache.get(key);
   if (!entry) return null;
   if (Date.now() > entry.expires) { _checkCache.delete(key); return null; }
   return entry.result;
 }
+
+/**
+ * Stores a result in the cache with a TTL of `CACHE_TTL` ms.
+ * Evicts the oldest entry (insertion order) when the cache is full.
+ */
 function setCache(key, result) {
   if (_checkCache.size >= CACHE_MAX) {
     // Evict oldest entry
@@ -81,6 +95,10 @@ function setCache(key, result) {
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const MAX_BASE64_LENGTH = 4 * 1024 * 1024 * 1.4; // ~4 MB decoded
 
+/**
+ * Parses a data URL into `{ mimeType, data }` (raw base64 without the prefix).
+ * Returns `null` if the MIME type is absent or not in the allowed set.
+ */
 function parseBase64Image(base64Image) {
   const mimeMatch = base64Image.match(/^data:(image\/[a-z0-9][a-z0-9!#$&\-^_]*);base64,/);
   const mimeType = mimeMatch ? mimeMatch[1].toLowerCase() : null;

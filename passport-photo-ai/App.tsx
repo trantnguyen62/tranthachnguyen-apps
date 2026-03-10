@@ -6,6 +6,17 @@ import { THEME } from './theme';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+/**
+ * Root application component for PassportLens.
+ *
+ * Manages three pieces of state:
+ * - `image` — the currently loaded photo (null until the user uploads one).
+ * - `status` — the `AppStatus` enum tracking the AI compliance check lifecycle.
+ * - `result` — the `PassportCheckResult` returned by `/api/passport/check`.
+ *
+ * `PhotoEditor` is lazy-loaded and preloaded in the background as soon as a
+ * photo is selected, so the chunk is ready before the user clicks "Fix Background".
+ */
 export default function App() {
   const [image, setImage] = useState<PassportImage | null>(null);
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
