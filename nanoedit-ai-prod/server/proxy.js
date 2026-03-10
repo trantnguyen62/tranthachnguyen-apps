@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import http from 'http';
+import https from 'https';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -14,6 +16,12 @@ const PORT = 5174;
 
 // URL of the gemini-web-proxy server
 const GEMINI_PROXY_URL = process.env.GEMINI_PROXY_URL || 'http://localhost:3000';
+
+// Keep-alive agents reuse TCP connections to the upstream proxy, reducing
+// per-request connection overhead (especially important for local loopback).
+const httpAgent = new http.Agent({ keepAlive: true });
+const httpsAgent = new https.Agent({ keepAlive: true });
+const fetchOptions = (url) => (url.startsWith('https://') ? { agent: httpsAgent } : { agent: httpAgent });
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -64,13 +72,10 @@ app.post('/api/gemini/edit-image', async (req, res) => {
           mimeType: mimeType || 'image/png'
         }),
         signal: upstreamController.signal,
+        ...fetchOptions(GEMINI_PROXY_URL),
       });
     } finally {
       clearTimeout(upstreamTimeout);
-    }
-
-    if (!response) {
-      return res.status(500).json({ error: 'Upstream request timed out' });
     }
 
     const data = await response.json();
@@ -140,7 +145,7 @@ app.get('/health', (req, res) => {
  */
 app.get('/api/status', async (req, res) => {
   try {
-    const response = await fetch(`${GEMINI_PROXY_URL}/api/status`);
+    const response = await fetch(`${GEMINI_PROXY_URL}/api/status`, fetchOptions(GEMINI_PROXY_URL));
     const data = await response.json();
     res.json({
       proxyStatus: 'connected',

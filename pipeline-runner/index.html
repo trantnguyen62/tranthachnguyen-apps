@@ -31,12 +31,12 @@
     <meta property="og:locale" content="en_US">
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://tranthachnguyen.com/pipeline-runner/">
-    <meta property="twitter:title" content="Pipeline Runner - Learn DevOps Through Gaming">
-    <meta property="twitter:description"
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://tranthachnguyen.com/pipeline-runner/">
+    <meta name="twitter:title" content="Pipeline Runner - Learn DevOps Through Gaming">
+    <meta name="twitter:description"
         content="Master Docker, Kubernetes, CI/CD and more through an engaging arcade game. Free DevOps training!">
-    <meta property="twitter:image" content="https://tranthachnguyen.com/pipeline-runner/og-image.png">
+    <meta name="twitter:image" content="https://tranthachnguyen.com/pipeline-runner/og-image.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="theme-color" content="#0d1b2a">
@@ -63,9 +63,11 @@
             "priceCurrency": "USD"
         },
         "author": {
-            "@type": "Person",
+            "@type": "Organization",
             "name": "Pipeline Runner Team"
         },
+        "inLanguage": "en-US",
+        "browserRequirements": "Requires JavaScript. Works on all modern browsers.",
         "genre": ["Educational", "Arcade", "Quiz"],
         "audience": {
             "@type": "Audience",
@@ -155,6 +157,14 @@
                     "@type": "Answer",
                     "text": "Pipeline Runner's Linux learning track reinforces essential commands like grep, chmod, ssh, curl, cron, journalctl, and pipe operators through active recall quizzes. It covers file management, process monitoring, user permissions, and system administration — skills required in almost every DevOps role."
                 }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I learn CI/CD pipelines for free?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Pipeline Runner's CI/CD learning track covers pipeline stages, triggers, artifacts, caching, environment variables, and deployment strategies used in tools like GitHub Actions, GitLab CI, and Jenkins. Practice concepts interactively through quiz gameplay at no cost, making it ideal for building CI/CD knowledge for DevOps roles and certifications."
+                }
             }
         ]
     }
@@ -163,6 +173,7 @@
     <!-- Fonts -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'">
 
+    <link rel="preload" href="styles.css" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com" referrerpolicy="no-referrer">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin referrerpolicy="no-referrer">
     <link
