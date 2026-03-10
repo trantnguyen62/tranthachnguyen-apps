@@ -190,10 +190,22 @@ function App() {
           </div>
 
           {/* Tabs */}
-          <div role="tablist" aria-label="Sidebar navigation" className="flex border-b border-slate-700/50">
+          <div
+            role="tablist"
+            aria-label="Sidebar navigation"
+            className="flex border-b border-slate-700/50"
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (activeTab === 'files') handleTabSearch();
+                else handleTabFiles();
+              }
+            }}
+          >
             <button
               role="tab"
               aria-selected={activeTab === 'files'}
+              tabIndex={activeTab === 'files' ? 0 : -1}
               onClick={handleTabFiles}
               className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 activeTab === 'files'
@@ -207,6 +219,7 @@ function App() {
             <button
               role="tab"
               aria-selected={activeTab === 'search'}
+              tabIndex={activeTab === 'search' ? 0 : -1}
               onClick={handleTabSearch}
               className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 activeTab === 'search'
@@ -386,12 +399,12 @@ function App() {
             <div className="p-4 border-b border-slate-700/50">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-emerald-400" />
+                  <MessageSquare className="w-4 h-4 text-emerald-400" aria-hidden="true" />
                   <span className="text-sm font-medium">AI Tutor</span>
                 </div>
                 {isConnected ? (
                   <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
                     Live
                   </span>
                 ) : isConnecting ? (

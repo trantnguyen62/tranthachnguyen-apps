@@ -127,6 +127,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
         onScroll={handleScroll}
         aria-label={`Code content for ${file.path}`}
         role="region"
+        tabIndex={0}
       >
         <pre className="code-font text-sm">
           <code>
