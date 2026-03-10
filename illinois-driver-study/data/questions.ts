@@ -545,6 +545,39 @@ export const questionsEn: Question[] = [
     ],
     correctIndex: 2,
     explanation: "At an uncontrolled intersection where two vehicles arrive simultaneously, the driver on the left must yield to the driver on the right. This 'yield to the right' rule helps prevent collisions when no traffic control devices are present. Always slow down and be prepared to yield when approaching uncontrolled intersections."
+  },
+  {
+    id: 53,
+    text: "In Illinois, it is illegal to park within how many feet of a fire hydrant?",
+    options: [
+      "10 feet",
+      "15 feet",
+      "20 feet"
+    ],
+    correctIndex: 1,
+    explanation: "Illinois law prohibits parking within 15 feet of a fire hydrant to ensure firefighters have unobstructed access in an emergency. Violators may be fined and their vehicle towed."
+  },
+  {
+    id: 54,
+    text: "To maintain a safe following distance under normal driving conditions, you should stay at least how many seconds behind the vehicle in front of you?",
+    options: [
+      "1 second",
+      "2 seconds",
+      "3 seconds"
+    ],
+    correctIndex: 2,
+    explanation: "The 3-second rule is the standard for safe following distance under normal conditions. Pick a fixed object ahead; when the vehicle in front passes it, count three full seconds. If you reach the object before finishing the count, you are following too closely. Increase this gap in adverse weather or low visibility."
+  },
+  {
+    id: 55,
+    text: "When you see a yield sign, you must:",
+    options: [
+      "Come to a complete stop and wait for a signal.",
+      "Slow down and give the right-of-way to traffic already in the intersection or roadway.",
+      "Maintain your speed because you have the right-of-way."
+    ],
+    correctIndex: 1,
+    explanation: "A yield sign means slow down and be prepared to stop if necessary. You must give the right-of-way to any vehicles or pedestrians in the intersection or approaching on the cross road. Unlike a stop sign, a full stop is not required if the way is clearly open."
   }
 ];
 
@@ -1093,6 +1126,39 @@ export const questionsVi: Question[] = [
     ],
     correctIndex: 2,
     explanation: "Tại giao lộ không có thiết bị kiểm soát giao thông, khi hai xe đến cùng lúc, tài xế bên trái phải nhường đường cho tài xế bên phải. Quy tắc 'nhường bên phải' này giúp ngăn va chạm khi không có thiết bị điều tiết giao thông. Luôn giảm tốc và sẵn sàng nhường đường khi tiếp cận giao lộ không có kiểm soát."
+  },
+  {
+    id: 53,
+    text: "Tại Illinois, đỗ xe trong phạm vi bao nhiêu feet tính từ trụ cứu hỏa là bất hợp pháp?",
+    options: [
+      "10 feet",
+      "15 feet",
+      "20 feet"
+    ],
+    correctIndex: 1,
+    explanation: "Pháp luật Illinois cấm đỗ xe trong vòng 15 feet tính từ trụ cứu hỏa để đảm bảo lính cứu hỏa có thể tiếp cận dễ dàng trong trường hợp khẩn cấp. Người vi phạm có thể bị phạt tiền và xe bị kéo đi."
+  },
+  {
+    id: 54,
+    text: "Để duy trì khoảng cách an toàn trong điều kiện lái xe bình thường, bạn nên giữ khoảng cách ít nhất bao nhiêu giây phía sau xe phía trước?",
+    options: [
+      "1 giây",
+      "2 giây",
+      "3 giây"
+    ],
+    correctIndex: 2,
+    explanation: "Quy tắc 3 giây là tiêu chuẩn về khoảng cách theo xe an toàn trong điều kiện bình thường. Chọn một vật cố định phía trước; khi xe trước vượt qua nó, hãy đếm đủ 3 giây. Nếu bạn đến vật đó trước khi đếm xong, bạn đang đi quá gần. Tăng khoảng cách này trong điều kiện thời tiết xấu hoặc tầm nhìn kém."
+  },
+  {
+    id: 55,
+    text: "Khi bạn thấy biển nhường đường (yield sign), bạn phải:",
+    options: [
+      "Dừng hoàn toàn và chờ tín hiệu.",
+      "Giảm tốc và nhường quyền ưu tiên cho phương tiện đã có trong giao lộ hoặc đường.",
+      "Giữ nguyên tốc độ vì bạn có quyền ưu tiên."
+    ],
+    correctIndex: 1,
+    explanation: "Biển nhường đường có nghĩa là giảm tốc và sẵn sàng dừng lại nếu cần thiết. Bạn phải nhường quyền ưu tiên cho bất kỳ phương tiện hoặc người đi bộ nào đang ở trong giao lộ hoặc đang đến từ đường ngang. Khác với biển dừng, bạn không cần dừng hoàn toàn nếu đường thông thoáng."
   }
 ];
 
