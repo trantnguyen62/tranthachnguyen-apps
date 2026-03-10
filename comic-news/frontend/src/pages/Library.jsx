@@ -15,16 +15,29 @@ function Library() {
   const searchQuery = searchParams.get('search') || '';
 
   useEffect(() => {
-    document.title = 'Story Library - Comic News';
-    document.querySelector('meta[name="description"]')?.setAttribute('content', 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.');
+    const title = 'Story Library - Comic News';
+    const description = 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
+    const url = `${window.location.origin}/library`;
+
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+
+    const setMeta = (sel, content) => document.querySelector(sel)?.setAttribute('content', content);
+    setMeta('meta[property="og:title"]', title);
+    setMeta('meta[property="og:description"]', description);
+    setMeta('meta[property="og:url"]', url);
+    setMeta('meta[property="og:type"]', 'website');
+    setMeta('meta[name="twitter:title"]', title);
+    setMeta('meta[name="twitter:description"]', description);
 
     const canonical = Object.assign(document.createElement('link'), {
-      id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/library`,
+      id: 'canonical-link', rel: 'canonical', href: url,
     });
     document.head.appendChild(canonical);
     return () => {
       canonical.remove();
-      document.querySelector('meta[name="description"]')?.setAttribute('content', 'Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you\'ll actually want to read.');
+      const origDesc = 'Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you\'ll actually want to read.';
+      document.querySelector('meta[name="description"]')?.setAttribute('content', origDesc);
     };
   }, []);
 

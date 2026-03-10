@@ -28,6 +28,22 @@ function Reader() {
         const comicRes = await fetch(`/api/comics/${id}`);
         const comicData = await comicRes.json();
         setComic(comicData);
+
+        // Canonical points to comic detail to avoid duplicate content
+        document.getElementById('canonical-link')?.remove();
+        const canonical = document.createElement('link');
+        canonical.id = 'canonical-link';
+        canonical.rel = 'canonical';
+        canonical.href = `${window.location.origin}/comic/${id}`;
+        document.head.appendChild(canonical);
+
+        // Noindex reader view - it's a UX page, not a content page
+        document.getElementById('meta-robots-reader')?.remove();
+        const robotsMeta = document.createElement('meta');
+        robotsMeta.id = 'meta-robots-reader';
+        robotsMeta.name = 'robots';
+        robotsMeta.content = 'noindex, follow';
+        document.head.appendChild(robotsMeta);
       } catch (error) {
         console.error('Error fetching comic:', error);
       } finally {
@@ -35,6 +51,10 @@ function Reader() {
       }
     };
     fetchComic();
+    return () => {
+      document.getElementById('canonical-link')?.remove();
+      document.getElementById('meta-robots-reader')?.remove();
+    };
   }, [id]);
 
   useEffect(() => {

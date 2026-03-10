@@ -75,6 +75,22 @@ function ComicDetail() {
           url: window.location.href,
         });
         document.head.appendChild(ld);
+
+        // BreadcrumbList structured data
+        document.getElementById('page-breadcrumb-jsonld')?.remove();
+        const ldBreadcrumb = document.createElement('script');
+        ldBreadcrumb.id = 'page-breadcrumb-jsonld';
+        ldBreadcrumb.type = 'application/ld+json';
+        ldBreadcrumb.textContent = JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: window.location.origin },
+            { '@type': 'ListItem', position: 2, name: 'Library', item: `${window.location.origin}/library` },
+            { '@type': 'ListItem', position: 3, name: comicData.title, item: `${window.location.origin}/comic/${id}` },
+          ],
+        });
+        document.head.appendChild(ldBreadcrumb);
       } catch (error) {
         console.error('Error fetching comic:', error);
       } finally {
@@ -84,6 +100,7 @@ function ComicDetail() {
     fetchData();
     return () => {
       document.getElementById('page-jsonld')?.remove();
+      document.getElementById('page-breadcrumb-jsonld')?.remove();
       document.getElementById('canonical-link')?.remove();
       document.getElementById('meta-keywords')?.remove();
     };
