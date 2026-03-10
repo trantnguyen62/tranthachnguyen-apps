@@ -87,14 +87,14 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
     
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     const match = text.match(/\{[\s\S]*\}/);
-    let parsed = {};
-    try { parsed = match ? JSON.parse(match[0]) : {}; } catch { parsed = {}; }
-    
+    let aiResult = {};
+    try { if (match) aiResult = JSON.parse(match[0]); } catch { /* use default */ }
+
     res.json({
-      compliant: !!parsed.compliant,
-      summary: parsed.summary || '',
-      issues: parsed.issues || [],
-      suggestions: parsed.suggestions || []
+      compliant: !!aiResult.compliant,
+      summary: aiResult.summary || '',
+      issues: aiResult.issues || [],
+      suggestions: aiResult.suggestions || []
     });
   } catch (e) {
     console.error(e);
@@ -130,7 +130,7 @@ adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }
     res.json(result);
   } catch (e) {
     console.error(e);
-    res.json({ overallScore: 70, autoFixRecommendations: { adjustBrightness: 5, adjustContrast: 8 } });
+    res.status(500).json({ error: 'Analysis failed. Please try again.' });
   }
 });
 
