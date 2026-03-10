@@ -4,7 +4,7 @@
  * and video output when the processed result is a video MIME type.
  */
 import React, { useState, useEffect, memo } from 'react';
-import { Download, Maximize2, Minimize2, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
+import { Download, Maximize2, X, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
 
 interface ComparisonViewProps {
   originalImage: string;
@@ -47,7 +47,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
             className="p-2 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-sm"
             aria-label="Exit fullscreen"
           >
-            <Minimize2 className="w-6 h-6" aria-hidden="true" />
+            <X className="w-6 h-6" aria-hidden="true" />
           </button>
         </div>
       )}

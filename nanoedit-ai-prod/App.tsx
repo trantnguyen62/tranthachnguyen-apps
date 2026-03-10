@@ -194,7 +194,8 @@ const App: React.FC = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {FEATURES.map((feat) => (
-                <span key={feat} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-medium shadow-sm">
+                <span key={feat} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-medium shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-500 flex-shrink-0" aria-hidden="true" />
                   {feat}
                 </span>
               ))}
@@ -246,9 +247,11 @@ const App: React.FC = () => {
                     >
                       <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
-                    <span className="text-xs text-slate-400 select-none" aria-label={`Step ${historyIndex + 1} of ${history.length}`}>
-                      {historyIndex + 1} of {history.length}
-                    </span>
+                    {history.length > 1 && (
+                      <span className="text-xs text-slate-400 select-none" aria-label={`Step ${historyIndex + 1} of ${history.length}`}>
+                        {historyIndex + 1} of {history.length}
+                      </span>
+                    )}
                     <button
                       onClick={handleRedo}
                       disabled={!canRedo}

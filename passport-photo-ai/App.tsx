@@ -109,7 +109,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Get your passport photo right the first time — free AI compliance check for any country, any document type.<br/>
+            Get your passport photo right the first time — free AI compliance check against international biometric photo standards.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Analyze</span> · <span style={{ color: accentPurple }}>Download</span>
           </p>
         </header>
@@ -160,7 +160,7 @@ export default function App() {
                   fontFamily: "'Space Grotesk', sans-serif"
                 }}
               >
-                <span aria-hidden="true">✨</span> Edit Photo
+                <span aria-hidden="true">✨</span> Fix Background
               </button>
               <button
                 onClick={handleCheck}
@@ -184,7 +184,7 @@ export default function App() {
                     Analyzing...
                   </>
                 ) : (
-                  <><span aria-hidden="true">🔍</span> Analyze</>
+                  <><span aria-hidden="true">🔍</span> Check Photo</>
                 )}
               </button>
             </div>
