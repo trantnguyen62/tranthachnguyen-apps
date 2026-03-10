@@ -667,6 +667,13 @@ body {
     margin-bottom: 0.25rem;
 }
 
+.topic-card-desc {
+    font-size: 0.75rem;
+    color: var(--nano-cyan);
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+}
+
 .topic-card-count {
     font-size: 0.8rem;
     color: var(--text-secondary);

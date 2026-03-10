@@ -294,18 +294,18 @@ const QUESTIONS = {
 
 // Topic configuration
 const TOPICS = [
-    { id: 'docker', name: 'Docker', icon: '🐳', color: '#0db7ed' },
-    { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', color: '#326ce5' },
-    { id: 'cicd', name: 'CI/CD', icon: '🔄', color: '#f97316' },
-    { id: 'aws', name: 'AWS', icon: '☁️', color: '#ff9900' },
-    { id: 'terraform', name: 'Terraform', icon: '🏗️', color: '#7b42bc' },
-    { id: 'git', name: 'Git', icon: '🌿', color: '#f05032' },
-    { id: 'linux', name: 'Linux', icon: '🐧', color: '#fcc624' },
-    { id: 'monitoring', name: 'Monitoring', icon: '📊', color: '#00c853' },
-    { id: 'ansible', name: 'Ansible', icon: '🔧', color: '#ee0000' },
-    { id: 'azure', name: 'Azure', icon: '🔷', color: '#0078d4' },
-    { id: 'devsecops', name: 'DevSecOps', icon: '🔒', color: '#dc2626' },
-    { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2' }
+    { id: 'docker', name: 'Docker', icon: '🐳', color: '#0db7ed', desc: 'Containers, images, volumes & networking' },
+    { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', color: '#326ce5', desc: 'Pods, deployments, services & scaling' },
+    { id: 'cicd', name: 'CI/CD', icon: '🔄', color: '#f97316', desc: 'Pipelines, GitOps & deployment strategies' },
+    { id: 'aws', name: 'AWS', icon: '☁️', color: '#ff9900', desc: 'EC2, S3, Lambda, IAM & core services' },
+    { id: 'terraform', name: 'Terraform', icon: '🏗️', color: '#7b42bc', desc: 'IaC, providers, state & modules' },
+    { id: 'git', name: 'Git', icon: '🌿', color: '#f05032', desc: 'Branching, merging, workflows & history' },
+    { id: 'linux', name: 'Linux', icon: '🐧', color: '#fcc624', desc: 'Commands, permissions, processes & scripting' },
+    { id: 'monitoring', name: 'Monitoring', icon: '📊', color: '#00c853', desc: 'Prometheus, Grafana, tracing & SLOs' },
+    { id: 'ansible', name: 'Ansible', icon: '🔧', color: '#ee0000', desc: 'Playbooks, roles, inventory & idempotency' },
+    { id: 'azure', name: 'Azure', icon: '🔷', color: '#0078d4', desc: 'AKS, Functions, DevOps & ARM templates' },
+    { id: 'devsecops', name: 'DevSecOps', icon: '🔒', color: '#dc2626', desc: 'SAST, DAST, scanning & zero trust' },
+    { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2', desc: 'DNS, load balancing, TLS & proxies' }
 ];
 
 // Assets Configuration
@@ -551,11 +551,15 @@ function renderTopicGrid() {
         const nameDiv = document.createElement('div');
         nameDiv.className = 'topic-card-name';
         nameDiv.textContent = topic.name;
+        const descDiv = document.createElement('div');
+        descDiv.className = 'topic-card-desc';
+        descDiv.textContent = topic.desc;
         const countDiv = document.createElement('div');
         countDiv.className = 'topic-card-count';
         countDiv.textContent = `${QUESTIONS[topic.id].length} questions`;
         card.appendChild(iconDiv);
         card.appendChild(nameDiv);
+        card.appendChild(descDiv);
         card.appendChild(countDiv);
         card.onclick = () => startGame('practice', topic.id);
         card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startGame('practice', topic.id); } };

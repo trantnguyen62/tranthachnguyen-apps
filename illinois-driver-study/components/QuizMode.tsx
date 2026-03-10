@@ -15,7 +15,14 @@ const TRANSLATIONS = {
     score: "Score",
     next: "Next Question",
     finish: "Finish Quiz",
-    explanation: "Explanation:"
+    explanation: "Explanation:",
+    quizComplete: "Quiz Complete!",
+    yourScore: "Your Score",
+    passing: "Passing",
+    needsWork: "Keep Practicing",
+    passingNote: "Illinois DMV requires 80% to pass",
+    retake: "Retake Quiz",
+    correct: "correct",
   },
   vi: {
     questionLabel: "Câu hỏi",
@@ -23,7 +30,14 @@ const TRANSLATIONS = {
     score: "Điểm",
     next: "Câu Tiếp Theo",
     finish: "Hoàn Thành",
-    explanation: "Giải thích:"
+    explanation: "Giải thích:",
+    quizComplete: "Hoàn Thành Bài Thi!",
+    yourScore: "Điểm Của Bạn",
+    passing: "Đạt",
+    needsWork: "Cần Ôn Thêm",
+    passingNote: "Điểm đậu IL DMV là 80%",
+    retake: "Làm Lại",
+    correct: "đúng",
   }
 } as const;
 
@@ -32,6 +46,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
+  const [quizCompleted, setQuizCompleted] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const questionRef = useRef<HTMLHeadingElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -74,12 +89,17 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
       setSelectedOption(null);
       setShowResult(false);
     } else {
-      setCurrentQuestionIndex(0);
-      setSelectedOption(null);
-      setShowResult(false);
-      setScore(0);
+      setQuizCompleted(true);
     }
   }, [currentQuestionIndex, questions.length]);
+
+  const restartQuiz = useCallback(() => {
+    setCurrentQuestionIndex(0);
+    setSelectedOption(null);
+    setShowResult(false);
+    setScore(0);
+    setQuizCompleted(false);
+  }, []);
 
   const playAudio = useCallback(async () => {
     try {
@@ -112,6 +132,57 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
       setIsPlayingAudio(false);
     }
   }, [question.text]);
+
+  if (quizCompleted) {
+    const pct = Math.round((score / questions.length) * 100);
+    const passed = pct >= 80;
+    return (
+      <div className="max-w-2xl mx-auto p-4 animate-fade-in">
+        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${passed ? 'bg-green-100' : 'bg-amber-100'}`}>
+            {passed ? (
+              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            ) : (
+              <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" /></svg>
+            )}
+          </div>
+          <h2 className="text-2xl font-bold text-slate-800 mb-1">{t.quizComplete}</h2>
+          <p className={`text-lg font-semibold mb-6 ${passed ? 'text-green-600' : 'text-amber-600'}`}>{passed ? t.passing : t.needsWork}</p>
+
+          <div className="flex justify-center gap-8 mb-6">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-slate-800">{score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
+              <div className="text-sm text-slate-500 mt-1">{t.correct}</div>
+            </div>
+            <div className="w-px bg-slate-200" />
+            <div className="text-center">
+              <div className={`text-4xl font-bold ${passed ? 'text-green-600' : 'text-amber-600'}`}>{pct}%</div>
+              <div className="text-sm text-slate-500 mt-1">{t.yourScore}</div>
+            </div>
+          </div>
+
+          <div className="w-full bg-slate-100 rounded-full h-3 mb-2">
+            <div
+              className={`h-3 rounded-full transition-all duration-700 ${passed ? 'bg-green-500' : 'bg-amber-400'}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-slate-400 mb-6">
+            <span>0%</span>
+            <span className="text-slate-500">80% — {t.passingNote}</span>
+            <span>100%</span>
+          </div>
+
+          <button
+            onClick={restartQuiz}
+            className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+          >
+            {t.retake}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-4">
