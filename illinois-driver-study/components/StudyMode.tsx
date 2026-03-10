@@ -11,12 +11,14 @@ const TRANSLATIONS = {
   en: {
     title: "Review All Questions",
     subtitle: "Browse through all practice questions and memorize the correct answers.",
-    correctAnswer: "(correct answer)"
+    correctAnswer: "(correct answer)",
+    explanation: "Explanation:"
   },
   vi: {
     title: "Xem Tất Cả Câu Hỏi",
     subtitle: "Xem qua tất cả các câu hỏi thực hành và ghi nhớ các câu trả lời đúng.",
-    correctAnswer: "(đáp án đúng)"
+    correctAnswer: "(đáp án đúng)",
+    explanation: "Giải thích:"
   }
 } as const;
 
@@ -45,12 +47,19 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
                   className={`p-3 rounded-md flex items-start ${idx === q.correctIndex ? 'bg-green-50 border border-green-200 text-green-900' : 'text-slate-500'}`}
                 >
                   <span aria-hidden="true" className={`w-6 h-6 rounded-full border flex-shrink-0 flex items-center justify-center mr-3 text-sm ${idx === q.correctIndex ? 'border-green-600 bg-green-600 text-white' : 'border-slate-300'}`}>
-                    {idx === q.correctIndex ? '✓' : String.fromCharCode(65 + idx)}
+                    {idx === q.correctIndex ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    ) : String.fromCharCode(65 + idx)}
                   </span>
                   <span>{opt}{idx === q.correctIndex && <span className="sr-only"> {t.correctAnswer}</span>}</span>
                 </li>
               ))}
             </ul>
+            {q.explanation && (
+              <div className="mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600">
+                <span className="font-semibold text-slate-700">{t.explanation}</span>{' '}{q.explanation}
+              </div>
+            )}
           </div>
         ))}
       </div>
