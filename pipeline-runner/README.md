@@ -17,8 +17,11 @@ An endless runner game that teaches DevOps concepts through gameplay. Navigate t
 |-------|--------|
 | `Space` / `Click` / `Tap` | Boost upward |
 | `1` / `2` / `3` / `4` | Select quiz answer during question |
+| `Arrow keys` | Navigate topic selection on start screen |
 
 ## 🚀 Quick Start
+
+> **Requirements:** Node.js 18+ is required for Capacitor 8.
 
 ### Run Locally (Web)
 
@@ -80,6 +83,18 @@ pipeline-runner/
 4. Answer DevOps questions at milestones to earn bonuses
 5. Try to beat your high score!
 
+## 🐳 Docker
+
+```bash
+# Build the image
+docker build -t pipeline-runner .
+
+# Run on port 8080
+docker run -p 8080:80 pipeline-runner
+```
+
+Then open `http://localhost:8080` in your browser.
+
 ## 📱 Mobile Deployment
 
 This game is designed for app store deployment using Capacitor:
@@ -120,7 +135,6 @@ To reset progress, run `localStorage.clear()` in the browser console.
 - **Favicon files:** `index.html` references `favicon-32x32.png`, `favicon-16x16.png`, and `apple-touch-icon.png`. These files are not yet included in the repository and must be generated (e.g. via [realfavicongenerator.net](https://realfavicongenerator.net)) before deployment.
 - **AdSense integration:** The AdSense `<script>` tag in `index.html` is commented out. Replace `ca-pub-XXXXXXXXXXXXXXXX` with your publisher ID and uncomment when ready.
 - **Content Security Policy:** The CSP in `index.html` is set for `'self'` + Google Fonts. If you add third-party scripts (e.g. AdSense, analytics), update the `script-src` and `connect-src` directives accordingly.
-- **Reset progress in dev:** Run `localStorage.clear()` in the browser console to wipe all stored scores and progress.
 
 ## 📄 License
 
