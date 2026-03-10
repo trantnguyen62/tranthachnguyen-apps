@@ -147,7 +147,7 @@ function Home() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <TrendingUp className="w-6 h-6 text-red-500" />
-            <h2 className="text-2xl font-bold text-white">Trending Stories</h2>
+            <h2 className="text-2xl font-bold text-white">Top Rated</h2>
           </div>
           <Link to="/library" className="text-red-500 hover:text-red-400 flex items-center gap-1 text-sm">
             View All <ArrowRight className="w-4 h-4" />
@@ -175,8 +175,8 @@ function Home() {
             <div className="w-14 h-14 bg-orange-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Bookmark className="w-7 h-7 text-orange-500" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Bookmarks</h3>
-            <p className="text-gray-400">Save your favorites and continue reading where you left off.</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Your Reading List</h3>
+            <p className="text-gray-400">Save your favorites and pick up exactly where you left off.</p>
           </div>
           <div className="glass-effect rounded-2xl p-6 text-center">
             <div className="w-14 h-14 bg-yellow-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">

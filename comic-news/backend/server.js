@@ -107,14 +107,14 @@ About a week later she creeped me on social media. Then email. Inferring things.
       { id: 8, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_8.png", caption: "The answer is no — integrity over temptation" }
     ],
     panels: [
-      { id: 1, title: "The Beginning", description: "Five years ago, contacted by a guy for business services" },
-      { id: 2, title: "Building Friendship", description: "Baseball games, bars, lunch - we became friends" },
-      { id: 3, title: "The Event", description: "Board of Trade function - introduced to his wife" },
-      { id: 4, title: "Recognition", description: "She recognized me immediately - we met in 1996" },
-      { id: 5, title: "The Past", description: "A sexual relationship that lasted just under 1 year" },
-      { id: 6, title: "Her Secret", description: "She doesn't want her husband to know her past" },
-      { id: 7, title: "The Proposition", description: "She wants to start an affair - nostalgic for those times" },
-      { id: 8, title: "The Decision", description: "I declined - not good business, and I respect her husband" }
+      { id: 1, title: "The Beginning", description: "Five years of reliable business — always paid on time, always easy to work with" },
+      { id: 2, title: "Building Friendship", description: "Baseball games, bars, lunch. A business contact becomes something more like a friend." },
+      { id: 3, title: "The Event", description: "A Board of Trade function. A formal introduction. A face from a very different chapter of life." },
+      { id: 4, title: "Recognition", description: "Her eyes said it before anything else — she knew exactly who I was" },
+      { id: 5, title: "The Past", description: "1996. A brief chapter that ended quietly and was never expected to resurface" },
+      { id: 6, title: "Her Secret", description: "Sixteen years of marriage. A 13-year-old daughter. Some things are better left in the past." },
+      { id: 7, title: "The Proposition", description: "A social media creep. Then email. Then a call. Nostalgia dressed up as something reckless." },
+      { id: 8, title: "The Decision", description: "I said no. Integrity is a better business plan than regret." }
     ]
   },
   {
