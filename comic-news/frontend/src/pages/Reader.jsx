@@ -209,6 +209,15 @@ function Reader() {
         </span>
       </div>
 
+      {/* Visually-hidden button so keyboard users can toggle controls */}
+      <button
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-1/2 focus:-translate-x-1/2 focus:z-50 focus:px-4 focus:py-2 focus:bg-black/80 focus:text-white focus:rounded-lg focus:text-sm"
+        onClick={() => setShowControls(c => !c)}
+        aria-pressed={showControls}
+      >
+        {showControls ? 'Hide controls' : 'Show controls'}
+      </button>
+
       {/* Seamless Scrolling Comic Panels */}
       <div
         ref={scrollContainerRef}

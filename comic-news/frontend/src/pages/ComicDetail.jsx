@@ -155,7 +155,7 @@ function ComicDetail() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-48 relative z-10">
         <Link to="/library" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           Back to Library
         </Link>
 
@@ -186,19 +186,19 @@ function ComicDetail() {
 
             <div className="flex flex-wrap items-center gap-6 mt-4 text-gray-300">
               <div className="flex items-center gap-2">
-                <User className="w-5 h-5 text-gray-400" />
+                <User className="w-5 h-5 text-gray-400" aria-hidden="true" />
                 <span>{comic.author}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Tag className="w-5 h-5 text-gray-400" />
+                <Tag className="w-5 h-5 text-gray-400" aria-hidden="true" />
                 <span>{comic.genre}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                <span>{comic.rating}</span>
+                <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" aria-hidden="true" />
+                <span aria-label={`Rating: ${comic.rating}`}>{comic.rating}</span>
               </div>
               <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-gray-400" />
+                <BookOpen className="w-5 h-5 text-gray-400" aria-hidden="true" />
                 <span>{comic.chapters} Chapters</span>
               </div>
             </div>
@@ -211,8 +211,15 @@ function ComicDetail() {
             {progress > 1 && (
               <div className="mt-6 p-4 glass-effect rounded-xl">
                 <p className="text-sm text-gray-400">Continue reading from page {progress}</p>
-                <div className="mt-2 h-2 bg-dark-200 rounded-full overflow-hidden">
-                  <div 
+                <div
+                  className="mt-2 h-2 bg-dark-200 rounded-full overflow-hidden"
+                  role="progressbar"
+                  aria-label="Reading progress"
+                  aria-valuenow={Math.round((progress / comic.pages.length) * 100)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                >
+                  <div
                     className="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full"
                     style={{ width: `${(progress / comic.pages.length) * 100}%` }}
                   />
@@ -226,11 +233,13 @@ function ComicDetail() {
                 to={`/read/${comic.id}`}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg shadow-red-500/25"
               >
-                <Play className="w-5 h-5" />
+                <Play className="w-5 h-5" aria-hidden="true" />
                 {progress > 1 ? 'Continue Reading' : 'Start Reading'}
               </Link>
               <button
                 onClick={toggleBookmark}
+                aria-pressed={isBookmarked}
+                aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
                 className={`inline-flex items-center gap-2 px-6 py-4 rounded-xl font-medium transition-all ${
                   isBookmarked
                     ? 'bg-red-500/20 text-red-400 border border-red-500/30'
@@ -260,7 +269,7 @@ function ComicDetail() {
               {/* Comic Version - First - Seamless Scrolling */}
               <div className="glass-effect rounded-2xl p-6 lg:p-8">
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <Image className="w-6 h-6 text-red-500" />
+                  <Image className="w-6 h-6 text-red-500" aria-hidden="true" />
                   Comic Version
                 </h2>
                 {/* Seamless vertical scroll container */}
@@ -287,7 +296,7 @@ function ComicDetail() {
               {/* The Story - Second */}
               <div className="glass-effect rounded-2xl p-6 lg:p-8">
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <FileText className="w-6 h-6 text-red-500" />
+                  <FileText className="w-6 h-6 text-red-500" aria-hidden="true" />
                   The Story
                 </h2>
                 <div className="prose prose-invert max-w-none">
@@ -326,7 +335,7 @@ function ComicDetail() {
         {!comic.hasTextVersion && (
           <div className="mt-16 mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <Image className="w-6 h-6 text-red-500" />
+              <Image className="w-6 h-6 text-red-500" aria-hidden="true" />
               Preview Pages
             </h2>
             
@@ -347,11 +356,12 @@ function ComicDetail() {
                   <Link
                     key={page.id}
                     to={`/read/${comic.id}?page=${index + 1}`}
+                    aria-label={`Read page ${index + 1}`}
                     className="aspect-[2/3] rounded-lg overflow-hidden bg-dark-200 hover:ring-2 hover:ring-red-500 transition-all"
                   >
                     <img
                       src={page.image}
-                      alt={`Page ${index + 1}`}
+                      alt=""
                       className="w-full h-full object-cover"
                     />
                   </Link>

@@ -138,7 +138,7 @@ function Library() {
         </div>
       ) : comics.length === 0 ? (
         <div className="text-center py-20">
-          <SearchX className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+          <SearchX className="w-12 h-12 text-gray-600 mx-auto mb-4" aria-hidden="true" />
           <p className="text-gray-400 text-lg">No stories found</p>
           <p className="text-gray-500 mt-2">Try adjusting your filters or search query</p>
         </div>
