@@ -487,6 +487,25 @@ function saveHighScore() {
 }
 
 function setupEventListeners() {
+    // Button handlers (replaces inline onclick attributes for CSP compliance)
+    document.getElementById('globalMenuBtn').addEventListener('click', togglePause);
+    document.getElementById('btnAdventure').addEventListener('click', () => startGame('adventure'));
+    document.getElementById('btnEndless').addEventListener('click', () => startGame('endless'));
+    document.getElementById('btnSpeedQuiz').addEventListener('click', () => startGame('speedquiz'));
+    document.getElementById('btnPractice').addEventListener('click', () => showScreen('topicSelect'));
+    document.getElementById('btnHowToPlay').addEventListener('click', () => showScreen('howToPlay'));
+    document.getElementById('btnExit').addEventListener('click', () => { window.close(); history.back(); });
+    document.getElementById('btnBackFromTopics').addEventListener('click', () => showScreen('mainMenu'));
+    document.getElementById('btnBackFromHowToPlay').addEventListener('click', () => showScreen('mainMenu'));
+    document.getElementById('btnResume').addEventListener('click', resumeGame);
+    document.getElementById('btnRestartPause').addEventListener('click', restartGame);
+    document.getElementById('btnQuitFromPause').addEventListener('click', quitToMenu);
+    document.getElementById('btnPlayAgain').addEventListener('click', restartGame);
+    document.getElementById('btnMainMenu').addEventListener('click', quitToMenu);
+    document.getElementById('btnNextZone').addEventListener('click', nextZone);
+    const menuIconImg = document.querySelector('.menu-icon-img');
+    if (menuIconImg) menuIconImg.addEventListener('error', () => { menuIconImg.style.display = 'none'; });
+
     document.addEventListener('keydown', (e) => {
         game.keys[e.key.toLowerCase()] = true;
 

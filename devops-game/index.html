@@ -59,9 +59,9 @@
 <body>
     <div class="game-container">
         <!-- Global Menu Button (always on top) -->
-        <button class="game-menu-btn" id="globalMenuBtn" onclick="togglePause()" title="Pause (P)"
-            aria-label="Pause game (P)" style="display: none;">
-            <img src="assets/menu_icon.png" alt="" class="menu-icon-img" onerror="this.style.display='none'">
+        <button class="game-menu-btn" id="globalMenuBtn" title="Pause (P)"
+            aria-label="Pause game (P)">
+            <img src="assets/menu_icon.png" alt="" class="menu-icon-img">
             <span aria-hidden="true">MENU</span>
         </button>
 
@@ -81,31 +81,31 @@
                     <p class="tagline">Master DevOps Through Combat</p>
                 </div>
                 <div class="menu-buttons">
-                    <button class="menu-btn primary" onclick="startGame('adventure')">
+                    <button class="menu-btn primary" id="btnAdventure">
                         <span class="btn-icon" aria-hidden="true">🚀</span>
                         <span class="btn-text">Adventure Mode</span>
                         <span class="btn-desc">Conquer all 12 DevOps topic zones</span>
                     </button>
-                    <button class="menu-btn" onclick="startGame('endless')">
+                    <button class="menu-btn" id="btnEndless">
                         <span class="btn-icon" aria-hidden="true">♾️</span>
                         <span class="btn-text">Endless Mode</span>
                         <span class="btn-desc">Survive endless waves across all topics</span>
                     </button>
-                    <button class="menu-btn" onclick="startGame('speedquiz')">
+                    <button class="menu-btn" id="btnSpeedQuiz">
                         <span class="btn-icon" aria-hidden="true">⚡</span>
                         <span class="btn-text">Speed Quiz</span>
                         <span class="btn-desc">15 seconds per question — think fast!</span>
                     </button>
-                    <button class="menu-btn" onclick="showScreen('topicSelect')">
+                    <button class="menu-btn" id="btnPractice">
                         <span class="btn-icon" aria-hidden="true">📚</span>
                         <span class="btn-text">Practice Mode</span>
                         <span class="btn-desc">Drill down on one DevOps topic</span>
                     </button>
-                    <button class="menu-btn secondary" onclick="showScreen('howToPlay')">
+                    <button class="menu-btn secondary" id="btnHowToPlay">
                         <span class="btn-icon" aria-hidden="true">❓</span>
                         <span class="btn-text">How to Play</span>
                     </button>
-                    <button class="menu-btn secondary" onclick="window.close(); history.back();">
+                    <button class="menu-btn secondary" id="btnExit">
                         <span class="btn-icon" aria-hidden="true">🚪</span>
                         <span class="btn-text">Exit</span>
                     </button>
@@ -125,7 +125,7 @@
             <div class="topic-content">
                 <h2 class="screen-title">Select Topic Zone</h2>
                 <div class="topic-grid" id="topicGrid"></div>
-                <button class="back-btn" onclick="showScreen('mainMenu')">← Back to Menu</button>
+                <button class="back-btn" id="btnBackFromTopics">← Back to Menu</button>
             </div>
         </div>
 
@@ -169,7 +169,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="back-btn" onclick="showScreen('mainMenu')">← Back to Menu</button>
+                <button class="back-btn" id="btnBackFromHowToPlay">← Back to Menu</button>
             </div>
         </div>
 
@@ -226,9 +226,9 @@
             <!-- Pause Menu -->
             <div class="pause-menu hidden" id="pauseMenu" role="dialog" aria-modal="true" aria-labelledby="pauseTitle">
                 <h2 id="pauseTitle">PAUSED</h2>
-                <button class="menu-btn" onclick="resumeGame()">Resume</button>
-                <button class="menu-btn" onclick="restartGame()">Restart</button>
-                <button class="menu-btn" onclick="quitToMenu()">Quit to Menu</button>
+                <button class="menu-btn" id="btnResume">Resume</button>
+                <button class="menu-btn" id="btnRestartPause">Restart</button>
+                <button class="menu-btn" id="btnQuitFromPause">Quit to Menu</button>
             </div>
 
             <!-- Game Over Screen -->
@@ -254,8 +254,8 @@
                 </div>
                 <div class="new-high-score hidden" id="newHighScore">🏆 NEW HIGH SCORE! 🏆</div>
                 <div class="game-over-buttons">
-                    <button class="menu-btn primary" onclick="restartGame()">Play Again</button>
-                    <button class="menu-btn" onclick="quitToMenu()">Main Menu</button>
+                    <button class="menu-btn primary" id="btnPlayAgain">Play Again</button>
+                    <button class="menu-btn" id="btnMainMenu">Main Menu</button>
                 </div>
             </div>
 
@@ -274,7 +274,7 @@
                         <span class="stat-value" id="zoneAccuracy">0%</span>
                     </div>
                 </div>
-                <button class="menu-btn primary" onclick="nextZone()">Next Zone →</button>
+                <button class="menu-btn primary" id="btnNextZone">Next Zone →</button>
             </div>
         </div>
     </div>
