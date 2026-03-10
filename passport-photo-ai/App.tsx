@@ -160,7 +160,7 @@ export default function App() {
                   fontFamily: "'Space Grotesk', sans-serif"
                 }}
               >
-                <span aria-hidden="true">✨</span> Auto-Fix
+                <span aria-hidden="true">✨</span> Edit Photo
               </button>
               <button
                 onClick={handleCheck}
@@ -295,14 +295,18 @@ export default function App() {
                       Issues Found
                     </h4>
                     {result.issues.map((issue: string, idx: number) => (
-                      <div key={idx} style={{ 
-                        padding: '12px 16px', 
-                        background: 'rgba(255,255,255,0.03)', 
+                      <div key={idx} style={{
+                        padding: '12px 16px',
+                        background: 'rgba(255,255,255,0.03)',
                         borderRadius: 10,
                         marginBottom: 8,
                         borderLeft: `3px solid ${accentGold}`,
-                        fontSize: 14, color: 'rgba(255,255,255,0.8)'
+                        fontSize: 14, color: 'rgba(255,255,255,0.8)',
+                        display: 'flex', alignItems: 'flex-start', gap: 10,
+                        animation: `fadeSlideIn 0.4s ease both`,
+                        animationDelay: `${idx * 0.07}s`
                       }}>
+                        <span style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: `${accentGold}22`, border: `1px solid ${accentGold}55`, color: accentGold, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>{idx + 1}</span>
                         {issue}
                       </div>
                     ))}
@@ -321,14 +325,18 @@ export default function App() {
                       Pro Tips
                     </h4>
                     {result.suggestions.map((tip: string, idx: number) => (
-                      <div key={idx} style={{ 
-                        padding: '12px 16px', 
-                        background: 'rgba(255,255,255,0.03)', 
+                      <div key={idx} style={{
+                        padding: '12px 16px',
+                        background: 'rgba(255,255,255,0.03)',
                         borderRadius: 10,
                         marginBottom: 8,
                         borderLeft: `3px solid ${accentPurple}`,
-                        fontSize: 14, color: 'rgba(255,255,255,0.8)'
+                        fontSize: 14, color: 'rgba(255,255,255,0.8)',
+                        display: 'flex', alignItems: 'flex-start', gap: 10,
+                        animation: `fadeSlideIn 0.4s ease both`,
+                        animationDelay: `${idx * 0.07}s`
                       }}>
+                        <span style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: `${accentPurple}22`, border: `1px solid ${accentPurple}55`, color: accentPurple, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>{idx + 1}</span>
                         {tip}
                       </div>
                     ))}
