@@ -23,6 +23,9 @@ app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Content-Security-Policy', "default-src 'none'");
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
 });
 
@@ -78,7 +81,7 @@ function setCache(key, result) {
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 function parseBase64Image(base64Image) {
-  const mimeMatch = base64Image.match(/^data:(image\/[a-z]+);base64,/i);
+  const mimeMatch = base64Image.match(/^data:(image\/[a-z0-9][a-z0-9!#$&\-^_]*);base64,/);
   const mimeType = mimeMatch ? mimeMatch[1].toLowerCase() : null;
   if (!mimeType || !ALLOWED_MIME_TYPES.has(mimeType)) return null;
   const data = base64Image.slice(mimeMatch[0].length);
@@ -119,14 +122,14 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
 
     const result = {
       compliant: !!aiResult.compliant,
-      summary: aiResult.summary || '',
-      issues: aiResult.issues || [],
-      suggestions: aiResult.suggestions || []
+      summary: typeof aiResult.summary === 'string' ? aiResult.summary.slice(0, 500) : '',
+      issues: Array.isArray(aiResult.issues) ? aiResult.issues.filter(s => typeof s === 'string').map(s => s.slice(0, 200)) : [],
+      suggestions: Array.isArray(aiResult.suggestions) ? aiResult.suggestions.filter(s => typeof s === 'string').map(s => s.slice(0, 200)) : []
     };
     setCache(cacheKey, result);
     res.json(result);
   } catch (e) {
-    console.error(e);
+    console.error('check error:', e instanceof Error ? e.message : 'unknown');
     res.status(500).json({ error: 'Analysis failed. Please try again.' });
   }
 });
@@ -154,11 +157,18 @@ adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }
     
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
     const match = text.match(/\{[\s\S]*\}/);
-    let result = { overallScore: 70, autoFixRecommendations: { adjustBrightness: 5, adjustContrast: 8 } };
-    try { if (match) result = JSON.parse(match[0]); } catch { /* use default */ }
+    let aiResult = {};
+    try { if (match) aiResult = JSON.parse(match[0]); } catch { /* use default */ }
+    const result = {
+      overallScore: typeof aiResult.overallScore === 'number' ? Math.min(100, Math.max(0, aiResult.overallScore)) : 70,
+      autoFixRecommendations: {
+        adjustBrightness: typeof aiResult.autoFixRecommendations?.adjustBrightness === 'number' ? Math.min(100, Math.max(-100, aiResult.autoFixRecommendations.adjustBrightness)) : 5,
+        adjustContrast: typeof aiResult.autoFixRecommendations?.adjustContrast === 'number' ? Math.min(100, Math.max(-100, aiResult.autoFixRecommendations.adjustContrast)) : 8,
+      }
+    };
     res.json(result);
   } catch (e) {
-    console.error(e);
+    console.error('analyze error:', e instanceof Error ? e.message : 'unknown');
     res.status(500).json({ error: 'Analysis failed. Please try again.' });
   }
 });
