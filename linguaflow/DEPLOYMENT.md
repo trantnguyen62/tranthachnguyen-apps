@@ -1,5 +1,7 @@
 # AWS Deployment Guide for LinguaFlow
 
+> **Note:** The current production setup uses **Cloudflare Tunnel** (see `LOCAL_SERVER_DEPLOYMENT.md`), not AWS. The AWS options below are alternatives if you prefer cloud-managed infrastructure.
+
 This guide covers deploying your React + Vite application to AWS with a custom domain.
 
 ## Prerequisites

@@ -352,7 +352,7 @@ Create `~/Library/LaunchAgents/com.linguaflow.app.plist`:
         <string>dev</string>
     </array>
     <key>WorkingDirectory</key>
-    <string>/Users/trannguyen/Downloads/linguaflow---ai-language-partner</string>
+    <string>/Users/YOUR_USERNAME/path/to/linguaflow</string>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>

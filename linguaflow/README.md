@@ -56,7 +56,8 @@ linguaflow/
 ├── utils/              # Utility functions
 ├── server/             # Backend servers
 │   ├── api-server.js   # REST API
-│   └── websocket-proxy.js  # WebSocket for live audio
+│   ├── websocket-proxy.js  # WebSocket for live audio
+│   └── logger.js       # Shared logging utility
 ├── data/               # User session data (users.json)
 └── Dockerfile*         # Docker configurations
 ```
