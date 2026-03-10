@@ -44,6 +44,7 @@ function App() {
   const [difficultyLevel, setDifficultyLevel] = useState(3); // 1-5 scale
   const [vietnameseRatio, setVietnameseRatio] = useState(70); // percentage of Vietnamese
   const sessionRecordedRef = useRef(false);
+  const pendingConnectRef = useRef(false);
   
   const { 
     connectionState, 
@@ -103,8 +104,15 @@ function App() {
   const handleProfileReady = useCallback((profile: UserProfile) => {
     setUserProfile(profile);
     setShowProfileModal(false);
-    setTimeout(() => connect(), 100);
-  }, [connect]);
+    pendingConnectRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (pendingConnectRef.current && userProfile) {
+      pendingConnectRef.current = false;
+      connect();
+    }
+  }, [userProfile, connect]);
 
   const isConnected = connectionState === ConnectionState.CONNECTED;
   const isConnecting = connectionState === ConnectionState.CONNECTING;

@@ -326,7 +326,7 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
           },
           onclose: () => {
             console.log("Connection closed");
-            setConnectionState(ConnectionState.DISCONNECTED);
+            disconnect();
           },
           onerror: (err) => {
             // DEBUGGING: Check server logs for actual error. Common issues:

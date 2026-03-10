@@ -65,7 +65,7 @@ async function writeUsers(data) {
 
 // Generate simple ID from name
 function generateId(name) {
-  return name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now().toString(36);
+  return name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
 // ============================================================================
