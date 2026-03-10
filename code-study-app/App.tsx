@@ -432,7 +432,10 @@ function App() {
                     Connecting
                   </span>
                 ) : (
-                  <span className="text-xs text-slate-400">Ready</span>
+                  <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-slate-700/30 text-slate-500 rounded-full border border-slate-700/50">
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500" aria-hidden="true" />
+                    Idle
+                  </span>
                 )}
               </div>
               <Visualizer volume={volume} isConnected={isConnected} color="#10B981" />
@@ -450,7 +453,7 @@ function App() {
               const previewLines = codeLines.slice(0, MAX_PREVIEW_LINES);
               const hiddenLines = codeLines.length - MAX_PREVIEW_LINES;
               return (
-                <div className="p-4 border-t border-slate-700/50 border-t-emerald-500/20">
+                <div className="p-4 border-t border-emerald-500/20">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />

@@ -225,6 +225,23 @@
         .glass-card:focus-within .cta-row {
             background-color: rgba(255, 255, 255, 0.06);
         }
+        .pulse-dot {
+            position: relative;
+        }
+        .pulse-dot::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: #34d399;
+            animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes ping {
+            75%, 100% { transform: scale(2.2); opacity: 0; }
+        }
+        .glass-card:active {
+            transform: scale(0.99);
+        }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 transition-duration: 0.01ms !important;
@@ -232,6 +249,7 @@
             }
             .blob { will-change: auto; }
             [data-card] { animation: none; }
+            .pulse-dot::after { animation: none; }
         }
     </style>
 </head>
@@ -247,13 +265,13 @@
             <h1 id="page-title" class="text-5xl md:text-7xl font-extrabold tracking-tight mb-2 gradient-text">
                 Tran Thach Nguyen
             </h1>
-            <p class="text-2xl md:text-3xl font-medium text-slate-300 mb-2">Building AI Tools That Actually Help</p>
+            <p class="text-2xl md:text-3xl font-medium text-slate-300 mb-4">Building AI Tools That Actually Help</p>
             <p class="text-slate-300 max-w-2xl mx-auto text-lg">
                 Practical AI apps you can use today — to learn a language, ace your driver's test, edit a photo, or catch up on the news. Built to solve real problems, not just for demos.
             </p>
             <div class="mt-6 flex items-center justify-center gap-2">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-400 text-sm font-medium">
-                    <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                    <span aria-hidden="true" class="pulse-dot w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
                     8 apps &amp; tools
                 </span>
             </div>
@@ -365,6 +383,7 @@
     </main>
 
     <footer class="mt-20 mb-6 text-center text-slate-400 text-sm z-10">
+        <div class="w-16 h-px bg-white/10 mx-auto mb-4"></div>
         <p>&copy; 2026 Tran Thach Nguyen. All rights reserved.</p>
     </footer>
 
