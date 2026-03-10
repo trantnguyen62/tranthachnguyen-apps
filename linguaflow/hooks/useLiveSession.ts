@@ -155,6 +155,8 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
           weather: 'thời tiết (weather)',
           hobbies: 'sở thích (hobbies)',
           health: 'sức khỏe (health)',
+          education: 'học tập, trường học (education)',
+          transportation: 'giao thông, đi lại (transportation)',
         };
         const topicName = topicNames[activeLanguage.selectedTopic] || activeLanguage.selectedTopic;
         systemInstruction = systemInstruction + `\n\nCHỦ ĐỀ GỢI Ý: Học viên muốn nói về ${topicName}. Hãy hướng dẫn và luyện tập xoay quanh chủ đề này, nhưng vẫn linh hoạt nếu học viên muốn nói về điều khác.`;
