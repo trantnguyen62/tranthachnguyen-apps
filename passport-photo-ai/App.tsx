@@ -23,6 +23,8 @@ export default function App() {
     setImage(img);
     setResult(null);
     setStatus(AppStatus.IDLE);
+    // Preload the PhotoEditor chunk in the background when a photo is ready
+    if (img) void import('./components/PhotoEditor');
   }, []);
 
   const handleEditorSave = useCallback((img: PassportImage) => {

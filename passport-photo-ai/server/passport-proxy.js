@@ -4,6 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import crypto from 'crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: `${__dirname}/../.env.local` });
@@ -38,7 +39,7 @@ function apiRateLimit(req, res, next) {
   next();
 }
 // Periodically clean up stale entries to prevent memory growth
-setInterval(() => { const now = Date.now(); _rateMap.forEach((v, k) => { if (now > v.resetAt) _rateMap.delete(k); }); }, 120_000);
+setInterval(() => { const now = Date.now(); _rateMap.forEach((v, k) => { if (now > v.resetAt) _rateMap.delete(k); }); }, 60_000);
 
 // Serve static files from dist
 const distPath = join(__dirname, '../dist');
@@ -52,6 +53,27 @@ app.use(express.static(distPath, {
 }));
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// Simple result cache: avoid duplicate Gemini API calls for the same image
+const _checkCache = new Map(); // hash -> { result, expires }
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const CACHE_MAX = 50;
+function getCacheKey(data) {
+  return crypto.createHash('sha256').update(data).digest('hex').slice(0, 16);
+}
+function getCached(key) {
+  const entry = _checkCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expires) { _checkCache.delete(key); return null; }
+  return entry.result;
+}
+function setCache(key, result) {
+  if (_checkCache.size >= CACHE_MAX) {
+    // Evict oldest entry
+    _checkCache.delete(_checkCache.keys().next().value);
+  }
+  _checkCache.set(key, { result, expires: Date.now() + CACHE_TTL });
+}
 
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
@@ -73,6 +95,10 @@ app.post('/api/passport/check', apiRateLimit, async (req, res) => {
     if (!parsed) return res.status(400).json({ error: 'Invalid image type' });
     const { mimeType, data: clean } = parsed;
 
+    const cacheKey = getCacheKey(clean);
+    const cached = getCached(cacheKey);
+    if (cached) return res.json(cached);
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
       contents: {
@@ -90,12 +116,14 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
     let aiResult = {};
     try { if (match) aiResult = JSON.parse(match[0]); } catch { /* use default */ }
 
-    res.json({
+    const result = {
       compliant: !!aiResult.compliant,
       summary: aiResult.summary || '',
       issues: aiResult.issues || [],
       suggestions: aiResult.suggestions || []
-    });
+    };
+    setCache(cacheKey, result);
+    res.json(result);
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Analysis failed. Please try again.' });
