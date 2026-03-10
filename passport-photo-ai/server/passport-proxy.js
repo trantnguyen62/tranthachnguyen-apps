@@ -59,7 +59,7 @@ function parseBase64Image(base64Image) {
   const mimeMatch = base64Image.match(/^data:(image\/[a-z]+);base64,/i);
   const mimeType = mimeMatch ? mimeMatch[1].toLowerCase() : null;
   if (!mimeType || !ALLOWED_MIME_TYPES.has(mimeType)) return null;
-  const data = base64Image.replace(/^data:image\/[a-z]+;base64,/i, '');
+  const data = base64Image.slice(mimeMatch[0].length);
   return { mimeType, data };
 }
 

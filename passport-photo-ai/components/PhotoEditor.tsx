@@ -64,10 +64,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
     setProgress(10);
     
     try {
-      const [header, b64data] = image.data.split(',');
-      const mime = header.match(/data:([^;]+)/)?.[1] || image.mimeType;
-      const bytes = Uint8Array.from(atob(b64data), (c) => c.charCodeAt(0));
-      const blob = new Blob([bytes], { type: mime });
+      const blob = await fetch(image.data).then(r => r.blob());
       setProgress(30);
       
       const { removeBackground } = await import('@imgly/background-removal');

@@ -3,6 +3,8 @@ import { ImageUploader } from './components/ImageUploader';
 const PhotoEditor = lazy(() => import('./components/PhotoEditor').then(m => ({ default: m.PhotoEditor })));
 import { PassportImage, PassportCheckResult, AppStatus } from './types';
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 // Theme constants moved outside component
 const THEME = {
   accentPink: '#E94560',
@@ -347,7 +349,7 @@ export default function App() {
           color: 'rgba(255,255,255,0.3)', fontSize: 13
         }}>
           <p>
-            Made with <span style={{ color: accentPink }}>♥</span> by PassportLens · {new Date().getFullYear()}
+            Made with <span style={{ color: accentPink }}>♥</span> by PassportLens · {CURRENT_YEAR}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
             100% private — photos are analyzed instantly and never stored, uploaded to a server, or shared.
