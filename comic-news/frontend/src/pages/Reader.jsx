@@ -28,6 +28,7 @@ function Reader() {
         const comicRes = await fetch(`/api/comics/${id}`);
         const comicData = await comicRes.json();
         setComic(comicData);
+        document.title = `Reading: ${comicData.title} - Comic News`;
 
         // Canonical points to comic detail to avoid duplicate content
         document.getElementById('canonical-link')?.remove();

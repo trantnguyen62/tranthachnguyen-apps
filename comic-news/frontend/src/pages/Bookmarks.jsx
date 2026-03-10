@@ -8,6 +8,16 @@ function Bookmarks() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = 'My Bookmarks - Comic News';
+    document.getElementById('canonical-link')?.remove();
+    const canonical = Object.assign(document.createElement('link'), {
+      id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/bookmarks`,
+    });
+    document.head.appendChild(canonical);
+    return () => { canonical.remove(); };
+  }, []);
+
+  useEffect(() => {
     const fetchBookmarks = async () => {
       try {
         const res = await fetch('/api/bookmarks');

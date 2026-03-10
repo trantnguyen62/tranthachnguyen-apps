@@ -32,6 +32,7 @@ function Library() {
     setMeta('meta[name="twitter:title"]', title);
     setMeta('meta[name="twitter:description"]', description);
 
+    document.getElementById('canonical-link')?.remove();
     const canonical = Object.assign(document.createElement('link'), {
       id: 'canonical-link', rel: 'canonical', href: url,
     });
