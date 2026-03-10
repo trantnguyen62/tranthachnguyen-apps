@@ -318,7 +318,7 @@ export default function App() {
                   filter: 'grayscale(100%)'
                 }}>🪪</div>
                 <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20 }}>
-                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> — our AI will check it against official passport requirements
+                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.5)' }}>Analyze</strong> — catch issues that could get your passport rejected before you apply
                 </p>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.2)', marginBottom: 8, fontWeight: 600 }}>
@@ -330,6 +330,7 @@ export default function App() {
                     <li>✓ Background color &amp; uniformity</li>
                     <li>✓ Lighting &amp; shadow quality</li>
                     <li>✓ Image sharpness &amp; resolution</li>
+                    <li>✓ Glasses &amp; lens reflections</li>
                   </ul>
                 </div>
               </div>
@@ -349,7 +350,7 @@ export default function App() {
             Made with <span style={{ color: accentPink }}>♥</span> by PassportLens · {new Date().getFullYear()}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
-            100% private — your photos are processed in the moment and never stored or shared.
+            100% private — photos are analyzed instantly and never stored, uploaded to a server, or shared.
           </p>
         </footer>
       </div>

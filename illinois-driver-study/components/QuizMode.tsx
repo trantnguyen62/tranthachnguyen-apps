@@ -73,6 +73,11 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedOption(null);
       setShowResult(false);
+    } else {
+      setCurrentQuestionIndex(0);
+      setSelectedOption(null);
+      setShowResult(false);
+      setScore(0);
     }
   }, [currentQuestionIndex, questions.length]);
 
@@ -111,13 +116,16 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-3">
           <span aria-live="polite" aria-atomic="true" className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
             {t.questionLabel} {currentQuestionIndex + 1} {t.of} {questions.length}
           </span>
           <span aria-live="polite" aria-atomic="true" className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
             {t.score}: {score}
           </span>
+        </div>
+        <div className="w-full bg-slate-100 rounded-full h-1.5 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length}>
+          <div className="bg-blue-600 h-1.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }} />
         </div>
 
         <div className="flex gap-2 items-start mb-6">
@@ -183,6 +191,8 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
                   }`}>
                     {isCorrect ? (
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    ) : isWrong ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     ) : (
                       String.fromCharCode(65 + idx)
                     )}

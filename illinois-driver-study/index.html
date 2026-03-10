@@ -183,6 +183,20 @@
       body {
         font-family: 'Inter', sans-serif;
       }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.25s ease-out;
+      }
+      .animate-fade-in-up {
+        animation: fadeInUp 0.25s ease-out;
+      }
     </style>
   <script type="importmap">
 {
