@@ -6,6 +6,7 @@ RUN npm install -g serve && \
 COPY --chown=appuser:appgroup index.html ./
 COPY --chown=appuser:appgroup robots.txt ./
 COPY --chown=appuser:appgroup sitemap.xml ./
+COPY --chown=appuser:appgroup serve.json ./
 USER appuser
 EXPOSE 80
 CMD ["serve", "-s", ".", "-l", "80"]
