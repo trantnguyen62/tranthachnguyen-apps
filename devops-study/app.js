@@ -1473,6 +1473,33 @@ aws ecs update-service \\
 
 echo "Deployed \$ECR_REPO:\$IMAGE_TAG to \$SERVICE_NAME"`
                 }
+            ],
+            commands: [
+                { command: 'aws configure', description: 'Configure AWS CLI credentials and default region' },
+                { command: 'aws configure list-profiles', description: 'List all named AWS CLI profiles' },
+                { command: 'aws sts get-caller-identity', description: 'Show current AWS account and IAM identity' },
+                { command: 'aws ec2 describe-instances --query "Reservations[].Instances[].{ID:InstanceId,State:State.Name,IP:PublicIpAddress}"', description: 'List EC2 instances with state and IP' },
+                { command: 'aws ec2 start-instances --instance-ids i-1234567890abcdef0', description: 'Start a stopped EC2 instance' },
+                { command: 'aws ec2 stop-instances --instance-ids i-1234567890abcdef0', description: 'Stop a running EC2 instance' },
+                { command: 'aws s3 ls s3://my-bucket/', description: 'List objects in an S3 bucket' },
+                { command: 'aws s3 cp ./file.txt s3://my-bucket/file.txt', description: 'Upload a file to S3' },
+                { command: 'aws s3 sync ./local-dir s3://my-bucket/prefix/', description: 'Sync a local directory to S3' },
+                { command: 'aws s3 presign s3://my-bucket/file.txt --expires-in 3600', description: 'Generate a presigned URL valid for 1 hour' },
+                { command: 'aws lambda invoke --function-name my-function --payload \'{}\' output.json', description: 'Invoke a Lambda function and save response' },
+                { command: 'aws lambda list-functions --query "Functions[].FunctionName"', description: 'List all Lambda functions in the region' },
+                { command: 'aws logs tail /aws/lambda/my-function --follow', description: 'Tail CloudWatch logs for a Lambda function' },
+                { command: 'aws cloudformation deploy --template-file template.yaml --stack-name my-stack --capabilities CAPABILITY_IAM', description: 'Deploy or update a CloudFormation stack' },
+                { command: 'aws cloudformation describe-stack-events --stack-name my-stack', description: 'View CloudFormation stack events for debugging' },
+                { command: 'aws cloudformation delete-stack --stack-name my-stack', description: 'Delete a CloudFormation stack and all its resources' },
+                { command: 'aws iam list-roles --query "Roles[].RoleName"', description: 'List all IAM roles in the account' },
+                { command: 'aws iam get-role --role-name my-role', description: 'Get details of a specific IAM role' },
+                { command: 'aws secretsmanager get-secret-value --secret-id my-secret --query SecretString --output text', description: 'Retrieve a secret value from Secrets Manager' },
+                { command: 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account>.dkr.ecr.us-east-1.amazonaws.com', description: 'Authenticate Docker with ECR' },
+                { command: 'aws ecs list-services --cluster my-cluster', description: 'List all ECS services in a cluster' },
+                { command: 'aws ecs update-service --cluster my-cluster --service my-service --force-new-deployment', description: 'Force a new ECS service deployment' },
+                { command: 'aws eks update-kubeconfig --region us-east-1 --name my-cluster', description: 'Configure kubectl to connect to an EKS cluster' },
+                { command: 'aws cloudwatch get-metric-statistics --namespace AWS/EC2 --metric-name CPUUtilization --dimensions Name=InstanceId,Value=i-1234 --start-time 2024-01-01T00:00:00Z --end-time 2024-01-02T00:00:00Z --period 3600 --statistics Average', description: 'Get EC2 CPU utilization metrics' },
+                { command: 'aws rds describe-db-instances --query "DBInstances[].{ID:DBInstanceIdentifier,Status:DBInstanceStatus,Endpoint:Endpoint.Address}"', description: 'List RDS instances with status and endpoints' }
             ]
         },
         {
@@ -1754,6 +1781,33 @@ resource "aws_ecs_service" "app" {
   }
 }`
                 }
+            ],
+            commands: [
+                { command: 'terraform init', description: 'Initialize a Terraform working directory and download providers' },
+                { command: 'terraform init -upgrade', description: 'Upgrade provider and module versions to latest allowed' },
+                { command: 'terraform plan', description: 'Preview changes Terraform will make to infrastructure' },
+                { command: 'terraform plan -out=tfplan', description: 'Save the plan to a file for later apply' },
+                { command: 'terraform apply', description: 'Apply changes to reach the desired infrastructure state' },
+                { command: 'terraform apply tfplan', description: 'Apply a previously saved plan file' },
+                { command: 'terraform apply -auto-approve', description: 'Apply changes without interactive confirmation prompt' },
+                { command: 'terraform destroy', description: 'Destroy all infrastructure managed by the current configuration' },
+                { command: 'terraform destroy -target aws_instance.example', description: 'Destroy a specific resource' },
+                { command: 'terraform validate', description: 'Validate the configuration files for syntax and consistency' },
+                { command: 'terraform fmt', description: 'Reformat configuration files to canonical style' },
+                { command: 'terraform fmt -recursive', description: 'Format all .tf files in the directory tree' },
+                { command: 'terraform state list', description: 'List all resources in the Terraform state' },
+                { command: 'terraform state show aws_instance.example', description: 'Show details of a specific resource in state' },
+                { command: 'terraform state rm aws_instance.example', description: 'Remove a resource from state without destroying it' },
+                { command: 'terraform import aws_instance.example i-1234567890abcdef0', description: 'Import existing infrastructure into Terraform state' },
+                { command: 'terraform output', description: 'Show all output values from the current state' },
+                { command: 'terraform output vpc_id', description: 'Show a specific output value' },
+                { command: 'terraform workspace list', description: 'List all Terraform workspaces' },
+                { command: 'terraform workspace new staging', description: 'Create a new workspace named staging' },
+                { command: 'terraform workspace select production', description: 'Switch to the production workspace' },
+                { command: 'terraform graph | dot -Tsvg > graph.svg', description: 'Generate a visual dependency graph' },
+                { command: 'terraform providers lock -platform=linux_amd64', description: 'Lock provider versions for a specific platform' },
+                { command: 'terraform taint aws_instance.example', description: 'Mark a resource for replacement on next apply' },
+                { command: 'terraform untaint aws_instance.example', description: 'Remove the taint mark from a resource' }
             ]
         },
         {
@@ -2007,6 +2061,38 @@ save_work() {
     hooks:
       - id: hadolint-docker`
                 }
+            ],
+            commands: [
+                { command: 'git init', description: 'Initialize a new Git repository in the current directory' },
+                { command: 'git clone https://github.com/user/repo.git', description: 'Clone a remote repository locally' },
+                { command: 'git clone --depth=1 https://github.com/user/repo.git', description: 'Shallow clone with only the latest commit (faster)' },
+                { command: 'git status', description: 'Show the working tree status and staged/unstaged changes' },
+                { command: 'git add -p', description: 'Interactively stage individual hunks of changes' },
+                { command: 'git commit -m "feat: add login page"', description: 'Create a commit with a message' },
+                { command: 'git commit --amend --no-edit', description: 'Add staged changes to the last commit without changing its message' },
+                { command: 'git log --oneline --graph --decorate -20', description: 'Compact branch graph of last 20 commits' },
+                { command: 'git log --author="Jane" --since="1 week ago"', description: 'Filter commits by author and time range' },
+                { command: 'git diff HEAD', description: 'Show all uncommitted changes compared to last commit' },
+                { command: 'git diff main..feature-branch', description: 'Compare two branches' },
+                { command: 'git branch -a', description: 'List all local and remote branches' },
+                { command: 'git checkout -b feature/my-feature', description: 'Create and switch to a new branch' },
+                { command: 'git branch -d feature/my-feature', description: 'Delete a merged local branch' },
+                { command: 'git merge --no-ff feature/my-feature', description: 'Merge with a merge commit (no fast-forward)' },
+                { command: 'git rebase -i HEAD~5', description: 'Interactively rebase last 5 commits to squash or reorder' },
+                { command: 'git rebase origin/main', description: 'Replay current branch commits on top of latest main' },
+                { command: 'git stash push -m "WIP: refactor auth"', description: 'Save uncommitted changes with a description' },
+                { command: 'git stash pop', description: 'Restore the most recently stashed changes' },
+                { command: 'git stash list', description: 'List all stash entries' },
+                { command: 'git cherry-pick abc1234', description: 'Apply a specific commit onto the current branch' },
+                { command: 'git tag -a v1.0.0 -m "Release 1.0.0"', description: 'Create an annotated tag for a release' },
+                { command: 'git push origin --tags', description: 'Push all local tags to the remote' },
+                { command: 'git fetch --prune', description: 'Fetch remote changes and remove stale remote-tracking branches' },
+                { command: 'git reset --soft HEAD~1', description: 'Undo last commit, keeping changes staged' },
+                { command: 'git reset --hard HEAD~1', description: 'Undo last commit, discarding all changes' },
+                { command: 'git reflog', description: 'Show the history of HEAD movements to recover lost commits' },
+                { command: 'git bisect start && git bisect bad && git bisect good v1.0.0', description: 'Start a binary search to find the commit that introduced a bug' },
+                { command: 'git blame -L 10,20 src/app.js', description: 'Show who last modified lines 10-20 of a file' },
+                { command: 'git shortlog -sn', description: 'Summarize commit count by contributor' }
             ]
         },
         {
@@ -2280,6 +2366,43 @@ dpkg-reconfigure -plow unattended-upgrades
 
 echo "Server setup complete!"`
                 }
+            ],
+            commands: [
+                { command: 'ls -lah /var/log/', description: 'List log files with human-readable sizes' },
+                { command: 'pwd && ls -la', description: 'Print current directory and list all files including hidden' },
+                { command: 'find /var -name "*.log" -mtime +7 -delete', description: 'Delete log files older than 7 days' },
+                { command: 'df -h', description: 'Show disk space usage in human-readable format' },
+                { command: 'du -sh /var/log/*', description: 'Show size of each item in /var/log' },
+                { command: 'free -h', description: 'Show memory usage in human-readable format' },
+                { command: 'top -b -n1 | head -20', description: 'Snapshot of top processes (non-interactive)' },
+                { command: 'ps aux --sort=-%cpu | head -10', description: 'List top 10 processes by CPU usage' },
+                { command: 'ps aux --sort=-%mem | head -10', description: 'List top 10 processes by memory usage' },
+                { command: 'kill -15 <PID>', description: 'Send SIGTERM for graceful process shutdown' },
+                { command: 'kill -9 <PID>', description: 'Send SIGKILL to force-terminate a process' },
+                { command: 'pkill -f myapp', description: 'Kill all processes matching the name pattern' },
+                { command: 'chmod 755 script.sh', description: 'Set rwxr-xr-x permissions on a script' },
+                { command: 'chmod -R 644 /var/www/html/', description: 'Recursively set file permissions' },
+                { command: 'chown -R www-data:www-data /var/www/', description: 'Recursively change file owner and group' },
+                { command: 'grep -rn "ERROR" /var/log/ --include="*.log"', description: 'Search for ERROR in all .log files recursively' },
+                { command: 'tail -f /var/log/syslog | grep -i error', description: 'Follow syslog and filter for errors in real time' },
+                { command: 'awk \'{print $1}\' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head -10', description: 'Top 10 most frequent IPs in Nginx access log' },
+                { command: 'sed -i \'s/old-value/new-value/g\' config.conf', description: 'In-place find-and-replace in a file' },
+                { command: 'ss -tlnp', description: 'Show listening TCP ports and the processes using them' },
+                { command: 'netstat -tulnp', description: 'List open ports and associated processes' },
+                { command: 'curl -I https://example.com', description: 'Fetch HTTP headers to check server response' },
+                { command: 'systemctl status nginx', description: 'Check the status of a systemd service' },
+                { command: 'systemctl restart nginx && systemctl is-active nginx', description: 'Restart a service and verify it is running' },
+                { command: 'journalctl -u nginx -f --since "1 hour ago"', description: 'Follow Nginx logs from the last hour' },
+                { command: 'crontab -e', description: 'Edit the current user\'s cron jobs' },
+                { command: 'crontab -l', description: 'List all cron jobs for the current user' },
+                { command: 'env | grep -i proxy', description: 'Show all environment variables matching proxy' },
+                { command: 'export HTTP_PROXY=http://proxy.example.com:3128', description: 'Set an environment variable for the current shell' },
+                { command: 'ssh -i ~/.ssh/key.pem -L 8080:localhost:80 user@remote-host', description: 'SSH with port forwarding and identity file' },
+                { command: 'scp -r ./dist/ user@server:/var/www/html/', description: 'Securely copy a directory to a remote server' },
+                { command: 'tar -czf backup.tar.gz /etc/nginx/', description: 'Create a gzip-compressed tarball of a directory' },
+                { command: 'tar -xzf backup.tar.gz -C /tmp/', description: 'Extract a tarball to a target directory' },
+                { command: 'ulimit -n 65536', description: 'Increase max open file descriptors for the current shell' },
+                { command: 'lsof -i :8080', description: 'Show which process is using port 8080' }
             ]
         },
         {
