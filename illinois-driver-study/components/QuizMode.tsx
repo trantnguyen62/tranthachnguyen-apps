@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 import { getQuestions } from '../data/questions';
-import { generateSpeech } from '../services/gemini';
 import { Language } from '../types';
 
 // Illinois DMV requires 80% to pass
@@ -113,6 +112,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
       currentSourceRef.current = null;
 
       setIsPlayingAudio(true);
+      const { generateSpeech } = await import('../services/gemini');
       const audioBuffer = await generateSpeech(question.text);
 
       // Reuse audio context across calls

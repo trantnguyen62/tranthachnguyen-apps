@@ -112,18 +112,6 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   
   const t = TRANSLATIONS[language];
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopSession();
-    };
-  }, [stopSession]);
-
-  // Update questions list when language changes, effectively resetting the session context conceptually
-  // though the session itself needs manual restart to pick up new system instructions.
-  const allQuestions = useMemo(() => getQuestions(language), [language]);
-  const questionsMap = useMemo(() => new Map(allQuestions.map(q => [q.id, q])), [allQuestions]);
-
   const stopSession = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -157,6 +145,18 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
     setVolume(0);
     setCurrentQuestion(null);
   }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopSession();
+    };
+  }, [stopSession]);
+
+  // Update questions list when language changes, effectively resetting the session context conceptually
+  // though the session itself needs manual restart to pick up new system instructions.
+  const allQuestions = useMemo(() => getQuestions(language), [language]);
+  const questionsMap = useMemo(() => new Map(allQuestions.map(q => [q.id, q])), [allQuestions]);
 
   const startSession = async () => {
     try {
