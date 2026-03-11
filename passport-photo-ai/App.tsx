@@ -35,6 +35,7 @@ export default function App() {
     setImage(img);
     setShowEditor(false);
     setResult(null);
+    setStatus(AppStatus.IDLE);
   }, []);
 
   const handleEditorCancel = useCallback(() => {
