@@ -366,6 +366,7 @@ function App() {
                 </>
               ) : isConnected ? (
                 <>
+                  <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" aria-hidden="true" />
                   <MicOff className="w-5 h-5" />
                   End Session
                 </>
