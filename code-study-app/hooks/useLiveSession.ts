@@ -5,6 +5,12 @@ import { createBlob, decode, decodeAudioData } from '../utils/audio';
 import { ConnectionState, ChatMessage, StudyContext } from '../types';
 import { MODEL_NAME, SYSTEM_INSTRUCTION } from '../constants';
 
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
+
 const MAX_FILE_CHARS = 12000;
 
 let messageCounter = 0;
@@ -107,8 +113,9 @@ export const useLiveSession = (studyContext: StudyContext) => {
         }
       });
 
-      const inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
-      const outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      const AudioContextImpl = window.AudioContext || window.webkitAudioContext;
+      const inputCtx = new AudioContextImpl({ sampleRate: 16000 });
+      const outputCtx = new AudioContextImpl({ sampleRate: 24000 });
 
       audioContextsRef.current = { input: inputCtx, output: outputCtx };
       streamRef.current = stream;
@@ -279,9 +286,9 @@ export const useLiveSession = (studyContext: StudyContext) => {
             console.log("Connection closed");
             setConnectionState(ConnectionState.DISCONNECTED);
           },
-          onerror: (err: any) => {
+          onerror: (err: unknown) => {
             console.error("Session error:", err);
-            const errorMessage = err?.message || "Connection error occurred. Please try again.";
+            const errorMessage = err instanceof Error ? err.message : "Connection error occurred. Please try again.";
             setError(errorMessage);
             setConnectionState(ConnectionState.ERROR);
             disconnect();
@@ -296,18 +303,20 @@ export const useLiveSession = (studyContext: StudyContext) => {
         if (sessionPromiseRef.current === sessionPromise) {
           sessionRef.current = session;
         }
-      }).catch((err: any) => {
+      }).catch((err: unknown) => {
         console.error("Session promise rejected:", err);
       });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Setup error:", err);
-      let errorMessage = err.message || "Failed to start session";
+      let errorMessage = err instanceof Error ? err.message : "Failed to start session";
 
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        errorMessage = "Microphone access denied. Please allow microphone access and try again.";
-      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-        errorMessage = "No microphone found. Please connect a microphone and try again.";
+      if (err instanceof Error) {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          errorMessage = "Microphone access denied. Please allow microphone access and try again.";
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          errorMessage = "No microphone found. Please connect a microphone and try again.";
+        }
       }
 
       setError(errorMessage);

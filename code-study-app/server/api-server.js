@@ -158,6 +158,7 @@ app.get('/api/projects', (req, res) => {
 // Simple in-memory cache for file trees (TTL: 60s)
 const treeCache = new Map();
 const TREE_CACHE_TTL = 60_000;
+const SEARCH_RESULTS_LIMIT = 50;
 
 // Get file tree for a project
 app.get('/api/projects/:project/tree', (req, res) => {
@@ -226,7 +227,7 @@ app.get('/api/search', async (req, res) => {
   }
 
   async function searchDir(dirPath, basePath = '') {
-    if (results.length >= 50) return;
+    if (results.length >= SEARCH_RESULTS_LIMIT) return;
     let entries;
     try {
       entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
@@ -235,7 +236,7 @@ app.get('/api/search', async (req, res) => {
     }
 
     for (const entry of entries) {
-      if (results.length >= 50) break;
+      if (results.length >= SEARCH_RESULTS_LIMIT) break;
 
       const fullPath = path.join(dirPath, entry.name);
       const relativePath = path.join(basePath, entry.name);
