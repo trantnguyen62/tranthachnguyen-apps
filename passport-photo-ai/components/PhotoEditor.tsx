@@ -183,18 +183,18 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
 
   return (
     <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="editor-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-      <div style={{ background: 'rgba(17,17,17,0.95)', borderRadius: 24, width: '90%', maxWidth: 700, padding: 28, border: '1px solid rgba(255,255,255,0.08)', boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)` }}>
+      <div style={{ background: 'rgba(17,17,17,0.95)', borderRadius: 24, width: '90%', maxWidth: 700, maxHeight: '90vh', overflowY: 'auto', padding: 28, border: '1px solid rgba(255,255,255,0.08)', boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)` }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <h2 id="editor-title" style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 700, background: `linear-gradient(135deg, #fff 0%, ${accentGold} 60%, ${accentPink} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Photo Studio</h2>
           <button onClick={onCancel} aria-label="Close editor" style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>×</button>
         </div>
 
-        <div style={{ display: 'flex', gap: 20, marginBottom: 24 }}>
-          <div style={{ flex: 1, textAlign: 'center' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 24 }}>
+          <div style={{ flex: '1 1 200px', textAlign: 'center' }}>
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Original</p>
             <img src={image.data} alt="Original photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }} />
           </div>
-          <div style={{ flex: 1, textAlign: 'center' }}>
+          <div style={{ flex: '1 1 200px', textAlign: 'center' }}>
             <p style={{ fontSize: 11, color: '#10B981', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Result</p>
             {result ? (
               <img src={result} alt="Processed passport photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(16,185,129,0.2)' }} />
@@ -229,7 +229,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 16, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)', alignItems: 'flex-start' }}>
           <div style={{ flexShrink: 0 }}>
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Background</p>
             <div style={{ display: 'flex', gap: 8 }}>

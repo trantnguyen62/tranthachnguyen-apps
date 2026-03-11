@@ -198,6 +198,8 @@ export default function App() {
                   fontFamily: "'Space Grotesk', sans-serif",
                   animation: image && status === AppStatus.IDLE ? 'ctaPulse 2.5s ease-in-out infinite' : 'none'
                 }}
+                onMouseEnter={e => { if (image && status !== AppStatus.CHECKING) { e.currentTarget.style.filter = 'brightness(1.1)'; e.currentTarget.style.boxShadow = `0 12px 32px ${accentPink}55`; } }}
+                onMouseLeave={e => { if (image) { e.currentTarget.style.filter = ''; e.currentTarget.style.boxShadow = `0 8px 24px ${accentPink}33`; } }}
               >
                 {status === AppStatus.CHECKING ? (
                   <>
