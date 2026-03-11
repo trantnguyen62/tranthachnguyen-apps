@@ -1,4 +1,4 @@
-import React, { useState, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { ImageUploader } from './components/ImageUploader';
 const PhotoEditor = lazy(() => import('./components/PhotoEditor').then(m => ({ default: m.PhotoEditor })));
 import { PassportImage, PassportCheckResult, AppStatus } from './types';
@@ -44,6 +44,12 @@ export default function App() {
   const handleOpenEditor = useCallback(() => {
     setShowEditor(true);
   }, []);
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = showEditor ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [showEditor]);
 
   const handleCheck = useCallback(async () => {
     if (!image) return;
@@ -160,16 +166,19 @@ export default function App() {
               <button
                 onClick={handleOpenEditor}
                 disabled={!image}
+                title="Remove and replace the background using AI"
                 style={{
                   padding: '16px 12px', borderRadius: 14,
                   border: image ? `1px solid ${accentPurple}44` : '1px solid transparent',
                   background: image ? `linear-gradient(135deg, ${accentPurple}33, ${accentPurple}11)` : 'rgba(255,255,255,0.03)',
-                  color: image ? accentPurple : 'rgba(255,255,255,0.2)', 
+                  color: image ? accentPurple : 'rgba(255,255,255,0.2)',
                   fontWeight: 600, cursor: image ? 'pointer' : 'not-allowed',
                   transition: 'all 0.3s ease',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   fontFamily: "'Space Grotesk', sans-serif"
                 }}
+                onMouseEnter={e => { if (image) { const el = e.currentTarget; el.style.background = `linear-gradient(135deg, ${accentPurple}55, ${accentPurple}22)`; el.style.borderColor = `${accentPurple}88`; } }}
+                onMouseLeave={e => { if (image) { const el = e.currentTarget; el.style.background = `linear-gradient(135deg, ${accentPurple}33, ${accentPurple}11)`; el.style.borderColor = `${accentPurple}44`; } }}
               >
                 <span aria-hidden="true">✨</span> Fix Background
               </button>
@@ -209,7 +218,7 @@ export default function App() {
             borderRadius: 24, 
             padding: 28,
             border: '1px solid rgba(255,255,255,0.08)',
-            minHeight: 450
+            minHeight: 'clamp(260px, 40vh, 450px)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <span aria-hidden="true" style={{ fontSize: 20 }}>📋</span>
@@ -331,13 +340,13 @@ export default function App() {
                 {/* Suggestions */}
                 {result.suggestions?.length > 0 && (
                   <div>
-                    <h4 style={{ 
-                      fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', 
+                    <h4 style={{
+                      fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em',
                       color: accentPurple, marginBottom: 12, fontWeight: 600,
                       display: 'flex', alignItems: 'center', gap: 8
                     }}>
                       <span style={{ width: 16, height: 2, background: accentPurple, borderRadius: 1 }} />
-                      Pro Tips
+                      AI Suggestions
                     </h4>
                     {result.suggestions.map((tip: string, idx: number) => (
                       <div key={idx} style={{

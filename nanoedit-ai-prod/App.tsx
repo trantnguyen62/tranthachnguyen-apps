@@ -8,12 +8,12 @@ import { ProcessedImage, AppStatus } from './types';
 
 // Static data moved outside component to prevent recreation
 const PRESET_PROMPTS = [
-  { text: "Remove the background", Icon: Scissors },
-  { text: "Enhance colors and brightness", Icon: Sun },
-  { text: "Turn this into a sketch", Icon: PenLine },
-  { text: "Add a cyberpunk neon filter", Icon: Zap },
-  { text: "Make it look like a vintage photo", Icon: Film },
-  { text: "Remove blemishes and smooth skin", Icon: Sparkles },
+  { label: "Remove Background", text: "Remove the background", Icon: Scissors },
+  { label: "Enhance Colors", text: "Enhance colors and brightness", Icon: Sun },
+  { label: "Sketch Effect", text: "Turn this into a sketch", Icon: PenLine },
+  { label: "Cyberpunk Filter", text: "Add a cyberpunk neon filter", Icon: Zap },
+  { label: "Vintage Look", text: "Make it look like a vintage photo", Icon: Film },
+  { label: "Smooth Skin", text: "Remove blemishes and smooth skin", Icon: Sparkles },
 ] as const;
 
 const PASSPORT_PROMPT = "Convert this into a professional passport photo: solid white background, center the subject, crop to head and shoulders, ensure even lighting, and make it look professional.";
@@ -43,15 +43,29 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [showSlowHint, setShowSlowHint] = useState(false);
   const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const slowHintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
-      if (downloadTimerRef.current !== null) {
-        clearTimeout(downloadTimerRef.current);
-      }
+      if (downloadTimerRef.current !== null) clearTimeout(downloadTimerRef.current);
+      if (slowHintTimerRef.current !== null) clearTimeout(slowHintTimerRef.current);
     };
   }, []);
+
+  // Show a "this may take a while" hint after 15 seconds of processing
+  useEffect(() => {
+    if (status === AppStatus.PROCESSING) {
+      slowHintTimerRef.current = setTimeout(() => setShowSlowHint(true), 15000);
+    } else {
+      if (slowHintTimerRef.current !== null) clearTimeout(slowHintTimerRef.current);
+      setShowSlowHint(false);
+    }
+    return () => {
+      if (slowHintTimerRef.current !== null) clearTimeout(slowHintTimerRef.current);
+    };
+  }, [status]);
 
   // Derived state
   const currentImage = history[historyIndex] ?? null;
@@ -291,7 +305,7 @@ const App: React.FC = () => {
                     {status === AppStatus.PROCESSING ? (
                       <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5 animate-pulse" role="status" aria-live="polite">
                         <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                        Generating your edit…
+                        {showSlowHint ? 'Still working — AI can take up to 2 min…' : 'Generating your edit…'}
                       </span>
                     ) : (
                       <span id="prompt-hint" className="text-xs text-slate-400 pl-2 flex items-center gap-2">
@@ -309,7 +323,7 @@ const App: React.FC = () => {
                         className="flex-1 sm:flex-initial rounded-lg shadow-sm"
                         leftIcon={<Wand2 className="w-4 h-4" />}
                       >
-                        Generate
+                        {status === AppStatus.PROCESSING ? 'Generating…' : 'Generate'}
                       </Button>
                     </div>
                   </div>
@@ -332,17 +346,18 @@ const App: React.FC = () => {
                   </button>
 
                   <div className="flex flex-wrap gap-2">
-                    {PRESET_PROMPTS.map(({ text, Icon }) => {
+                    {PRESET_PROMPTS.map(({ label, text, Icon }) => {
                       const isActive = prompt === text;
                       return (
                         <button
                           key={text}
                           onClick={() => handlePresetClick(text)}
                           aria-pressed={isActive}
+                          title={text}
                           className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border rounded-full transition-colors ${isActive ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200'}`}
                         >
                           <Icon className="w-3 h-3" aria-hidden="true" />
-                          {text}
+                          {label}
                         </button>
                       );
                     })}
