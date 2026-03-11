@@ -64,7 +64,7 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
           )}
           <span className="text-slate-200 font-medium truncate">{node.name}</span>
           {!isExpanded && node.children && node.children.length > 0 && (
-            <span className="ml-auto text-xs text-slate-600 pr-1 flex-shrink-0">{node.children.length}</span>
+            <span className="ml-auto text-xs text-slate-500 bg-slate-700/60 rounded px-1.5 py-0.5 flex-shrink-0 leading-none">{node.children.length}</span>
           )}
         </button>
         {isExpanded && node.children && (

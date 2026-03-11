@@ -265,7 +265,7 @@ function App() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    placeholder="Search files..."
+                    placeholder="Search by filename or content..."
                     aria-label="Search files"
                     className="flex-1 bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                   />
@@ -340,7 +340,7 @@ function App() {
               </div>
             </div>
           ) : (
-            <span className="text-xs text-slate-600 italic">Select a file to begin</span>
+            <span className="text-xs text-slate-500">Open a file from the sidebar to view it here</span>
           )}
 
           <div className="flex-1" />
@@ -353,7 +353,7 @@ function App() {
               aria-label={isConnecting ? 'Connecting to AI tutor' : isConnected ? 'End voice session' : 'Start voice session'}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 isConnected
-                  ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                  ? 'bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/30'
                   : isConnecting
                   ? 'bg-slate-700/50 text-slate-400'
                   : 'bg-emerald-500 text-white hover:bg-emerald-400 shadow-lg shadow-emerald-500/25'
@@ -439,9 +439,8 @@ function App() {
                     Connecting
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-slate-700/30 text-slate-500 rounded-full border border-slate-700/50">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-500" aria-hidden="true" />
-                    Idle
+                  <span className="text-xs text-slate-600 italic">
+                    Start a session to chat
                   </span>
                 )}
               </div>

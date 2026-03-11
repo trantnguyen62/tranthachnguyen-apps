@@ -55,18 +55,19 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
             <p className="text-slate-300 font-semibold mb-1">AI Tutor ready</p>
             <p className="text-slate-500 text-xs">Start a voice session to ask questions about your code</p>
           </div>
-          <div className="text-left space-y-2.5 text-xs text-slate-500 bg-slate-800/60 rounded-lg p-3">
-            <p className="flex items-center gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0">1</span>
-              Open a file from the sidebar
+          <div className="text-left space-y-2 text-xs text-slate-500 bg-slate-800/60 rounded-lg p-3 border border-slate-700/40">
+            <p className="text-slate-400 font-medium mb-2.5">Get started in 3 steps:</p>
+            <p className="flex items-start gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-px">1</span>
+              <span>Open a file from the sidebar</span>
             </p>
-            <p className="flex items-center gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0">2</span>
-              Click <span className="text-emerald-400 font-medium mx-1">Start Voice Session</span>
+            <p className="flex items-start gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-px">2</span>
+              <span>Click <span className="text-emerald-400 font-medium">Start Voice Session</span></span>
             </p>
-            <p className="flex items-center gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0">3</span>
-              Speak your question
+            <p className="flex items-start gap-2.5">
+              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs flex-shrink-0 mt-px">3</span>
+              <span>Speak your question — select code first to add context</span>
             </p>
           </div>
         </div>
