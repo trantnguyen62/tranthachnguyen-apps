@@ -612,6 +612,29 @@ function setupEventListeners() {
         if (game.questionActive && ['1', '2', '3', '4'].includes(e.key)) {
             selectAnswer(parseInt(e.key) - 1);
         }
+
+        // Focus trap inside question modal
+        if (game.questionActive && e.key === 'Tab') {
+            const answerBtns = [...document.querySelectorAll('#answerGrid .answer-btn:not([disabled])')];
+            if (answerBtns.length === 0) return;
+            const currentIdx = answerBtns.indexOf(document.activeElement);
+            if (e.shiftKey) {
+                const prevIdx = currentIdx <= 0 ? answerBtns.length - 1 : currentIdx - 1;
+                answerBtns[prevIdx].focus();
+            } else {
+                const nextIdx = currentIdx >= answerBtns.length - 1 ? 0 : currentIdx + 1;
+                answerBtns[nextIdx].focus();
+            }
+            e.preventDefault();
+        }
+
+        // Escape on game over screen goes to menu
+        if (e.key === 'Escape') {
+            const gameOverScreen = document.getElementById('gameOverScreen');
+            if (gameOverScreen && !gameOverScreen.classList.contains('hidden')) {
+                showStartScreen();
+            }
+        }
     });
 
     document.addEventListener('click', (e) => {
@@ -698,7 +721,9 @@ function startGame() {
 
     updateTopicCache();
     const topic = game.topicCache.topic;
-    document.getElementById('currentTopicBadge').textContent = `${topic.icon} ${topic.name}`;
+    const topicBadge = document.getElementById('currentTopicBadge');
+    topicBadge.textContent = `${topic.icon} ${topic.name}`;
+    topicBadge.setAttribute('aria-label', `Current topic: ${topic.name}`);
     game.elScore.textContent = '0';
     game.elStreak.textContent = '0';
     game.elLives.textContent = '0';
@@ -1215,7 +1240,11 @@ function closeQuestion() {
     game.currentQuestion = null;
     document.getElementById('questionModal').classList.add('hidden');
     // Restart the render loop that was suspended during the question
-    if (game.running) gameLoop();
+    if (game.running) {
+        gameLoop();
+        // Return focus to canvas so keyboard events (Space) still work
+        if (game.canvas) game.canvas.focus({ preventScroll: true });
+    }
 }
 
 // Tips

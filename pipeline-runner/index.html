@@ -193,7 +193,8 @@
 </head>
 
 <body>
-    <main class="game-container">
+    <a href="#main-content" class="skip-link">Skip to game</a>
+    <main class="game-container" id="main-content">
         <!-- Ad Banner (Top) -->
         <div class="ad-banner ad-banner-top" id="adBannerTop" aria-hidden="true">
             <div class="ad-placeholder">
@@ -236,10 +237,10 @@
 
         <!-- Game Screen -->
         <div id="gameScreen" class="screen hidden">
-            <canvas id="gameCanvas" aria-label="Pipeline Runner game" role="img">Pipeline Runner game canvas. Use Space or click to boost your character through the pipeline obstacles.</canvas>
+            <canvas id="gameCanvas" aria-label="Pipeline Runner game" role="img" tabindex="-1">Pipeline Runner game canvas. Use Space or click to boost your character through the pipeline obstacles.</canvas>
             <div class="game-hud">
                 <div class="hud-left">
-                    <div class="topic-badge" id="currentTopicBadge">🐳 Docker</div>
+                    <div class="topic-badge" id="currentTopicBadge" aria-label="Current topic: Docker">🐳 Docker</div>
                 </div>
                 <div class="hud-center">
                     <div class="score-display">
