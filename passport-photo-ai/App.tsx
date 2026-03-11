@@ -377,7 +377,7 @@ export default function App() {
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: 10, fontWeight: 600 }}>
                     What we check
                   </p>
-                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1 }}>
+                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
                     {[
                       'Face centered, 70–80% of frame height',
                       'Neutral expression, eyes open & visible',

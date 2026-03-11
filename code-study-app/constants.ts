@@ -24,7 +24,7 @@ export const PROJECTS: Project[] = [
   {
     name: 'Landing Page',
     path: 'landing-page',
-    description: 'Personal portfolio site — good reference for layout composition, animation, and responsive design without a heavy framework'
+    description: 'Personal portfolio site — good reference for CSS animation techniques, scroll-based effects, responsive layout with CSS Grid/Flexbox, and keeping a UI fast without bundling a heavy framework'
   },
   {
     name: 'Cloudify',
@@ -160,6 +160,9 @@ SHARED PATTERNS WORTH HIGHLIGHTING:
 - LRU file cache in App.tsx prevents redundant API calls while bounding memory use — a common pattern worth understanding
 - Virtual scrolling in the code viewer renders only visible lines, which is important for large files; explain the math behind buffer + scroll offset calculations
 - WebSocket proxy servers add a security layer: they validate origins, apply rate limiting, and keep API keys server-side rather than exposing them to the browser
+- Cleanup patterns in useEffect and custom hooks: note when refs are used to cancel in-flight work, stop audio nodes, clear intervals, and release media streams — missing cleanup is a common source of memory leaks and stale-state bugs
+- React memoization choices: React.memo on components, useCallback for stable function references passed as props, useMemo for expensive derived values — point out where these are used and explain the trade-off: over-memoizing adds complexity without benefit, under-memoizing causes unnecessary re-renders
+- Error boundaries vs. local error state: these apps use local error state (useState for error strings) rather than React error boundaries — discuss why and when a full error boundary would be appropriate
 
 WHEN THE DEVELOPER SEEMS STUCK OR CONFUSED:
 - Reframe the concept with a concrete real-world analogy
