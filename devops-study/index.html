@@ -82,6 +82,7 @@
 </head>
 
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="app-container">
         <!-- Animated Background -->
         <div class="bg-animation">
@@ -143,7 +144,7 @@
             </aside>
 
             <!-- Main Content -->
-            <main class="main-content">
+            <main class="main-content" id="main-content">
                 <!-- Welcome Screen -->
                 <section class="welcome-screen" id="welcomeScreen">
                     <div class="welcome-content">
@@ -236,7 +237,7 @@
                             <div class="quiz-options" id="quizOptions">
                                 <!-- Options will be populated by JS -->
                             </div>
-                            <div class="quiz-feedback hidden" id="quizFeedback" aria-live="polite" aria-atomic="true">
+                            <div class="quiz-feedback hidden" id="quizFeedback" role="status" aria-live="polite" aria-atomic="true">
                                 <p id="feedbackText"></p>
                             </div>
                             <button class="quiz-next-btn hidden" id="quizNextBtn">Next Question</button>

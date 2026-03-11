@@ -3996,6 +3996,7 @@ function renderMatchItems() {
         if (!pair.matched) {
             item.setAttribute('tabindex', '0');
             item.setAttribute('role', 'button');
+            item.setAttribute('aria-pressed', 'false');
             item.addEventListener('click', () => selectMatchItem(item, pair.id, 'term'));
             item.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMatchItem(item, pair.id, 'term'); }
@@ -4013,6 +4014,7 @@ function renderMatchItems() {
         if (!pair.matched) {
             item.setAttribute('tabindex', '0');
             item.setAttribute('role', 'button');
+            item.setAttribute('aria-pressed', 'false');
             item.addEventListener('click', () => selectMatchItem(item, pair.id, 'definition'));
             item.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMatchItem(item, pair.id, 'definition'); }
@@ -4029,9 +4031,11 @@ function selectMatchItem(element, id, type) {
         // Deselect previous term if any
         if (matchState.selectedTermEl) {
             matchState.selectedTermEl.classList.remove('selected');
+            matchState.selectedTermEl.setAttribute('aria-pressed', 'false');
         }
 
         element.classList.add('selected');
+        element.setAttribute('aria-pressed', 'true');
         matchState.selectedTerm = id;
         matchState.selectedTermEl = element;
     } else if (type === 'definition' && matchState.selectedTerm !== null) {
@@ -4049,6 +4053,7 @@ function selectMatchItem(element, id, type) {
             document.querySelectorAll(`.match-item[data-id="${id}"]`).forEach(el => {
                 el.classList.remove('selected');
                 el.classList.add('matched');
+                el.removeAttribute('aria-pressed');
             });
 
             matchState.selectedTerm = null;
@@ -4068,6 +4073,7 @@ function selectMatchItem(element, id, type) {
                 element.classList.remove('incorrect');
                 if (selectedTermEl) {
                     selectedTermEl.classList.remove('incorrect', 'selected');
+                    selectedTermEl.setAttribute('aria-pressed', 'false');
                 }
                 matchState.selectedTerm = null;
                 matchState.selectedTermEl = null;
