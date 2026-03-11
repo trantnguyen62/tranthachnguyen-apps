@@ -8,6 +8,14 @@ import { ProcessedImage, AppStatus } from './types';
 
 const MAX_HISTORY = 10;
 
+const PROCESSING_MESSAGES = [
+  'Analyzing your image…',
+  'Applying your edits…',
+  'Generating the result…',
+  'Adding finishing touches…',
+  'Almost there…',
+] as const;
+
 // Static data moved outside component to prevent recreation
 const PRESET_PROMPTS = [
   { label: "Remove Background", text: "Remove the background", Icon: Scissors },
@@ -45,27 +53,29 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
-  const [showSlowHint, setShowSlowHint] = useState(false);
+  const [processingMsgIdx, setProcessingMsgIdx] = useState(0);
   const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const slowHintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const processingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     return () => {
       if (downloadTimerRef.current !== null) clearTimeout(downloadTimerRef.current);
-      if (slowHintTimerRef.current !== null) clearTimeout(slowHintTimerRef.current);
+      if (processingIntervalRef.current !== null) clearInterval(processingIntervalRef.current);
     };
   }, []);
 
-  // Show a "this may take a while" hint after 15 seconds of processing
+  // Cycle through processing messages to make the wait feel shorter
   useEffect(() => {
     if (status === AppStatus.PROCESSING) {
-      slowHintTimerRef.current = setTimeout(() => setShowSlowHint(true), 15000);
+      setProcessingMsgIdx(0);
+      processingIntervalRef.current = setInterval(() => {
+        setProcessingMsgIdx(prev => (prev + 1) % PROCESSING_MESSAGES.length);
+      }, 3500);
     } else {
-      if (slowHintTimerRef.current !== null) clearTimeout(slowHintTimerRef.current);
-      setShowSlowHint(false);
+      if (processingIntervalRef.current !== null) clearInterval(processingIntervalRef.current);
     }
     return () => {
-      if (slowHintTimerRef.current !== null) clearTimeout(slowHintTimerRef.current);
+      if (processingIntervalRef.current !== null) clearInterval(processingIntervalRef.current);
     };
   }, [status]);
 
@@ -267,11 +277,9 @@ const App: React.FC = () => {
                     >
                       <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
-                    {history.length > 1 && (
-                      <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full select-none mx-0.5" aria-label={`Version ${historyIndex + 1} of ${history.length}`}>
-                        {historyIndex + 1}/{history.length}
-                      </span>
-                    )}
+                    <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full select-none mx-0.5" aria-label={`Version ${historyIndex + 1} of ${history.length}`}>
+                      {historyIndex + 1}/{history.length}
+                    </span>
                     <button
                       onClick={handleRedo}
                       disabled={!canRedo}
@@ -309,9 +317,9 @@ const App: React.FC = () => {
                   </div>
                   <div className="px-2 pb-2 flex justify-between items-center gap-2">
                     {status === AppStatus.PROCESSING ? (
-                      <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5 animate-pulse" role="status" aria-live="polite">
-                        <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                        {showSlowHint ? 'Complex edits take a moment — almost there…' : 'Generating your edit…'}
+                      <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5" role="status" aria-live="polite" aria-atomic="true">
+                        <Sparkles className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
+                        {PROCESSING_MESSAGES[processingMsgIdx]}
                       </span>
                     ) : (
                       <span id="prompt-hint" className="text-xs text-slate-400 pl-2 flex items-center gap-2">
