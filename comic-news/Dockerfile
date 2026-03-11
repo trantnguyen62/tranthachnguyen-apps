@@ -12,4 +12,5 @@ COPY backend/server.js ./server.js
 COPY backend/images ./images
 
 EXPOSE 5187
+USER node
 CMD ["node", "server.js"]

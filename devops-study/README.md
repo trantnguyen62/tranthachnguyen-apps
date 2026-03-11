@@ -21,6 +21,10 @@ An interactive study application to master DevOps concepts through flashcards, q
 - 🌿 Git
 - 🐧 Linux
 - 📊 Monitoring
+- 🤖 Ansible
+- ☁️ Azure
+- 🔒 DevSecOps
+- 🌐 Networking
 
 ## 🚀 Quick Start
 
@@ -47,6 +51,7 @@ docker run -p 8080:80 devops-study
 |-----|--------|
 | `←` / `→` | Previous / Next flashcard |
 | `Space` / `Enter` | Flip flashcard |
+| `1` – `4` | Select quiz answer |
 
 ## 📁 Project Structure
 
@@ -54,12 +59,27 @@ docker run -p 8080:80 devops-study
 devops-study/
 ├── index.html          # Main HTML file
 ├── privacy.html        # Privacy policy page
-├── app.js              # Application logic
-├── app.min.js          # Minified version
+├── app.js              # Application logic and study data
+├── app.min.js          # Minified version (generated)
 ├── styles.css          # Styling
-├── styles.min.css      # Minified version
+├── styles.min.css      # Minified version (generated)
+├── serve.json          # Static server config with security headers
 └── Dockerfile          # Docker configuration
 ```
+
+## 🛠️ Development
+
+The app has no build step for development — edit `app.js` and `styles.css` directly.
+
+To regenerate the minified files before deploying:
+
+```bash
+npm install
+npx terser app.js -o app.min.js
+npx terser --compress --mangle -- styles.css > styles.min.css
+```
+
+Progress is stored in `localStorage` under the key `devops-mastery-progress`.
 
 ## 🌐 Live Demo
 

@@ -24,6 +24,8 @@ app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:");
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
   next();
 });
 
@@ -31,6 +33,13 @@ app.use((req, res, next) => {
 const writeRateLimits = new Map();
 const WRITE_WINDOW_MS = 60_000;
 const WRITE_MAX_REQUESTS = 30;
+// Purge stale entries every 5 minutes to prevent unbounded memory growth
+setInterval(() => {
+  const cutoff = Date.now() - WRITE_WINDOW_MS;
+  for (const [key, entry] of writeRateLimits) {
+    if (entry.start < cutoff) writeRateLimits.delete(key);
+  }
+}, 5 * 60_000).unref();
 function writeRateLimit(req, res, next) {
   const key = req.ip;
   const now = Date.now();
