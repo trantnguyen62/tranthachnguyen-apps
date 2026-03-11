@@ -65,10 +65,14 @@ function Reader() {
   }, []);
 
   useEffect(() => {
-    const handleKeyPress = (e) => {
+    const handleKeyPress = async (e) => {
       if (e.key === 'Escape') {
         if (isFullscreen) {
-          document.exitFullscreen();
+          try {
+            await document.exitFullscreen();
+          } catch (error) {
+            console.error('exitFullscreen failed:', error);
+          }
         } else {
           navigate(`/comic/${id}`);
         }
@@ -104,11 +108,15 @@ function Reader() {
     }
   }, [comic]);
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.error('Fullscreen request failed:', error);
     }
   };
 
@@ -160,10 +168,12 @@ function Reader() {
       </div>
 
       {/* Top Controls */}
-      <div 
+      <div
         className={`fixed top-1 left-0 right-0 z-40 transition-opacity duration-300 ${
           showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
+        aria-hidden={!showControls}
+        inert={!showControls ? '' : undefined}
       >
         <div className="bg-gradient-to-b from-black/90 to-transparent p-4">
           <div className="max-w-4xl mx-auto flex items-center justify-between">

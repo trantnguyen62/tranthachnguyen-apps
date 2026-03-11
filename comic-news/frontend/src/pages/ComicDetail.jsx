@@ -231,7 +231,7 @@ function ComicDetail() {
                 >
                   <div
                     className="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full"
-                    style={{ width: `${(progress / comic.pages.length) * 100}%` }}
+                    style={{ width: comic.pages.length > 0 ? `${(progress / comic.pages.length) * 100}%` : '0%' }}
                   />
                 </div>
               </div>
