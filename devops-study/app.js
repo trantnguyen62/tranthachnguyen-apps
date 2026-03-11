@@ -4051,6 +4051,7 @@ function selectMatchItem(element, id, type) {
         matchState.attempts++;
         document.getElementById('matchAttempts').textContent = matchState.attempts;
 
+        const matchAnnouncer = document.getElementById('matchAnnouncer');
         if (matchState.selectedTerm === id) {
             // Correct match!
             matchState.pairs[id].matched = true;
@@ -4069,6 +4070,8 @@ function selectMatchItem(element, id, type) {
                 el.setAttribute('aria-label', `${type === 'term' ? 'Term' : 'Definition'}: ${text}, matched`);
             });
 
+            if (matchAnnouncer) matchAnnouncer.textContent = `Correct match! ${matchState.matchedPairs} of ${matchState.pairs.length} matched.`;
+
             matchState.selectedTerm = null;
             matchState.selectedTermEl = null;
 
@@ -4081,6 +4084,7 @@ function selectMatchItem(element, id, type) {
             const selectedTermEl = matchState.selectedTermEl;
             element.classList.add('incorrect');
             if (selectedTermEl) selectedTermEl.classList.add('incorrect');
+            if (matchAnnouncer) matchAnnouncer.textContent = 'Incorrect match. Try again.';
 
             setTimeout(() => {
                 element.classList.remove('incorrect');
@@ -4169,6 +4173,12 @@ function markCardViewed(topicId, cardIndex) {
 function flipCard() {
     dom.flashcard.classList.toggle('flipped');
     state.isCardFlipped = !state.isCardFlipped;
+    const card = state.currentTopic.flashcards[state.currentCardIndex];
+    dom.flashcard.setAttribute('aria-label',
+        state.isCardFlipped
+            ? `Definition: ${card.definition}. Press Space or Enter to flip back.`
+            : `Term: ${card.term}. Press Space or Enter to flip.`
+    );
 }
 
 // Navigate flashcards
@@ -4239,12 +4249,16 @@ function selectAnswer(selectedIndex) {
     }
 
     // Highlight answers
+    const letters = ['A', 'B', 'C', 'D'];
     dom.quizOptions.querySelectorAll('.quiz-option').forEach((opt, index) => {
         opt.disabled = true;
+        const optionText = question.options[index];
         if (index === question.correct) {
             opt.classList.add('correct');
+            opt.setAttribute('aria-label', `Correct answer - Option ${letters[index]}: ${optionText}`);
         } else if (index === selectedIndex && !isCorrect) {
             opt.classList.add('incorrect');
+            opt.setAttribute('aria-label', `Incorrect - Option ${letters[index]}: ${optionText}`);
         }
     });
 
