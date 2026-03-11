@@ -43,6 +43,7 @@ function ComicDetail() {
         setMeta('meta[name="twitter:title"]', pageTitle);
         setMeta('meta[name="twitter:description"]', comicData.description);
         setMeta('meta[name="twitter:image"]', imgUrl);
+        setMeta('meta[property="og:image:alt"]', comicData.title);
 
         // Keywords meta
         document.getElementById('meta-keywords')?.remove();
@@ -74,7 +75,15 @@ function ComicDetail() {
           publisher: { '@type': 'Organization', name: 'Comic News', url: window.location.origin },
           image: imgUrl,
           genre: comicData.genre,
+          inLanguage: 'en-US',
           url: window.location.href,
+          aggregateRating: comicData.rating ? {
+            '@type': 'AggregateRating',
+            ratingValue: comicData.rating,
+            bestRating: 5,
+            worstRating: 1,
+            ratingCount: 1,
+          } : undefined,
         });
         document.head.appendChild(ld);
 

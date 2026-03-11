@@ -3993,14 +3993,18 @@ function renderMatchItems() {
         item.dataset.id = pair.id;
         item.dataset.type = 'term';
         item.textContent = pair.term;
+        item.setAttribute('role', 'button');
         if (!pair.matched) {
             item.setAttribute('tabindex', '0');
-            item.setAttribute('role', 'button');
             item.setAttribute('aria-pressed', 'false');
+            item.setAttribute('aria-label', `Term: ${pair.term}`);
             item.addEventListener('click', () => selectMatchItem(item, pair.id, 'term'));
             item.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMatchItem(item, pair.id, 'term'); }
             });
+        } else {
+            item.setAttribute('aria-disabled', 'true');
+            item.setAttribute('aria-label', `Term: ${pair.term}, matched`);
         }
         termsContainer.appendChild(item);
     });
@@ -4125,6 +4129,7 @@ function renderFlashcard() {
     // Update progress bar
     const progress = ((state.currentCardIndex + 1) / cards.length) * 100;
     dom.flashcardProgress.style.width = progress + '%';
+    dom.flashcardProgress.parentElement.setAttribute('aria-valuenow', Math.round(progress));
 
     // Reset flip state
     dom.flashcard.classList.remove('flipped');
@@ -4191,6 +4196,7 @@ function renderQuizQuestion() {
     question.options.forEach((option, index) => {
         const btn = document.createElement('button');
         btn.className = 'quiz-option';
+        btn.setAttribute('aria-label', `Option ${letters[index]}: ${option}`);
         btn.innerHTML = `
             <span class="option-letter">${letters[index]}</span>
             <span>${escapeHtml(option)}</span>
@@ -4202,6 +4208,7 @@ function renderQuizQuestion() {
     // Update progress bar
     const progress = ((state.currentQuestionIndex + 1) / questions.length) * 100;
     dom.quizProgress.style.width = progress + '%';
+    dom.quizProgress.parentElement.setAttribute('aria-valuenow', Math.round(progress));
 
     // Hide feedback and next button
     dom.quizFeedback.classList.add('hidden');
