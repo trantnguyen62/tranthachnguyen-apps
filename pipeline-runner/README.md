@@ -104,6 +104,19 @@ This game is designed for app store deployment using Capacitor:
 
 See [Apple Developer Program](https://developer.apple.com) for iOS App Store submission requirements.
 
+## 🏅 Ranks & Progression
+
+Gates passed determine your rank at the end of each run:
+
+| Gates | Rank |
+|-------|------|
+| 0 | 🔧 Junior DevOps |
+| 10 | ⚙️ DevOps Engineer |
+| 25 | 🛠️ Senior DevOps |
+| 50 | 🚀 DevOps Lead |
+| 75 | 🌟 Platform Engineer |
+| 100 | 👑 DevOps Architect |
+
 ## ⚙️ Game Configuration
 
 Key constants in `game.js` (`CONFIG` object) that control gameplay feel:
@@ -138,4 +151,4 @@ To reset progress, run `localStorage.clear()` in the browser console.
 
 ## 📄 License
 
-© 2026 Pipeline Runner. All rights reserved.
+MIT © 2026 Pipeline Runner.
