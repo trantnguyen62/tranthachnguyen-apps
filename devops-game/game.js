@@ -450,6 +450,7 @@ function init() {
         domCache.levelName     = document.getElementById('levelName');
         domCache.waveNumber    = document.getElementById('waveNumber');
         domCache.timerFill     = document.getElementById('timerFill');
+        domCache.timerText     = document.getElementById('timerText');
         domCache.questionPanel = document.getElementById('questionPanel');
         domCache.questionTopic = document.getElementById('questionTopic');
         domCache.questionText  = document.getElementById('questionText');
@@ -1481,7 +1482,12 @@ function updateTimerDisplay() {
     if (w === game._lastTimerWidth) return;
     game._lastTimerWidth = w;
     domCache.timerFill.style.width = `${w}%`;
-    domCache.timerFill.classList.toggle('timer-danger', pct < 0.3);
+    const isDanger = pct < 0.3;
+    domCache.timerFill.classList.toggle('timer-danger', isDanger);
+    if (domCache.timerText) {
+        domCache.timerText.textContent = `${Math.ceil(game.questionTimer)}s`;
+        domCache.timerText.classList.toggle('timer-danger', isDanger);
+    }
 }
 
 // Game state management

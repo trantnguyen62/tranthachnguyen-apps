@@ -314,6 +314,7 @@ body {
     display: block;
     width: 100%;
     height: 100%;
+    cursor: none;
 }
 
 .hud {
@@ -673,6 +674,24 @@ body {
     animation: timerPulse 0.5s ease-in-out infinite alternate;
 }
 
+.timer-text {
+    position: absolute;
+    top: 6px;
+    right: 0.75rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--nano-yellow);
+    text-shadow: 0 0 6px var(--nano-yellow-glow);
+    pointer-events: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.timer-text.timer-danger {
+    color: var(--danger);
+    text-shadow: 0 0 6px rgba(255, 0, 60, 0.6);
+}
+
 @keyframes timerPulse {
     0% { opacity: 1; }
     100% { opacity: 0.5; }
@@ -726,6 +745,7 @@ body {
 .topic-card {
     background: rgba(10, 10, 15, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 3px solid var(--topic-color, rgba(255, 255, 255, 0.2));
     padding: 1.5rem;
     cursor: pointer;
     transition: 0.3s;
