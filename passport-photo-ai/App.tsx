@@ -126,8 +126,8 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Get your passport photo right the first time — free AI compliance check against international biometric photo standards.<br/>
-            <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Analyze</span> · <span style={{ color: accentPurple }}>Download</span>
+            Avoid passport photo rejections. Free AI check for background, lighting, face position, and more — results in seconds.<br/>
+            <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
         </header>
 
@@ -348,7 +348,7 @@ export default function App() {
                       display: 'flex', alignItems: 'center', gap: 8
                     }}>
                       <span style={{ width: 16, height: 2, background: accentPurple, borderRadius: 1 }} />
-                      AI Suggestions
+                      How to Fix
                     </h4>
                     {result.suggestions.map((tip: string, idx: number) => (
                       <div key={idx} style={{
@@ -382,7 +382,7 @@ export default function App() {
                   filter: 'grayscale(100%)'
                 }}>🪪</div>
                 <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.4)' }}>
-                  Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to catch compliance issues before submitting your passport or visa application.
+                  Upload your photo and tap <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to instantly verify it meets official passport and visa requirements.
                 </p>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginBottom: 10, fontWeight: 600 }}>
@@ -391,11 +391,12 @@ export default function App() {
                   <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
                     {[
                       'Face centered, 70–80% of frame height',
-                      'Neutral expression, eyes open & visible',
+                      'Neutral expression, mouth closed, eyes open',
                       'Plain white or off-white background',
                       'Even lighting, no harsh shadows on face',
-                      'Sharp focus, sufficient resolution',
-                      'No glasses or lens reflections',
+                      'Sharp focus and sufficient resolution',
+                      'No glasses, tinted lenses, or reflections',
+                      'No head coverings (except for religious reasons)',
                     ].map((item, i) => (
                       <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                         <span style={{ flexShrink: 0, width: 16, height: 16, borderRadius: '50%', background: `${accentGold}18`, border: `1px solid ${accentGold}44`, color: accentGold, fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>

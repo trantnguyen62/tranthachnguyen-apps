@@ -3,7 +3,7 @@
  * Supports fullscreen mode, a loading overlay while a new edit is generating,
  * and video output when the processed result is a video MIME type.
  */
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { Download, Maximize2, X, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
 
 interface ComparisonViewProps {
@@ -23,6 +23,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isVideo = processedMimeType.startsWith('video/');
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   // Close fullscreen on Escape key press
   useEffect(() => {
@@ -34,6 +35,13 @@ export const ComparisonView = memo<ComparisonViewProps>(({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isExpanded]);
 
+  // Move focus to close button when fullscreen opens
+  useEffect(() => {
+    if (isExpanded && closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+  }, [isExpanded]);
+
   return (
     <div
       className={`transition-all duration-500 ease-in-out ${isExpanded ? 'fixed inset-0 z-50 bg-slate-900/95 p-4 overflow-y-auto' : 'w-full'}`}
@@ -43,8 +51,9 @@ export const ComparisonView = memo<ComparisonViewProps>(({
       {isExpanded && (
         <div className="fixed top-4 right-4 z-50">
            <button
+            ref={closeButtonRef}
             onClick={() => setIsExpanded(false)}
-            className="p-2 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-sm"
+            className="p-2 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white"
             aria-label="Exit fullscreen"
           >
             <X className="w-6 h-6" aria-hidden="true" />
@@ -127,7 +136,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                )}
 
                {isProcessing && (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" role="status" aria-live="polite">
+                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" role="status" aria-live="polite" aria-atomic="true">
                    <Loader2 className="w-8 h-8 text-brand-600 animate-spin" aria-hidden="true" />
                    <span className="text-xs font-medium text-slate-600 bg-white/80 px-3 py-1 rounded-full backdrop-blur-sm">
                      Generating your edit…

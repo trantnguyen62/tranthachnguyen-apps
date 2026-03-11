@@ -192,7 +192,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
             background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
             padding: '6px 14px', borderRadius: 20, fontSize: 12, color: accentGold
           }}>
-            Align face within guide
+            Center face within the oval
           </div>
         </div>
         
@@ -265,7 +265,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           🖼️
         </div>
         <p style={{ color: '#F8F8F8', fontWeight: 600, marginBottom: 6, fontFamily: "'Syne', sans-serif" }}>
-          Upload your passport photo
+          Upload your passport or visa photo
         </p>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>Drag &amp; drop or tap to browse</p>
         <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, marginTop: 8 }}>JPG, PNG, WEBP — max 10 MB</p>

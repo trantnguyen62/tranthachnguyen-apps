@@ -181,7 +181,7 @@ const App: React.FC = () => {
       <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white shadow-sm">
+            <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white shadow-sm" aria-hidden="true">
               <Sparkles className="w-5 h-5" />
             </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-brand-700 to-brand-500 bg-clip-text text-transparent">
@@ -341,7 +341,7 @@ const App: React.FC = () => {
                     aria-pressed={prompt === PASSPORT_PROMPT}
                     className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 border rounded-lg transition-colors text-sm font-medium ${prompt === PASSPORT_PROMPT ? 'bg-brand-600 border-brand-600 text-white' : 'bg-brand-50 border-brand-200 text-brand-700 hover:bg-brand-100'}`}
                   >
-                    <UserSquare2 className="w-4 h-4" />
+                    <UserSquare2 className="w-4 h-4" aria-hidden="true" />
                     Passport Photo
                   </button>
 
@@ -367,7 +367,7 @@ const App: React.FC = () => {
                 {/* Error Message */}
                 {errorMsg && (
                   <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
-                    <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">Unable to generate — try again</p>
                       <p className="text-sm opacity-90">{errorMsg}</p>
@@ -410,7 +410,7 @@ const App: React.FC = () => {
 
       {/* Download toast */}
       {downloadSuccess && (
-        <div role="status" aria-live="polite" className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg animate-fadeIn text-sm font-medium">
+        <div role="status" aria-live="polite" aria-atomic="true" className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg animate-fadeIn text-sm font-medium">
           <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
           Image downloaded!
         </div>
