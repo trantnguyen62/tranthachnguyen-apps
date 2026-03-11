@@ -1142,8 +1142,12 @@ function checkAnswer(index) {
     const btns = document.querySelectorAll('.answer-btn');
 
     btns[game.currentQuestion.correctIndex].classList.add('correct');
+    btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
+        `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
     if (!correct) {
         btns[index].classList.add('incorrect');
+        btns[index].setAttribute('aria-label',
+            `Wrong answer: ${game.currentQuestion.shuffledAnswers[index].text}`);
     }
 
     const feedbackEl = document.getElementById('answerFeedback');
@@ -1168,7 +1172,7 @@ function checkAnswer(index) {
         // Award a life for correct answer!
         game.lives++;
         game.elLives.textContent = game.lives;
-        showTip(`+1 Life! ❤️ You now have ${game.lives} lives!`);
+        showTip(`✅ Correct!${game.streak > 1 ? ` 🔥 ${game.streak} streak!` : ''} ❤️ +1 life — you have ${game.lives} now.`);
 
         game.lastLearnedFact = game.currentQuestion.fact || "Great job! Keep learning!";
     } else {
@@ -1187,6 +1191,8 @@ function handleTimeout() {
 
     const btns = document.querySelectorAll('.answer-btn');
     btns[game.currentQuestion.correctIndex].classList.add('correct');
+    btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
+        `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
 
     const feedbackEl = document.getElementById('answerFeedback');
     if (feedbackEl) {
@@ -1247,7 +1253,7 @@ function gameOver() {
         const randomLearned = game.learnedItems[Math.floor(Math.random() * game.learnedItems.length)];
         document.getElementById('factText').textContent = `${randomLearned.cmd}: ${randomLearned.desc}`;
     } else {
-        document.getElementById('factText').textContent = game.lastLearnedFact || "Keep practicing to learn more DevOps commands!";
+        document.getElementById('factText').textContent = game.lastLearnedFact || "Keep playing to build your DevOps knowledge!";
     }
 
     // Store the timeout so it can be cancelled if user continues with extra life
@@ -1264,7 +1270,7 @@ function useLife() {
     game.elLives.textContent = game.lives;
 
     game.respawnInvincible = true;
-    showTip(`❤️ Used 1 life! ${game.lives} remaining. Keep going!`);
+    showTip(`❤️ Used 1 life! ${game.lives} left — answer questions to earn more.`);
 
     // Reset player position to safe spot
     game.player.y = game.height / 2;
@@ -1499,7 +1505,7 @@ const AdManager = {
         gameLoop();
 
         // Show "Tap to Continue" tip that stays until tap
-        showTip('👆 Tap to continue! You\'ll have 3s of invincibility.');
+        showTip('👆 Tap to resume — 3s of invincibility incoming!');
 
         // Set up one-time tap handler to resume gameplay
         const resumeHandler = (e) => {
@@ -1511,7 +1517,7 @@ const AdManager = {
             game.respawnInvincibleTimeout = setTimeout(() => {
                 game.respawnInvincible = false;
                 game.respawnInvincibleTimeout = null;
-                showTip('⚠️ Invincibility ended - stay alert!');
+                showTip('⚠️ Invincibility ended — eyes on the pipeline!');
             }, 3000);
 
             // Unpause the game

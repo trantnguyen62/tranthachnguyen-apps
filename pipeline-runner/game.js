@@ -1142,8 +1142,12 @@ function checkAnswer(index) {
     const btns = document.querySelectorAll('.answer-btn');
 
     btns[game.currentQuestion.correctIndex].classList.add('correct');
+    btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
+        `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
     if (!correct) {
         btns[index].classList.add('incorrect');
+        btns[index].setAttribute('aria-label',
+            `Wrong answer: ${game.currentQuestion.shuffledAnswers[index].text}`);
     }
 
     const feedbackEl = document.getElementById('answerFeedback');
@@ -1187,6 +1191,8 @@ function handleTimeout() {
 
     const btns = document.querySelectorAll('.answer-btn');
     btns[game.currentQuestion.correctIndex].classList.add('correct');
+    btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
+        `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
 
     const feedbackEl = document.getElementById('answerFeedback');
     if (feedbackEl) {

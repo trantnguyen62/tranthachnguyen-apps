@@ -218,11 +218,11 @@
                 </div>
 
                 <button type="button" class="start-btn" onclick="startGame()">
-                    <span>▶️ DEPLOY</span>
+                    <span aria-hidden="true">▶️</span> DEPLOY
                 </button>
 
                 <div class="high-score-display">
-                    🏆 Best Run: <span id="bestScore">0</span> | 📚 Learned: <span id="totalLearned">0</span>
+                    <span aria-hidden="true">🏆</span> Best Run: <span id="bestScore">0</span> | <span aria-hidden="true">📚</span> Learned: <span id="totalLearned">0</span>
                 </div>
 
                 <div class="instructions">
@@ -234,7 +234,7 @@
 
         <!-- Game Screen -->
         <div id="gameScreen" class="screen hidden">
-            <canvas id="gameCanvas" aria-label="Pipeline Runner game" role="img"></canvas>
+            <canvas id="gameCanvas" aria-label="Pipeline Runner game" role="img">Pipeline Runner game canvas. Use Space or click to boost your character through the pipeline obstacles.</canvas>
             <div class="game-hud">
                 <div class="hud-left">
                     <div class="topic-badge" id="currentTopicBadge">🐳 Docker</div>
@@ -252,7 +252,7 @@
 
             <!-- DevOps Tip Banner -->
             <div class="tip-banner hidden" id="tipBanner" role="status" aria-live="polite" aria-atomic="true">
-                <span class="tip-icon">💡</span>
+                <span class="tip-icon" aria-hidden="true">💡</span>
                 <span class="tip-text" id="tipText"></span>
             </div>
         </div>
@@ -295,21 +295,21 @@
                 </div>
 
                 <div class="learned-fact" id="learnedFact">
-                    <span class="fact-label">📚 You Learned:</span>
+                    <span class="fact-label"><span aria-hidden="true">📚</span> You Learned:</span>
                     <span class="fact-text" id="factText"></span>
                 </div>
 
                 <!-- Watch Ad Button -->
                 <button type="button" class="watch-ad-btn" id="watchAdBtn" onclick="AdManager.showRewardedAd()">
-                    📺 Watch Ad for Extra Life
+                    <span aria-hidden="true">📺</span> Watch Ad for Extra Life
                 </button>
 
                 <div class="game-over-buttons">
                     <button type="button" class="retry-btn" onclick="startGame()">
-                        🔄 Redeploy
+                        <span aria-hidden="true">🔄</span> Redeploy
                     </button>
                     <button type="button" class="menu-btn" onclick="showStartScreen()">
-                        🏠 Menu
+                        <span aria-hidden="true">🏠</span> Menu
                     </button>
                 </div>
             </div>
@@ -318,9 +318,9 @@
         <!-- Rewarded Ad Modal -->
         <div id="rewardedAdModal" class="rewarded-ad-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rewardedAdHeading">
             <div class="rewarded-ad-content">
-                <h3 id="rewardedAdHeading" class="rewarded-ad-title">📺 Watch Ad for Extra Life</h3>
+                <h3 id="rewardedAdHeading" class="rewarded-ad-title"><span aria-hidden="true">📺</span> Watch Ad for Extra Life</h3>
                 <div class="rewarded-ad-video">
-                    <p>🎬 Video Ad Playing...</p>
+                    <p><span aria-hidden="true">🎬</span> Video Ad Playing...</p>
                     <p style="font-size: 0.8rem; margin-top: 0.5rem;">(Demo Mode - Real ads coming soon!)</p>
                 </div>
                 <div class="rewarded-ad-timer" id="rewardedAdTimer">5</div>
