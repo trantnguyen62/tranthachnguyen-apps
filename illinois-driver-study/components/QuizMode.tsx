@@ -26,6 +26,7 @@ const TRANSLATIONS = {
     passingNote: "Illinois DMV requires 80% to pass",
     retake: "Retake Quiz",
     correct: "correct",
+    incorrect: "incorrect",
   },
   vi: {
     questionLabel: "Câu hỏi",
@@ -41,6 +42,7 @@ const TRANSLATIONS = {
     passingNote: "Điểm đậu IL DMV là 80%",
     retake: "Làm Lại",
     correct: "đúng",
+    incorrect: "sai",
   }
 } as const;
 
@@ -154,8 +156,13 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
 
           <div className="flex justify-center gap-8 mb-6">
             <div className="text-center">
-              <div className="text-4xl font-bold text-slate-800">{score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
+              <div className="text-4xl font-bold text-green-600">{score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
               <div className="text-sm text-slate-500 mt-1">{t.correct}</div>
+            </div>
+            <div className="w-px bg-slate-200" />
+            <div className="text-center">
+              <div className="text-4xl font-bold text-red-400">{questions.length - score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
+              <div className="text-sm text-slate-500 mt-1">{t.incorrect}</div>
             </div>
             <div className="w-px bg-slate-200" />
             <div className="text-center">
@@ -195,9 +202,15 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
           <span aria-live="polite" aria-atomic="true" className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
             {t.questionLabel} {currentQuestionIndex + 1} {t.of} {questions.length}
           </span>
-          <span aria-live="polite" aria-atomic="true" className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-            {t.score}: {score}
-          </span>
+          {(() => {
+            const answered = currentQuestionIndex + (showResult ? 1 : 0);
+            const pct = answered > 0 ? Math.round((score / answered) * 100) : null;
+            return (
+              <span aria-live="polite" aria-atomic="true" className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                {t.score}: {score}{pct !== null ? ` (${pct}%)` : ''}
+              </span>
+            );
+          })()}
         </div>
         <div className="w-full bg-slate-100 rounded-full h-1.5 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length}>
           <div className="bg-blue-600 h-1.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }} />
