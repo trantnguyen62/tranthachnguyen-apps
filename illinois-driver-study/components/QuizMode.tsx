@@ -197,7 +197,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center mb-3">
           <span aria-live="polite" aria-atomic="true" className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
             {t.questionLabel} {currentQuestionIndex + 1} {t.of} {questions.length}
@@ -212,8 +212,8 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
             );
           })()}
         </div>
-        <div className="w-full bg-slate-100 rounded-full h-1.5 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length}>
-          <div className="bg-blue-600 h-1.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }} />
+        <div className="w-full bg-slate-100 rounded-full h-2 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length}>
+          <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }} />
         </div>
 
         <div className="flex gap-2 items-start mb-6">
@@ -244,7 +244,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
 
         <div role="radiogroup" aria-label={language === 'vi' ? 'Các lựa chọn' : 'Answer options'} className="space-y-3">
           {question.options.map((option, idx) => {
-            let className = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ";
+            let className = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer disabled:cursor-default ";
             const isCorrect = showResult && idx === question.correctIndex;
             const isWrong = showResult && idx === selectedOption && idx !== question.correctIndex;
             if (showResult) {
@@ -305,19 +305,18 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
             <span className="font-semibold">{t.explanation}</span>{' '}{question.explanation}
           </div>
         )}
+        {showResult && (
+          <div className="mt-5 flex justify-end animate-fade-in-up">
+            <button
+              onClick={nextQuestion}
+              className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md flex items-center justify-center cursor-pointer"
+            >
+              {currentQuestionIndex === questions.length - 1 ? t.finish : t.next}
+              <svg aria-hidden="true" className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            </button>
+          </div>
+        )}
       </div>
-
-      {showResult && (
-        <div className="flex justify-end animate-fade-in-up">
-          <button
-            onClick={nextQuestion}
-            className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md flex items-center justify-center"
-          >
-            {currentQuestionIndex === questions.length - 1 ? t.finish : t.next}
-            <svg aria-hidden="true" className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-          </button>
-        </div>
-      )}
     </div>
   );
 });
