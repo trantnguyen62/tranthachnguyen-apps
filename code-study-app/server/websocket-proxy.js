@@ -19,7 +19,7 @@ const ALLOWED_ORIGINS = [
   'https://localhost:3007',
 ];
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Rate limiting
 const connectionAttempts = new Map();
@@ -32,30 +32,38 @@ function getClientIP(req) {
     'unknown';
 }
 
-function isOriginAllowed(origin, req) {
-  if (req && req.headers && req.headers['cf-ray']) return true;
-  if (!origin && req && req.headers && (req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'])) return true;
+function isOriginAllowed(origin, _req) {
   if (!origin) return isDevelopment;
-  
+
   if (isDevelopment) {
     const localhostPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
     if (localhostPattern.test(origin)) return true;
   }
-  
-  return ALLOWED_ORIGINS.some(allowed => origin.startsWith(allowed));
+
+  return ALLOWED_ORIGINS.includes(origin);
 }
 
 function checkRateLimit(ip) {
   const now = Date.now();
   const attempts = connectionAttempts.get(ip) || [];
   const recentAttempts = attempts.filter(ts => now - ts < 60000);
-  
+
   if (recentAttempts.length >= 10) return false;
-  
+
   recentAttempts.push(now);
   connectionAttempts.set(ip, recentAttempts);
   return true;
 }
+
+// Periodically clean up stale rate limit entries to prevent memory growth
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, attempts] of connectionAttempts) {
+    const recent = attempts.filter(ts => now - ts < 60000);
+    if (recent.length === 0) connectionAttempts.delete(ip);
+    else connectionAttempts.set(ip, recent);
+  }
+}, 60000);
 
 const wss = new WebSocketServer({
   port: PORT,

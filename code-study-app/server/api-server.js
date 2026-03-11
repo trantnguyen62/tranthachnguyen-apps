@@ -39,8 +39,29 @@ const CODE_EXTENSIONS = [
   '.ts', '.tsx', '.js', '.jsx', '.json', '.html', '.css', '.md', '.py', '.sh', '.yml', '.yaml'
 ];
 
-app.use(cors());
-app.use(express.json());
+const ALLOWED_ORIGINS = [
+  'http://localhost:3007',
+  'http://127.0.0.1:3007',
+  'https://localhost:3007',
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server) only in development
+    if (!origin) return callback(null, process.env.NODE_ENV !== 'production');
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
+}));
+app.use(express.json({ limit: '1mb' }));
+
+// Security headers
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Content-Security-Policy', "default-src 'none'");
+  next();
+});
 
 // Get language from file extension
 function getLanguage(filename) {
@@ -182,8 +203,11 @@ app.get('/api/projects/:project/tree', (req, res) => {
 app.get('/api/file', async (req, res) => {
   const filePath = req.query.path;
 
-  if (!filePath) {
+  if (!filePath || typeof filePath !== 'string') {
     return res.status(400).json({ error: 'Path required' });
+  }
+  if (filePath.includes('\0') || filePath.length > 500) {
+    return res.status(400).json({ error: 'Invalid path' });
   }
 
   const fullPath = path.join(CODEBASE_PATH, filePath);
@@ -194,6 +218,19 @@ app.get('/api/file', async (req, res) => {
   }
 
   try {
+    // Resolve symlinks and re-validate to prevent path traversal via symlinks
+    const realPath = fs.realpathSync(fullPath);
+    const realBase = fs.realpathSync(CODEBASE_PATH);
+    if (!realPath.startsWith(realBase + path.sep)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const stat = await fs.promises.stat(fullPath);
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (stat.size > MAX_FILE_SIZE) {
+      return res.status(413).json({ error: 'File too large' });
+    }
+
     const content = await fs.promises.readFile(fullPath, 'utf-8');
     const language = getLanguage(filePath);
 
@@ -216,6 +253,12 @@ app.get('/api/search', async (req, res) => {
 
   if (!query) {
     return res.status(400).json({ error: 'Query required' });
+  }
+  if (query.length > 256 || query.includes('\0')) {
+    return res.status(400).json({ error: 'Invalid query' });
+  }
+  if (project && (typeof project !== 'string' || project.includes('\0') || project.length > 200)) {
+    return res.status(400).json({ error: 'Invalid project' });
   }
 
   const results = [];

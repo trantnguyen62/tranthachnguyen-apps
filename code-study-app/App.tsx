@@ -414,8 +414,18 @@ function App() {
                   <p className="text-xs text-slate-600">Check that the API server is running</p>
                 </div>
               </div>
-            ) : (
+            ) : selectedFile ? (
               <CodeViewer file={selectedFile} onCodeSelect={handleCodeSelect} />
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center space-y-3">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center mx-auto">
+                    <Code2 className="w-8 h-8 text-slate-600" aria-hidden="true" />
+                  </div>
+                  <p className="text-slate-400 font-medium">No file open</p>
+                  <p className="text-xs text-slate-600">Select a file from the sidebar to view its contents</p>
+                </div>
+              </div>
             )}
           </div>
 

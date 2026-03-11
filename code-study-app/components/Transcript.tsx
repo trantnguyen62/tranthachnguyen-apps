@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, memo, useCallback } from 'react';
 import { ChatMessage } from '../types';
-import { User, Bot, Copy, Check } from 'lucide-react';
+import { User, Bot, Copy, Check, ChevronDown } from 'lucide-react';
 
 function formatTime(date: Date): string {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -33,16 +33,35 @@ interface TranscriptProps {
 
 const Transcript = memo<TranscriptProps>(({ messages }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
+
+  const isNearBottom = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+  }, []);
+
+  const scrollToBottom = useCallback(() => {
+    const el = containerRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    setShowScrollBtn(false);
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    setShowScrollBtn(!isNearBottom());
+  }, [isNearBottom]);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (el) {
+    if (isNearBottom()) {
       const raf = requestAnimationFrame(() => {
-        el.scrollTop = el.scrollHeight;
+        const el = containerRef.current;
+        if (el) el.scrollTop = el.scrollHeight;
       });
       return () => cancelAnimationFrame(raf);
+    } else {
+      setShowScrollBtn(true);
     }
-  }, [messages]);
+  }, [messages, isNearBottom]);
 
   if (messages.length === 0) {
     return (
@@ -76,8 +95,20 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
   }
 
   return (
+    <div className="flex-1 relative overflow-hidden flex flex-col">
+    {showScrollBtn && (
+      <button
+        onClick={scrollToBottom}
+        aria-label="Scroll to latest message"
+        className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/90 hover:bg-emerald-400 text-white text-xs font-medium rounded-full shadow-lg transition-all animate-bounce-subtle"
+      >
+        <ChevronDown className="w-3 h-3" aria-hidden="true" />
+        New messages
+      </button>
+    )}
     <div
       ref={containerRef}
+      onScroll={handleScroll}
       role="log"
       aria-label="Conversation transcript"
       aria-live="polite"
@@ -99,10 +130,10 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
               aria-label={`${message.role === 'user' ? 'You' : 'AI Tutor'}: ${message.text}`}
               className={`flex items-start gap-1 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
             >
-              <div className={`rounded-2xl px-4 py-2 ${
+              <div className={`rounded-2xl px-4 py-2.5 ${
                 message.role === 'user'
-                  ? 'bg-blue-500/20 text-blue-100'
-                  : 'bg-slate-700/50 text-slate-200'
+                  ? 'bg-blue-600/25 text-blue-100 border border-blue-500/20'
+                  : 'bg-slate-700/60 text-slate-200 border border-slate-600/30'
               }`}>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
                 {message.role === 'model' && !message.isFinal && (
@@ -124,6 +155,7 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
           )}
         </div>
       ))}
+    </div>
     </div>
   );
 });
