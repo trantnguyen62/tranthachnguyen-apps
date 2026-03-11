@@ -218,11 +218,11 @@
                 </div>
 
                 <button type="button" class="start-btn" onclick="startGame()">
-                    <span>▶️ DEPLOY</span>
+                    <span aria-hidden="true">▶️</span> DEPLOY
                 </button>
 
                 <div class="high-score-display">
-                    🏆 Best Run: <span id="bestScore">0</span> | 📚 Learned: <span id="totalLearned">0</span>
+                    <span aria-hidden="true">🏆</span> Best Run: <span id="bestScore">0</span> | <span aria-hidden="true">📚</span> Learned: <span id="totalLearned">0</span>
                 </div>
 
                 <div class="instructions">
@@ -234,7 +234,7 @@
 
         <!-- Game Screen -->
         <div id="gameScreen" class="screen hidden">
-            <canvas id="gameCanvas" aria-label="Pipeline Runner game" role="img"></canvas>
+            <canvas id="gameCanvas" aria-label="Pipeline Runner game" role="img">Pipeline Runner game canvas. Use Space or click to boost your character through the pipeline obstacles.</canvas>
             <div class="game-hud">
                 <div class="hud-left">
                     <div class="topic-badge" id="currentTopicBadge">🐳 Docker</div>
@@ -252,7 +252,7 @@
 
             <!-- DevOps Tip Banner -->
             <div class="tip-banner hidden" id="tipBanner" role="status" aria-live="polite" aria-atomic="true">
-                <span class="tip-icon">💡</span>
+                <span class="tip-icon" aria-hidden="true">💡</span>
                 <span class="tip-text" id="tipText"></span>
             </div>
         </div>

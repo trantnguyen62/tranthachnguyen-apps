@@ -12,13 +12,15 @@ const TRANSLATIONS = {
     title: "Review All Questions",
     subtitle: "Browse through all practice questions and memorize the correct answers.",
     correctAnswer: "(correct answer)",
-    explanation: "Explanation:"
+    explanation: "Explanation:",
+    questions: "questions"
   },
   vi: {
     title: "Xem Tất Cả Câu Hỏi",
     subtitle: "Xem qua tất cả các câu hỏi thực hành và ghi nhớ các câu trả lời đúng.",
     correctAnswer: "(đáp án đúng)",
-    explanation: "Giải thích:"
+    explanation: "Giải thích:",
+    questions: "câu hỏi"
   }
 } as const;
 
@@ -29,8 +31,15 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">{t.title}</h2>
-        <p className="text-slate-600">{t.subtitle}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-800 mb-2">{t.title}</h2>
+            <p className="text-slate-600">{t.subtitle}</p>
+          </div>
+          <span className="flex-shrink-0 bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1.5 rounded-full border border-blue-100">
+            {questions.length} {t.questions}
+          </span>
+        </div>
       </div>
 
       <div className="grid gap-4">
@@ -40,6 +49,16 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
               <span className="text-slate-500 mr-2">#{q.id}.</span>
               {q.text}
             </h3>
+            {q.image && (
+              <div className="mb-4 flex justify-center">
+                <img
+                  src={q.image}
+                  alt=""
+                  loading="lazy"
+                  className="max-h-36 object-contain rounded-lg border border-slate-200"
+                />
+              </div>
+            )}
             <ul role="list" className="space-y-2">
               {q.options.map((opt, idx) => (
                 <li

@@ -164,11 +164,12 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
             </div>
           </div>
 
-          <div className="w-full bg-slate-100 rounded-full h-3 mb-2">
+          <div className="w-full bg-slate-100 rounded-full h-3 mb-2 relative overflow-hidden">
             <div
               className={`h-3 rounded-full transition-all duration-700 ${passed ? 'bg-green-500' : 'bg-amber-400'}`}
               style={{ width: `${pct}%` }}
             />
+            <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/60" style={{ left: '80%' }} title="80% passing threshold" />
           </div>
           <div className="flex justify-between text-xs text-slate-400 mb-6">
             <span>0%</span>
@@ -297,7 +298,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
         <div className="flex justify-end animate-fade-in-up">
           <button
             onClick={nextQuestion}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md flex items-center"
+            className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md flex items-center justify-center"
           >
             {currentQuestionIndex === questions.length - 1 ? t.finish : t.next}
             <svg aria-hidden="true" className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>

@@ -326,6 +326,124 @@ I run drills.`,
       { id: 5, title: "Thanks", description: "One word. They went inside. The door swung shut behind them." },
       { id: 6, title: "The System", description: "Eight feet: hold. Sixteen feet: go in. I have a system now. I run drills." }
     ]
+  },
+  {
+    id: 8,
+    title: "I Called My Teacher 'Mom' in Front of the Whole Class",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    coverImage: "/images/called-teacher-mom.svg",
+    description: "Third period. Quiz handed back. Full confidence. Zero hesitation. Thirty-two witnesses.",
+    rating: 4.8,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I called my teacher "Mom" in front of the whole class.
+
+It was a Tuesday. Third period. She had just handed back my quiz and I said, without any hesitation, with full confidence:
+
+"Thanks, Mom."
+
+The class went quiet in the way that classrooms only go quiet when something truly has occurred.
+
+She looked at me. I looked at her. I looked at the quiz. The quiz could not help me.
+
+"You're welcome," she said, because she was a professional.
+
+I spent the rest of the period studying the surface of my desk in extraordinary detail. It had a scratch shaped like a lightning bolt. I thought about that scratch for years afterward.
+
+I am 34 now. My teacher is retired. I still think about this sometimes. I assume she does too.`,
+    pages: [
+      { id: 1, image: "/images/called-teacher-mom.svg", caption: "Third period. A quiz returned. One word too many." }
+    ],
+    panels: [
+      { id: 1, title: "Third Period, Tuesday", description: "Quiz handed back. A moment of pure, innocent confidence." },
+      { id: 2, title: "Thanks, Mom.", description: "Full volume. No hesitation. Thirty-two witnesses." },
+      { id: 3, title: "The Silence", description: "The whole class experienced a collective pause. Even the clock seemed to stop." },
+      { id: 4, title: "The Eye Contact", description: "She looked at me. I looked at her. The quiz offered no guidance." },
+      { id: 5, title: "You're Welcome", description: "Professional. Measured. She absolutely did not have to do that." },
+      { id: 6, title: "The Desk Scratch", description: "A lightning bolt shape. I thought about it for years. Still do." }
+    ]
+  },
+  {
+    id: 9,
+    title: "I Replied 'You're Welcome' Before Anyone Said Thank You",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    coverImage: "/images/youre-welcome-early.svg",
+    description: "The gratitude was clearly on its way. I could see it coming. I just didn't wait for it to arrive.",
+    rating: 4.7,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I replied "you're welcome" before anyone said thank you.
+
+It was a Friday afternoon. A colleague stopped by my desk with a question about a spreadsheet. I walked her through it. She nodded. She seemed satisfied.
+
+I could see it coming. The gratitude was right there. Inevitable.
+
+"You're welcome," I said.
+
+She had not said thank you yet. She was going to. But she hadn't. I just preemptively accepted the gratitude that had not yet been offered.
+
+She paused. Then she said "...thank you."
+
+"Yeah," I said, which was the wrong response.
+
+She left. I spent the next twenty minutes reconstructing exactly what had happened and why I had done it. I still don't have a satisfying answer.
+
+I now wait. I wait for the thank you. I do not rush it. Some things need to arrive in their own time.`,
+    pages: [
+      { id: 1, image: "/images/youre-welcome-early.svg", caption: "The thank you was coming. I just didn't let it arrive on its own." }
+    ],
+    panels: [
+      { id: 1, title: "Friday Afternoon", description: "A colleague. A spreadsheet question. A clear and solvable problem." },
+      { id: 2, title: "It Was Going Well", description: "She nodded. The gratitude was clearly on its way. Any moment now." },
+      { id: 3, title: "You're Welcome", description: "Said before the thank you. Confident. Deeply premature." },
+      { id: 4, title: "The Pause", description: "She processed what had just occurred. So did I, in real time." },
+      { id: 5, title: "...Thank You", description: "Graciously delivered, one beat late. Or one beat early. Depending on perspective." },
+      { id: 6, title: "Yeah.", description: "The wrong response. I was there. I know. I'm still working on it." }
+    ]
+  },
+  {
+    id: 10,
+    title: "I Laughed at the Wrong Part of Someone's Story",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    coverImage: "/images/laughed-wrong-part.svg",
+    description: "I had misread the tone. I thought the worst was already behind them. I was wrong — the worst was the part I laughed at.",
+    rating: 4.6,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I laughed at the wrong part of someone's story.
+
+It was a dinner party. Someone was telling a story about their car breaking down on the highway. A bad day. Stressful. No shoulder. Cars going by at 70 miles per hour.
+
+At some point I laughed.
+
+I don't know what I was expecting the story to be. I had misread the tone. I thought the worst was already behind them. I was wrong — the worst was the part I laughed at.
+
+She stopped talking.
+
+Everyone looked at me.
+
+I said "sorry, I thought—" and then didn't finish the sentence because there was no good ending to it.
+
+She finished the story. It got worse before it got better. I did not laugh at any of it. I nodded with great seriousness for the remainder of the evening.
+
+I now wait for other people to laugh first. This is not cowardice. It is calibration.`,
+    pages: [
+      { id: 1, image: "/images/laughed-wrong-part.svg", caption: "A dinner party. A story about a highway breakdown. One person who laughed at the wrong moment." }
+    ],
+    panels: [
+      { id: 1, title: "A Dinner Party", description: "Comfortable setting. Someone starting a story. Reasonable expectations." },
+      { id: 2, title: "The Highway", description: "No shoulder. Cars at 70 mph. The tone was clearly not light." },
+      { id: 3, title: "I Laughed", description: "Wrong moment. Wrong read. Full commitment to the wrong interpretation." },
+      { id: 4, title: "She Stopped", description: "The table went quiet. Eight people recalibrated their understanding of me." },
+      { id: 5, title: "Sorry, I Thought—", description: "A sentence with no good ending. Left unfinished. Wisely." },
+      { id: 6, title: "Very Serious Nodding", description: "For the remainder of the evening. I had earned this. I nodded through all of it." }
+    ]
   }
 ];
 
