@@ -135,7 +135,7 @@ function Library() {
       <div className="glass-effect rounded-xl p-4 mb-8">
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-gray-400" />
+            <Filter className="w-5 h-5 text-gray-400" aria-hidden="true" />
             <span className="text-gray-400 text-sm">Category:</span>
           </div>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by genre">
