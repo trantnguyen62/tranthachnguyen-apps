@@ -420,7 +420,10 @@ let game = {
     highScore: 0,
 
     // Shooting
-    lastFireTime: 0
+    lastFireTime: 0,
+
+    // HUD dirty-check cache (avoids redundant DOM writes every frame)
+    _hud: {}
 };
 
 // Initialize game on load
@@ -458,6 +461,16 @@ function init() {
         domCache.newHighScore   = document.getElementById('newHighScore');
         domCache.menuHighScore  = document.getElementById('menuHighScore');
         domCache.ariaAnnouncer  = document.getElementById('ariaAnnouncer');
+        domCache.zoneCompleteIcon = document.getElementById('zoneCompleteIcon');
+        domCache.zoneCompleteName = document.getElementById('zoneCompleteName');
+        domCache.zoneScore      = document.getElementById('zoneScore');
+        domCache.zoneAccuracy   = document.getElementById('zoneAccuracy');
+        domCache.finalScore     = document.getElementById('finalScore');
+        domCache.questionsAnswered = document.getElementById('questionsAnswered');
+        domCache.accuracy       = document.getElementById('accuracy');
+        domCache.bestStreak     = document.getElementById('bestStreak');
+        domCache.gameOverTitle  = document.querySelector('.game-over-title');
+        domCache.screens        = Array.from(document.querySelectorAll('.screen'));
 
         loadHighScore();
         let _resizeTimer;
@@ -593,7 +606,7 @@ function renderTopicGrid() {
 
 // Screen management
 function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    domCache.screens.forEach(s => s.classList.add('hidden'));
     document.getElementById(screenId).classList.remove('hidden');
 }
 
@@ -828,12 +841,13 @@ function render() {
 
     // Draw particles, batched by color to reduce fillStyle changes per frame
     if (game.particles.length > 0) {
-        const colorGroups = {};
+        const colorGroups = new Map();
         for (const p of game.particles) {
-            if (!colorGroups[p.color]) colorGroups[p.color] = [];
-            colorGroups[p.color].push(p);
+            let group = colorGroups.get(p.color);
+            if (!group) { group = []; colorGroups.set(p.color, group); }
+            group.push(p);
         }
-        for (const [color, group] of Object.entries(colorGroups)) {
+        colorGroups.forEach((group, color) => {
             ctx.fillStyle = `rgb(${color})`;
             for (const p of group) {
                 ctx.globalAlpha = p.life;
@@ -841,16 +855,18 @@ function render() {
                 ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
                 ctx.fill();
             }
-        }
+        });
         ctx.globalAlpha = 1.0;
     }
 
     // Draw powerups
-    game.powerups.forEach(p => {
+    if (game.powerups.length > 0) {
         ctx.font = '30px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(p.type === 'health' ? '❤️' : '🛡️', p.x, p.y);
-    });
+        game.powerups.forEach(p => {
+            ctx.fillText(p.type === 'health' ? '❤️' : '🛡️', p.x, p.y);
+        });
+    }
 
     // Draw enemies
     game.enemies.forEach(enemy => {
@@ -1390,10 +1406,10 @@ function completeWave() {
 function completeZone() {
     const topic = TOPICS[game.currentZone];
 
-    document.getElementById('zoneCompleteIcon').textContent = topic.icon;
-    document.getElementById('zoneCompleteName').textContent = topic.name;
-    document.getElementById('zoneScore').textContent = game.score;
-    document.getElementById('zoneAccuracy').textContent =
+    domCache.zoneCompleteIcon.textContent = topic.icon;
+    domCache.zoneCompleteName.textContent = topic.name;
+    domCache.zoneScore.textContent = game.score;
+    domCache.zoneAccuracy.textContent =
         game.questionsAnswered > 0
             ? Math.round(game.correctAnswers / game.questionsAnswered * 100) + '%'
             : '0%';
@@ -1422,17 +1438,40 @@ function nextZone() {
 
 // HUD updates
 function updateHUD() {
-    domCache.healthFill.style.width = `${game.player.health}%`;
-    domCache.healthText.textContent = Math.round(game.player.health);
-    domCache.shieldFill.style.width = `${game.player.shield}%`;
-    domCache.scoreValue.textContent = game.score;
-    domCache.streakValue.textContent = game.streak;
-    domCache.multiplier.textContent = `x${game.multiplier.toFixed(1)}`;
-
-    const topic = TOPICS[game.currentZone];
-    domCache.levelLabel.textContent = `ZONE ${game.currentZone + 1}`;
-    domCache.levelName.textContent = topic.name;
-    domCache.waveNumber.textContent = game.currentWave;
+    const h = game._hud;
+    const health = Math.round(game.player.health);
+    if (health !== h.health) {
+        h.health = health;
+        domCache.healthFill.style.width = `${game.player.health}%`;
+        domCache.healthText.textContent = health;
+    }
+    if (game.player.shield !== h.shield) {
+        h.shield = game.player.shield;
+        domCache.shieldFill.style.width = `${game.player.shield}%`;
+    }
+    if (game.score !== h.score) {
+        h.score = game.score;
+        domCache.scoreValue.textContent = game.score;
+    }
+    if (game.streak !== h.streak) {
+        h.streak = game.streak;
+        domCache.streakValue.textContent = game.streak;
+    }
+    const mult = game.multiplier.toFixed(1);
+    if (mult !== h.mult) {
+        h.mult = mult;
+        domCache.multiplier.textContent = `x${mult}`;
+    }
+    if (game.currentZone !== h.zone) {
+        h.zone = game.currentZone;
+        const topic = TOPICS[game.currentZone];
+        domCache.levelLabel.textContent = `ZONE ${game.currentZone + 1}`;
+        domCache.levelName.textContent = topic.name;
+    }
+    if (game.currentWave !== h.wave) {
+        h.wave = game.currentWave;
+        domCache.waveNumber.textContent = game.currentWave;
+    }
 }
 
 function updateTimerDisplay() {
@@ -1482,22 +1521,22 @@ function gameOver(victory = false) {
 
     const isNewHighScore = saveHighScore();
 
-    document.getElementById('finalScore').textContent = game.score;
-    document.getElementById('questionsAnswered').textContent = game.questionsAnswered;
-    document.getElementById('accuracy').textContent =
+    domCache.finalScore.textContent = game.score;
+    domCache.questionsAnswered.textContent = game.questionsAnswered;
+    domCache.accuracy.textContent =
         game.questionsAnswered > 0
             ? Math.round(game.correctAnswers / game.questionsAnswered * 100) + '%'
             : '0%';
-    document.getElementById('bestStreak').textContent = game.bestStreak;
+    domCache.bestStreak.textContent = game.bestStreak;
 
     domCache.newHighScore.classList.toggle('hidden', !isNewHighScore);
 
     if (victory) {
-        document.querySelector('.game-over-title').textContent = 'VICTORY!';
-        document.querySelector('.game-over-title').style.color = '#22c55e';
+        domCache.gameOverTitle.textContent = 'VICTORY!';
+        domCache.gameOverTitle.style.color = '#22c55e';
     } else {
-        document.querySelector('.game-over-title').textContent = 'GAME OVER';
-        document.querySelector('.game-over-title').style.color = '#ef4444';
+        domCache.gameOverTitle.textContent = 'GAME OVER';
+        domCache.gameOverTitle.style.color = '#ef4444';
     }
 
     domCache.gameOver.classList.remove('hidden');
