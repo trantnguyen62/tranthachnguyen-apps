@@ -1,4 +1,5 @@
 import compression from 'compression';
+import crypto from 'crypto';
 import express from 'express';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
@@ -489,6 +490,30 @@ const featuredComics = [...comics]
   .sort((a, b) => b.rating - a.rating)
   .slice(0, 4)
   .map(({ pages, ...comic }) => comic);
+
+// Precomputed genre-filtered sorted lists
+const comicsByGenre = new Map();
+for (const genre of genreList) {
+  if (genre === 'All') continue;
+  const filtered = comicsListDefault.filter(c => c.genre === genre);
+  comicsByGenre.set(genre, {
+    byRating: [...filtered].sort((a, b) => b.rating - a.rating),
+    byTitle: [...filtered].sort((a, b) => a.title.localeCompare(b.title)),
+    default: filtered,
+  });
+}
+
+// Precomputed lowercase strings for search
+const comicsWithLower = comics.map(c => ({
+  ...c, _titleLower: c.title.toLowerCase(), _authorLower: c.author.toLowerCase(),
+}));
+
+// ETags for static endpoints (computed once at startup)
+const _dataHash = crypto.createHash('sha1').update(JSON.stringify(comics)).digest('hex').slice(0, 16);
+const comicsETag = `"${_dataHash}"`;
+const genresETag = `"${_dataHash}-genres"`;
+const featuredETag = `"${_dataHash}-featured"`;
+const comicETags = new Map(comics.map(c => [c.id, `"${_dataHash}-${c.id}"`]));
 
 const baseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
 const today = new Date().toISOString().split('T')[0];
