@@ -4,23 +4,31 @@ import { useState, memo } from 'react';
 
 function ComicCard({ comic }) {
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   return (
     <Link to={`/comic/${comic.id}`} title={comic.title} className="comic-card group block cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#11111b]">
       <div className="relative overflow-hidden rounded-xl bg-dark-200 border border-white/5 hover:border-red-500/30">
         <div className="aspect-[2/3] overflow-hidden relative">
-          {!imgLoaded && (
+          {!imgLoaded && !imgError && (
             <div className="absolute inset-0 bg-dark-100 animate-pulse" aria-hidden="true" />
           )}
-          <img
-            src={comic.coverImage}
-            alt={comic.title}
-            onLoad={() => setImgLoaded(true)}
-            onError={() => setImgLoaded(true)}
-            loading="lazy"
-            decoding="async"
-            className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-          />
+          {imgError ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-dark-200 text-gray-600">
+              <BookOpen className="w-8 h-8 mb-2 opacity-40" aria-hidden="true" />
+              <span className="text-xs">No image</span>
+            </div>
+          ) : (
+            <img
+              src={comic.coverImage}
+              alt={comic.title}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => { setImgError(true); setImgLoaded(true); }}
+              loading="lazy"
+              decoding="async"
+              className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+            />
+          )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" aria-hidden="true">
           <div className="absolute bottom-0 left-0 right-0 p-4">

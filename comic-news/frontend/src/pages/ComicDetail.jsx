@@ -139,10 +139,13 @@ function ComicDetail() {
 
   if (!comic) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Comic not found</h2>
-          <Link to="/library" className="text-red-500 hover:text-red-400">
+          <BookOpen className="w-16 h-16 text-gray-700 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-2xl font-bold text-white mb-2">Comic not found</h2>
+          <p className="text-gray-400 mb-6">This story doesn't exist or may have been removed.</p>
+          <Link to="/library" className="inline-flex items-center gap-2 px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-colors">
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             Back to Library
           </Link>
         </div>
@@ -321,7 +324,8 @@ function ComicDetail() {
                 {comic.panels && comic.panels.length > 0 && (
                   <div className="mt-8 pt-6 border-t border-white/10">
                     <h3 className="text-lg font-semibold text-white mb-4">Panel Breakdown</h3>
-                    <div className="grid gap-3 max-h-64 overflow-y-auto">
+                    <div className="relative">
+                    <div className="grid gap-3 max-h-64 overflow-y-auto pb-6">
                       {comic.panels.map((panel) => (
                         <div key={panel.id} className="flex gap-3 p-3 bg-dark-200 rounded-lg">
                           <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -333,6 +337,10 @@ function ComicDetail() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                    {comic.panels.length > 3 && (
+                      <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/5 to-transparent pointer-events-none rounded-b-lg" aria-hidden="true" />
+                    )}
                     </div>
                   </div>
                 )}

@@ -19,6 +19,7 @@ function Reader() {
   const [hintVisible, setHintVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loadedImages, setLoadedImages] = useState({});
+  const [errorImages, setErrorImages] = useState({});
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -136,6 +137,11 @@ function Reader() {
     setLoadedImages(prev => ({ ...prev, [index]: true }));
   };
 
+  const handleImageError = (index) => {
+    setErrorImages(prev => ({ ...prev, [index]: true }));
+    setLoadedImages(prev => ({ ...prev, [index]: true }));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center" role="status" aria-label="Loading comic">
@@ -146,10 +152,12 @@ function Reader() {
 
   if (!comic) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Comic not found</h2>
-          <Link to="/library" className="text-red-500 hover:text-red-400">
+          <Home className="w-16 h-16 text-gray-700 mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-2xl font-bold text-white mb-2">Comic not found</h2>
+          <p className="text-gray-500 mb-6">This story doesn't exist or may have been removed.</p>
+          <Link to="/library" className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-colors">
             Back to Library
           </Link>
         </div>
@@ -242,21 +250,31 @@ function Reader() {
             {comic.pages.map((page, index) => (
               <div key={page.id} className="relative">
                 {!loadedImages[index] && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900 min-h-[200px]" aria-hidden="true">
+                  <div className="flex items-center justify-center bg-gray-900 min-h-[200px]" aria-hidden="true">
                     <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 )}
-                <img
-                  src={page.image}
-                  alt={page.caption || `Panel ${index + 1}`}
-                  className={`w-full transition-opacity duration-300 ${
-                    loadedImages[index] ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  onLoad={() => handleImageLoad(index)}
-                  loading={index < 3 ? "eager" : "lazy"}
-                  decoding={index === 0 ? "sync" : "async"}
-                  fetchPriority={index === 0 ? "high" : index < 3 ? "auto" : "low"}
-                />
+                {errorImages[index] ? (
+                  <div className="flex flex-col items-center justify-center bg-gray-900 min-h-[200px] text-gray-600 py-12">
+                    <svg className="w-10 h-10 mb-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-sm">Panel {index + 1} unavailable</span>
+                  </div>
+                ) : (
+                  <img
+                    src={page.image}
+                    alt={page.caption || `Panel ${index + 1}`}
+                    className={`w-full transition-opacity duration-300 ${
+                      loadedImages[index] ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    onLoad={() => handleImageLoad(index)}
+                    onError={() => handleImageError(index)}
+                    loading={index < 3 ? "eager" : "lazy"}
+                    decoding={index === 0 ? "sync" : "async"}
+                    fetchPriority={index === 0 ? "high" : index < 3 ? "auto" : "low"}
+                  />
+                )}
               </div>
             ))}
           </div>
