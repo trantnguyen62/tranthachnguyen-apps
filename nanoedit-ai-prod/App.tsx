@@ -323,8 +323,8 @@ const App: React.FC = () => {
                       </span>
                     ) : (
                       <span id="prompt-hint" className="text-xs text-slate-400 pl-2 flex items-center gap-2">
-                        <span className="hidden sm:inline">
-                          <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate
+                        <span className="hidden sm:flex items-center gap-1.5">
+                          <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate <span className="text-slate-300">·</span> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Shift+Enter</kbd> for newline
                         </span>
                         <span className={`tabular-nums transition-opacity ${prompt.length > 0 ? 'opacity-100' : 'opacity-0'}`}>{prompt.length} chars</span>
                       </span>

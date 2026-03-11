@@ -117,7 +117,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
 
           {/* Processed (Image or Video) */}
           <div className="space-y-3 relative">
-             <div className={`relative rounded-xl overflow-hidden border-2 bg-slate-100 shadow-xl transition-colors ${isProcessing ? 'border-slate-300' : 'border-brand-500'} ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>
+             <div className={`relative rounded-xl overflow-hidden border-2 bg-slate-100 shadow-xl transition-colors ${isProcessing ? 'border-brand-400 animate-pulse' : 'border-brand-500'} ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>
                {isVideo ? (
                  <video
                     src={processedImage}
@@ -145,8 +145,8 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                )}
 
                <div className="absolute bottom-4 left-4 px-3 py-1 bg-brand-600/90 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide shadow-lg flex items-center gap-1" aria-hidden="true">
-                 {isVideo ? <Play className="w-3 h-3 fill-current" /> : <Sparkles className="w-3 h-3" />}
-                 {isVideo ? 'VIDEO RESULT' : 'AFTER'}
+                 {isProcessing ? <Loader2 className="w-3 h-3 animate-spin" /> : isVideo ? <Play className="w-3 h-3 fill-current" /> : <Sparkles className="w-3 h-3" />}
+                 {isProcessing ? 'PROCESSING' : isVideo ? 'VIDEO RESULT' : 'AFTER'}
                </div>
              </div>
              
