@@ -460,7 +460,11 @@ function init() {
         domCache.ariaAnnouncer  = document.getElementById('ariaAnnouncer');
 
         loadHighScore();
-        window.addEventListener('resize', resizeCanvas);
+        let _resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(_resizeTimer);
+            _resizeTimer = setTimeout(resizeCanvas, 100);
+        });
     });
 }
 
@@ -1026,6 +1030,7 @@ function showQuestion(enemy) {
     domCache.questionText.textContent = question.q;
 
     domCache.answerGrid.innerHTML = '';
+    domCache.answerBtns = [];
 
     answers.forEach((answer, i) => {
         const btn = document.createElement('button');
@@ -1042,6 +1047,7 @@ function showQuestion(enemy) {
         btn.appendChild(textSpan);
         btn.onclick = () => selectAnswer(i);
         domCache.answerGrid.appendChild(btn);
+        domCache.answerBtns.push(btn);
     });
 }
 
@@ -1049,7 +1055,7 @@ function selectAnswer(index) {
     if (!game.questionActive || game.selectedAnswer !== -1) return;
 
     game.selectedAnswer = index;
-    const btns = document.querySelectorAll('.answer-btn');
+    const btns = domCache.answerBtns;
 
     btns.forEach((btn, i) => {
         btn.classList.add('disabled');
@@ -1063,7 +1069,7 @@ function selectAnswer(index) {
 
 function checkAnswer(index) {
     const correct = index === game.currentQuestion.correctIndex;
-    const btns = document.querySelectorAll('.answer-btn');
+    const btns = domCache.answerBtns;
     const enemy = game.currentQuestion.enemy; // Save reference before closeQuestion
 
     btns[game.currentQuestion.correctIndex].classList.add('correct');
@@ -1135,7 +1141,7 @@ function handleTimeout() {
     const enemy = game.currentQuestion.enemy; // Save reference before closeQuestion
 
     // Show correct answer
-    const btns = document.querySelectorAll('.answer-btn');
+    const btns = domCache.answerBtns;
     btns[game.currentQuestion.correctIndex].classList.add('correct');
 
     takeDamage(CONFIG.DAMAGE_TIMEOUT);
