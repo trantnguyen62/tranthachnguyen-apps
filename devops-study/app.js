@@ -3527,8 +3527,8 @@ function renderSidebarTopics() {
         li.setAttribute('aria-label', `${topic.name}, ${progress}% complete`);
         li.innerHTML = `
             <span class="topic-icon" aria-hidden="true">${topic.icon}</span>
-            <span class="topic-name">${topic.name}</span>
-            <div class="topic-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${topic.name} progress">
+            <span class="topic-name">${escapeHtml(topic.name)}</span>
+            <div class="topic-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${escapeHtml(topic.name)} progress">
                 <div class="topic-progress-fill" style="width: ${progress}%"></div>
             </div>
         `;
@@ -3559,12 +3559,12 @@ function createTopicCard(topic) {
     card.setAttribute('aria-label', `${topic.name}: ${topic.flashcards.length} flashcards, ${topic.quiz.length} quiz questions, ${progress}% complete`);
     card.innerHTML = `
         <span class="topic-card-icon" aria-hidden="true">${topic.icon}</span>
-        <h3 class="topic-card-name">${topic.name}</h3>
+        <h3 class="topic-card-name">${escapeHtml(topic.name)}</h3>
         <div class="topic-card-stats" aria-hidden="true">
             <span>📇 ${topic.flashcards.length} cards</span>
             <span>❓ ${topic.quiz.length} questions</span>
         </div>
-        <div class="topic-card-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${topic.name} progress">
+        <div class="topic-card-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${escapeHtml(topic.name)} progress">
             <div class="topic-card-progress-fill" style="width: ${progress}%"></div>
         </div>
     `;
@@ -4046,6 +4046,7 @@ function renderQuizQuestion() {
 
     const questions = state.currentTopic.quiz;
     const question = questions[state.currentQuestionIndex];
+    if (!question) return;
 
     dom.quizQuestion.textContent = question.question;
     dom.currentQuestionNum.textContent = state.currentQuestionIndex + 1;

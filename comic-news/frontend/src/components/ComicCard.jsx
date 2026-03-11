@@ -29,9 +29,9 @@ function ComicCard({ comic }) {
         </div>
         <div className="absolute top-2 right-2 pointer-events-none">
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-            comic.status === 'Ongoing' 
-              ? 'bg-green-500/20 text-green-400' 
-              : 'bg-blue-500/20 text-blue-400'
+            comic.status === 'Ongoing'
+              ? 'bg-green-500/20 text-green-400 ring-1 ring-green-500/30'
+              : 'bg-gray-500/20 text-gray-300 ring-1 ring-gray-500/30'
           }`}>
             {comic.status}
           </span>

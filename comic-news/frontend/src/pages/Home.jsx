@@ -108,7 +108,7 @@ function Home() {
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link
                 to="/library"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg shadow-red-500/25 hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg shadow-red-500/40 hover:shadow-xl hover:shadow-red-500/50 hover:scale-105 active:scale-95"
               >
                 Explore Stories
                 <ArrowRight className="w-5 h-5" />
@@ -135,7 +135,7 @@ function Home() {
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {loading
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
             : featured.map((comic) => <ComicCard key={comic.id} comic={comic} />)

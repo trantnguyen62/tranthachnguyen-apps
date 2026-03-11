@@ -118,8 +118,8 @@ function Library() {
                 aria-pressed={selectedGenre === genre}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   selectedGenre === genre
-                    ? 'bg-red-500 text-white'
-                    : 'bg-dark-200 text-gray-300 hover:bg-dark-100'
+                    ? 'bg-red-500 text-white shadow-sm shadow-red-500/30'
+                    : 'bg-dark-200/60 text-gray-200 border border-white/10 hover:bg-dark-100 hover:text-white'
                 }`}
               >
                 {genre}
