@@ -29,7 +29,7 @@ const TRANSLATIONS = {
 } as const;
 
 export const StudyMode = memo<StudyModeProps>(({ language }) => {
-  const questions = getQuestions(language);
+  const questions = useMemo(() => getQuestions(language), [language]);
   const t = TRANSLATIONS[language];
   const [search, setSearch] = useState('');
 

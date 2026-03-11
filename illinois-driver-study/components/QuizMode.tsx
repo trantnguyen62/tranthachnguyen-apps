@@ -195,6 +195,9 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
     );
   }
 
+  const answeredCount = currentQuestionIndex + (showResult ? 1 : 0);
+  const scorePct = answeredCount > 0 ? Math.round((score / answeredCount) * 100) : null;
+
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="bg-white rounded-xl shadow-lg p-6">
@@ -202,15 +205,9 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
           <span aria-live="polite" aria-atomic="true" className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
             {t.questionLabel} {currentQuestionIndex + 1} {t.of} {questions.length}
           </span>
-          {(() => {
-            const answered = currentQuestionIndex + (showResult ? 1 : 0);
-            const pct = answered > 0 ? Math.round((score / answered) * 100) : null;
-            return (
-              <span aria-live="polite" aria-atomic="true" className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-                {t.score}: {score}{pct !== null ? ` (${pct}%)` : ''}
-              </span>
-            );
-          })()}
+          <span aria-live="polite" aria-atomic="true" className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+            {t.score}: {score}{scorePct !== null ? ` (${scorePct}%)` : ''}
+          </span>
         </div>
         <div className="w-full bg-slate-100 rounded-full h-2 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length}>
           <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }} />

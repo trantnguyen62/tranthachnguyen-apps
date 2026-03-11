@@ -117,29 +117,29 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
     return () => {
       stopSession();
     };
-  }, []);
+  }, [stopSession]);
 
   // Update questions list when language changes, effectively resetting the session context conceptually
   // though the session itself needs manual restart to pick up new system instructions.
   const allQuestions = useMemo(() => getQuestions(language), [language]);
   const questionsMap = useMemo(() => new Map(allQuestions.map(q => [q.id, q])), [allQuestions]);
 
-  const stopSession = () => {
+  const stopSession = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-    
+
     if (processorRef.current) {
       processorRef.current.disconnect();
       processorRef.current = null;
     }
-    
+
     if (sourceRef.current) {
       sourceRef.current.disconnect();
       sourceRef.current = null;
     }
-    
+
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;
@@ -149,14 +149,14 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       outputAudioContextRef.current.close();
       outputAudioContextRef.current = null;
     }
-    
+
     resolvedSessionRef.current = null;
     lastVolumeRef.current = 0;
     setIsActive(false);
     setStatus('idle');
     setVolume(0);
     setCurrentQuestion(null);
-  };
+  }, []);
 
   const startSession = async () => {
     try {
