@@ -3,6 +3,24 @@
    Optimized for comfort and readability
    ===================================================== */
 
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background: #1a2744;
+    color: #60a5fa;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    z-index: 9999;
+    text-decoration: none;
+    border: 2px solid #60a5fa;
+    border-radius: 0 0 6px 0;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
 .site-footer {
     position: absolute;
     bottom: 0;
@@ -137,17 +155,18 @@ body {
 
 .topic-selector label {
     display: block;
-    font-size: 0.95rem;
-    color: #7b8eaa;
-    margin-bottom: 1rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    color: #60a5fa;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .topic-buttons {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.6rem;
-    justify-content: center;
     max-width: 600px;
     margin: 0 auto;
 }
@@ -213,9 +232,14 @@ body {
 }
 
 .high-score-display {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     font-size: 0.95rem;
     color: #7b8eaa;
+    background: rgba(26, 39, 68, 0.7);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 10px;
+    padding: 0.7rem 1.5rem;
+    display: inline-block;
 }
 
 .high-score-display span {
@@ -472,6 +496,7 @@ body {
 .answer-btn:hover:not(.disabled) {
     border-color: #60a5fa;
     background: rgba(96, 165, 250, 0.1);
+    color: #ffffff;
     transform: translateX(3px);
 }
 
@@ -573,6 +598,19 @@ body {
     background: rgba(26, 39, 68, 0.9);
     border-radius: 12px;
     padding: 1rem 0.8rem;
+    border-top: 3px solid transparent;
+}
+
+.stat-box:nth-child(1) {
+    border-top-color: #60a5fa;
+}
+
+.stat-box:nth-child(2) {
+    border-top-color: #4ade80;
+}
+
+.stat-box:nth-child(3) {
+    border-top-color: #fbbf24;
 }
 
 .stat-value {
@@ -919,6 +957,10 @@ body {
 
     .icon-preview {
         font-size: 4rem;
+    }
+
+    .topic-buttons {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .score-display {
