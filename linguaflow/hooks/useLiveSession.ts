@@ -24,6 +24,7 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
   const streamRef = useRef<MediaStream | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const outputVolumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const inputVolumeRef = useRef<number>(0);
 
   const disconnect = useCallback(() => {
     // 1. Close session if possible (wrapper doesn't expose close explicitly on promise, but we stop sending)
@@ -206,13 +207,13 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
             analyser.connect(outputCtx.destination);
             analyserRef.current = analyser;
 
-            // Single polling interval for output volume visualisation
+            // Single polling interval for combined volume visualisation
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
             outputVolumeIntervalRef.current = setInterval(() => {
               analyser.getByteFrequencyData(dataArray);
               let sum = 0;
               for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-              setVolume(prev => ({ ...prev, output: sum / dataArray.length / 255 }));
+              setVolume({ input: inputVolumeRef.current, output: sum / dataArray.length / 255 });
             }, 150);
 
             // Setup Audio Processing
@@ -223,11 +224,11 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
             scriptProcessor.onaudioprocess = (e) => {
               const inputData = e.inputBuffer.getChannelData(0);
 
-              // Calculate volume for visualizer
+              // Update input volume ref (read by the combined interval, avoids extra state update)
               let sum = 0;
               for (let i = 0; i < inputData.length; i++) sum += inputData[i] * inputData[i];
               const rms = Math.sqrt(sum / inputData.length);
-              setVolume(prev => ({ ...prev, input: Math.min(rms * 5, 1) })); // Boost for visibility, clamped to [0,1]
+              inputVolumeRef.current = Math.min(rms * 5, 1); // Boost for visibility, clamped to [0,1]
 
               const pcmBlob = createBlob(inputData);
               if (sessionPromiseRef.current) {
@@ -254,7 +255,7 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
 
               if (userText) {
                 const id = `${++messageCounterRef.current}-user`;
-                setMessages(prev => [...prev, {
+                setMessages(prev => [...prev.slice(-99), {
                   id,
                   role: 'user',
                   text: userText,
@@ -264,7 +265,7 @@ Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp t�
               }
               if (modelText) {
                 const id = `${++messageCounterRef.current}-model`;
-                setMessages(prev => [...prev, {
+                setMessages(prev => [...prev.slice(-99), {
                   id,
                   role: 'model',
                   text: modelText,

@@ -49,8 +49,8 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
 
   const animate = () => {
     if (document.hidden) {
-      requestRef.current = requestAnimationFrame(animate);
-      return;
+      requestRef.current = null;
+      return; // Stop loop; visibilitychange will restart it
     }
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -139,11 +139,23 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
 
   // Only restart the animation loop when isActive changes, not on every volume update.
   // Volume and color are read via refs inside animate(), keeping them current without
-  // triggering a loop restart.
+  // triggering a loop restart. When the tab is hidden the loop stops itself; a
+  // visibilitychange listener restarts it when the tab becomes visible again.
   useEffect(() => {
+    const startLoop = () => {
+      if (!document.hidden && requestRef.current === null) {
+        requestRef.current = requestAnimationFrame(animate);
+      }
+    };
+
     requestRef.current = requestAnimationFrame(animate);
+    document.addEventListener('visibilitychange', startLoop);
     return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      document.removeEventListener('visibilitychange', startLoop);
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
+        requestRef.current = null;
+      }
     };
   }, [isActive]); // eslint-disable-line react-hooks/exhaustive-deps
 
