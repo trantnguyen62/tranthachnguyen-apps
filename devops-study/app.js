@@ -4015,14 +4015,18 @@ function renderMatchItems() {
         item.dataset.id = pair.id;
         item.dataset.type = 'definition';
         item.textContent = pair.definition;
+        item.setAttribute('role', 'button');
         if (!pair.matched) {
             item.setAttribute('tabindex', '0');
-            item.setAttribute('role', 'button');
             item.setAttribute('aria-pressed', 'false');
+            item.setAttribute('aria-label', `Definition: ${pair.definition}`);
             item.addEventListener('click', () => selectMatchItem(item, pair.id, 'definition'));
             item.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMatchItem(item, pair.id, 'definition'); }
             });
+        } else {
+            item.setAttribute('aria-disabled', 'true');
+            item.setAttribute('aria-label', `Definition: ${pair.definition}, matched`);
         }
         defsContainer.appendChild(item);
     });
@@ -4058,6 +4062,11 @@ function selectMatchItem(element, id, type) {
                 el.classList.remove('selected');
                 el.classList.add('matched');
                 el.removeAttribute('aria-pressed');
+                el.setAttribute('aria-disabled', 'true');
+                el.setAttribute('tabindex', '-1');
+                const type = el.dataset.type;
+                const text = el.textContent;
+                el.setAttribute('aria-label', `${type === 'term' ? 'Term' : 'Definition'}: ${text}, matched`);
             });
 
             matchState.selectedTerm = null;

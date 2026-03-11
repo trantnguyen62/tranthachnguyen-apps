@@ -31,7 +31,7 @@
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.7);
     --text-tertiary: rgba(255, 255, 255, 0.6);
-    --text-muted: rgba(255, 255, 255, 0.3);
+    --text-muted: rgba(255, 255, 255, 0.5);
 
     /* Feedback Colors */
     --color-success: #10b981;
@@ -1550,7 +1550,7 @@ body {
 /* Syntax highlighting */
 .code-keyword { color: #c792ea; }
 .code-string { color: #c3e88d; }
-.code-comment { color: #546e7a; font-style: italic; }
+.code-comment { color: #8a9ba8; font-style: italic; }
 .code-number { color: #f78c6c; }
 .code-property { color: #82aaff; }
 .code-tag { color: #f07178; }
