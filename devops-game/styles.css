@@ -870,6 +870,68 @@ body {
     margin-bottom: 0.5rem;
 }
 
+/* Stats panels (game over & level complete) */
+.final-stats,
+.level-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--nano-cyan);
+    text-transform: uppercase;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--nano-yellow);
+    text-shadow: 0 0 10px var(--nano-yellow-glow);
+}
+
+/* Zone complete overlay extras */
+.zone-icon {
+    font-size: 3rem;
+    margin: 0.5rem 0;
+}
+
+.zone-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: var(--nano-cyan);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+.new-high-score {
+    color: var(--nano-yellow);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    text-shadow: 0 0 20px var(--nano-yellow);
+    margin: 1rem 0;
+    letter-spacing: 0.05em;
+    animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+    from { opacity: 0.8; text-shadow: 0 0 10px var(--nano-yellow); }
+    to   { opacity: 1;   text-shadow: 0 0 30px var(--nano-yellow), 0 0 60px var(--nano-yellow-glow); }
+}
+
 /* =====================================================
    Screen Reader Only (visually hidden)
    ===================================================== */
@@ -905,6 +967,10 @@ body {
     }
 
     .timer-fill.timer-danger {
+        animation: none;
+    }
+
+    .new-high-score {
         animation: none;
     }
 
