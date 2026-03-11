@@ -19,12 +19,32 @@ app.use(express.json({ limit: '10kb' }));
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:");
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   next();
 });
+
+// Simple in-memory rate limiter for write endpoints
+const writeRateLimits = new Map();
+const WRITE_WINDOW_MS = 60_000;
+const WRITE_MAX_REQUESTS = 30;
+function writeRateLimit(req, res, next) {
+  const key = req.ip;
+  const now = Date.now();
+  const entry = writeRateLimits.get(key);
+  if (!entry || now - entry.start > WRITE_WINDOW_MS) {
+    writeRateLimits.set(key, { start: now, count: 1 });
+    return next();
+  }
+  if (entry.count >= WRITE_MAX_REQUESTS) {
+    return res.status(429).json({ error: 'Too many requests' });
+  }
+  entry.count++;
+  next();
+}
 app.use('/images', express.static(join(__dirname, 'images'), { maxAge: '7d' }));
 
 // Serve static frontend (for Docker deployment)
@@ -526,6 +546,7 @@ app.get('/api/genres', (req, res) => {
 
 // Bookmarks
 app.get('/api/bookmarks', (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const bookmarkedComics = comics
     .filter(c => bookmarks.includes(c.id))
     .map(({ pages, ...comic }) => comic);
@@ -535,10 +556,11 @@ app.get('/api/bookmarks', (req, res) => {
 app.get('/api/bookmarks/check/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
+  res.set('Cache-Control', 'no-store');
   res.json({ isBookmarked: bookmarks.includes(id) });
 });
 
-app.post('/api/bookmarks/:id', (req, res) => {
+app.post('/api/bookmarks/:id', writeRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   if (!comics.find(c => c.id === id)) return res.status(404).json({ error: 'Comic not found' });
@@ -549,7 +571,7 @@ app.post('/api/bookmarks/:id', (req, res) => {
   res.json({ success: true });
 });
 
-app.delete('/api/bookmarks/:id', (req, res) => {
+app.delete('/api/bookmarks/:id', writeRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   bookmarks = bookmarks.filter(b => b !== id);
@@ -560,14 +582,19 @@ app.delete('/api/bookmarks/:id', (req, res) => {
 app.get('/api/progress/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
+  res.set('Cache-Control', 'no-store');
   res.json({ page: readingProgress[id] || 1 });
 });
 
-app.post('/api/progress/:id', (req, res) => {
+app.post('/api/progress/:id', writeRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
+  if (!comics.find(c => c.id === id)) return res.status(404).json({ error: 'Comic not found' });
   const page = parseInt(req.body.page, 10);
   if (isNaN(page) || page < 1 || page > 10000) return res.status(400).json({ error: 'Invalid page' });
+  if (Object.keys(readingProgress).length >= 1000 && !(id in readingProgress)) {
+    return res.status(429).json({ error: 'Progress storage limit reached' });
+  }
   readingProgress[id] = page;
   res.json({ success: true });
 });
