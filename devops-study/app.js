@@ -3503,7 +3503,7 @@ function updateHeaderStats() {
     let totalCardsStudied = 0;
 
     Object.values(state.progress).forEach(p => {
-        totalCardsStudied += p.flashcardsViewed.length;
+        totalCardsStudied += p.flashcardsViewed.size;
     });
 
     dom.totalProgress.textContent = totalProgress + '%';
