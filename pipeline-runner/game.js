@@ -519,7 +519,7 @@ function renderTopicButtons() {
         btn.setAttribute('aria-label', `${topic.name} topic`);
         // Roving tabindex: only the selected button is in the tab order
         btn.tabIndex = topic.id === game.selectedTopic ? 0 : -1;
-        btn.innerHTML = `${topic.icon} ${topic.name}`;
+        btn.textContent = `${topic.icon} ${topic.name}`;
         btn.onclick = () => selectTopic(topic.id);
         btn.addEventListener('keydown', handleTopicKeydown);
         container.appendChild(btn);
@@ -1163,6 +1163,8 @@ function selectAnswer(index) {
 }
 
 function checkAnswer(index) {
+    const answerCount = game.currentQuestion.shuffledAnswers.length;
+    if (index < 0 || index >= answerCount) return;
     const correct = index === game.currentQuestion.correctIndex;
     const btns = document.querySelectorAll('.answer-btn');
 
