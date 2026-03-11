@@ -97,13 +97,13 @@ function Navbar() {
             )}
 
             <div className="flex md:hidden items-center gap-1 ml-1">
-              <Link to="/" aria-label="Home" aria-current={isActive('/') ? 'page' : undefined} className={`p-2 rounded-lg transition-colors ${isActive('/') ? 'text-red-500 bg-red-500/10' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+              <Link to="/" aria-label="Home" aria-current={isActive('/') ? 'page' : undefined} className={`p-2.5 rounded-lg transition-colors ${isActive('/') ? 'text-red-500 bg-red-500/10' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
                 <Home className="w-5 h-5" aria-hidden="true" />
               </Link>
-              <Link to="/library" aria-label="Library" aria-current={isActive('/library') ? 'page' : undefined} className={`p-2 rounded-lg transition-colors ${isActive('/library') ? 'text-red-500 bg-red-500/10' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+              <Link to="/library" aria-label="Library" aria-current={isActive('/library') ? 'page' : undefined} className={`p-2.5 rounded-lg transition-colors ${isActive('/library') ? 'text-red-500 bg-red-500/10' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
                 <Library className="w-5 h-5" aria-hidden="true" />
               </Link>
-              <Link to="/bookmarks" aria-label="Bookmarks" aria-current={isActive('/bookmarks') ? 'page' : undefined} className={`p-2 rounded-lg transition-colors ${isActive('/bookmarks') ? 'text-red-500 bg-red-500/10' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+              <Link to="/bookmarks" aria-label="Bookmarks" aria-current={isActive('/bookmarks') ? 'page' : undefined} className={`p-2.5 rounded-lg transition-colors ${isActive('/bookmarks') ? 'text-red-500 bg-red-500/10' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
                 <Bookmark className="w-5 h-5" aria-hidden="true" />
               </Link>
             </div>

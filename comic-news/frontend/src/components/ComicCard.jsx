@@ -6,7 +6,7 @@ function ComicCard({ comic }) {
   const [imgLoaded, setImgLoaded] = useState(false);
 
   return (
-    <Link to={`/comic/${comic.id}`} title={comic.title} className="comic-card group block cursor-pointer">
+    <Link to={`/comic/${comic.id}`} title={comic.title} className="comic-card group block cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#11111b]">
       <div className="relative overflow-hidden rounded-xl bg-dark-200 border border-white/5 hover:border-red-500/30">
         <div className="aspect-[2/3] overflow-hidden relative">
           {!imgLoaded && (

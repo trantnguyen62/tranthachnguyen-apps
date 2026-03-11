@@ -17,6 +17,8 @@ body {
   background-color: #11111b;
   color: #ffffff;
   min-height: 100vh;
+  scrollbar-color: #313244 #181825;
+  scrollbar-width: thin;
 }
 
 ::selection {

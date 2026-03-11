@@ -180,7 +180,7 @@ function Reader() {
                   {comic.title}
                 </h1>
                 <p className="text-gray-400 text-sm">
-                  {comic.pages.length} panels • Scroll to read
+                  {comic.pages.length} panels • {Math.round(scrollProgress)}% read
                 </p>
               </div>
             </div>
@@ -265,15 +265,15 @@ function Reader() {
       </div>
 
       {/* Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          aria-label="Scroll to top"
-          className="fixed bottom-6 right-6 p-3 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg transition-all z-50"
-        >
-          <ChevronUp className="w-6 h-6" aria-hidden="true" />
-        </button>
-      )}
+      <button
+        onClick={scrollToTop}
+        aria-label="Scroll to top"
+        className={`fixed bottom-6 right-6 p-3 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg z-50 transition-all duration-300 ${
+          showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
+      >
+        <ChevronUp className="w-6 h-6" aria-hidden="true" />
+      </button>
     </div>
   );
 }
