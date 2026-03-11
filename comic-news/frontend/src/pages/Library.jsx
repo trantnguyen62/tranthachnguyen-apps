@@ -18,7 +18,9 @@ function Library() {
 
   useEffect(() => {
     const title = 'Story Library - Comic News';
-    const description = 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
+    const description = selectedGenre !== 'All'
+      ? `Browse ${selectedGenre} comics on Comic News. Discover news stories and real-life moments transformed into visual comics.`
+      : 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
     const url = `${window.location.origin}/library`;
 
     document.title = title;
@@ -42,7 +44,7 @@ function Library() {
       const origDesc = 'Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you\'ll actually want to read.';
       document.querySelector('meta[name="description"]')?.setAttribute('content', origDesc);
     };
-  }, []);
+  }, [selectedGenre]);
 
   useEffect(() => {
     if (cachedGenres) {
@@ -76,6 +78,29 @@ function Library() {
         if (!res.ok) return;
         const data = await res.json();
         setComics(data);
+
+        // ItemList structured data
+        document.getElementById('library-jsonld')?.remove();
+        const ld = document.createElement('script');
+        ld.id = 'library-jsonld';
+        ld.type = 'application/ld+json';
+        ld.textContent = JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: selectedGenre !== 'All' ? `${selectedGenre} Comics - Comic News` : 'Story Library - Comic News',
+          url: `${window.location.origin}/library`,
+          description: selectedGenre !== 'All'
+            ? `Browse ${selectedGenre} comics on Comic News.`
+            : 'Browse all news stories transformed into comics.',
+          hasPart: data.slice(0, 20).map(comic => ({
+            '@type': 'Article',
+            name: comic.title,
+            url: `${window.location.origin}/comic/${comic.id}`,
+            genre: comic.genre,
+            author: { '@type': 'Person', name: comic.author },
+          })),
+        });
+        document.head.appendChild(ld);
       } catch (error) {
         if (error.name !== 'AbortError') console.error('Error fetching comics:', error);
       } finally {
@@ -83,7 +108,10 @@ function Library() {
       }
     };
     fetchComics();
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      document.getElementById('library-jsonld')?.remove();
+    };
   }, [selectedGenre, sortBy, searchQuery]);
 
   return (

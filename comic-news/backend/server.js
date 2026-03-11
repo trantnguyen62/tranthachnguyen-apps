@@ -581,7 +581,7 @@ app.get('/api/featured', (req, res) => {
 // robots.txt
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain');
-  res.send('User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: /sitemap.xml\n');
+  res.send('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /bookmarks\nDisallow: /read/\n\nSitemap: /sitemap.xml\n');
 });
 
 // sitemap.xml
