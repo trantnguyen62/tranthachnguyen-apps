@@ -2,6 +2,7 @@
 export interface PassportImage {
   /** Base64 data URL, e.g. `data:image/jpeg;base64,...` */
   data: string;
+  /** MIME type of the encoded image, e.g. `"image/jpeg"`. */
   mimeType: string;
 }
 

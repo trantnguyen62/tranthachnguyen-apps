@@ -31,7 +31,7 @@ cp .env.local.example .env.local
 # Terminal 1 — start the API server
 npm run server
 
-# Terminal 2 — start the frontend dev server
+# Terminal 2 — start the frontend dev server (http://localhost:5186)
 npm run dev
 ```
 

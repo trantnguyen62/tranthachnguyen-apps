@@ -1,3 +1,4 @@
+/** Shared brand color constants used across all components. */
 export const THEME = {
   accentPink: '#E94560',
   accentGold: '#F4A261',
