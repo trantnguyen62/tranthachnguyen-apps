@@ -132,7 +132,7 @@ body {
 .bg-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(60px);
+    filter: blur(40px);
     animation: float 20s infinite ease-in-out;
     will-change: transform;
 }

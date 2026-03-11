@@ -3998,10 +3998,6 @@ function renderMatchItems() {
             item.setAttribute('tabindex', '0');
             item.setAttribute('aria-pressed', 'false');
             item.setAttribute('aria-label', `Term: ${pair.term}`);
-            item.addEventListener('click', () => selectMatchItem(item, pair.id, 'term'));
-            item.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMatchItem(item, pair.id, 'term'); }
-            });
         } else {
             item.setAttribute('aria-disabled', 'true');
             item.setAttribute('aria-label', `Term: ${pair.term}, matched`);
@@ -4020,15 +4016,30 @@ function renderMatchItems() {
             item.setAttribute('tabindex', '0');
             item.setAttribute('aria-pressed', 'false');
             item.setAttribute('aria-label', `Definition: ${pair.definition}`);
-            item.addEventListener('click', () => selectMatchItem(item, pair.id, 'definition'));
-            item.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectMatchItem(item, pair.id, 'definition'); }
-            });
         } else {
             item.setAttribute('aria-disabled', 'true');
             item.setAttribute('aria-label', `Definition: ${pair.definition}, matched`);
         }
         defsContainer.appendChild(item);
+    });
+
+    // Use event delegation: one handler per container instead of per item
+    const handleClick = (e) => {
+        const item = e.target.closest('.match-item');
+        if (item) selectMatchItem(item, +item.dataset.id, item.dataset.type);
+    };
+    const handleKey = (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const item = e.target.closest('.match-item');
+        if (item) { e.preventDefault(); selectMatchItem(item, +item.dataset.id, item.dataset.type); }
+    };
+    [termsContainer, defsContainer].forEach(container => {
+        if (container._matchClick) container.removeEventListener('click', container._matchClick);
+        if (container._matchKey) container.removeEventListener('keydown', container._matchKey);
+        container.addEventListener('click', handleClick);
+        container.addEventListener('keydown', handleKey);
+        container._matchClick = handleClick;
+        container._matchKey = handleKey;
     });
 }
 
