@@ -143,6 +143,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
         <button
           onClick={handleClear}
           aria-label="Remove photo"
+          title="Remove photo"
           style={{
             position: 'absolute', top: 12, right: 12,
             width: 36, height: 36, borderRadius: 10,
@@ -151,8 +152,10 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
             color: '#fff', cursor: 'pointer', fontSize: 18,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: `0 4px 16px ${accentPink}44`,
-            transition: 'transform 0.2s'
+            transition: 'transform 0.15s ease, opacity 0.15s ease'
           }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
         >×</button>
       </div>
     );
@@ -275,9 +278,11 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           border: `1px solid ${accentPurple}44`, background: `${accentPurple}11`,
           color: accentPurple, fontWeight: 600, cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-          transition: 'all 0.3s ease',
+          transition: 'all 0.2s ease',
           fontFamily: "'Space Grotesk', sans-serif"
         }}
+        onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = `${accentPurple}22`; el.style.borderColor = `${accentPurple}88`; }}
+        onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = `${accentPurple}11`; el.style.borderColor = `${accentPurple}44`; }}
       >
         📷 Take Photo
       </button>

@@ -230,8 +230,8 @@ export default function App() {
                     <div key={i} style={{ height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.03)', width: `${w * 100}%`, animation: `pulse 1.5s ease-in-out ${0.4 + i * 0.2}s infinite` }} />
                   ))}
                 </div>
-                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 16 }}>
-                  Analyzing · usually under 15 seconds
+                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 16, letterSpacing: '0.03em' }}>
+                  Analyzing against biometric standards&hellip;
                 </p>
               </div>
             ) : status === AppStatus.ERROR ? (
@@ -278,7 +278,7 @@ export default function App() {
                       width: 56, height: 56, borderRadius: 16,
                       background: result.compliant ? '#10B981' : accentPink,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 28, boxShadow: `0 8px 24px ${result.compliant ? '#10B98144' : accentPink + '44'}`
+                      fontSize: 26, fontWeight: 800, boxShadow: `0 8px 24px ${result.compliant ? '#10B98144' : accentPink + '44'}`
                     }}>
                       {result.compliant ? '✓' : '!'}
                     </div>
@@ -374,7 +374,7 @@ export default function App() {
                   Upload a photo and click <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to catch compliance issues before submitting your passport or visa application.
                 </p>
                 <div style={{ textAlign: 'left' }}>
-                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', marginBottom: 10, fontWeight: 600 }}>
+                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginBottom: 10, fontWeight: 600 }}>
                     What we check
                   </p>
                   <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>

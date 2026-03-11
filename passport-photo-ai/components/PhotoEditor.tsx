@@ -199,8 +199,9 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
             {result ? (
               <img src={result} alt="Processed passport photo" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(16,185,129,0.2)' }} />
             ) : (
-              <div style={{ height: 200, background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>
-                Click "Auto-Fix" to start
+              <div style={{ height: 200, background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px dashed rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>
+                <span style={{ fontSize: 28, opacity: 0.5 }}>✨</span>
+                <span>Click <strong style={{ color: 'rgba(255,255,255,0.45)' }}>Auto-Fix</strong> to start</span>
               </div>
             )}
           </div>
@@ -228,8 +229,8 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 16, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)' }}>
-          <div>
+        <div style={{ display: 'flex', gap: 16, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)', alignItems: 'flex-start' }}>
+          <div style={{ flexShrink: 0 }}>
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Background</p>
             <div style={{ display: 'flex', gap: 8 }}>
               {BG_COLORS.map((c) => (
@@ -239,11 +240,13 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
                   disabled={step !== 'done'}
                   aria-label={`Background color: ${BG_COLOR_NAMES[c]}`}
                   aria-pressed={bgColor === c}
-                  style={{ width: 30, height: 30, borderRadius: 8, background: c, border: bgColor === c ? `2px solid ${accentPurple}` : '2px solid rgba(255,255,255,0.15)', cursor: step === 'done' ? 'pointer' : 'not-allowed', transition: 'border-color 0.2s', boxShadow: bgColor === c ? `0 0 0 3px ${accentPurple}33` : 'none' }}
+                  title={BG_COLOR_NAMES[c]}
+                  style={{ width: 30, height: 30, borderRadius: 8, background: c, border: bgColor === c ? `2px solid ${accentPurple}` : '2px solid rgba(255,255,255,0.15)', cursor: step === 'done' ? 'pointer' : 'not-allowed', transition: 'border-color 0.2s, box-shadow 0.2s', boxShadow: bgColor === c ? `0 0 0 3px ${accentPurple}33` : 'none' }}
                 />
               ))}
             </div>
           </div>
+          <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,0.06)', borderRadius: 1, flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <label htmlFor="brightness-range" style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, display: 'block', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Brightness: {brightness}%</label>
             <input id="brightness-range" type="range" min="90" max="120" value={brightness} onChange={handleBrightnessChange} disabled={step !== 'done'} style={{ width: '100%', accentColor: accentGold }} />
