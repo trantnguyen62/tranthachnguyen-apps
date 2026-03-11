@@ -3935,7 +3935,10 @@ function shuffleArray(array) {
 
 function initMatchGame() {
     if (!state.currentTopic) return;
-    
+
+    // Clear any existing timer before resetting state
+    if (matchState.timerInterval) clearInterval(matchState.timerInterval);
+
     // Reset match state
     matchState = {
         pairs: [],
@@ -4182,6 +4185,7 @@ function markCardViewed(topicId, cardIndex) {
 
 // Flip flashcard
 function flipCard() {
+    if (!state.currentTopic) return;
     dom.flashcard.classList.toggle('flipped');
     state.isCardFlipped = !state.isCardFlipped;
     const card = state.currentTopic.flashcards[state.currentCardIndex];
