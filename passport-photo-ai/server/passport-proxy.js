@@ -208,8 +208,13 @@ adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }
 });
 
 // Handle SPA routing
-app.get(/(.*)/, (req, res) => {
+app.get('/{*splat}', (req, res) => {
   res.sendFile(join(distPath, 'index.html'));
 });
 
-app.listen(5185, () => console.log('API on port 5185, Key:', process.env.GEMINI_API_KEY ? 'Yes' : 'No'));
+if (!process.env.GEMINI_API_KEY) {
+  console.error('ERROR: GEMINI_API_KEY is not set. Server cannot start without it.');
+  process.exit(1);
+}
+
+app.listen(5185, () => console.log('API on port 5185, Key: Yes'));

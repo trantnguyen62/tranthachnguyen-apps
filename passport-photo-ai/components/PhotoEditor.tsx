@@ -101,7 +101,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
       
       const { removeBackground } = await import('@imgly/background-removal');
       const removed = await removeBackground(blob, {
-        progress: (_, cur, total) => setProgress(30 + Math.round((cur / total) * 50)),
+        progress: (_, cur, total) => setProgress(30 + (total > 0 ? Math.round((cur / total) * 50) : 0)),
       });
       
       if (removedBgRef.current) URL.revokeObjectURL(removedBgRef.current);
