@@ -531,24 +531,32 @@ app.get('/api/comics', (req, res) => {
   res.set('Cache-Control', 'public, max-age=60');
   const { genre, search, sort } = req.query;
 
-  // Fast path: no filters applied — serve precomputed results
+  // Fast path: no filters — serve precomputed results with ETag
   if (!genre && !search) {
+    res.set('ETag', comicsETag);
+    if (req.headers['if-none-match'] === comicsETag) return res.status(304).end();
     if (!sort || sort === 'rating') return res.json(comicsSortedByRating);
     if (sort === 'title') return res.json(comicsSortedByTitle);
     return res.json(comicsListDefault);
   }
 
-  let result = genre && genre !== 'All'
-    ? comics.filter(comic => comic.genre === genre)
-    : [...comics];
-
-  if (search) {
-    const searchLower = String(search).slice(0, 100).toLowerCase();
-    result = result.filter(comic =>
-      comic.title.toLowerCase().includes(searchLower) ||
-      comic.author.toLowerCase().includes(searchLower)
-    );
+  // Genre filter: use precomputed map when no search
+  if (genre && genre !== 'All' && !search) {
+    const genreData = comicsByGenre.get(genre);
+    if (genreData) {
+      if (!sort || sort === 'rating') return res.json(genreData.byRating);
+      if (sort === 'title') return res.json(genreData.byTitle);
+      return res.json(genreData.default);
+    }
+    return res.json([]);
   }
+
+  // Search path: use precomputed lowercase strings
+  const searchLower = search ? String(search).slice(0, 100).toLowerCase() : null;
+  let result = comicsWithLower.filter(comic =>
+    (genre && genre !== 'All' ? comic.genre === genre : true) &&
+    (searchLower ? comic._titleLower.includes(searchLower) || comic._authorLower.includes(searchLower) : true)
+  );
 
   if (sort === 'rating') {
     result.sort((a, b) => b.rating - a.rating);
@@ -556,8 +564,8 @@ app.get('/api/comics', (req, res) => {
     result.sort((a, b) => a.title.localeCompare(b.title));
   }
 
-  // Return without pages for list view
-  res.json(result.map(({ pages, ...comic }) => comic));
+  // Return without pages or internal fields
+  res.json(result.map(({ pages, _titleLower, _authorLower, ...comic }) => comic));
 });
 
 // Get single comic with pages
@@ -565,16 +573,19 @@ app.get('/api/comics/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   const comic = comics.find(c => c.id === id);
-  if (!comic) {
-    return res.status(404).json({ error: 'Comic not found' });
-  }
+  if (!comic) return res.status(404).json({ error: 'Comic not found' });
+  const etag = comicETags.get(id);
   res.set('Cache-Control', 'public, max-age=300');
+  res.set('ETag', etag);
+  if (req.headers['if-none-match'] === etag) return res.status(304).end();
   res.json(comic);
 });
 
 // Get genres
 app.get('/api/genres', (req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
+  res.set('ETag', genresETag);
+  if (req.headers['if-none-match'] === genresETag) return res.status(304).end();
   res.json(genreList);
 });
 
@@ -636,6 +647,8 @@ app.post('/api/progress/:id', writeRateLimit, (req, res) => {
 // Featured/Popular comics
 app.get('/api/featured', (req, res) => {
   res.set('Cache-Control', 'public, max-age=300');
+  res.set('ETag', featuredETag);
+  if (req.headers['if-none-match'] === featuredETag) return res.status(304).end();
   res.json(featuredComics);
 });
 
