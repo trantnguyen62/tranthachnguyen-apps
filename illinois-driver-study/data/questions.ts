@@ -1,5 +1,17 @@
 import { Question, Language } from '../types';
 
+/**
+ * Official Illinois DMV written knowledge test questions.
+ *
+ * Two parallel arrays (`questionsEn` / `questionsVi`) hold the same 55 questions
+ * in English and Vietnamese respectively. IDs must match across both arrays —
+ * the Live Practice instructor looks up questions by `id` to display them in the UI.
+ *
+ * To add a question: append an entry to both arrays with the same `id`.
+ * To edit an answer or explanation: update `correctIndex` (0-based) and `explanation`.
+ * Optional `image` field: path relative to `public/` (e.g. `"images/stop-sign.svg"`).
+ */
+
 export const questionsEn: Question[] = [
   {
     id: 1,

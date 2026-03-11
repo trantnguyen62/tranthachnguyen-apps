@@ -52,6 +52,14 @@ const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: stri
 ));
 NavButton.displayName = 'NavButton';
 
+/**
+ * Root application component.
+ *
+ * Manages global state: the active study mode (`AppMode`) and the display language
+ * (`en` | `vi`). Renders the sticky header with navigation and language toggle,
+ * lazy-loads StudyMode and LivePractice to keep the initial bundle small, and
+ * updates `<title>` and `<meta name="description">` on each mode change for SEO.
+ */
 const App: React.FC = () => {
   const [mode, setMode] = useState<AppMode>(AppMode.QUIZ);
   const [language, setLanguage] = useState<Language>('en');
