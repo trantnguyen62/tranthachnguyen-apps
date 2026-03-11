@@ -3537,6 +3537,16 @@ const debouncedSaveProgress = debounce(saveProgress, 500);
 // Fast topic lookup map (O(1) vs O(n) find)
 const topicMap = new Map(devopsData.topics.map(t => [t.id, t]));
 
+// Pre-built lowercase search index to avoid repeated .toLowerCase() on every keystroke
+const searchIndex = devopsData.topics.map(topic => ({
+    topic,
+    nameLower: topic.name.toLowerCase(),
+    cards: topic.flashcards.map(card => ({
+        termLower: card.term.toLowerCase(),
+        defLower: card.definition.toLowerCase()
+    }))
+}));
+
 // Application State
 let state = {
     currentTopic: null,
@@ -3764,19 +3774,12 @@ function updateTabs() {
         btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
 
-    const flashcardView = document.getElementById('flashcardView');
-    const quizView = document.getElementById('quizView');
-    const quizResults = document.getElementById('quizResults');
-    const commandsView = document.getElementById('commandsView');
-    const matchView = document.getElementById('matchView');
-    const codebaseView = document.getElementById('codebaseView');
-
-    flashcardView.classList.toggle('hidden', state.currentTab !== 'flashcards');
-    quizView.classList.toggle('hidden', state.currentTab !== 'quiz');
-    commandsView.classList.toggle('hidden', state.currentTab !== 'commands');
-    matchView.classList.toggle('hidden', state.currentTab !== 'match');
-    codebaseView.classList.toggle('hidden', state.currentTab !== 'codebase');
-    quizResults.classList.add('hidden');
+    dom.flashcardView.classList.toggle('hidden', state.currentTab !== 'flashcards');
+    dom.quizView.classList.toggle('hidden', state.currentTab !== 'quiz');
+    dom.commandsView.classList.toggle('hidden', state.currentTab !== 'commands');
+    dom.matchView.classList.toggle('hidden', state.currentTab !== 'match');
+    dom.codebaseView.classList.toggle('hidden', state.currentTab !== 'codebase');
+    dom.quizResults.classList.add('hidden');
 
     // Stop match timer when leaving match tab
     if (state.currentTab !== 'match' && matchState.timerInterval) {
@@ -4313,19 +4316,18 @@ function handleSearch(event) {
         return;
     }
 
-    // Search through all topics and cards
+    // Search using pre-built lowercase index to avoid repeated .toLowerCase() calls
     const results = [];
-    devopsData.topics.forEach(topic => {
-        const topicMatch = topic.name.toLowerCase().includes(query);
-        const cardMatches = topic.flashcards.filter(card =>
-            card.term.toLowerCase().includes(query) ||
-            card.definition.toLowerCase().includes(query)
-        );
+    searchIndex.forEach(({ topic, nameLower, cards }) => {
+        const topicMatch = nameLower.includes(query);
+        const matchCount = cards.filter(c =>
+            c.termLower.includes(query) || c.defLower.includes(query)
+        ).length;
 
-        if (topicMatch || cardMatches.length > 0) {
+        if (topicMatch || matchCount > 0) {
             results.push({
                 topic,
-                matchCount: cardMatches.length + (topicMatch ? 1 : 0)
+                matchCount: matchCount + (topicMatch ? 1 : 0)
             });
         }
     });
@@ -4374,6 +4376,10 @@ function init() {
         resultsPercentage: document.getElementById('resultsPercentage'),
         resultsIcon: document.getElementById('resultsIcon'),
         resultsTitle: document.getElementById('resultsTitle'),
+        flashcardView: document.getElementById('flashcardView'),
+        commandsView: document.getElementById('commandsView'),
+        matchView: document.getElementById('matchView'),
+        codebaseView: document.getElementById('codebaseView'),
     };
 
     loadProgress();
