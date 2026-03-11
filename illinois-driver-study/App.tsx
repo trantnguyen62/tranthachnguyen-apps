@@ -39,7 +39,7 @@ const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: stri
     aria-current={currentMode === targetMode ? 'page' : undefined}
     className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-200 w-full sm:w-auto flex-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 outline-none ${
       currentMode === targetMode
-        ? 'bg-blue-600 text-white shadow-lg scale-105'
+        ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-300 ring-offset-1'
         : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
     }`}
   >

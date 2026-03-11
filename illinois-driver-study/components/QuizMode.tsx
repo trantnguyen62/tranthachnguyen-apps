@@ -253,7 +253,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
               } else if (isWrong) {
                 className += "border-red-500 bg-red-50 text-red-900";
               } else {
-                className += "border-slate-100 text-slate-400 opacity-60";
+                className += "border-slate-100 text-slate-400 opacity-75";
               }
             } else {
               className += "border-slate-200 hover:border-blue-400 hover:bg-slate-50 text-slate-700";
