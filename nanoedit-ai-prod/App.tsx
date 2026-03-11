@@ -18,7 +18,7 @@ const PRESET_PROMPTS = [
 
 const PASSPORT_PROMPT = "Convert this into a professional passport photo: solid white background, center the subject, crop to head and shoulders, ensure even lighting, and make it look professional.";
 
-const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement"];
+const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement", "100% Free · No Sign-up"];
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -201,10 +201,10 @@ const App: React.FC = () => {
         {history.length === 0 && (
           <div className="text-center mb-12 max-w-2xl mx-auto">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
-              AI Image Editor — Edit Photos with <span className="text-brand-600">Natural Language</span>
+              Edit Any Photo Instantly — Just <span className="text-brand-600">Describe What You Want</span>
             </h2>
             <p className="text-lg text-slate-600 mb-6">
-              Upload a photo and describe what you want — remove backgrounds, enhance colors, create passport photos, retouch portraits, or apply artistic effects. Instant results powered by Google Gemini.
+              Upload a photo and type what you want changed — remove backgrounds, create passport photos, retouch portraits, or apply artistic effects. Powered by Google Gemini. No account needed, completely free.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {FEATURES.map((feat) => (
@@ -305,7 +305,7 @@ const App: React.FC = () => {
                     {status === AppStatus.PROCESSING ? (
                       <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5 animate-pulse" role="status" aria-live="polite">
                         <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                        {showSlowHint ? 'Still working — AI can take up to 2 min…' : 'Generating your edit…'}
+                        {showSlowHint ? 'Complex edits take a moment — almost there…' : 'Generating your edit…'}
                       </span>
                     ) : (
                       <span id="prompt-hint" className="text-xs text-slate-400 pl-2 flex items-center gap-2">
