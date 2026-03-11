@@ -1,3 +1,18 @@
+// WebSocket proxy server that bridges the browser client and the Gemini Live API.
+//
+// Why a proxy? The Gemini API key must not be exposed in browser-side code.
+// This server holds the key server-side and forwards audio/text between the
+// client (port 3007) and Gemini.
+//
+// Security measures:
+//   - Origin allowlist: only requests from the Vite dev server are accepted
+//   - Rate limiting: max 10 connection attempts per IP per 60-second window
+//   - Session timeout: connections are forcibly closed after 30 minutes
+//
+// Message protocol (JSON over WebSocket):
+//   Client → server: { type: "connect"|"realtimeInput"|"sendText"|"disconnect", ... }
+//   Server → client: { type: "open"|"message"|"close"|"error", ... }
+
 import { WebSocketServer } from 'ws';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';

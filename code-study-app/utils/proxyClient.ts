@@ -1,4 +1,15 @@
-// WebSocket proxy client for Gemini Live API
+// WebSocket proxy client for the Gemini Live API.
+//
+// The browser cannot connect directly to Gemini Live because that would expose
+// the API key in client-side code. This client connects to the local WebSocket
+// proxy server (websocket-proxy.js), which holds the key and forwards messages.
+//
+// Two-phase connect protocol:
+//   1. Open WebSocket to proxy → send { type: "connect", config }
+//   2. Proxy replies { type: "open" } once Gemini is ready → resolve connect()
+//
+// Messages sent before the connection is open are queued and flushed in order
+// once the WebSocket handshake completes.
 
 interface SessionCallbacks {
   onopen?: () => void;

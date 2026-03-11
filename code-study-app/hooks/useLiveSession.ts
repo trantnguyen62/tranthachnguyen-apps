@@ -1,3 +1,21 @@
+// Custom hook that manages a Gemini Live voice session.
+//
+// Audio pipeline:
+//   Microphone → ScriptProcessorNode (4096-sample chunks, 16 kHz)
+//     → Float32→Int16 PCM (createBlob) → proxy → Gemini
+//   Gemini → PCM Int16 base64 (24 kHz) → AudioBuffer
+//     → AudioBufferSourceNode → shared AnalyserNode → speakers
+//
+// Transcription:
+//   Gemini streams partial transcription tokens for both user speech
+//   (inputTranscription) and model speech (outputTranscription).
+//   Tokens are accumulated in refs and committed to React state only when
+//   a turnComplete event signals that a conversational turn has finished.
+//   This avoids many small re-renders and keeps messages atomic.
+//
+// studyContext is kept in a ref so that the connect callback does not need to
+// be recreated every time the user selects a new file or highlights code.
+
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Modality, LiveServerMessage } from '@google/genai';
 import { ProxyGoogleGenAI, ProxyLiveSession } from '../utils/proxyClient';

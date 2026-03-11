@@ -1,5 +1,15 @@
+// Audio encoding/decoding utilities for the Gemini Live API.
+//
+// Audio pipeline:
+//   Microphone (Float32, 16 kHz) → createBlob → PCM Int16 base64 → Gemini
+//   Gemini → base64 PCM Int16 (24 kHz) → decodeAudioData → AudioBuffer → speaker
+
 import { Blob } from '@google/genai';
 
+// Converts raw Float32 microphone samples to a Gemini-compatible PCM blob.
+// Float32 web audio samples are in [-1, 1]; PCM Int16 uses [-32768, 32767].
+// Negative uses 0x8000 (32768) and positive uses 0x7FFF (32767) to preserve
+// the asymmetric Int16 range correctly.
 export function createBlob(data: Float32Array): Blob {
   const l = data.length;
   const int16 = new Int16Array(l);
@@ -13,6 +23,7 @@ export function createBlob(data: Float32Array): Blob {
   };
 }
 
+// Base64-encodes a byte array for transmission over JSON.
 export function encode(bytes: Uint8Array): string {
   let binary = '';
   const len = bytes.byteLength;
@@ -22,6 +33,7 @@ export function encode(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
+// Base64-decodes a string back to raw bytes.
 export function decode(base64: string): Uint8Array {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -32,6 +44,9 @@ export function decode(base64: string): Uint8Array {
   return bytes;
 }
 
+// Converts raw PCM bytes received from Gemini into a Web Audio API AudioBuffer.
+// Trims a trailing byte if present to keep the Int16 view 2-byte-aligned.
+// Divides Int16 samples by 32768 to normalise back to Float32 [-1, 1].
 export async function decodeAudioData(
   data: Uint8Array,
   ctx: AudioContext,
