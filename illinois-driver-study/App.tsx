@@ -1,7 +1,10 @@
 import React, { useState, useCallback, memo, lazy, Suspense, useEffect } from 'react';
 import { QuizMode } from './components/QuizMode';
-import { StudyMode } from './components/StudyMode';
 import { AppMode, Language } from './types';
+
+const StudyMode = lazy(() =>
+  import('./components/StudyMode').then(m => ({ default: m.StudyMode }))
+);
 
 const LivePractice = lazy(() =>
   import('./components/LivePractice').then(m => ({ default: m.LivePractice }))
@@ -144,7 +147,11 @@ const App: React.FC = () => {
 
         <div className="flex-grow animate-fade-in">
           {mode === AppMode.QUIZ && <QuizMode language={language} />}
-          {mode === AppMode.STUDY && <StudyMode language={language} />}
+          {mode === AppMode.STUDY && (
+            <Suspense fallback={<div role="status" className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400"><svg className="w-8 h-8 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg><span className="text-sm">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span></div>}>
+              <StudyMode language={language} />
+            </Suspense>
+          )}
           {mode === AppMode.LIVE_PRACTICE && (
             <Suspense fallback={<div role="status" className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400"><svg className="w-8 h-8 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg><span className="text-sm">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span></div>}>
               <LivePractice language={language} />
