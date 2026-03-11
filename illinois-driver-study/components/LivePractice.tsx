@@ -186,7 +186,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
           properties: {
             id: {
               type: Type.NUMBER,
-              description: 'The ID of the question (1-52) to display.',
+              description: 'The ID of the question (1-55) to display.',
             },
           },
           required: ['id'],

@@ -578,6 +578,39 @@ export const questionsEn: Question[] = [
     ],
     correctIndex: 1,
     explanation: "A yield sign means slow down and be prepared to stop if necessary. You must give the right-of-way to any vehicles or pedestrians in the intersection or approaching on the cross road. Unlike a stop sign, a full stop is not required if the way is clearly open."
+  },
+  {
+    id: 56,
+    text: "In Illinois, what is the maximum speed limit in a school zone when children are present?",
+    options: [
+      "20 mph",
+      "25 mph",
+      "30 mph"
+    ],
+    correctIndex: 0,
+    explanation: "Illinois law sets a maximum speed limit of 20 mph in school zones when children are present or when posted signs indicate reduced speed. Drivers must slow down and watch for pedestrians crossing near schools."
+  },
+  {
+    id: 57,
+    text: "When parking your vehicle on a downhill slope with a curb, you should turn your front wheels:",
+    options: [
+      "Straight ahead.",
+      "Toward the curb (right).",
+      "Away from the curb (left)."
+    ],
+    correctIndex: 1,
+    explanation: "When parking downhill with a curb, turn your front wheels toward the curb. If the vehicle rolls forward, the curb will stop it. When parking uphill with a curb, turn wheels away from the curb so a rolling vehicle will be caught by the curb. When there is no curb, always turn wheels toward the edge of the road."
+  },
+  {
+    id: 58,
+    text: "In Illinois, U-turns are prohibited:",
+    options: [
+      "On any road outside city limits.",
+      "Where your view is obstructed, in business districts, or where signs prohibit them.",
+      "Only on interstate highways."
+    ],
+    correctIndex: 1,
+    explanation: "Illinois law prohibits U-turns where the driver's view is obstructed within 500 feet in either direction, in business districts (unless permitted by signal), and wherever signs prohibit them. U-turns must only be made when they can be done safely without interfering with other traffic."
   }
 ];
 
@@ -1159,6 +1192,39 @@ export const questionsVi: Question[] = [
     ],
     correctIndex: 1,
     explanation: "Biển nhường đường có nghĩa là giảm tốc và sẵn sàng dừng lại nếu cần thiết. Bạn phải nhường quyền ưu tiên cho bất kỳ phương tiện hoặc người đi bộ nào đang ở trong giao lộ hoặc đang đến từ đường ngang. Khác với biển dừng, bạn không cần dừng hoàn toàn nếu đường thông thoáng."
+  },
+  {
+    id: 56,
+    text: "Tại Illinois, giới hạn tốc độ tối đa trong khu vực trường học khi có trẻ em là bao nhiêu?",
+    options: [
+      "20 mph",
+      "25 mph",
+      "30 mph"
+    ],
+    correctIndex: 0,
+    explanation: "Pháp luật Illinois quy định tốc độ tối đa 20 mph trong khu vực trường học khi có trẻ em hoặc khi biển báo yêu cầu giảm tốc. Tài xế phải giảm tốc và chú ý người đi bộ qua đường gần trường học."
+  },
+  {
+    id: 57,
+    text: "Khi đỗ xe trên dốc xuống có vỉa hè (lề đường), bạn nên quay bánh trước về hướng nào?",
+    options: [
+      "Thẳng về phía trước.",
+      "Về phía vỉa hè (bên phải).",
+      "Ra xa vỉa hè (bên trái)."
+    ],
+    correctIndex: 1,
+    explanation: "Khi đỗ xe xuống dốc có vỉa hè, quay bánh trước về phía vỉa hè. Nếu xe lăn về phía trước, vỉa hè sẽ chặn lại. Khi đỗ xe lên dốc có vỉa hè, quay bánh ra xa vỉa hè để nếu xe lăn lui sẽ bị vỉa hè chặn. Khi không có vỉa hè, luôn quay bánh về phía lề đường."
+  },
+  {
+    id: 58,
+    text: "Tại Illinois, quay đầu xe (U-turn) bị cấm trong trường hợp nào?",
+    options: [
+      "Trên bất kỳ con đường nào ngoài giới hạn thành phố.",
+      "Khi tầm nhìn bị che khuất, trong khu thương mại, hoặc nơi có biển cấm.",
+      "Chỉ trên đường cao tốc liên tiểu bang."
+    ],
+    correctIndex: 1,
+    explanation: "Pháp luật Illinois cấm quay đầu xe khi tầm nhìn của tài xế bị che khuất trong vòng 500 feet theo cả hai hướng, trong khu thương mại (trừ khi được phép bởi tín hiệu), và bất cứ nơi nào có biển cấm. Quay đầu xe chỉ được thực hiện khi có thể làm an toàn mà không cản trở giao thông khác."
   }
 ];
 
