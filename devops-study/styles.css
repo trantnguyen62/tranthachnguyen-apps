@@ -460,6 +460,14 @@ body {
     font-weight: 500;
 }
 
+.topic-progress-pct {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    min-width: 28px;
+    text-align: right;
+}
+
 .topic-progress {
     width: 32px;
     height: 4px;
@@ -655,12 +663,27 @@ body {
     margin-bottom: var(--space-md);
 }
 
+.topic-card-progress-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+}
+
 .topic-card-progress {
+    flex: 1;
     height: 4px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-full);
     overflow: hidden;
-    margin-top: var(--space-md);
+}
+
+.topic-card-progress-pct {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-muted);
+    min-width: 32px;
+    text-align: right;
 }
 
 .topic-card-progress-fill {
@@ -724,6 +747,13 @@ body {
     padding: var(--space-xs);
     border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.study-tabs::-webkit-scrollbar {
+    display: none;
 }
 
 .tab-btn {
@@ -739,6 +769,8 @@ body {
     align-items: center;
     gap: var(--space-sm);
     transition: var(--transition-base);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .tab-btn:hover {
@@ -1308,11 +1340,6 @@ body {
 
     .quiz-container {
         padding: var(--space-lg);
-    }
-
-    /* Hide tab text labels on very small screens, show only icons */
-    .tab-btn span:last-child {
-        display: none;
     }
 
     .tab-btn {

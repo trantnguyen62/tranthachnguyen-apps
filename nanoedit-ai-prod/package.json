@@ -1,7 +1,15 @@
 {
   "name": "nanoedit-ai",
   "description": "Free AI-powered image editor — edit photos with natural language using Google Gemini",
-  "keywords": ["ai", "image-editor", "gemini", "background-removal", "passport-photo", "react", "typescript"],
+  "keywords": [
+    "ai",
+    "image-editor",
+    "gemini",
+    "background-removal",
+    "passport-photo",
+    "react",
+    "typescript"
+  ],
   "homepage": "https://photoedit.tranthachnguyen.com",
   "private": true,
   "version": "0.0.0",
@@ -13,6 +21,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.30.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",

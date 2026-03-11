@@ -3661,6 +3661,7 @@ function renderSidebarTopics() {
         li.innerHTML = `
             <span class="topic-icon" aria-hidden="true">${topic.icon}</span>
             <span class="topic-name">${escapeHtml(topic.name)}</span>
+            <span class="topic-progress-pct" aria-hidden="true">${progress}%</span>
             <div class="topic-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${escapeHtml(topic.name)} progress">
                 <div class="topic-progress-fill" style="width: ${progress}%"></div>
             </div>
@@ -3677,8 +3678,12 @@ function renderSidebarTopics() {
 // Update a single sidebar topic's progress bar without rebuilding the whole list
 function updateSidebarTopicProgress(topicId) {
     const progress = calculateTopicProgress(topicId);
-    const fill = document.querySelector(`.topic-item[data-id="${topicId}"] .topic-progress-fill`);
+    const item = document.querySelector(`.topic-item[data-id="${topicId}"]`);
+    if (!item) return;
+    const fill = item.querySelector('.topic-progress-fill');
     if (fill) fill.style.width = progress + '%';
+    const pct = item.querySelector('.topic-progress-pct');
+    if (pct) pct.textContent = progress + '%';
 }
 
 // Create a topic card element
@@ -3697,8 +3702,11 @@ function createTopicCard(topic) {
             <span>📇 ${topic.flashcards.length} cards</span>
             <span>❓ ${topic.quiz.length} questions</span>
         </div>
-        <div class="topic-card-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${escapeHtml(topic.name)} progress">
-            <div class="topic-card-progress-fill" style="width: ${progress}%"></div>
+        <div class="topic-card-progress-row">
+            <div class="topic-card-progress" role="progressbar" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100" aria-label="${escapeHtml(topic.name)} progress">
+                <div class="topic-card-progress-fill" style="width: ${progress}%"></div>
+            </div>
+            <span class="topic-card-progress-pct" aria-hidden="true">${progress}%</span>
         </div>
     `;
     card.addEventListener('click', () => selectTopic(topic));

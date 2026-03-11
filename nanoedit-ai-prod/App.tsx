@@ -6,6 +6,8 @@ import { ComparisonView } from './components/ComparisonView';
 import { generateEditedImage } from './services/geminiService';
 import { ProcessedImage, AppStatus } from './types';
 
+const MAX_HISTORY = 10;
+
 // Static data moved outside component to prevent recreation
 const PRESET_PROMPTS = [
   { label: "Remove Background", text: "Remove the background", Icon: Scissors },
@@ -109,9 +111,13 @@ const App: React.FC = () => {
           mimeType: 'image/png'
         };
 
-        // Add to history, removing any future redo states if we were in the middle
-        const newHistory = history.slice(0, historyIndex + 1);
-        newHistory.push(newImage);
+        // Add to history, removing any future redo states if we were in the middle.
+        // Cap at MAX_HISTORY entries to prevent unbounded memory growth from base64 strings.
+        const truncated = history.slice(0, historyIndex + 1);
+        truncated.push(newImage);
+        const newHistory = truncated.length > MAX_HISTORY
+          ? truncated.slice(truncated.length - MAX_HISTORY)
+          : truncated;
 
         setHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
