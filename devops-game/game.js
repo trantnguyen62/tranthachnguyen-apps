@@ -40,7 +40,7 @@ const QUESTIONS = {
         { q: "Which port mapping is correct?", a: ["-p 8080:80", "-p 80-8080", "-port 8080:80", "--port=8080,80"], c: 0 },
         { q: "What is a multi-stage build?", a: ["Build with multiple FROM statements", "Building multiple containers", "Parallel builds", "Sequential deployments"], c: 0 },
         { q: "What does ENTRYPOINT do in a Dockerfile?", a: ["Sets the main executable", "Defines environment variables", "Copies files", "Exposes ports"], c: 0 },
-        { q: "What is Docker Hub?", a: ["Public container registry", "Container orchestrator", "Build tool", "Monitoring service"], c: 0 },
+        { q: "Which Dockerfile instruction sets the user that runs the container process?", a: ["USER", "RUN", "ENV", "EXPOSE"], c: 0 },
         { q: "What does 'docker exec' do?", a: ["Runs command in running container", "Starts new container", "Stops container", "Removes container"], c: 0 },
         { q: "What is the CMD instruction?", a: ["Default container command", "Runs command at build time", "Copy files", "Create directory"], c: 0 },
         { q: "What does 'docker logs' show?", a: ["Container output logs", "System logs", "Build logs", "Network logs"], c: 0 },
@@ -58,7 +58,7 @@ const QUESTIONS = {
         { q: "What does HPA stand for?", a: ["Horizontal Pod Autoscaler", "High Performance Architecture", "Host Port Allocation", "Hybrid Pod Application"], c: 0 },
         { q: "Which object stores sensitive data?", a: ["Secret", "ConfigMap", "PersistentVolume", "Deployment"], c: 0 },
         { q: "What is an Ingress?", a: ["HTTP route manager", "Container runtime", "Pod scheduler", "Volume provisioner"], c: 0 },
-        { q: "What does 'kubectl get pods' show?", a: ["List of Pods", "Pod logs", "Pod description", "Pod metrics"], c: 0 },
+        { q: "What kubectl command shows detailed events for a pod stuck in CrashLoopBackOff?", a: ["kubectl describe pod", "kubectl get pod", "kubectl logs --tail", "kubectl exec -it"], c: 0 },
         { q: "What is a StatefulSet used for?", a: ["Stateful applications", "Stateless services", "Network policies", "Resource quotas"], c: 0 },
         { q: "What is a DaemonSet?", a: ["Runs Pod on every node", "Manages secrets", "Handles ingress", "Schedules jobs"], c: 0 },
         { q: "What does kubelet do?", a: ["Runs containers on nodes", "Manages the API", "Stores cluster state", "Routes traffic"], c: 0 },
@@ -89,7 +89,7 @@ const QUESTIONS = {
         { q: "What is a rollback?", a: ["Reverting to previous version", "Moving forward", "Scaling up", "Restarting"], c: 0 },
         { q: "What is feature flagging?", a: ["Toggle features on/off", "Code commenting", "Branch naming", "Error logging"], c: 0 },
         { q: "What is trunk-based development?", a: ["Single main branch", "Many long branches", "Feature branches", "Release branches"], c: 0 },
-        { q: "What is CircleCI?", a: ["CI/CD platform", "Code editor", "Container registry", "Cloud provider"], c: 0 },
+        { q: "What CI/CD tool uses 'orbs' as reusable shareable configuration packages?", a: ["CircleCI", "Jenkins", "GitHub Actions", "GitLab CI"], c: 0 },
         { q: "What is a build matrix?", a: ["Multiple config combinations", "Single build", "Code coverage", "Deployment target"], c: 0 },
         { q: "What is semantic versioning?", a: ["MAJOR.MINOR.PATCH format", "Date-based versioning", "Random numbering", "Alphabetic versioning"], c: 0 }
     ],
@@ -116,7 +116,7 @@ const QUESTIONS = {
         { q: "What is ElastiCache?", a: ["In-memory caching", "File storage", "Compute service", "Database backup"], c: 0 }
     ],
     terraform: [
-        { q: "What is Terraform?", a: ["Infrastructure as Code tool", "Container runtime", "CI/CD platform", "Monitoring tool"], c: 0 },
+        { q: "What does 'terraform import' do?", a: ["Brings existing infrastructure into Terraform state", "Downloads provider plugins", "Imports a Terraform module", "Exports the current state file"], c: 0 },
         { q: "What language does Terraform use?", a: ["HCL", "YAML", "JSON", "Python"], c: 0 },
         { q: "What does 'terraform init' do?", a: ["Initializes working directory", "Creates resources", "Destroys resources", "Shows plan"], c: 0 },
         { q: "What does 'terraform plan' show?", a: ["Preview of changes", "Current state", "Provider list", "Variable values"], c: 0 },
@@ -138,7 +138,7 @@ const QUESTIONS = {
         { q: "What does the 'count' meta-argument do?", a: ["Creates multiple resource instances", "Counts total resources", "Limits resource quantity", "Checks resource count"], c: 0 }
     ],
     git: [
-        { q: "What does 'git clone' do?", a: ["Copies a repository", "Creates a branch", "Merges branches", "Pushes changes"], c: 0 },
+        { q: "What makes 'git revert' safer than 'git reset' on shared branches?", a: ["It creates a new commit without rewriting history", "It is faster to execute", "It doesn't affect the working directory", "It only works locally"], c: 0 },
         { q: "What does 'git commit' do?", a: ["Saves changes to local repo", "Uploads to remote", "Downloads changes", "Creates branch"], c: 0 },
         { q: "What does 'git push' do?", a: ["Uploads commits to remote", "Downloads changes", "Creates branch", "Merges branches"], c: 0 },
         { q: "What does 'git pull' do?", a: ["Fetches and merges changes", "Uploads commits", "Creates branch", "Shows history"], c: 0 },
@@ -161,7 +161,7 @@ const QUESTIONS = {
     ],
     linux: [
         { q: "What does 'ls' command do?", a: ["Lists directory contents", "Creates file", "Deletes file", "Moves file"], c: 0 },
-        { q: "What does 'cd' command do?", a: ["Changes directory", "Creates directory", "Copies directory", "Deletes directory"], c: 0 },
+        { q: "Which command displays the full path of the current working directory?", a: ["pwd", "ls -la", "echo $SHELL", "cd --show"], c: 0 },
         { q: "What does 'grep' do?", a: ["Searches text patterns", "Creates files", "Compresses files", "Lists processes"], c: 0 },
         { q: "What does 'chmod' modify?", a: ["File permissions", "File owner", "File name", "File size"], c: 0 },
         { q: "What does 'sudo' do?", a: ["Runs as superuser", "Shuts down system", "Shows disk usage", "Searches files"], c: 0 },
@@ -190,7 +190,7 @@ const QUESTIONS = {
         { q: "What is an SLO?", a: ["Service Level Objective", "System Log Output", "Server Load Optimizer", "Service Launch Order"], c: 0 },
         { q: "What is APM?", a: ["Application Performance Monitoring", "Automated Process Manager", "Advanced Package Manager", "Application Process Memory"], c: 0 },
         { q: "What is tracing?", a: ["Following request paths", "Logging errors", "Measuring latency", "Counting requests"], c: 0 },
-        { q: "What is a dashboard?", a: ["Visual display of metrics", "Configuration file", "Log aggregator", "Alert manager"], c: 0 },
+        { q: "What is a Prometheus 'recording rule' used for?", a: ["Pre-computing expensive queries for performance", "Creating alert conditions", "Storing raw metrics to disk", "Routing alerts to receivers"], c: 0 },
         { q: "What is log aggregation?", a: ["Collecting logs centrally", "Deleting old logs", "Compressing logs", "Encrypting logs"], c: 0 },
         { q: "What is OpenTelemetry?", a: ["Observability framework", "Container runtime", "CI/CD tool", "Database service"], c: 0 },
         { q: "What is a time series database?", a: ["Stores timestamped data points", "SQL relational database", "NoSQL document store", "In-memory cache"], c: 0 },
@@ -204,7 +204,7 @@ const QUESTIONS = {
         { q: "What is an on-call rotation?", a: ["Scheduled team incident response", "Database backup schedule", "Deployment schedule", "Sprint planning cycle"], c: 0 }
     ],
     ansible: [
-        { q: "What is Ansible?", a: ["Configuration management tool", "Container runtime", "CI/CD platform", "Monitoring system"], c: 0 },
+        { q: "What makes Ansible agentless compared to tools like Puppet or Chef?", a: ["It uses SSH and requires no agent on managed hosts", "It runs faster than agent-based tools", "It uses a push model over HTTP", "It stores state on managed hosts"], c: 0 },
         { q: "What is an Ansible Playbook?", a: ["YAML file with tasks", "Python script", "Shell script", "JSON config"], c: 0 },
         { q: "What is Ansible inventory?", a: ["List of managed hosts", "Task definitions", "Variable storage", "Module library"], c: 0 },
         { q: "What is an Ansible role?", a: ["Reusable task collection", "User account", "Network config", "Container image"], c: 0 },
@@ -226,7 +226,7 @@ const QUESTIONS = {
         { q: "What does 'delegate_to' do in Ansible?", a: ["Runs the task on a different host", "Delegates role creation", "Assigns task priority", "Runs as a different user"], c: 0 }
     ],
     azure: [
-        { q: "What is Azure?", a: ["Microsoft's cloud platform", "AWS service", "Google product", "Linux distro"], c: 0 },
+        { q: "What is the correct Azure scope hierarchy from broadest to narrowest?", a: ["Management Group → Subscription → Resource Group → Resource", "Subscription → Management Group → Resource Group → Resource", "Resource Group → Subscription → Resource → Management Group", "Management Group → Resource Group → Subscription → Resource"], c: 0 },
         { q: "What is Azure DevOps?", a: ["Development tools suite", "Virtual machine", "Database service", "Storage account"], c: 0 },
         { q: "What is AKS?", a: ["Azure Kubernetes Service", "Azure Key Storage", "Azure Knowledge System", "Azure Kernel Service"], c: 0 },
         { q: "What is Azure Functions?", a: ["Serverless compute", "Virtual machines", "Container instances", "Database service"], c: 0 },
@@ -248,7 +248,7 @@ const QUESTIONS = {
         { q: "What is Azure Logic Apps?", a: ["Workflow automation service", "Container orchestration", "Relational database service", "Monitoring solution"], c: 0 }
     ],
     devsecops: [
-        { q: "What is DevSecOps?", a: ["Security integrated in DevOps", "Development operations", "Security department", "Operations security"], c: 0 },
+        { q: "Which practice best embodies the 'shift left' principle in DevSecOps?", a: ["Running SAST scans on every pull request", "Performing penetration tests before release", "Hiring a dedicated security team", "Adding firewalls at the network boundary"], c: 0 },
         { q: "What is 'shift left'?", a: ["Earlier security testing", "Code formatting", "Left alignment", "Branch merging"], c: 0 },
         { q: "What is SAST?", a: ["Static Application Security Testing", "System Admin Security Tool", "Server Authentication", "Storage Access Service"], c: 0 },
         { q: "What is DAST?", a: ["Dynamic Application Security Testing", "Data Admin Security Tool", "Database Access Service", "Deployment Auto Security"], c: 0 },
