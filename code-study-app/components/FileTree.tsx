@@ -48,7 +48,7 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
           role="treeitem"
           aria-expanded={isExpanded}
           onClick={handleToggle}
-          className="flex items-center gap-1 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm"
+          className="flex items-center gap-1 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm transition-colors"
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
           aria-label={`${node.name} folder, ${isExpanded ? 'expanded' : 'collapsed'}`}
         >

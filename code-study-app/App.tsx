@@ -347,6 +347,7 @@ function App() {
           <button
             onClick={handleToggleSidebar}
             aria-label={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
+            title={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
             aria-expanded={showSidebar}
             className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
           >
@@ -482,8 +483,8 @@ function App() {
                     Connecting
                   </span>
                 ) : (
-                  <span className="text-xs text-slate-600 italic">
-                    Start a session to chat
+                  <span className="text-xs px-2 py-0.5 bg-slate-700/40 text-slate-500 rounded-full border border-slate-700/50">
+                    Idle
                   </span>
                 )}
               </div>
@@ -511,7 +512,7 @@ function App() {
                         {codeLines.length} line{codeLines.length !== 1 ? 's' : ''}
                       </span>
                       {selectedFile && (
-                        <span className="text-xs text-slate-500 code-font truncate max-w-[6rem]" title={selectedFile.name}>
+                        <span className="text-xs text-slate-500 code-font truncate max-w-[10rem]" title={selectedFile.name}>
                           {selectedFile.name}
                         </span>
                       )}
