@@ -92,8 +92,8 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
     try {
       const { data, mimeType } = await compressImage(file);
       onImageSelected({ data, mimeType });
-    } catch {
-      setError("Failed to read file.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to read file.");
     }
   }, [onImageSelected]);
 
@@ -134,6 +134,8 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
       const data = canvas.toDataURL('image/jpeg', 0.92);
       onImageSelected({ data, mimeType: 'image/jpeg' });
       stopCamera();
+    } else {
+      setError('Failed to capture photo. Please try again.');
     }
   }, [onImageSelected, stopCamera]);
 
