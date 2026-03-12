@@ -4318,18 +4318,25 @@ function showQuizResults() {
     dom.maxScore.textContent = totalQuestions;
     dom.resultsPercentage.textContent = percentage + '%';
 
+    const resultsContent = dom.quizResults.querySelector('.results-content');
+    resultsContent.className = 'results-content';
+
     if (percentage >= 80) {
         dom.resultsIcon.textContent = '🎉';
         dom.resultsTitle.textContent = 'Excellent Work!';
+        resultsContent.classList.add('results-excellent');
     } else if (percentage >= 60) {
         dom.resultsIcon.textContent = '👍';
         dom.resultsTitle.textContent = 'Good Job!';
+        resultsContent.classList.add('results-good');
     } else if (percentage >= 40) {
         dom.resultsIcon.textContent = '📚';
         dom.resultsTitle.textContent = 'Keep Studying!';
+        resultsContent.classList.add('results-average');
     } else {
         dom.resultsIcon.textContent = '💪';
         dom.resultsTitle.textContent = 'Practice Makes Perfect!';
+        resultsContent.classList.add('results-poor');
     }
 
     // Update best score
@@ -4369,8 +4376,11 @@ function studyCards() {
 // Search functionality
 function handleSearch(event) {
     const query = event.target.value.toLowerCase().trim();
+    const searchResultInfo = document.getElementById('searchResultInfo');
 
     if (!query) {
+        searchResultInfo.hidden = true;
+        searchResultInfo.textContent = '';
         renderTopicGrid();
         return;
     }
@@ -4396,9 +4406,20 @@ function handleSearch(event) {
     topicGrid.innerHTML = '';
 
     if (results.length === 0) {
-        topicGrid.innerHTML = '<p style="color: var(--text-tertiary); grid-column: 1/-1; text-align: center; padding: 2rem;">No results found</p>';
+        searchResultInfo.hidden = true;
+        searchResultInfo.textContent = '';
+        topicGrid.innerHTML = `
+            <div class="empty-state" role="status">
+                <span class="empty-state-icon" aria-hidden="true">🔍</span>
+                <p class="empty-state-title">No results found</p>
+                <p class="empty-state-message">Try searching for a different topic or term</p>
+            </div>`;
         return;
     }
+
+    const topicWord = results.length === 1 ? 'topic' : 'topics';
+    searchResultInfo.textContent = `${results.length} ${topicWord} found`;
+    searchResultInfo.hidden = false;
 
     const searchFragment = document.createDocumentFragment();
     results.forEach(({ topic }) => searchFragment.appendChild(createTopicCard(topic)));

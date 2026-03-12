@@ -1187,6 +1187,124 @@ body {
 }
 
 /* =====================================================
+   Search Result Info
+   ===================================================== */
+.search-result-info {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    text-align: left;
+    padding: 0 var(--space-md) var(--space-sm);
+    letter-spacing: 0.02em;
+}
+
+/* =====================================================
+   Empty State
+   ===================================================== */
+.empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl) var(--space-lg);
+    gap: var(--space-sm);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    opacity: 0.5;
+    margin-bottom: var(--space-sm);
+}
+
+.empty-state-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.empty-state-message {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* =====================================================
+   Tab View Fade-in
+   ===================================================== */
+@keyframes tab-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.flashcard-view:not(.hidden),
+.quiz-view:not(.hidden),
+.match-view:not(.hidden),
+.codebase-view:not(.hidden),
+.commands-view:not(.hidden) {
+    animation: tab-fade-in 0.2s ease both;
+}
+
+/* =====================================================
+   Topic Card Entrance Animation
+   ===================================================== */
+@keyframes card-enter {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.topic-card {
+    animation: card-enter 0.25s ease both;
+}
+
+/* =====================================================
+   Color-coded Quiz Results
+   ===================================================== */
+.results-content.results-excellent {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.08);
+}
+
+.results-content.results-excellent .results-percentage {
+    color: var(--color-success);
+}
+
+.results-content.results-good {
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.08);
+}
+
+.results-content.results-good .results-percentage {
+    color: var(--color-warning);
+}
+
+.results-content.results-average {
+    border-color: rgba(249, 115, 22, 0.35);
+}
+
+.results-content.results-average .results-percentage {
+    color: #f97316;
+}
+
+.results-content.results-poor {
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+.results-content.results-poor .results-percentage {
+    color: var(--color-error);
+}
+
+/* =====================================================
    Utility Classes
    ===================================================== */
 .hidden {
