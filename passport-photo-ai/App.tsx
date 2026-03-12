@@ -127,7 +127,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Avoid passport photo rejections. Free AI check for background, lighting, face position, and more — results in seconds.<br/>
+            Don't get rejected at the counter. Free AI check instantly verifies your photo meets official biometric standards — for passports, visas, and ID cards worldwide.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
         </header>
@@ -243,7 +243,7 @@ export default function App() {
                   ))}
                 </div>
                 <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 16, letterSpacing: '0.03em' }}>
-                  Analyzing against biometric standards&hellip;
+                  Checking against official passport standards&hellip;
                 </p>
               </div>
             ) : status === AppStatus.ERROR ? (
@@ -301,7 +301,7 @@ export default function App() {
                         color: result.compliant ? '#10B981' : accentPink,
                         marginBottom: 4
                       }}>
-                        {result.compliant ? 'Photo Meets Standards' : 'Issues Detected'}
+                        {result.compliant ? 'Photo Passes — Ready to Submit' : 'Issues Found — Here\'s How to Fix'}
                       </h3>
                       <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
                         {result.summary}
@@ -383,7 +383,7 @@ export default function App() {
                   filter: 'grayscale(80%)'
                 }}>🪪</div>
                 <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.55)' }}>
-                  Upload your photo and tap <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to instantly verify it meets official passport and visa requirements.
+                  Upload a photo and tap <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to get instant feedback on whether it meets official passport and visa requirements.
                 </p>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: 10, fontWeight: 600 }}>
@@ -395,7 +395,7 @@ export default function App() {
                       'Neutral expression, mouth closed, eyes open',
                       'Plain white or off-white background',
                       'Even lighting, no harsh shadows on face',
-                      'Sharp focus and sufficient resolution',
+                      'Sharp focus, no blur or pixelation',
                       'No glasses, tinted lenses, or reflections',
                       'No head coverings (except for religious reasons)',
                     ].map((item, i) => (
