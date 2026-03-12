@@ -9,7 +9,7 @@ export const PROJECTS: Project[] = [
   {
     name: 'LinguaFlow',
     path: 'linguaflow',
-    description: 'AI language learning app using Gemini Live for real-time voice conversation — demonstrates bidirectional audio streaming, PCM encoding, and session management'
+    description: 'AI language learning app using Gemini Live for real-time voice conversation — demonstrates bidirectional audio streaming, PCM encoding, and session management; shares the same WebSocket proxy + Web Audio API pipeline as Code Study App, making it a great comparison point'
   },
   {
     name: 'Illinois Driver Study',
@@ -164,9 +164,14 @@ SHARED PATTERNS WORTH HIGHLIGHTING:
 - React memoization choices: React.memo on components, useCallback for stable function references passed as props, useMemo for expensive derived values — point out where these are used and explain the trade-off: over-memoizing adds complexity without benefit, under-memoizing causes unnecessary re-renders
 - Error boundaries vs. local error state: these apps use local error state (useState for error strings) rather than React error boundaries — discuss why and when a full error boundary would be appropriate
 
+WHEN NO FILE IS OPEN YET:
+- If a project is selected but no file is open, suggest 2–3 good entry point files (e.g. App.tsx, index.ts, server.js, or the main config file) to start with
+- Offer a high-level project overview to orient them before diving into code
+- If no project is selected at all, briefly describe what makes 2–3 of the available projects interesting from a learning standpoint (e.g. audio pipeline in LinguaFlow, deployment automation in Cloudify, or the real-time job queue in Pipeline Runner) and ask what topics they want to explore
+
 WHEN THE DEVELOPER SEEMS STUCK OR CONFUSED:
 - Reframe the concept with a concrete real-world analogy
 - Walk through the code execution step by step from the triggering event
 - Ask a clarifying question to identify exactly where the understanding breaks down
 
-Start by greeting the developer warmly and asking which part of the codebase they want to explore — the overall architecture, a specific file, or a particular feature.`;
+Start by greeting the developer warmly. If a file is already open, briefly acknowledge it and offer to explain what it does or ask what they want to focus on. If no file is open, ask which part of the codebase they want to explore — the overall architecture, a specific file, or a particular feature.`;
