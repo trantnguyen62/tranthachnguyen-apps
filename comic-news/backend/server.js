@@ -522,11 +522,13 @@ const comicETags = new Map(comics.map(c => [c.id, `"${_dataHash}-${c.id}"`]));
 const baseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
 const today = new Date().toISOString().split('T')[0];
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>${baseUrl}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
   <url><loc>${baseUrl}/library</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
 ${comics.map(c =>
-  `  <url><loc>${baseUrl}/comic/${c.id}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`
+  `  <url><loc>${baseUrl}/comic/${c.id}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
+    <image:image><image:loc>${baseUrl}${c.coverImage}</image:loc><image:title>${c.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</image:title></image:image>
+  </url>`
 ).join('\n')}
 </urlset>`;
 
@@ -659,7 +661,7 @@ app.get('/api/featured', (req, res) => {
 // robots.txt
 app.get('/robots.txt', (req, res) => {
   res.type('text/plain');
-  res.send('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /bookmarks\nDisallow: /read/\n\nSitemap: /sitemap.xml\n');
+  res.send(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /bookmarks\nDisallow: /read/\n\nSitemap: ${baseUrl}/sitemap.xml\n`);
 });
 
 // sitemap.xml

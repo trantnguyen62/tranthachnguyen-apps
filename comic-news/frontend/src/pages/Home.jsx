@@ -12,6 +12,22 @@ function Home() {
   useEffect(() => {
     document.title = 'Comic News - Daily News Turned Into Comics';
 
+    // Reset OG/Twitter tags to site defaults
+    const defaultImg = `${window.location.origin}/comics/love-you-cashier.png`;
+    const defaultTitle = 'Comic News - Daily News Turned Into Comics';
+    const defaultDesc = "Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you'll actually want to read.";
+    const setMeta = (sel, content) => document.querySelector(sel)?.setAttribute('content', content);
+    setMeta('meta[property="og:type"]', 'website');
+    setMeta('meta[property="og:title"]', defaultTitle);
+    setMeta('meta[property="og:description"]', defaultDesc);
+    setMeta('meta[property="og:image"]', defaultImg);
+    setMeta('meta[property="og:image:alt"]', defaultTitle);
+    setMeta('meta[property="og:url"]', `${window.location.origin}/`);
+    setMeta('meta[name="twitter:title"]', defaultTitle);
+    setMeta('meta[name="twitter:description"]', defaultDesc);
+    setMeta('meta[name="twitter:image"]', defaultImg);
+    setMeta('meta[name="description"]', defaultDesc);
+
     // Canonical link
     document.getElementById('canonical-link')?.remove();
     const canonical = Object.assign(document.createElement('link'), {
