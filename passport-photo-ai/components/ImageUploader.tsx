@@ -288,7 +288,17 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
       </button>
 
       {cameraError && (
-        <p role="alert" style={{ color: accentPink, fontSize: 12, textAlign: 'center', marginTop: 4 }}>{cameraError}</p>
+        <div role="alert" style={{
+          background: `${accentPink}15`,
+          border: `1px solid ${accentPink}44`,
+          borderRadius: 10,
+          padding: '10px 14px',
+          display: 'flex', alignItems: 'flex-start', gap: 8,
+          marginTop: 4
+        }}>
+          <span aria-hidden="true" style={{ flexShrink: 0, fontSize: 14, lineHeight: '18px' }}>⚠️</span>
+          <p style={{ color: accentPink, fontSize: 12, lineHeight: 1.5, margin: 0 }}>{cameraError}</p>
+        </div>
       )}
     </div>
   );

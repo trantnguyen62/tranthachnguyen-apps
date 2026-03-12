@@ -182,8 +182,18 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   const { accentPink, accentGold, accentPurple } = THEME;
 
   return (
-    <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="editor-title" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-      <div style={{ background: 'rgba(17,17,17,0.95)', borderRadius: 24, width: '90%', maxWidth: 700, maxHeight: '90vh', overflowY: 'auto', padding: 28, border: '1px solid rgba(255,255,255,0.08)', boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)` }}>
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="editor-title"
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}
+      onClick={onCancel}
+    >
+      <div
+        style={{ background: 'rgba(17,17,17,0.95)', borderRadius: 24, width: '90%', maxWidth: 700, maxHeight: '90vh', overflowY: 'auto', padding: 28, border: '1px solid rgba(255,255,255,0.08)', boxShadow: `0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)` }}
+        onClick={e => e.stopPropagation()}
+      >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <h2 id="editor-title" style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 700, background: `linear-gradient(135deg, #fff 0%, ${accentGold} 60%, ${accentPink} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Photo Studio</h2>
           <button onClick={onCancel} aria-label="Close editor" style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>×</button>
@@ -219,7 +229,9 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
                 style={{ width: `${progress}%`, height: '100%', background: `linear-gradient(90deg, ${accentPurple}, ${accentPink})`, transition: 'width 0.3s', borderRadius: 2 }}
               />
             </div>
-            <p style={{ fontSize: 12, color: accentPurple, textAlign: 'center', fontWeight: 500 }}>Processing... {progress}%</p>
+            <p style={{ fontSize: 12, color: accentPurple, textAlign: 'center', fontWeight: 500 }}>
+              {progress < 30 ? 'Preparing image…' : progress < 80 ? 'Removing background…' : progress < 100 ? 'Finalizing…' : 'Done!'} {progress}%
+            </p>
           </div>
         )}
 

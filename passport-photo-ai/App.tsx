@@ -322,7 +322,7 @@ export default function App() {
                       Issues Found
                     </h4>
                     {result.issues.map((issue: string, idx: number) => (
-                      <div key={idx} style={{
+                      <div key={idx} className="result-item" style={{
                         padding: '12px 16px',
                         background: 'rgba(255,255,255,0.03)',
                         borderRadius: 10,
@@ -352,7 +352,7 @@ export default function App() {
                       How to Fix
                     </h4>
                     {result.suggestions.map((tip: string, idx: number) => (
-                      <div key={idx} style={{
+                      <div key={idx} className="result-item" style={{
                         padding: '12px 16px',
                         background: 'rgba(255,255,255,0.03)',
                         borderRadius: 10,
@@ -375,21 +375,21 @@ export default function App() {
                 height: 350,
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
-                color: 'rgba(255,255,255,0.25)',
+                color: 'rgba(255,255,255,0.4)',
                 textAlign: 'center'
               }}>
                 <div aria-hidden="true" style={{
-                  fontSize: 64, marginBottom: 16, opacity: 0.3,
-                  filter: 'grayscale(100%)'
+                  fontSize: 64, marginBottom: 16, opacity: 0.4,
+                  filter: 'grayscale(80%)'
                 }}>🪪</div>
-                <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.4)' }}>
+                <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.55)' }}>
                   Upload your photo and tap <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to instantly verify it meets official passport and visa requirements.
                 </p>
                 <div style={{ textAlign: 'left' }}>
-                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginBottom: 10, fontWeight: 600 }}>
+                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: 10, fontWeight: 600 }}>
                     What we check
                   </p>
-                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
+                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>
                     {[
                       'Face centered, 70–80% of frame height',
                       'Neutral expression, mouth closed, eyes open',
@@ -433,6 +433,8 @@ export default function App() {
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes ctaPulse { 0%, 100% { box-shadow: 0 8px 24px #E9456033; } 50% { box-shadow: 0 8px 32px #E9456066, 0 0 0 4px #E9456018; } }
+        .result-item { transition: background 0.15s ease; }
+        .result-item:hover { background: rgba(255,255,255,0.06) !important; }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
             animation-duration: 0.01ms !important;
