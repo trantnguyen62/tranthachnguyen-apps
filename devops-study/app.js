@@ -1605,6 +1605,21 @@ echo "Deployed \$ECR_REPO:\$IMAGE_TAG to \$SERVICE_NAME"`
                     question: 'What is the difference between count and for_each?',
                     options: ['No difference', 'count uses an integer; for_each iterates over a map or set for named instances', 'for_each is deprecated', 'count only works with modules'],
                     correct: 1
+                },
+                {
+                    question: 'What does the lifecycle create_before_destroy setting do?',
+                    options: ['Prevents resource deletion', 'Ensures a replacement resource is created before the old one is destroyed', 'Creates a backup first', 'Runs a pre-destroy script'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the .terraform.lock.hcl file used for?',
+                    options: ['Locking the state file during apply', 'Recording exact provider versions for reproducible runs', 'Storing workspace names', 'Encrypting the backend config'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the modern replacement for terraform taint?',
+                    options: ['terraform refresh', 'terraform apply -replace=<resource>', 'terraform state rm', 'terraform plan -destroy'],
+                    correct: 1
                 }
             ],
             codebase: [
