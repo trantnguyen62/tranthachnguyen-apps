@@ -3,7 +3,7 @@ import { Question, Language } from '../types';
 /**
  * Official Illinois DMV written knowledge test questions.
  *
- * Two parallel arrays (`questionsEn` / `questionsVi`) hold the same 55 questions
+ * Two parallel arrays (`questionsEn` / `questionsVi`) hold the same 58 questions
  * in English and Vietnamese respectively. IDs must match across both arrays —
  * the Live Practice instructor looks up questions by `id` to display them in the UI.
  *
@@ -231,7 +231,7 @@ export const questionsEn: Question[] = [
     text: "The '2-Second Rule' works like this: when the vehicle ahead of you passes a fixed object like a tree, etc., if you begin counting, 'one thousand one, one thousand two' then if you reach the same tree before you have finished saying 'one thousand two,' you are following too closely.",
     options: ["True", "False"],
     correctIndex: 0,
-    explanation: "The 2-second counting method described here is a minimum baseline taught in some driving manuals—if you reach the fixed point before finishing the count, you are too close. However, the current Illinois standard recommends a full 3-second gap under normal conditions (see the 3-second rule). Increase your following distance further in bad weather, heavy traffic, or low visibility."
+    explanation: "The 2-second counting method is the minimum baseline described in the Illinois Rules of the Road. If you reach the fixed object before finishing the count of 'one thousand two,' you are following too closely. Increase your following distance in bad weather, heavy traffic, or low visibility."
   },
   {
     id: 23,
@@ -845,7 +845,7 @@ export const questionsVi: Question[] = [
     text: "Quy tắc '2 Giây' hoạt động như sau: khi xe phía trước bạn vượt qua một vật cố định như cái cây, nếu bạn bắt đầu đếm 'một ngàn một, một ngàn hai' và bạn đến cái cây đó trước khi đếm xong, bạn đang đi quá gần.",
     options: ["Đúng", "Sai"],
     correctIndex: 0,
-    explanation: "Phương pháp đếm 2 giây được mô tả ở đây là ngưỡng tối thiểu trong một số tài liệu lái xe—nếu bạn đến điểm cố định trước khi đếm xong, bạn đang đi quá gần. Tuy nhiên, tiêu chuẩn hiện tại của Illinois khuyến nghị khoảng cách 3 giây trong điều kiện bình thường. Tăng khoảng cách theo dõi trong điều kiện thời tiết xấu, giao thông đông hoặc tầm nhìn hạn chế."
+    explanation: "Phương pháp đếm 2 giây là ngưỡng tối thiểu được mô tả trong Quy tắc Giao thông Illinois. Nếu bạn đến vật cố định trước khi đếm xong 'một ngàn hai,' bạn đang đi quá gần. Hãy tăng khoảng cách trong điều kiện thời tiết xấu, giao thông đông hoặc tầm nhìn hạn chế."
   },
   {
     id: 23,
