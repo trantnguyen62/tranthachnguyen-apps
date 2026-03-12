@@ -1106,6 +1106,7 @@ function showQuestion() {
 
     answerGrid.innerHTML = '';
     answerGrid.appendChild(fragment);
+    game.currentQuestion.btns = Array.from(answerGrid.querySelectorAll('.answer-btn'));
 
     document.getElementById('questionModal').classList.remove('hidden');
     startQuestionTimer();
@@ -1151,7 +1152,7 @@ function selectAnswer(index) {
     if (!game.questionActive || game.currentQuestion.answered) return;
 
     game.currentQuestion.answered = true;
-    const btns = document.querySelectorAll('.answer-btn');
+    const btns = game.currentQuestion.btns;
 
     btns.forEach((btn, i) => {
         btn.classList.add('disabled');
@@ -1166,7 +1167,7 @@ function checkAnswer(index) {
     const answerCount = game.currentQuestion.shuffledAnswers.length;
     if (index < 0 || index >= answerCount) return;
     const correct = index === game.currentQuestion.correctIndex;
-    const btns = document.querySelectorAll('.answer-btn');
+    const btns = game.currentQuestion.btns;
 
     btns[game.currentQuestion.correctIndex].classList.add('correct');
     btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
@@ -1354,6 +1355,12 @@ function darkenColor(hex, percent) {
 // or after a canvas resize (height change invalidates the obstacle canvas height).
 function updateTopicCache() {
     const topic = TOPICS.find(t => t.id === game.selectedTopic);
+    // Skip rebuild if topic and canvas height are unchanged (e.g. horizontal-only resize)
+    if (game.topicCache &&
+        game.topicCache.topic === topic &&
+        game.topicCache.obstacleCanvas.height === (game.height || 800)) {
+        return;
+    }
     const lightColor20 = lightenColor(topic.color, 20);
     const lightColor30 = lightenColor(topic.color, 30);
     const darkColor20 = darkenColor(topic.color, 20);
@@ -1453,6 +1460,10 @@ const AdManager = {
         skipBtn.disabled = true;
         skipBtn.textContent = `Skip in ${this.remainingTime}s`;
 
+        // Move focus into modal for keyboard/screen reader users
+        const heading = document.getElementById('rewardedAdHeading');
+        if (heading) heading.focus();
+
         // Countdown timer
         this.rewardedAdTimer = setInterval(() => {
             this.remainingTime--;
@@ -1463,6 +1474,7 @@ const AdManager = {
                 clearInterval(this.rewardedAdTimer);
                 skipBtn.disabled = false;
                 skipBtn.textContent = '✓ Claim Reward';
+                skipBtn.focus();
             }
         }, 1000);
     },
@@ -1535,6 +1547,9 @@ const AdManager = {
 
         // Show game screen using the standard function
         showScreen('gameScreen');
+
+        // Return focus to canvas so keyboard input works immediately
+        if (game.canvas) game.canvas.focus({ preventScroll: true });
 
         // Hide the ad banner during gameplay
         AdManager.hideBanner();

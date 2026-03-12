@@ -1460,6 +1460,10 @@ const AdManager = {
         skipBtn.disabled = true;
         skipBtn.textContent = `Skip in ${this.remainingTime}s`;
 
+        // Move focus into modal for keyboard/screen reader users
+        const heading = document.getElementById('rewardedAdHeading');
+        if (heading) heading.focus();
+
         // Countdown timer
         this.rewardedAdTimer = setInterval(() => {
             this.remainingTime--;
@@ -1470,6 +1474,7 @@ const AdManager = {
                 clearInterval(this.rewardedAdTimer);
                 skipBtn.disabled = false;
                 skipBtn.textContent = '✓ Claim Reward';
+                skipBtn.focus();
             }
         }, 1000);
     },
@@ -1542,6 +1547,9 @@ const AdManager = {
 
         // Show game screen using the standard function
         showScreen('gameScreen');
+
+        // Return focus to canvas so keyboard input works immediately
+        if (game.canvas) game.canvas.focus({ preventScroll: true });
 
         // Hide the ad banner during gameplay
         AdManager.hideBanner();
