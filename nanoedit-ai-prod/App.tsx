@@ -1,10 +1,11 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2, Scissors, Sun, PenLine, Zap, Film, X, CheckCircle2 } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { Button } from './components/Button';
-import { ComparisonView } from './components/ComparisonView';
 import { generateEditedImage } from './services/geminiService';
 import { ProcessedImage, AppStatus } from './types';
+
+const ComparisonView = lazy(() => import('./components/ComparisonView').then(m => ({ default: m.ComparisonView })));
 
 const MAX_HISTORY = 10;
 
@@ -436,13 +437,15 @@ const App: React.FC = () => {
                   <History className="w-4 h-4" aria-hidden="true" />
                   <span>Edit {historyIndex} of {history.length - 1}</span>
                 </div>
-                <ComparisonView
-                  originalImage={originalImage.data}
-                  processedImage={currentImage.data}
-                  processedMimeType={currentImage.mimeType}
-                  onDownload={handleDownload}
-                  isProcessing={status === AppStatus.PROCESSING}
-                />
+                <Suspense fallback={null}>
+                  <ComparisonView
+                    originalImage={originalImage.data}
+                    processedImage={currentImage.data}
+                    processedMimeType={currentImage.mimeType}
+                    onDownload={handleDownload}
+                    isProcessing={status === AppStatus.PROCESSING}
+                  />
+                </Suspense>
               </div>
             </div>
           )}
