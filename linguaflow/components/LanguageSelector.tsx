@@ -3,8 +3,14 @@ import { LANGUAGES, FEMALE_VOICES, CONVERSATION_TOPICS } from '../constants';
 import { LanguageConfig, DifficultyLevel } from '../types';
 
 interface Props {
+  /** Currently active language configuration, including any selected level and topic. */
   selected: LanguageConfig;
+  /**
+   * Called whenever the user changes language, difficulty level, voice, or topic.
+   * The parent is responsible for persisting the returned config.
+   */
   onSelect: (lang: LanguageConfig) => void;
+  /** When `true`, all buttons are non-interactive (e.g. during an active session). */
   disabled: boolean;
 }
 

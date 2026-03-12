@@ -6,6 +6,38 @@ import { ConnectionState, ChatMessage, LanguageConfig, UserProfile } from '../ty
 import { MODEL_NAME } from '../constants';
 
 
+/**
+ * Custom hook that manages a live audio conversation session with the AI tutor.
+ *
+ * Handles the full session lifecycle:
+ *   1. Requests microphone access and initialises two AudioContexts — input at
+ *      16 kHz (Gemini requirement) and output at 24 kHz (model response rate).
+ *   2. Opens a WebSocket connection through the local proxy to the Gemini Live
+ *      Audio API, authenticating with the server-side API key.
+ *   3. Streams PCM16 audio from the microphone to Gemini via a ScriptProcessor.
+ *   4. Receives audio chunks from Gemini, decodes them, and schedules gap-free
+ *      playback using an AudioBufferSourceNode queue.
+ *   5. Accumulates rolling transcription text and flushes it to `messages` on
+ *      each `turnComplete` event from the server.
+ *   6. Polls the AnalyserNode at 150 ms intervals to derive normalised [0, 1]
+ *      volume levels for both input (RMS) and output (mean FFT magnitude).
+ *   7. Tears down all Web Audio and WebSocket resources on disconnect or unmount.
+ *
+ * @param activeLanguage - Language configuration including voice, system prompt,
+ *   optional difficulty level, and optional conversation topic.
+ * @param userProfile - Optional learner profile injected into the system prompt
+ *   to personalise greetings and track vocabulary progress.
+ *
+ * @returns
+ *   - `connectionState` – current lifecycle state (DISCONNECTED / CONNECTING / CONNECTED / ERROR).
+ *   - `connect` – starts a new session; no-op if already connected.
+ *   - `disconnect` – gracefully stops all audio, clears the session, and resets state.
+ *   - `sendInstruction` – sends an out-of-band text turn to the live session
+ *     (used to inject mid-session instructions without interrupting audio).
+ *   - `messages` – ordered array of finalised transcription turns (user + model).
+ *   - `volume` – live `{ input, output }` volume levels for the visualiser.
+ *   - `error` – human-readable error string, or `null` when there is no error.
+ */
 export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: UserProfile | null) => {
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const [messages, setMessages] = useState<ChatMessage[]>([]);

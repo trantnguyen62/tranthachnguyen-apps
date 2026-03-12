@@ -2,6 +2,12 @@ import React, { useEffect, useRef, memo } from 'react';
 import { ChatMessage } from '../types';
 
 interface Props {
+  /**
+   * Ordered list of finalised conversation turns to display.
+   * The component auto-scrolls to the latest message whenever this array grows.
+   * The last 100 messages are kept in memory by `useLiveSession`; older ones are
+   * dropped to avoid unbounded growth during long sessions.
+   */
   messages: ChatMessage[];
 }
 

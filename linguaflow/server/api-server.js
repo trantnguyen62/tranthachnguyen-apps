@@ -1,3 +1,32 @@
+/**
+ * LinguaFlow API Server — REST backend for learner profiles and session tracking.
+ *
+ * Runs on port 3002. All routes are prefixed with /api.
+ *
+ * Endpoints:
+ *   GET  /api/health                    Health check; returns { status, timestamp }.
+ *   GET  /api/users/search?name=<name>  Find a user by name (case-insensitive).
+ *   GET  /api/users/:id                 Fetch a single user by their generated ID.
+ *   POST /api/users                     Create a user (or return existing by name).
+ *   PATCH /api/users/:id                Update profile fields (lessonNumber, notes, etc.).
+ *   POST /api/users/:id/words           Append new vocabulary words (deduped, lowercase).
+ *   POST /api/users/:id/session         Record a completed session and advance lesson.
+ *
+ * Persistence:
+ *   User data is stored as JSON in data/users.json and cached in memory after the
+ *   first read. Writes flush to disk immediately so data survives restarts.
+ *
+ * User object schema:
+ *   {
+ *     id:              string,   // URL-safe slug derived from name + timestamp
+ *     name:            string,
+ *     lessonNumber:    number,   // Auto-incremented on session completion
+ *     wordsLearned:    string[], // Deduplicated, lowercase vocabulary list
+ *     lastSessionDate: string,   // ISO 8601 timestamp
+ *     totalSessions:   number,
+ *     notes:           string    // Free-form tutor notes from the AI
+ *   }
+ */
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs/promises';
