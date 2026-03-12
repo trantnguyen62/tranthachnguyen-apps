@@ -57,7 +57,7 @@ function writeRateLimit(req, res, next) {
   entry.count++;
   next();
 }
-app.use('/images', express.static(join(__dirname, 'images'), { maxAge: '7d' }));
+app.use('/images', express.static(join(__dirname, 'images'), { maxAge: '30d' }));
 
 // Serve static frontend (for Docker deployment)
 // Vite hashes JS/CSS filenames, so they can be cached immutably for 1 year
@@ -552,7 +552,7 @@ ${comics.map(c =>
 
 // Get all comics
 app.get('/api/comics', (req, res) => {
-  res.set('Cache-Control', 'public, max-age=60');
+  res.set('Cache-Control', 'public, max-age=300');
   const { genre, search, sort } = req.query;
 
   // Fast path: no filters — serve precomputed results with ETag
