@@ -111,6 +111,20 @@ function Reader() {
     }
   }, [comic]);
 
+  // Save reading progress (debounced, only when user has scrolled into the comic)
+  useEffect(() => {
+    if (!comic || scrollProgress <= 0) return;
+    const page = Math.max(1, Math.ceil((scrollProgress / 100) * comic.pages.length));
+    const timer = setTimeout(() => {
+      fetch(`/api/progress/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page }),
+      }).catch(() => {});
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [id, comic, scrollProgress]);
+
   const toggleFullscreen = async () => {
     try {
       if (!document.fullscreenElement) {
