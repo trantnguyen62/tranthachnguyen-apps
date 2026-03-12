@@ -35,11 +35,17 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(binary);
 }
 
+const ttsCache = new Map<string, ArrayBuffer>();
+
 /**
  * Generates spoken audio for the given text using Gemini TTS.
  * Returns raw PCM audio data as an ArrayBuffer suitable for Web Audio API decoding.
+ * Results are cached in-memory to avoid redundant API calls for repeated questions.
  */
 export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
+  const cached = ttsCache.get(text);
+  if (cached) return cached.slice(0); // Return a copy since decodeAudioData may detach the buffer
+
   const ai = await getAI(false);
   const response = await ai.models.generateContent({
     model: MODEL_TTS,
@@ -64,6 +70,7 @@ export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
   for (let i = 0; i < len; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
+  ttsCache.set(text, bytes.buffer);
   return bytes.buffer;
 };
 
