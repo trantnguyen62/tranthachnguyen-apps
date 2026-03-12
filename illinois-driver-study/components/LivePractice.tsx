@@ -15,7 +15,7 @@ interface LivePracticeProps {
 const TRANSLATIONS = {
   en: {
     title: "Live Driving Instructor",
-    subtitle: "Practice with an AI instructor. The instructor will quiz you on the 55 official questions.",
+    subtitle: "Practice with an AI instructor. The instructor will quiz you on the 58 official questions.",
     start: "Start Session",
     stop: "End Session",
     status_connecting: "Connecting...",
