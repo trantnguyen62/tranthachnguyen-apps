@@ -37,6 +37,8 @@ function App() {
   const [fileLoadError, setFileLoadError] = useState<string | null>(null);
   const [dismissedError, setDismissedError] = useState<string | null>(null);
   const fileCache = useRef<Map<string, { content: string; language: string }>>(new Map());
+  const fileFetchAbortRef = useRef<AbortController | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
 
   // Study context for AI - memoized to prevent unnecessary re-renders
   const studyContext = useMemo<StudyContext>(() => ({
@@ -99,10 +101,14 @@ function App() {
       return;
     }
 
+    fileFetchAbortRef.current?.abort();
+    const abortCtrl = new AbortController();
+    fileFetchAbortRef.current = abortCtrl;
+
     setIsLoadingFile(true);
     setFileLoadError(null);
     try {
-      const res = await fetch(`${API_URL}/api/file?path=${encodeURIComponent(filePath)}`);
+      const res = await fetch(`${API_URL}/api/file?path=${encodeURIComponent(filePath)}`, { signal: abortCtrl.signal });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
 
@@ -116,6 +122,7 @@ function App() {
         language: data.language
       });
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
       console.error('Failed to load file:', err);
       setFileLoadError(file.name);
     } finally {
@@ -130,14 +137,19 @@ function App() {
       return;
     }
 
+    searchAbortRef.current?.abort();
+    const abortCtrl = new AbortController();
+    searchAbortRef.current = abortCtrl;
+
     setIsSearching(true);
     try {
       const projectParam = selectedProject ? `&project=${encodeURIComponent(selectedProject.path)}` : '';
-      const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchQuery)}${projectParam}`);
+      const res = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchQuery)}${projectParam}`, { signal: abortCtrl.signal });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       setSearchResults(data);
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
       console.error('Search failed:', err);
     } finally {
       setIsSearching(false);

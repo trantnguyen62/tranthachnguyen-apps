@@ -48,7 +48,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
     const ro = new ResizeObserver(() => setViewportHeight(el.clientHeight));
     ro.observe(el);
     return () => ro.disconnect();
-  }, [file]);
+  }, []);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
@@ -74,6 +74,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   const visibleEnd = Math.min(lines.length, Math.ceil((scrollTop + viewportHeight) / LINE_HEIGHT) + BUFFER);
   const paddingTop = visibleStart * LINE_HEIGHT;
   const paddingBottom = Math.max(0, (lines.length - visibleEnd) * LINE_HEIGHT);
+  const lineNumWidth = lines.length >= 10000 ? 'w-16' : lines.length >= 1000 ? 'w-14' : 'w-10';
 
   if (!file) {
     return (
@@ -141,7 +142,6 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
             <div style={{ height: `${paddingTop}px` }} />
             {lines.slice(visibleStart, visibleEnd).map((line, i) => {
               const lineIndex = visibleStart + i;
-              const lineNumWidth = lines.length >= 10000 ? 'w-16' : lines.length >= 1000 ? 'w-14' : 'w-10';
               return (
                 <div key={lineIndex} className="flex hover:bg-slate-700/40 group" style={{ height: `${LINE_HEIGHT}px` }}>
                   <span className={`${lineNumWidth} text-right pr-3 text-slate-600 group-hover:text-slate-500 select-none leading-5 flex-shrink-0`} aria-hidden="true">
