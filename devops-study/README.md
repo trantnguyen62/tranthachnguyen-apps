@@ -69,15 +69,17 @@ devops-study/
 
 ## 🛠️ Development
 
-The app has no build step for development — edit `app.js` and `styles.css` directly.
+The app has no build step for development — edit `app.js` and `styles.css` directly. Requires **Node.js 20+**.
 
 To regenerate the minified files before deploying:
 
 ```bash
 npm install
 npx terser app.js -o app.min.js
-npx terser --compress --mangle -- styles.css > styles.min.css
+npx cleancss -o styles.min.css styles.css
 ```
+
+> `cleancss` is a CSS-specific minifier (`npm install -g clean-css-cli`). Do not use terser for CSS files.
 
 Progress is stored in `localStorage` under the key `devops-mastery-progress`.
 
