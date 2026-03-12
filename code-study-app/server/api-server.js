@@ -178,7 +178,7 @@ app.get('/api/projects', (req, res) => {
 
 // Simple in-memory cache for file trees (TTL: 60s)
 const treeCache = new Map();
-const TREE_CACHE_TTL = 60_000;
+const TREE_CACHE_TTL = 300_000;
 const SEARCH_RESULTS_LIMIT = 50;
 
 // Get file tree for a project
@@ -278,6 +278,8 @@ app.get('/api/search', async (req, res) => {
       return;
     }
 
+    const subdirSearches = [];
+
     for (const entry of entries) {
       if (results.length >= SEARCH_RESULTS_LIMIT) break;
 
@@ -286,7 +288,7 @@ app.get('/api/search', async (req, res) => {
 
       if (entry.isDirectory()) {
         if (IGNORED_DIRS.includes(entry.name)) continue;
-        await searchDir(fullPath, relativePath);
+        subdirSearches.push(searchDir(fullPath, relativePath));
       } else {
         if (IGNORED_FILES.includes(entry.name)) continue;
 
@@ -319,6 +321,11 @@ app.get('/api/search', async (req, res) => {
           }
         } catch (e) {}
       }
+    }
+
+    // Traverse subdirectories in parallel rather than sequentially
+    if (subdirSearches.length > 0) {
+      await Promise.all(subdirSearches);
     }
   }
 

@@ -51,6 +51,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
   const streamRef = useRef<MediaStream | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const volumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastInputVolumeRef = useRef(0);
   
   // Use ref for study context to avoid recreating connect callback
   const studyContextRef = useRef(studyContext);
@@ -100,6 +101,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
 
     setConnectionState(ConnectionState.DISCONNECTED);
     nextStartTimeRef.current = 0;
+    lastInputVolumeRef.current = 0;
     setVolume({ input: 0, output: 0 });
   }, []);
 
@@ -194,7 +196,12 @@ export const useLiveSession = (studyContext: StudyContext) => {
               let sum = 0;
               for (let i = 0; i < inputData.length; i++) sum += inputData[i] * inputData[i];
               const rms = Math.sqrt(sum / inputData.length);
-              setVolume(prev => ({ ...prev, input: rms * 5 }));
+              const newInputVolume = rms * 5;
+              // Skip state update if change is negligible to avoid unnecessary re-renders
+              if (Math.abs(newInputVolume - lastInputVolumeRef.current) > 0.01) {
+                lastInputVolumeRef.current = newInputVolume;
+                setVolume(prev => ({ ...prev, input: newInputVolume }));
+              }
 
               const pcmBlob = createBlob(inputData);
               if (sessionRef.current) {
