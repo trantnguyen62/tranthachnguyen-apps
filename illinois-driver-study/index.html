@@ -238,6 +238,17 @@
       .animate-fade-in-up {
         animation: fadeInUp 0.25s ease-out;
       }
+      @media (prefers-reduced-motion: reduce) {
+        .animate-fade-in,
+        .animate-fade-in-up,
+        .animate-spin,
+        .animate-pulse {
+          animation: none !important;
+        }
+        * {
+          transition-duration: 0.01ms !important;
+        }
+      }
     </style>
   <script type="importmap">
 {
