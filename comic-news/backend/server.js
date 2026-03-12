@@ -2,6 +2,7 @@ import compression from 'compression';
 import crypto from 'crypto';
 import express from 'express';
 import cors from 'cors';
+import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -521,6 +522,20 @@ const comicETags = new Map(comics.map(c => [c.id, `"${_dataHash}-${c.id}"`]));
 
 const baseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
 const today = new Date().toISOString().split('T')[0];
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+let indexHtmlTemplate = '';
+try {
+  indexHtmlTemplate = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
+} catch { /* dist not built yet */ }
+
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url><loc>${baseUrl}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
@@ -669,6 +684,65 @@ app.get('/sitemap.xml', (req, res) => {
   res.set('Cache-Control', 'public, max-age=86400');
   res.type('application/xml');
   res.send(sitemapXml);
+});
+
+// SSR meta injection for comic detail pages (improves crawler visibility)
+app.get('/comic/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const comic = comics.find(c => c.id === id);
+  if (!comic || !indexHtmlTemplate) {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    return res.sendFile(join(__dirname, 'dist', 'index.html'));
+  }
+
+  const pageTitle = `${comic.title} - Comic News`;
+  const imgUrl = `${baseUrl}${comic.coverImage}`;
+  const canonicalUrl = `${baseUrl}/comic/${id}`;
+
+  const articleLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: comic.title,
+    description: comic.description,
+    author: { '@type': 'Person', name: comic.author },
+    publisher: { '@type': 'Organization', name: 'Comic News', url: baseUrl },
+    image: imgUrl,
+    genre: comic.genre,
+    inLanguage: 'en-US',
+    url: canonicalUrl,
+    ...(comic.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: comic.rating, bestRating: 5, worstRating: 1 } } : {}),
+  };
+
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+      { '@type': 'ListItem', position: 2, name: 'Library', item: `${baseUrl}/library` },
+      { '@type': 'ListItem', position: 3, name: comic.title, item: canonicalUrl },
+    ],
+  };
+
+  const html = indexHtmlTemplate
+    .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(pageTitle)}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
+    .replace(/(<meta property="og:type" content=")[^"]*(")/,  `$1article$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
+    .replace(/(<meta property="og:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
+    .replace(/(<meta property="og:image:alt" content=")[^"]*(")/,  `$1${escapeHtml(comic.title)}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
+    .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
+    .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
+    .replace(
+      /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
+      `$1\n    <script type="application/ld+json">${JSON.stringify(articleLd)}</script>\n    <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>`
+    );
+
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.type('html').send(html);
 });
 
 // SPA fallback - serve index.html for all non-API routes
