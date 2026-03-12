@@ -1120,8 +1120,9 @@ function handleCorrectAnswer() {
     // Calculate score
     let points = CONFIG.BASE_SCORE;
 
-    // Speed bonus
-    if (game.questionTimer > CONFIG.QUESTION_TIME - 5) {
+    // Speed bonus: answered in first 5 seconds
+    const maxTime = game.mode === 'speedquiz' ? CONFIG.SPEEDQUIZ_QUESTION_TIME : CONFIG.QUESTION_TIME;
+    if (game.questionTimer > maxTime - 5) {
         points += CONFIG.SPEED_BONUS;
     }
 
@@ -1495,8 +1496,17 @@ function togglePause() {
     game.paused = !game.paused;
     domCache.pauseMenu.classList.toggle('hidden', !game.paused);
     if (game.paused) {
+        // Hide question panel while paused to prevent reading without time pressure
+        if (game.questionActive) {
+            domCache.questionPanel.classList.add('hidden');
+        }
         const firstBtn = domCache.pauseMenu.querySelector('button');
         if (firstBtn) firstBtn.focus();
+    } else {
+        // Restore question panel if a question was active when paused
+        if (game.questionActive) {
+            domCache.questionPanel.classList.remove('hidden');
+        }
     }
 }
 
