@@ -69,7 +69,11 @@ app.use(express.static(join(__dirname, 'dist'), {
   }
 }));
 
-// Comic data
+// Comic data — each entry has:
+//   id, title, author, genre, coverImage, description, rating, chapters, status,
+//   hasTextVersion, textStory (optional), pages (array of {id, image, caption}),
+//   panels (array of {id, title, description})
+// List endpoints strip `pages` before sending to keep payloads small.
 const comics = [
   {
     id: 1,

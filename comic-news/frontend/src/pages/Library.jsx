@@ -4,6 +4,8 @@ import { Filter, SortAsc, SearchX } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 import SkeletonCard from '../components/SkeletonCard';
 
+// Module-level cache: genres are static, so we fetch once per page load
+// and skip the network request if the Library component remounts (e.g. nav back).
 let cachedGenres = null;
 
 function Library() {

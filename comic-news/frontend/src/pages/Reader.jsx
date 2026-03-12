@@ -85,6 +85,8 @@ function Reader() {
   }, [isFullscreen, navigate, id]);
 
   useEffect(() => {
+    // rAF flag prevents multiple scroll callbacks from queuing up between frames,
+    // keeping the progress bar update at most once per animation frame (~60fps).
     let rafId = null;
     const handleScroll = () => {
       if (rafId) return;
@@ -270,6 +272,8 @@ function Reader() {
                     }`}
                     onLoad={() => handleImageLoad(index)}
                     onError={() => handleImageError(index)}
+                    // First 3 panels load eagerly; the rest are lazy to save bandwidth.
+                    // Panel 0 gets sync decoding and high fetch priority for fastest first paint.
                     loading={index < 3 ? "eager" : "lazy"}
                     decoding={index === 0 ? "sync" : "async"}
                     fetchPriority={index === 0 ? "high" : index < 3 ? "auto" : "low"}

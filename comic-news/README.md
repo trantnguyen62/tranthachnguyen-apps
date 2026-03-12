@@ -78,7 +78,35 @@ comic-news/
 | GET | `/robots.txt` | SEO robots file |
 | GET | `/sitemap.xml` | SEO sitemap |
 
-> Note: Bookmarks and reading progress are stored in-memory and reset on server restart.
+> Note: Bookmarks and reading progress are stored in-memory and reset on server restart. Bookmarks are capped at 500 entries; reading progress at 1000 unique comics.
+
+## Data Model
+
+A comic object returned by `/api/comics/:id`:
+
+```json
+{
+  "id": 1,
+  "title": "Story Title",
+  "author": "Author Name",
+  "genre": "Slice of Life",
+  "coverImage": "/images/cover.png",
+  "description": "Short description shown on cards and detail pages.",
+  "rating": 4.8,
+  "chapters": 1,
+  "status": "Completed",
+  "hasTextVersion": true,
+  "textStory": "Full plain-text version of the story.",
+  "pages": [
+    { "id": 1, "image": "/images/panel_1.png", "caption": "Panel caption for alt text" }
+  ],
+  "panels": [
+    { "id": 1, "title": "Panel Title", "description": "Panel summary shown on detail page" }
+  ]
+}
+```
+
+List endpoints (`/api/comics`, `/api/featured`, `/api/bookmarks`) omit `pages` to keep payloads small.
 
 ## Environment Variables
 
