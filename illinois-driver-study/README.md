@@ -4,7 +4,7 @@ An interactive study guide for the Illinois Driver's License written knowledge t
 
 ## Features
 
-- **Quiz Mode** - 55 official exam-style questions with instant feedback and explanations. Requires 80% to pass (matching Illinois DMV standard).
+- **Quiz Mode** - 58 official exam-style questions with instant feedback and explanations. Requires 80% to pass (matching Illinois DMV standard).
 - **Study List** - Searchable/filterable review of all questions with explanations.
 - **Live AI Instructor** - Real-time voice conversation with a Gemini-powered instructor that quizzes you on official questions (uses Gemini Live API with WebSocket streaming).
 - **Voice Transcription** - Record spoken notes and transcribe them via Gemini.
@@ -64,7 +64,7 @@ illinois-driver-study/
 │   ├── VoiceTools.tsx     # Audio recording and Gemini transcription
 │   └── ImageGenerator.tsx # Driving scenario image generation
 ├── data/
-│   └── questions.ts       # 55 questions in English and Vietnamese
+│   └── questions.ts       # 58 questions in English and Vietnamese
 ├── services/
 │   └── gemini.ts          # Gemini API client (TTS, image generation, transcription)
 └── public/
@@ -92,7 +92,7 @@ Keep `id` values in sync between `questionsEn` and `questionsVi`. The Live Pract
 
 ## Tech Stack
 
-- **Frontend**: React 18, TypeScript, Vite
+- **Frontend**: React 19, TypeScript, Vite
 - **Styling**: TailwindCSS
 - **AI**: Google Gemini API (`gemini-2.5-flash`, `gemini-2.5-flash-preview-tts`, `gemini-2.5-flash-native-audio-preview`, `gemini-3-pro-image-preview`)
 
