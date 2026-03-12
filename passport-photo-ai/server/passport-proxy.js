@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
@@ -11,6 +12,7 @@ dotenv.config({ path: `${__dirname}/../.env.local` });
 
 const app = express();
 app.set('trust proxy', 1);
+app.use(compression());
 app.use(cors({
   origin: ['https://passportphoto.tranthachnguyen.com', 'http://localhost:5186', 'http://localhost:5173'],
   methods: ['POST'],
@@ -70,8 +72,8 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // Simple result cache: avoid duplicate Gemini API calls for the same image
 const _checkCache = new Map(); // hash -> { result, expires }
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-const CACHE_MAX = 50;
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+const CACHE_MAX = 200;
 /** Returns a 16-character hex prefix of the SHA-256 hash of the base64 image data. */
 function getCacheKey(data) {
   return crypto.createHash('sha256').update(data).digest('hex').slice(0, 16);

@@ -3,7 +3,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Install runtime dependencies
-RUN npm install express cors dotenv @google/genai
+RUN npm install express cors dotenv @google/genai compression
 
 # Copy pre-built files
 COPY dist ./dist
