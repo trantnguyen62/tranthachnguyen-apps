@@ -93,6 +93,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'speaking' | 'disconnected'>('idle');
   const [volume, setVolume] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
   
   // Two separate AudioContexts are required: one for microphone capture at 16 kHz
   // (the rate expected by the Gemini Live API input) and one for playback at 24 kHz
@@ -163,6 +164,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       setStatus('connecting');
       setIsActive(true);
       setCurrentQuestion(null);
+      setSessionError(null);
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -342,7 +344,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       console.error("Connection failed", err);
       setStatus('idle');
       setIsActive(false);
-      alert(t.mic_permission);
+      setSessionError(t.mic_permission);
     }
   };
 
@@ -432,6 +434,12 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
            </div>
         ) : null}
       </div>
+
+      {sessionError && (
+        <p role="alert" className="text-red-600 text-center text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-3 max-w-sm">
+          {sessionError}
+        </p>
+      )}
 
       <button
         onClick={isActive ? stopSession : startSession}

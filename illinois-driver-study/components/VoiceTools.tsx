@@ -31,6 +31,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -60,7 +61,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
       setTranscription(null);
     } catch (err) {
       console.error("Error accessing microphone:", err);
-      alert(t.micError);
+      setMicError(t.micError);
     }
   };
 
@@ -128,7 +129,13 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
             </div>
           </div>
 
-          {!isRecording && !processing && !transcription && (
+          {micError && (
+            <p role="alert" className="text-red-600 text-center text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+              {micError}
+            </p>
+          )}
+
+          {!isRecording && !processing && !transcription && !micError && (
             <p className="text-slate-500 text-center">
               {t.start}
             </p>

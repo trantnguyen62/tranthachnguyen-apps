@@ -50,13 +50,15 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
             <h2 className="text-2xl font-bold text-slate-800 mb-2">{t.title}</h2>
             <p className="text-slate-600">{t.subtitle}</p>
           </div>
-          <span className="flex-shrink-0 bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1.5 rounded-full border border-blue-100">
+          <span aria-live="polite" aria-atomic="true" className="flex-shrink-0 bg-blue-50 text-blue-700 text-sm font-semibold px-3 py-1.5 rounded-full border border-blue-100">
             {filtered.length}{search ? `/${questions.length}` : ''} {t.questions}
           </span>
         </div>
         <div className="relative">
+          <label htmlFor="search-questions" className="sr-only">{t.search}</label>
           <svg aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
           <input
+            id="search-questions"
             type="search"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -90,7 +92,7 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
               <div className="mb-4 flex justify-center">
                 <img
                   src={q.image}
-                  alt=""
+                  alt={q.text}
                   loading="lazy"
                   className="max-h-36 object-contain rounded-lg border border-slate-200"
                 />
