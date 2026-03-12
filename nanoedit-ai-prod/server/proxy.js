@@ -177,7 +177,6 @@ app.listen(PORT, () => {
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   console.log(`📡 Mode: Gemini Web Proxy (Puppeteer automation)`);
   console.log(`   Proxy URL: ${GEMINI_PROXY_URL}`);
-  console.log(`   Video generation: REMOVED`);
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   console.log(`\n⚠️  Make sure gemini-web-proxy is running!`);
   console.log(`   cd /path/to/gemini-web-proxy && npm start\n`);
