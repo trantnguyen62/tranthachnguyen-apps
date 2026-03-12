@@ -431,6 +431,23 @@ body {
     text-shadow: 0 0 10px var(--nano-yellow-glow);
     margin-left: 0.4rem;
     transition: transform 0.15s ease, text-shadow 0.15s ease;
+    display: inline-block;
+}
+
+@keyframes multiplierPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.5); text-shadow: 0 0 25px var(--nano-yellow), 0 0 50px var(--nano-yellow-glow); }
+    100% { transform: scale(1); }
+}
+
+.multiplier.pop {
+    animation: multiplierPop 0.35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .multiplier.pop {
+        animation: none;
+    }
 }
 
 /* HUD sections */

@@ -446,6 +446,9 @@ function init() {
         domCache.scoreValue    = document.getElementById('scoreValue');
         domCache.streakValue   = document.getElementById('streakValue');
         domCache.multiplier    = document.getElementById('multiplier');
+        domCache.multiplier.addEventListener('animationend', () => {
+            domCache.multiplier.classList.remove('pop');
+        });
         domCache.levelLabel    = document.getElementById('levelLabel');
         domCache.levelName     = document.getElementById('levelName');
         domCache.waveNumber    = document.getElementById('waveNumber');
@@ -1471,6 +1474,9 @@ function updateHUD() {
     if (mult !== h.mult) {
         h.mult = mult;
         domCache.multiplier.textContent = `x${mult}`;
+        domCache.multiplier.classList.remove('pop');
+        void domCache.multiplier.offsetWidth;
+        domCache.multiplier.classList.add('pop');
     }
     if (game.currentZone !== h.zone) {
         h.zone = game.currentZone;
