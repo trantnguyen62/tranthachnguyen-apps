@@ -157,9 +157,9 @@ function ComicDetail() {
     <div className="min-h-screen">
       {/* Hero Background */}
       <div className="relative h-80 overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${comic.coverImage})` }}
+          style={/^\/images\/[\w.\-]+$/.test(comic.coverImage) ? { backgroundImage: `url(${comic.coverImage})` } : {}}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-dark-300 via-dark-300/80 to-dark-300/40" />
         <div className="absolute inset-0 backdrop-blur-sm" />
