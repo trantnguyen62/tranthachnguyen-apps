@@ -1208,7 +1208,17 @@ spec:
                 { term: 'API Gateway', definition: 'A fully managed service for creating, publishing, and securing APIs at any scale. Commonly fronts Lambda functions for serverless REST APIs.' },
                 { term: 'CodePipeline', definition: 'A fully managed CI/CD service that automates build, test, and deploy phases each time code is changed, integrating with CodeBuild, CodeDeploy, and third-party tools.' },
                 { term: 'Secrets Manager', definition: 'A service to store, rotate, and retrieve secrets like database credentials and API keys, with automatic rotation support.' },
-                { term: 'CloudTrail', definition: 'Records API calls and account activity across your AWS infrastructure, providing audit logs for compliance and security analysis.' }
+                { term: 'CloudTrail', definition: 'Records API calls and account activity across your AWS infrastructure, providing audit logs for compliance and security analysis.' },
+                { term: 'EBS', definition: 'Elastic Block Store - Persistent block-level storage volumes that attach to EC2 instances, similar to a hard drive. Supports snapshots for backups and replication.' },
+                { term: 'ElastiCache', definition: 'A fully managed in-memory caching service supporting Redis and Memcached, used to reduce database load and improve application response times.' },
+                { term: 'ACM', definition: 'AWS Certificate Manager - A service for provisioning, managing, and deploying public and private TLS certificates for use with AWS services like ALB and CloudFront.' },
+                { term: 'WAF', definition: 'Web Application Firewall - Protects web applications from common exploits like SQL injection and XSS by filtering HTTP traffic based on customizable rules.' },
+                { term: 'Cognito', definition: 'A fully managed user identity service providing sign-up, sign-in, and access control for web and mobile apps, with support for social and SAML identity providers.' },
+                { term: 'Step Functions', definition: 'A serverless workflow orchestration service that sequences Lambda functions and AWS services into multi-step workflows with built-in error handling and retries.' },
+                { term: 'EventBridge', definition: 'A serverless event bus that connects application components using events, enabling loosely coupled architectures. Supports rules-based routing to targets like Lambda and SQS.' },
+                { term: 'Parameter Store', definition: 'Part of AWS Systems Manager, provides secure storage for configuration data and secrets as strings or encrypted SecureString values, with versioning support.' },
+                { term: 'Auto Scaling Group', definition: 'Automatically adjusts the number of EC2 instances based on defined policies or schedules, ensuring the right capacity is available to handle demand at minimal cost.' },
+                { term: 'NAT Gateway', definition: 'A managed Network Address Translation service that allows instances in private subnets to initiate outbound internet traffic while preventing inbound connections from the internet.' }
             ],
             quiz: [
                 {
@@ -1264,6 +1274,21 @@ spec:
                 {
                     question: 'What does AWS CloudTrail provide?',
                     options: ['Network routing', 'API call audit logs for security and compliance', 'Container deployment', 'Load balancing'],
+                    correct: 1
+                },
+                {
+                    question: 'What is the purpose of an AWS NAT Gateway?',
+                    options: ['Translate DNS records', 'Allow private subnet instances to reach the internet without inbound exposure', 'Balance traffic across AZs', 'Manage SSL certificates'],
+                    correct: 1
+                },
+                {
+                    question: 'Which AWS service is used for in-memory caching?',
+                    options: ['RDS', 'DynamoDB', 'ElastiCache', 'EBS'],
+                    correct: 2
+                },
+                {
+                    question: 'What does AWS Cognito provide?',
+                    options: ['Container orchestration', 'User sign-up, sign-in, and identity management', 'DNS routing', 'Event-driven workflow'],
                     correct: 1
                 }
             ],
@@ -1525,7 +1550,15 @@ echo "Deployed \$ECR_REPO:\$IMAGE_TAG to \$SERVICE_NAME"`
                 { term: 'terraform import', definition: 'A command that brings existing infrastructure under Terraform management by mapping real resources to configuration blocks and updating state.' },
                 { term: 'terraform destroy', definition: 'A command that removes all infrastructure managed by the current Terraform configuration, with a confirmation prompt before execution.' },
                 { term: 'depends_on', definition: 'An explicit dependency meta-argument that forces Terraform to create or destroy resources in a specific order when implicit dependency detection is insufficient.' },
-                { term: 'Remote State', definition: 'Sharing Terraform state stored in a remote backend (e.g., S3) between configurations using the terraform_remote_state data source to access outputs.' }
+                { term: 'Remote State', definition: 'Sharing Terraform state stored in a remote backend (e.g., S3) between configurations using the terraform_remote_state data source to access outputs.' },
+                { term: 'lifecycle Block', definition: 'A meta-argument on resources with rules like create_before_destroy, prevent_destroy, and ignore_changes to control how Terraform manages resource replacements.' },
+                { term: '.terraform.lock.hcl', definition: 'A lock file that records the exact provider versions selected during terraform init, ensuring consistent provider versions across team members and CI runs.' },
+                { term: 'dynamic Block', definition: 'Generates repeated nested configuration blocks (like ingress rules) from a list or map variable, avoiding copy-paste duplication in resource definitions.' },
+                { term: 'moved Block', definition: 'Allows renaming or moving resources in configuration without destroying and recreating them. Terraform updates the state file to reflect the new address.' },
+                { term: 'sensitive Variable', definition: 'A variable or output marked sensitive = true so its value is redacted from plan and apply output, preventing secrets from appearing in logs.' },
+                { term: 'Provisioner', definition: 'An escape hatch that runs scripts on a resource (local-exec or remote-exec) after creation. Discouraged in favor of configuration management tools like Ansible.' },
+                { term: '-replace Flag', definition: 'Passed to terraform apply or plan to force replacement of a specific resource (e.g., -replace=aws_instance.web), replacing the deprecated terraform taint command.' },
+                { term: 'templatefile()', definition: 'A Terraform built-in function that renders a template file with provided variables, commonly used to generate cloud-init user data or config file contents.' }
             ],
             quiz: [
                 {
