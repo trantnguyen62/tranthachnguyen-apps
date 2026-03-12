@@ -829,7 +829,7 @@ function showLearnedContent(content) {
         desc: content.desc,
         x: game.player.x + 50,
         y: game.player.y,
-        life: 1
+        life: 1.4
     });
 
     // Also show in tip banner
@@ -1251,15 +1251,22 @@ function closeQuestion() {
 
 // Tips
 let _tipHideTimer = null;
+let _tipFadeTimer = null;
 function showTip(text) {
     if (_tipHideTimer) { clearTimeout(_tipHideTimer); _tipHideTimer = null; }
+    if (_tipFadeTimer) { clearTimeout(_tipFadeTimer); _tipFadeTimer = null; }
     game.elTipText.textContent = text;
-    game.elTipBanner.classList.remove('hidden');
+    game.elTipBanner.classList.remove('hidden', 'fading');
     _tipHideTimer = setTimeout(() => { hideTipBanner(); _tipHideTimer = null; }, 3000);
 }
 
 function hideTipBanner() {
-    game.elTipBanner.classList.add('hidden');
+    game.elTipBanner.classList.add('fading');
+    _tipFadeTimer = setTimeout(() => {
+        game.elTipBanner.classList.add('hidden');
+        game.elTipBanner.classList.remove('fading');
+        _tipFadeTimer = null;
+    }, 280);
 }
 
 // Game Over
