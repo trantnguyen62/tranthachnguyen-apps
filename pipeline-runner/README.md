@@ -2,6 +2,21 @@
 
 An endless runner game that teaches DevOps concepts through gameplay. Navigate through CI/CD pipelines, answer questions, and level up your DevOps skills!
 
+## Table of Contents
+
+- [Features](#-features)
+- [Controls](#️-controls)
+- [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
+- [Tech Stack](#️-tech-stack)
+- [Gameplay](#-gameplay)
+- [Docker](#-docker)
+- [Mobile Deployment](#-mobile-deployment)
+- [Ranks & Progression](#-ranks--progression)
+- [Game Configuration](#️-game-configuration)
+- [Local Storage](#-local-storage)
+- [Development Notes](#️-development-notes)
+
 ## 🎯 Features
 
 - **Endless Runner Gameplay** - Tap/Space to boost through obstacles
@@ -59,13 +74,18 @@ npm run ios        # or: npx cap open ios
 
 ```
 pipeline-runner/
-├── index.html              # Main HTML file
-├── game.js                 # Game logic (Canvas-based)
-├── styles.css              # Styling
-├── capacitor.config.json   # Capacitor configuration
-├── ios/                    # iOS Xcode project
-├── www/                    # Built web assets for mobile
-└── package.json            # Dependencies
+├── index.html              # Main HTML file (SEO, ARIA, structured data)
+├── game.js                 # Game logic (Canvas-based engine, quiz engine)
+├── styles.css              # Styling and animations
+├── package.json            # Node.js dependencies and scripts
+├── capacitor.config.json   # Capacitor app configuration
+├── Dockerfile              # Container image (nginx:1.27-alpine)
+├── nginx.conf              # Nginx config with security headers
+├── robots.txt              # Search engine crawl rules
+├── sitemap.xml             # XML sitemap for SEO
+├── og-image.png            # Social media share image (Open Graph)
+├── ios/                    # iOS Xcode project (Capacitor-generated)
+└── www/                    # Built web assets synced to mobile (git-ignored)
 ```
 
 ## 🛠️ Tech Stack
