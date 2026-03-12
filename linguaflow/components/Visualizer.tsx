@@ -30,6 +30,9 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
   const particlesRef = useRef<Array<{x: number, y: number, r: number, vx: number, vy: number}>>([]);
   const volumeRef = useRef<AudioVolume>(volume);
   const colorRef = useRef<string>(color);
+  const prefersReducedMotionRef = useRef(
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
 
   // Sync volume and color into refs so the animation loop reads latest values
   // without being restarted on every volume update.
@@ -61,6 +64,20 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (!isActive) {
+        if (prefersReducedMotionRef.current) {
+            // Static ring — no animation loop
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, 40, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(100, 116, 139, 0.35)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(100, 116, 139, 0.5)';
+            ctx.fill();
+            return; // Do not schedule next frame
+        }
+
         // Idle pulsing animation
         const now = Date.now() / 1000;
         const pulse = 0.5 + 0.5 * Math.sin(now * 2);

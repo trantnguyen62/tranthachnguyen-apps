@@ -186,6 +186,11 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
                           {word}
                         </span>
                       ))}
+                      {existingProfile.wordsLearned.length > 8 && (
+                        <span className="px-2 py-1 bg-slate-800 rounded text-xs text-slate-500 italic">
+                          +{existingProfile.wordsLearned.length - 8} more
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}

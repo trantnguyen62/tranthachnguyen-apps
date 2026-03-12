@@ -44,7 +44,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
   const handleTopicSelect = useCallback((topicId: string) => {
     onSelect({
       ...selected,
-      selectedTopic: topicId
+      selectedTopic: selected.selectedTopic === topicId ? undefined : topicId
     });
   }, [selected, onSelect]);
 

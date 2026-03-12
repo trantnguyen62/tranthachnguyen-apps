@@ -50,7 +50,7 @@ const Transcript = memo<Props>(({ messages }) => {
           `}>
             {msg.text}
           </div>
-          <span className="text-[10px] text-slate-500 mt-1 px-1">
+          <span className="text-xs text-slate-500 mt-1 px-1">
             {msg.role === 'user' ? 'You' : 'AI Tutor'} · {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
