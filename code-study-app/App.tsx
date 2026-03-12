@@ -34,6 +34,7 @@ function App() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [activeTab, setActiveTab] = useState<'files' | 'search'>('files');
   const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const [isLoadingTree, setIsLoadingTree] = useState(false);
   const [fileLoadError, setFileLoadError] = useState<string | null>(null);
   const [dismissedError, setDismissedError] = useState<string | null>(null);
   const fileCache = useRef<Map<string, { content: string; language: string }>>(new Map());
@@ -73,10 +74,12 @@ function App() {
   useEffect(() => {
     fileCache.current.clear();
     if (selectedProject) {
+      setIsLoadingTree(true);
       fetch(`${API_URL}/api/projects/${encodeURIComponent(selectedProject.path)}/tree`)
         .then(res => { if (!res.ok) throw new Error(`Server returned ${res.status}`); return res.json(); })
         .then(data => setFileTree(data))
-        .catch(err => console.error('Failed to load file tree:', err));
+        .catch(err => console.error('Failed to load file tree:', err))
+        .finally(() => setIsLoadingTree(false));
     } else {
       setFileTree([]);
     }
@@ -255,11 +258,17 @@ function App() {
           <div className="flex-1 overflow-y-auto p-2">
             {activeTab === 'files' ? (
               selectedProject ? (
-                <FileTree 
-                  nodes={fileTree} 
-                  onFileSelect={handleFileSelect}
-                  selectedPath={selectedFile?.path}
-                />
+                isLoadingTree ? (
+                  <div className="flex items-center justify-center py-8" role="status" aria-label="Loading file tree">
+                    <Loader2 className="w-5 h-5 animate-spin text-emerald-400" aria-hidden="true" />
+                  </div>
+                ) : (
+                  <FileTree
+                    nodes={fileTree}
+                    onFileSelect={handleFileSelect}
+                    selectedPath={selectedFile?.path}
+                  />
+                )
               ) : (
                 <div className="text-center text-slate-500 py-8 px-4">
                   <div className="w-12 h-12 rounded-xl bg-slate-700/50 flex items-center justify-center mx-auto mb-3">
@@ -385,7 +394,8 @@ function App() {
               ) : (
                 <>
                   <Mic className="w-5 h-5" />
-                  Start Voice Session
+                  <span className="hidden sm:inline">Start Voice Session</span>
+                  <span className="sm:hidden">Start</span>
                 </>
               )}
             </button>
@@ -506,7 +516,10 @@ function App() {
                   <div className="bg-slate-900/60 rounded-lg text-xs code-font text-slate-300 border border-emerald-500/20 overflow-hidden">
                     <div className="p-3 overflow-x-auto">
                       {previewLines.map((line, i) => (
-                        <div key={i} className="whitespace-pre leading-5">{line || ' '}</div>
+                        <div key={i} className="flex leading-5">
+                          <span className="w-6 text-right pr-2 text-slate-600 select-none flex-shrink-0">{i + 1}</span>
+                          <span className="whitespace-pre">{line || ' '}</span>
+                        </div>
                       ))}
                     </div>
                     {hiddenLines > 0 && (
