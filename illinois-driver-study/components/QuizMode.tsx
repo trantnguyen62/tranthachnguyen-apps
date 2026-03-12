@@ -222,9 +222,15 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
             className={`flex-shrink-0 p-2 rounded-full transition-colors ${isPlayingAudio ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
             title={language === 'vi' ? "Đọc câu hỏi" : "Read question aloud"}
           >
-             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6${isPlayingAudio ? ' animate-pulse' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-             </svg>
+             {isPlayingAudio ? (
+               <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                 <rect x="6" y="6" width="4" height="12" rx="1" /><rect x="14" y="6" width="4" height="12" rx="1" />
+               </svg>
+             ) : (
+               <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+               </svg>
+             )}
           </button>
         </div>
 
@@ -297,9 +303,24 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
                   : `Incorrect. The correct answer is: ${question.options[question.correctIndex]}`)}
           </div>
         )}
-        {showResult && question.explanation && (
+        {showResult && (
           <div className={`mt-4 p-4 rounded-lg border-l-4 text-sm ${selectedOption === question.correctIndex ? 'border-green-500 bg-green-50 text-green-900' : 'border-red-400 bg-red-50 text-red-900'}`}>
-            <span className="font-semibold">{t.explanation}</span>{' '}{question.explanation}
+            <div className="flex items-center gap-1.5 font-bold mb-1">
+              {selectedOption === question.correctIndex ? (
+                <>
+                  <svg aria-hidden="true" className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                  <span className="text-green-700">{language === 'vi' ? 'Đúng!' : 'Correct!'}</span>
+                </>
+              ) : (
+                <>
+                  <svg aria-hidden="true" className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                  <span className="text-red-600">{language === 'vi' ? 'Chưa đúng!' : 'Incorrect!'}</span>
+                </>
+              )}
+            </div>
+            {question.explanation && (
+              <p><span className="font-semibold">{t.explanation}</span>{' '}{question.explanation}</p>
+            )}
           </div>
         )}
         {showResult && (

@@ -107,13 +107,13 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                     ) : String.fromCharCode(65 + idx)}
                   </span>
-                  <span>{opt}{idx === q.correctIndex && <span className="sr-only"> {t.correctAnswer}</span>}</span>
+                  <span>{opt}{idx === q.correctIndex && <span className="ml-2 text-xs font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded-full">{t.correctAnswer}</span>}</span>
                 </li>
               ))}
             </ul>
             {q.explanation && (
-              <div className="mt-4 pt-4 border-t border-slate-100 text-sm text-slate-600">
-                <span className="font-semibold text-slate-700">{t.explanation}</span>{' '}{q.explanation}
+              <div className="mt-4 p-3 border-l-4 border-blue-300 bg-blue-50 rounded-r-md text-sm text-slate-700">
+                <span className="font-semibold text-blue-800">{t.explanation}</span>{' '}{q.explanation}
               </div>
             )}
           </div>
