@@ -286,7 +286,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
             <div
               className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${isDragging ? 'bg-brand-200 text-brand-600' : 'bg-slate-100 text-slate-400 group-hover:bg-brand-50 group-hover:text-brand-500'}`}
             >
-              <Upload className="w-8 h-8" />
+              <Upload className="w-8 h-8" aria-hidden="true" />
             </div>
             <p className="text-lg font-semibold text-slate-700">
               {isDragging ? 'Drop it here!' : 'Drag & drop or click to upload'}

@@ -24,26 +24,56 @@ export const ComparisonView = memo<ComparisonViewProps>(({
   const [isExpanded, setIsExpanded] = useState(false);
   const isVideo = processedMimeType.startsWith('video/');
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const expandButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
-  // Close fullscreen on Escape key press
+  const closeDialog = () => {
+    setIsExpanded(false);
+  };
+
+  // Close fullscreen on Escape key press and trap focus within dialog
   useEffect(() => {
     if (!isExpanded) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsExpanded(false);
+      if (e.key === 'Escape') {
+        closeDialog();
+        return;
+      }
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
+      }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isExpanded]);
 
-  // Move focus to close button when fullscreen opens
+  // Move focus to close button when fullscreen opens; return focus when it closes
   useEffect(() => {
-    if (isExpanded && closeButtonRef.current) {
-      closeButtonRef.current.focus();
+    if (isExpanded) {
+      closeButtonRef.current?.focus();
+    } else {
+      expandButtonRef.current?.focus();
     }
   }, [isExpanded]);
 
   return (
     <div
+      ref={isExpanded ? dialogRef : undefined}
       className={`transition-all duration-500 ease-in-out ${isExpanded ? 'fixed inset-0 z-50 bg-slate-900/95 p-4 overflow-y-auto' : 'w-full'}`}
       {...(isExpanded ? { role: 'dialog', 'aria-modal': true, 'aria-label': 'Fullscreen image comparison' } : {})}
     >
@@ -52,7 +82,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
         <div className="fixed top-4 right-4 z-50">
            <button
             ref={closeButtonRef}
-            onClick={() => setIsExpanded(false)}
+            onClick={closeDialog}
             className="p-2 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white"
             aria-label="Exit fullscreen"
           >
@@ -71,6 +101,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
             </h3>
             <div className="flex gap-2">
                <button
+                ref={expandButtonRef}
                 onClick={() => setIsExpanded(true)}
                 className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
                 title="Fullscreen"

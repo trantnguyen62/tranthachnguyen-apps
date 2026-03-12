@@ -273,7 +273,7 @@ const App: React.FC = () => {
                       disabled={!canUndo}
                       className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                       title="Undo (go back one version)"
-                      aria-label="Undo"
+                      aria-label="Undo — go back one version"
                     >
                       <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
@@ -285,7 +285,7 @@ const App: React.FC = () => {
                       disabled={!canRedo}
                       className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                       title="Redo (go forward one version)"
-                      aria-label="Redo"
+                      aria-label="Redo — go forward one version"
                     >
                       <RotateCw className="w-4 h-4" aria-hidden="true" />
                     </button>
