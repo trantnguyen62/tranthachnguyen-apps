@@ -34,7 +34,7 @@ const QUESTIONS = {
         { q: "Which command lists all running containers?", a: ["docker ps", "docker list", "docker show", "docker containers"], c: 0 },
         { q: "What does 'docker pull' do?", a: ["Downloads an image from a registry", "Uploads an image", "Creates a container", "Removes a container"], c: 0 },
         { q: "What is Docker Compose used for?", a: ["Multi-container applications", "Building images", "Network configuration", "Security scanning"], c: 0 },
-        { q: "Which command stops a running container?", a: ["docker stop", "docker kill", "docker end", "docker halt"], c: 0 },
+        { q: "Which command gracefully stops a container by sending SIGTERM first?", a: ["docker stop", "docker kill", "docker end", "docker halt"], c: 0 },
         { q: "What is a Docker volume?", a: ["Persistent data storage", "Network interface", "CPU allocation", "Memory limit"], c: 0 },
         { q: "What does the -d flag do in 'docker run -d'?", a: ["Runs container in detached mode", "Enables debugging", "Downloads image", "Deletes after exit"], c: 0 },
         { q: "Which port mapping is correct?", a: ["-p 8080:80", "-p 80-8080", "-port 8080:80", "--port=8080,80"], c: 0 },
@@ -42,7 +42,7 @@ const QUESTIONS = {
         { q: "What does ENTRYPOINT do in a Dockerfile?", a: ["Sets the main executable", "Defines environment variables", "Copies files", "Exposes ports"], c: 0 },
         { q: "What is Docker Hub?", a: ["Public container registry", "Container orchestrator", "Build tool", "Monitoring service"], c: 0 },
         { q: "What does 'docker exec' do?", a: ["Runs command in running container", "Starts new container", "Stops container", "Removes container"], c: 0 },
-        { q: "What is the CMD instruction?", a: ["Default container command", "Comment line", "Copy files", "Create directory"], c: 0 },
+        { q: "What is the CMD instruction?", a: ["Default container command", "Runs command at build time", "Copy files", "Create directory"], c: 0 },
         { q: "What does 'docker logs' show?", a: ["Container output logs", "System logs", "Build logs", "Network logs"], c: 0 },
         { q: "What is the difference between ADD and COPY?", a: ["ADD can extract archives", "ADD is faster", "COPY is deprecated", "No difference"], c: 0 },
         { q: "What does 'docker network create' do?", a: ["Creates custom network", "Lists networks", "Removes network", "Inspects network"], c: 0 },
@@ -85,7 +85,7 @@ const QUESTIONS = {
         { q: "What is a canary deployment?", a: ["Gradual rollout to subset", "Fast deployment", "Rollback strategy", "Testing approach"], c: 0 },
         { q: "What is GitHub Actions?", a: ["CI/CD platform", "Code review tool", "Issue tracker", "Wiki system"], c: 0 },
         { q: "What is a pipeline stage?", a: ["Group of jobs", "Code branch", "Server node", "Database"], c: 0 },
-        { q: "What is ArgoCD?", a: ["GitOps CD tool", "CI tool", "Container registry", "Monitoring tool"], c: 0 },
+        { q: "What is ArgoCD?", a: ["GitOps continuous delivery tool", "Source code repository", "Container registry", "Monitoring platform"], c: 0 },
         { q: "What is a rollback?", a: ["Reverting to previous version", "Moving forward", "Scaling up", "Restarting"], c: 0 },
         { q: "What is feature flagging?", a: ["Toggle features on/off", "Code commenting", "Branch naming", "Error logging"], c: 0 },
         { q: "What is trunk-based development?", a: ["Single main branch", "Many long branches", "Feature branches", "Release branches"], c: 0 },
@@ -177,7 +177,7 @@ const QUESTIONS = {
         { q: "What does 'tar' do?", a: ["Archives files", "Transfers files", "Terminates processes", "Tests network"], c: 0 },
         { q: "What does 'awk' do?", a: ["Text processing", "Archive creation", "Process listing", "Disk formatting"], c: 0 },
         { q: "What does 'sed' do?", a: ["Stream editing", "Service daemon", "System export", "Secure delete"], c: 0 },
-        { q: "What is /etc/passwd?", a: ["User account file", "Password storage", "Network config", "System log"], c: 0 },
+        { q: "What is /etc/passwd?", a: ["User account info file", "Encrypted password storage", "Network config", "System log"], c: 0 },
         { q: "What does 'crontab' manage?", a: ["Scheduled tasks", "User accounts", "Network routes", "File systems"], c: 0 },
         { q: "What does 'htop' provide?", a: ["Interactive process viewer", "HTTP server", "Help topics", "Hash table"], c: 0 }
     ],
@@ -221,7 +221,7 @@ const QUESTIONS = {
         { q: "What are Ansible tags?", a: ["Labels to run specific tasks", "Inventory groups", "Variable files", "Module parameters"], c: 0 },
         { q: "What is AWX?", a: ["Open-source Ansible web UI", "CLI tool for Ansible", "Module library", "Inventory plugin"], c: 0 },
         { q: "What is ansible-lint?", a: ["Checks playbook best practices", "Runs playbooks", "Manages inventory", "Encrypts variables"], c: 0 },
-        { q: "What is the 'with_items' loop?", a: ["Iterates over a list", "Waits for items", "Counts items", "Filters items"], c: 0 },
+        { q: "What is the modern Ansible syntax for iterating over a list?", a: ["loop", "with_items", "for_each", "iterate"], c: 0 },
         { q: "What is an Ansible ad hoc command?", a: ["One-off task without a playbook", "Scheduled playbook run", "Role-based execution", "Module unit test"], c: 0 },
         { q: "What does 'delegate_to' do in Ansible?", a: ["Runs the task on a different host", "Delegates role creation", "Assigns task priority", "Runs as a different user"], c: 0 }
     ],
@@ -304,7 +304,7 @@ const TOPICS = [
     { id: 'linux', name: 'Linux', icon: '🐧', color: '#fcc624', desc: 'Commands, permissions, processes & scripting' },
     { id: 'monitoring', name: 'Monitoring', icon: '📊', color: '#00c853', desc: 'Prometheus, Grafana, tracing & SLOs' },
     { id: 'ansible', name: 'Ansible', icon: '🔧', color: '#ee0000', desc: 'Playbooks, roles, inventory & idempotency' },
-    { id: 'azure', name: 'Azure', icon: '🔷', color: '#0078d4', desc: 'AKS, Functions, DevOps & ARM templates' },
+    { id: 'azure', name: 'Azure', icon: '🔷', color: '#0078d4', desc: 'AKS, Functions, DevOps & resource management' },
     { id: 'devsecops', name: 'DevSecOps', icon: '🔒', color: '#dc2626', desc: 'SAST, DAST, scanning & zero trust' },
     { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2', desc: 'DNS, load balancing, TLS & proxies' }
 ];
