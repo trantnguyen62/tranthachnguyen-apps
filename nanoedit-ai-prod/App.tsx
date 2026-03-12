@@ -10,15 +10,15 @@ const MAX_HISTORY = 10;
 
 const PROCESSING_MESSAGES = [
   'Analyzing your image…',
+  'Sending to Google Gemini…',
   'Applying your edits…',
   'Generating the result…',
   'Adding finishing touches…',
-  'Almost there…',
   'Enhancing details…',
   'Refining the output…',
   'Rendering your image…',
   'Polishing the result…',
-  'Just a moment more…',
+  'Waiting for Gemini response…',
 ] as const;
 
 // Static data moved outside component to prevent recreation
@@ -33,7 +33,7 @@ const PRESET_PROMPTS = [
 
 const PASSPORT_PROMPT = "Convert this into a professional passport photo: solid white background, center the subject, crop to head and shoulders, ensure even lighting, and make it look professional.";
 
-const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement", "100% Free · No Sign-up"];
+const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement", "Always Free · No Account Needed"];
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -248,7 +248,7 @@ const App: React.FC = () => {
               Edit Any Photo Instantly — Just <span className="text-brand-600">Describe What You Want</span>
             </h2>
             <p className="text-lg text-slate-600 mb-6">
-              Upload a photo and type what you want changed — remove backgrounds, create passport photos, retouch portraits, or apply artistic effects. Powered by Google Gemini. No account needed, completely free.
+              Upload any photo and describe your edit in plain English — NanoEdit AI handles the rest. Powered by Google Gemini. No account needed, completely free.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
               {FEATURES.map((feat) => (
@@ -328,7 +328,7 @@ const App: React.FC = () => {
                       aria-label="Describe the image changes you want"
                       aria-describedby="prompt-hint"
                       onKeyDown={handleKeyDown}
-                      placeholder="E.g., 'Remove the background' or 'Make it look vintage'"
+                      placeholder="E.g., 'Remove the background' or 'Make it a professional headshot'"
                       className="w-full p-4 pr-10 text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent rounded-lg text-base"
                       rows={3}
                     />
