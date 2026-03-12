@@ -14,6 +14,11 @@ const PROCESSING_MESSAGES = [
   'Generating the result…',
   'Adding finishing touches…',
   'Almost there…',
+  'Enhancing details…',
+  'Refining the output…',
+  'Rendering your image…',
+  'Polishing the result…',
+  'Just a moment more…',
 ] as const;
 
 // Static data moved outside component to prevent recreation
@@ -158,6 +163,29 @@ const App: React.FC = () => {
     }
   }, [canRedo]);
 
+  // Global keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
+      if (e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        if (canUndo) {
+          setHistoryIndex(prev => prev - 1);
+          setErrorMsg(null);
+        }
+      } else if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) {
+        e.preventDefault();
+        if (canRedo) {
+          setHistoryIndex(prev => prev + 1);
+          setErrorMsg(null);
+        }
+      }
+    };
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [canUndo, canRedo]);
+
   /** Triggers a browser download of the current image and briefly shows a success toast. */
   const handleDownload = useCallback(() => {
     if (!currentImage) return;
@@ -272,8 +300,8 @@ const App: React.FC = () => {
                       onClick={handleUndo}
                       disabled={!canUndo}
                       className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
-                      title="Undo (go back one version)"
-                      aria-label="Undo — go back one version"
+                      title="Undo (Ctrl+Z)"
+                      aria-label="Undo — go back one version (Ctrl+Z)"
                     >
                       <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
@@ -284,8 +312,8 @@ const App: React.FC = () => {
                       onClick={handleRedo}
                       disabled={!canRedo}
                       className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
-                      title="Redo (go forward one version)"
-                      aria-label="Redo — go forward one version"
+                      title="Redo (Ctrl+Y)"
+                      aria-label="Redo — go forward one version (Ctrl+Y)"
                     >
                       <RotateCw className="w-4 h-4" aria-hidden="true" />
                     </button>
@@ -326,7 +354,7 @@ const App: React.FC = () => {
                         <span className="hidden sm:flex items-center gap-1.5">
                           <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate <span className="text-slate-300">·</span> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Shift+Enter</kbd> for newline
                         </span>
-                        <span className={`tabular-nums transition-opacity ${prompt.length > 0 ? 'opacity-100' : 'opacity-0'}`}>{prompt.length} chars</span>
+                        <span className={`tabular-nums transition-all ${prompt.length > 0 ? 'opacity-100' : 'opacity-0'} ${prompt.length > 400 ? 'text-amber-500 font-medium' : ''}`}>{prompt.length} chars</span>
                       </span>
                     )}
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
@@ -424,7 +452,7 @@ const App: React.FC = () => {
 
       {/* Download toast */}
       {downloadSuccess && (
-        <div role="status" aria-live="polite" aria-atomic="true" className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg animate-fadeIn text-sm font-medium">
+        <div role="status" aria-live="polite" aria-atomic="true" className="fixed bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 z-50 flex items-center gap-2 px-4 py-3 bg-brand-600 text-white rounded-xl shadow-lg animate-fadeIn text-sm font-medium whitespace-nowrap">
           <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
           Image downloaded!
         </div>
