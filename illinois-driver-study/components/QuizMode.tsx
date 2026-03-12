@@ -198,6 +198,12 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   const answeredCount = currentQuestionIndex + (showResult ? 1 : 0);
   const scorePct = answeredCount > 0 ? Math.round((score / answeredCount) * 100) : null;
 
+  const scoreBadgeClass = scorePct === null
+    ? 'text-blue-600 bg-blue-50'
+    : scorePct >= PASSING_SCORE
+      ? 'text-green-700 bg-green-50'
+      : 'text-amber-700 bg-amber-50';
+
   return (
     <div className="max-w-2xl mx-auto p-4">
       <div className="bg-white rounded-xl shadow-lg p-6">
@@ -205,7 +211,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
           <span aria-live="polite" aria-atomic="true" className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
             {t.questionLabel} {currentQuestionIndex + 1} {t.of} {questions.length}
           </span>
-          <span aria-live="polite" aria-atomic="true" className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+          <span aria-live="polite" aria-atomic="true" className={`text-sm font-bold px-3 py-1 rounded-full transition-colors duration-300 ${scoreBadgeClass}`}>
             {t.score}: {score}{scorePct !== null ? ` (${scorePct}%)` : ''}
           </span>
         </div>
@@ -275,7 +281,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
                 className={className}
               >
                 <div className="flex items-center">
-                  <span aria-hidden="true" className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
+                  <span aria-hidden="true" className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 text-xs font-semibold ${
                      isCorrect ? "border-green-600 bg-green-600 text-white" :
                      isWrong ? "border-red-500 bg-red-500 text-white" :
                      "border-slate-300 text-slate-500"
@@ -304,7 +310,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
           </div>
         )}
         {showResult && (
-          <div className={`mt-4 p-4 rounded-lg border-l-4 text-sm ${selectedOption === question.correctIndex ? 'border-green-500 bg-green-50 text-green-900' : 'border-red-400 bg-red-50 text-red-900'}`}>
+          <div className={`mt-4 p-4 rounded-lg border-l-4 text-sm animate-fade-in-up ${selectedOption === question.correctIndex ? 'border-green-500 bg-green-50 text-green-900' : 'border-red-400 bg-red-50 text-red-900'}`}>
             <div className="flex items-center gap-1.5 font-bold mb-1">
               {selectedOption === question.correctIndex ? (
                 <>

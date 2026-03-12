@@ -117,10 +117,10 @@ const App: React.FC = () => {
              <button
                onClick={toggleLanguage}
                aria-label={language === 'en' ? 'Switch to Vietnamese' : 'Chuyển sang tiếng Anh'}
-               className="px-3 py-1 rounded-full text-xs font-bold border border-slate-300 bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors"
+               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white hover:border-slate-300 hover:shadow-sm transition-all duration-150"
              >
-               <span aria-hidden="true">{language === 'en' ? '🇺🇸 EN' : '🇻🇳 VN'}</span>
-               <span className="sr-only">{language === 'en' ? 'EN' : 'VN'}</span>
+               <span aria-hidden="true">{language === 'en' ? '🇺🇸' : '🇻🇳'}</span>
+               <span>{language === 'en' ? 'EN' : 'VN'}</span>
              </button>
              <div className="text-xs text-slate-400 font-mono hidden sm:block">
                v1.2.0

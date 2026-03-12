@@ -79,7 +79,10 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center text-slate-400 py-10 text-sm">{t.noResults}</div>
+        <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-400">
+          <svg aria-hidden="true" className="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
+          <p className="text-sm">{t.noResults}</p>
+        </div>
       )}
       <div className="grid gap-4">
         {filtered.map((q) => (
