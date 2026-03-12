@@ -556,6 +556,13 @@ function setupEventListeners() {
     document.addEventListener('keyup', (e) => {
         game.keys[e.key.toLowerCase()] = false;
     });
+
+    // Auto-pause when user switches tabs or minimises the window
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && game.running && !game.paused) {
+            togglePause();
+        }
+    });
 }
 
 function resizeCanvas() {
@@ -1105,11 +1112,12 @@ function checkAnswer(index) {
         handleWrongAnswer();
     }
 
-    // Close question and destroy enemy (always remove enemy after question)
+    // Close question and destroy enemy — longer delay on wrong answers so the player can read the correct one
+    const closeDelay = correct ? 800 : 1500;
     setTimeout(() => {
         closeQuestion();
         destroyEnemy(enemy);
-    }, 1000);
+    }, closeDelay);
 }
 
 function handleCorrectAnswer() {
@@ -1167,7 +1175,7 @@ function handleTimeout() {
     setTimeout(() => {
         closeQuestion();
         destroyEnemy(enemy);
-    }, 1000);
+    }, 1500);
 
     updateHUD();
 }
