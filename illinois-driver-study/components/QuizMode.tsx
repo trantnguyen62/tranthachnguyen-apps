@@ -146,9 +146,9 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${passed ? 'bg-green-100' : 'bg-amber-100'}`}>
             {passed ? (
-              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <svg aria-hidden="true" className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             ) : (
-              <svg className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" /></svg>
+              <svg aria-hidden="true" className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" /></svg>
             )}
           </div>
           <h2 className="text-2xl font-bold text-slate-800 mb-1">{t.quizComplete}</h2>
@@ -209,7 +209,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
             {t.score}: {score}{scorePct !== null ? ` (${scorePct}%)` : ''}
           </span>
         </div>
-        <div className="w-full bg-slate-100 rounded-full h-2 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length}>
+        <div className="w-full bg-slate-100 rounded-full h-2 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length} aria-label={language === 'vi' ? `Câu hỏi ${currentQuestionIndex + 1} trên ${questions.length}` : `Question ${currentQuestionIndex + 1} of ${questions.length}`}>
           <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }} />
         </div>
 
