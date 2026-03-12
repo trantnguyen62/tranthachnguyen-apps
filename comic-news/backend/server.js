@@ -745,6 +745,43 @@ app.get('/comic/:id', (req, res) => {
   res.type('html').send(html);
 });
 
+// SSR meta injection for library page (improves crawler visibility)
+app.get('/library', (req, res) => {
+  if (!indexHtmlTemplate) {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    return res.sendFile(join(__dirname, 'dist', 'index.html'));
+  }
+
+  const pageTitle = 'Story Library - Comic News';
+  const pageDesc = 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
+  const canonicalUrl = `${baseUrl}/library`;
+
+  const collectionLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: pageTitle,
+    url: canonicalUrl,
+    description: pageDesc,
+  };
+
+  const html = indexHtmlTemplate
+    .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(pageTitle)}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(")/,  `$1${escapeHtml(pageDesc)}$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/,  `$1${escapeHtml(pageDesc)}$2`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(pageDesc)}$2`)
+    .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
+    .replace(
+      /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
+      `$1\n    <script type="application/ld+json">${JSON.stringify(collectionLd)}</script>`
+    );
+
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.type('html').send(html);
+});
+
 // SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
