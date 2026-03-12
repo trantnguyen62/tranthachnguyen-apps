@@ -120,6 +120,7 @@ function App() {
   const [sessionStart, setSessionStart] = useState<number | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [errorDismissed, setErrorDismissed] = useState(false);
+  const [transcriptOpen, setTranscriptOpen] = useState(false);
 
   useEffect(() => {
     if (error) setErrorDismissed(false);
@@ -293,55 +294,49 @@ function App() {
                      {/* Difficulty Control */}
                      <div className="flex items-center gap-2 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700">
                        <span className="text-xs text-slate-400 mr-1">Độ khó:</span>
-                       <button
-                         onClick={() => adjustDifficulty(-1)}
-                         disabled={difficultyLevel <= 1}
-                         aria-label="Giảm độ khó"
-                         className="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-bold"
-                       >
-                         −
-                       </button>
-                       <div className="flex gap-1 px-2" role="img" aria-label={`Độ khó: ${difficultyLevel}/5`}>
+                       <div className="flex gap-1 px-1" role="group" aria-label={`Độ khó: ${difficultyLevel}/5`}>
                          {[1, 2, 3, 4, 5].map((level) => (
-                           <div
+                           <button
                              key={level}
-                             className={`w-2 h-4 rounded-full ${level <= difficultyLevel ? 'bg-yellow-500' : 'bg-slate-600'}`}
+                             onClick={() => {
+                               const newLevel = level;
+                               setDifficultyLevel(newLevel);
+                               const levelNames = ['rất dễ', 'dễ', 'trung bình', 'khó', 'rất khó'];
+                               sendInstruction(`[HỆ THỐNG] Học viên muốn thay đổi độ khó. Hãy điều chỉnh sang mức ${levelNames[newLevel - 1]} (${newLevel}/5). Nói ${newLevel <= 2 ? 'chậm hơn, dùng từ đơn giản hơn' : newLevel >= 4 ? 'nhanh hơn, dùng từ phức tạp hơn' : 'ở mức bình thường'}.`);
+                             }}
+                             aria-label={`Độ khó ${level}/5`}
+                             aria-pressed={difficultyLevel === level}
+                             className={`w-2.5 h-5 rounded-full transition-all duration-150 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 ${level <= difficultyLevel ? 'bg-yellow-500' : 'bg-slate-600 hover:bg-slate-500'}`}
                            />
                          ))}
                        </div>
-                       <button
-                         onClick={() => adjustDifficulty(1)}
-                         disabled={difficultyLevel >= 5}
-                         aria-label="Tăng độ khó"
-                         className="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-bold"
-                       >
-                         +
-                       </button>
                      </div>
 
                      {/* Language Ratio Control */}
-                     <div className="flex items-center gap-2 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700">
+                     <div className="flex items-center gap-3 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700" aria-label={`Language ratio: ${100 - vietnameseRatio}% English, ${vietnameseRatio}% Vietnamese`}>
                        <span className="text-xs text-slate-400" aria-hidden="true">🇬🇧</span>
-                       <button
-                         onClick={() => adjustLanguageRatio(-10)}
-                         disabled={vietnameseRatio <= 10}
-                         aria-label="Giảm tỷ lệ tiếng Việt"
-                         className="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-bold"
-                       >
-                         −
-                       </button>
-                       <div className="text-center min-w-[60px]" aria-live="polite" aria-atomic="true">
-                         <div className="text-sm font-medium">{vietnameseRatio}%</div>
-                         <div className="text-xs text-slate-500" aria-hidden="true">🇻🇳 Việt</div>
+                       <div className="flex flex-col gap-1 items-center">
+                         <div className="flex gap-1">
+                           {Array.from({ length: 9 }, (_, i) => {
+                             const barRatio = (i + 1) * 10; // 10..90 Vietnamese ratio
+                             const isActive = barRatio <= vietnameseRatio;
+                             return (
+                               <button
+                                 key={i}
+                                 onClick={() => {
+                                   const newRatio = barRatio;
+                                   setVietnameseRatio(newRatio);
+                                   sendInstruction(`[HỆ THỐNG] Học viên muốn thay đổi tỷ lệ ngôn ngữ. Từ giờ hãy nói ${newRatio}% tiếng Việt và ${100 - newRatio}% tiếng Anh.`);
+                                 }}
+                                 aria-label={`${barRatio}% Vietnamese`}
+                                 aria-pressed={barRatio === vietnameseRatio}
+                                 className={`w-2 h-4 rounded-sm transition-all duration-150 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${isActive ? 'bg-emerald-500' : 'bg-slate-600 hover:bg-slate-500'}`}
+                               />
+                             );
+                           })}
+                         </div>
+                         <div className="text-xs text-slate-500 tabular-nums" aria-hidden="true">{vietnameseRatio}% 🇻🇳</div>
                        </div>
-                       <button
-                         onClick={() => adjustLanguageRatio(10)}
-                         disabled={vietnameseRatio >= 90}
-                         aria-label="Tăng tỷ lệ tiếng Việt"
-                         className="w-8 h-8 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-lg font-bold"
-                       >
-                         +
-                       </button>
                        <span className="text-xs text-slate-400" aria-hidden="true">🇻🇳</span>
                      </div>
                    </div>
@@ -363,20 +358,31 @@ function App() {
         </div>
       </div>
 
-      {/* Right Panel: Transcript (Collapsed on mobile usually, but side-by-side on desktop) */}
-      <div className="w-full md:w-96 border-t md:border-t-0 md:border-l border-slate-800 bg-slate-900/50 backdrop-blur-sm flex flex-col h-[50vh] md:h-screen">
+      {/* Right Panel: Transcript */}
+      <div className={`w-full md:w-96 border-t md:border-t-0 md:border-l border-slate-800 bg-slate-900/50 backdrop-blur-sm flex flex-col md:h-screen transition-all duration-300 ${transcriptOpen ? 'h-[55vh]' : 'h-auto'}`}>
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
           <h3 className="font-semibold text-slate-300 flex items-center gap-2">
             <svg className="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
             Live Transcript
           </h3>
-          {messages.length > 0 && (
-            <span className="text-xs text-slate-500 px-2 py-1 rounded-full bg-slate-800">
-              {messages.length} {messages.length === 1 ? 'message' : 'messages'}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {messages.length > 0 && (
+              <span className="text-xs text-slate-500 px-2 py-1 rounded-full bg-slate-800">
+                {messages.length} {messages.length === 1 ? 'message' : 'messages'}
+              </span>
+            )}
+            <button
+              onClick={() => setTranscriptOpen(o => !o)}
+              aria-label={transcriptOpen ? 'Collapse transcript' : 'Expand transcript'}
+              className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
+            >
+              <svg className={`w-4 h-4 transition-transform duration-300 ${transcriptOpen ? 'rotate-180' : ''}`} aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <div className="flex-1 overflow-hidden">
+        <div className={`flex-1 overflow-hidden ${transcriptOpen ? '' : 'hidden md:block'}`}>
           <Transcript messages={messages} />
         </div>
       </div>

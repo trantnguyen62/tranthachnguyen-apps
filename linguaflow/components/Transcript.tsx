@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, memo } from 'react';
+import React, { useEffect, useRef, memo, useState, useCallback } from 'react';
 import { ChatMessage } from '../types';
 
 interface Props {
@@ -10,6 +10,34 @@ interface Props {
    */
   messages: ChatMessage[];
 }
+
+const CopyButton = memo<{ text: string }>(({ text }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }, [text]);
+  return (
+    <button
+      onClick={handleCopy}
+      aria-label={copied ? 'Copied!' : 'Copy message'}
+      className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 w-6 h-6 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-slate-700 focus:opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-500"
+    >
+      {copied ? (
+        <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      ) : (
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+      )}
+    </button>
+  );
+});
+CopyButton.displayName = 'CopyButton';
 
 const Transcript = memo<Props>(({ messages }) => {
   const endRef = useRef<HTMLDivElement>(null);
@@ -40,7 +68,7 @@ const Transcript = memo<Props>(({ messages }) => {
         <div
           key={msg.id}
           aria-label={`${msg.role === 'user' ? 'You' : 'AI Tutor'}: ${msg.text}`}
-          className={`msg-fade-in flex flex-col max-w-[85%] ${msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'}`}
+          className={`msg-fade-in group flex flex-col max-w-[85%] ${msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'}`}
         >
           <div className={`
             px-4 py-2.5 rounded-2xl text-sm leading-relaxed
@@ -50,9 +78,12 @@ const Transcript = memo<Props>(({ messages }) => {
           `}>
             {msg.text}
           </div>
-          <span className="text-xs text-slate-500 mt-1 px-1">
-            {msg.role === 'user' ? 'You' : 'AI Tutor'} · {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </span>
+          <div className={`flex items-center gap-1 mt-1 px-1 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            <span className="text-xs text-slate-500">
+              {msg.role === 'user' ? 'You' : 'AI Tutor'} · {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+            <CopyButton text={msg.text} />
+          </div>
         </div>
       ))}
       <div ref={endRef} />
