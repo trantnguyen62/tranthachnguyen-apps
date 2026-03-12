@@ -535,7 +535,9 @@ function escapeHtml(str) {
 let indexHtmlTemplate = '';
 try {
   indexHtmlTemplate = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
-} catch { /* dist not built yet */ }
+} catch (err) {
+  if (err.code !== 'ENOENT') console.error('Failed to read dist/index.html:', err);
+}
 
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
@@ -543,7 +545,7 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>${baseUrl}/library</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
 ${comics.map(c =>
   `  <url><loc>${baseUrl}/comic/${c.id}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
-    <image:image><image:loc>${baseUrl}${c.coverImage}</image:loc><image:title>${c.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</image:title></image:image>
+    <image:image><image:loc>${baseUrl}${c.coverImage}</image:loc><image:title>${escapeHtml(c.title)}</image:title></image:image>
   </url>`
 ).join('\n')}
 </urlset>`;

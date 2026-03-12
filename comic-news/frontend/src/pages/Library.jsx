@@ -56,6 +56,7 @@ function Library() {
     const fetchGenres = async () => {
       try {
         const res = await fetch('/api/genres');
+        if (!res.ok) return;
         const data = await res.json();
         cachedGenres = data;
         setGenres(data);
