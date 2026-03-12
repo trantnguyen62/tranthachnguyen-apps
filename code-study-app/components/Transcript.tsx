@@ -146,7 +146,7 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
               </div>
               {message.isFinal && <CopyButton text={message.text} />}
             </div>
-            <span className="text-xs text-slate-600 px-1">{formatTime(message.timestamp)}</span>
+            <span className="text-xs text-slate-500 px-1">{formatTime(message.timestamp)}</span>
           </div>
           {message.role === 'user' && (
             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">

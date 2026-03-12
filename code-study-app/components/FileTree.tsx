@@ -106,8 +106,9 @@ TreeNode.displayName = 'TreeNode';
 const FileTree = memo<FileTreeProps>(({ nodes, onFileSelect, selectedPath }) => {
   if (nodes.length === 0) {
     return (
-      <div className="text-slate-500 text-sm text-center py-4">
-        No files found
+      <div className="text-center text-slate-500 py-6 space-y-2">
+        <File className="w-6 h-6 mx-auto opacity-30" aria-hidden="true" />
+        <p className="text-sm">No files found</p>
       </div>
     );
   }
