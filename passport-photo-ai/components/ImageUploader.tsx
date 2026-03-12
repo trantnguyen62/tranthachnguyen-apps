@@ -103,11 +103,12 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   /** Draws the current video frame onto a canvas, converts it to JPEG, and stops the stream. */
   const capturePhoto = useCallback(() => {
     if (!videoRef.current) return;
-    
+
     const video = videoRef.current;
+    if (!video.videoWidth || !video.videoHeight) return; // video not ready yet
     const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 720;
-    canvas.height = video.videoHeight || 960;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;

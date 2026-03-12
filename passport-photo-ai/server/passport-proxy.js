@@ -23,9 +23,14 @@ app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Content-Security-Policy', "default-src 'none'");
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains');
-  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  // Apply restrictive CSP and Permissions-Policy only to API responses (JSON),
+  // not to HTML/asset responses — "default-src 'none'" on the HTML document would
+  // block all scripts/styles from loading, and "camera=()" would break webcam capture.
+  if (req.path.startsWith('/api/')) {
+    res.setHeader('Content-Security-Policy', "default-src 'none'");
+    res.setHeader('Permissions-Policy', 'geolocation=()');
+  }
   next();
 });
 
