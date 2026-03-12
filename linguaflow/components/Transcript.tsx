@@ -15,17 +15,21 @@ const Transcript = memo<Props>(({ messages }) => {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'instant' });
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   if (messages.length === 0) {
     return (
-      <div role="log" aria-live="polite" aria-label="Conversation transcript" className="h-full flex flex-col items-center justify-center gap-2 text-slate-500 px-6 text-center">
-        <svg className="w-8 h-8 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-        </svg>
-        <p className="text-sm">Your conversation will appear here.</p>
-        <p className="text-xs text-slate-600">Start speaking and watch your dialogue appear in real time.</p>
+      <div role="log" aria-live="polite" aria-label="Conversation transcript" className="h-full flex flex-col items-center justify-center gap-3 text-slate-500 px-6 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center">
+          <svg className="w-6 h-6 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        </div>
+        <div>
+          <p className="text-sm text-slate-400">Your conversation will appear here.</p>
+          <p className="text-xs text-slate-600 mt-1">Start speaking to see your dialogue in real time.</p>
+        </div>
       </div>
     );
   }
