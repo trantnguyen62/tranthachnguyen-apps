@@ -783,6 +783,7 @@ function update() {
             obs.passed = true;
             game.score++;
             game.elScore.textContent = game.score;
+            pulseStat(game.elScore);
 
             // Show learned content as floating text
             game.learnedItems.push(obs.content);
@@ -977,6 +978,11 @@ function drawPlayer(ctx) {
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rotation * DEG_TO_RAD);
+
+    // Flash player during respawn invincibility (every 150ms)
+    if (game.respawnInvincible) {
+        ctx.globalAlpha = Math.floor(Date.now() / 150) % 2 === 0 ? 0.35 : 1;
+    }
 
     ctx.drawImage(playerCanvas, -playerOX, -playerOY);
 
@@ -1196,6 +1202,7 @@ function checkAnswer(index) {
 
         game.score += 5;
         game.elScore.textContent = game.score;
+        pulseStat(game.elScore);
 
         // Award a life for correct answer!
         game.lives++;
@@ -1216,6 +1223,14 @@ function handleTimeout() {
     game.questionsAnswered++;
     game.streak = 0;
     game.elStreak.textContent = '0';
+
+    // Shake the panel to signal time's up
+    const panel = document.querySelector('.question-panel');
+    if (panel) {
+        panel.classList.remove('modal-shake');
+        void panel.offsetWidth;
+        panel.classList.add('modal-shake');
+    }
 
     const btns = document.querySelectorAll('.answer-btn');
     btns[game.currentQuestion.correctIndex].classList.add('correct');
@@ -1248,6 +1263,15 @@ function closeQuestion() {
         // Return focus to canvas so keyboard events (Space) still work
         if (game.canvas) game.canvas.focus({ preventScroll: true });
     }
+}
+
+// Briefly pulse a HUD element with a CSS class, then remove it
+function pulseStat(el) {
+    if (!el) return;
+    el.classList.remove('score-bump');
+    // Force reflow so re-adding the class restarts the animation
+    void el.offsetWidth;
+    el.classList.add('score-bump');
 }
 
 // Tips
