@@ -443,7 +443,8 @@ body {
 }
 
 .topic-item.active {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
 }
 
 .topic-item.active::before {
@@ -780,6 +781,7 @@ body {
 .tab-btn.active {
     background: var(--accent-gradient);
     color: white;
+    box-shadow: 0 2px 12px rgba(139, 92, 246, 0.4);
 }
 
 /* =====================================================
@@ -803,6 +805,11 @@ body {
     height: 350px;
     cursor: pointer;
     position: relative;
+    transition: filter var(--transition-base);
+}
+
+.flashcard:hover {
+    filter: drop-shadow(0 0 16px rgba(139, 92, 246, 0.25));
 }
 
 .flashcard-inner {
@@ -912,6 +919,18 @@ body {
     font-size: var(--font-size-lg);
     font-weight: 600;
     color: var(--text-secondary);
+}
+
+.keyboard-hint {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+}
+
+@media (hover: none) {
+    .keyboard-hint {
+        display: none;
+    }
 }
 
 .flashcard-progress,
@@ -1828,7 +1847,6 @@ body {
     background: rgba(16, 185, 129, 0.15);
     color: var(--color-success);
     cursor: default;
-    opacity: 0.7;
 }
 
 .match-item.incorrect {
