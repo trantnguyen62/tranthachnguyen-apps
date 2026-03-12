@@ -2,7 +2,7 @@ FROM node:20-alpine
 RUN npm install -g serve
 RUN addgroup -g 1001 -S appgroup && adduser -S appuser -u 1001 -G appgroup
 WORKDIR /app
-COPY index.html styles.css game.js ./
+COPY index.html styles.css game.js robots.txt sitemap.xml ./
 COPY assets/ ./assets/
 
 # Create serve config with caching and security headers
