@@ -37,7 +37,6 @@ export const generateEditedImage = async (
       }),
       signal: controller.signal,
     });
-    clearTimeout(timeoutId);
 
     if (!response.ok) {
       let errorMessage = 'Failed to generate image';
@@ -53,11 +52,12 @@ export const generateEditedImage = async (
     const data = await response.json();
     return data.imageData;
   } catch (error) {
-    clearTimeout(timeoutId);
     if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('Request timed out. Please try again.');
     }
     console.error('Error generating edited image:', error);
     throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
 };

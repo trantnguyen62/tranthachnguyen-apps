@@ -80,7 +80,13 @@ app.post('/api/gemini/edit-image', async (req, res) => {
       clearTimeout(upstreamTimeout);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      console.error('[edit-image] Upstream returned non-JSON response (status %d)', response.status);
+      return res.status(502).json({ error: 'Upstream proxy returned an unexpected response' });
+    }
 
     if (!response.ok || !data.success) {
       console.error('[edit-image] Proxy error:', data.error);
@@ -129,6 +135,10 @@ app.post('/api/gemini/edit-image', async (req, res) => {
     return res.status(500).json({ error: 'No image generated' });
 
   } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.error('[edit-image] Upstream request timed out');
+      return res.status(504).json({ error: 'Request to AI service timed out. Please try again.' });
+    }
     const message = error instanceof Error ? error.message : String(error);
     console.error('[edit-image] Error:', message);
     return res.status(500).json({ error: message });
