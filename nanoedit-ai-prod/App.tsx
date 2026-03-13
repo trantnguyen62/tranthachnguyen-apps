@@ -252,14 +252,14 @@ const App: React.FC = () => {
             <p className="text-lg text-slate-600 mb-6">
               Upload any photo and describe your edit in plain English — NanoEdit AI handles the rest. Powered by Google Gemini. No account needed, completely free.
             </p>
-            <div className="flex flex-wrap justify-center gap-2">
+            <ul className="flex flex-wrap justify-center gap-2 list-none" aria-label="Features">
               {FEATURES.map((feat) => (
-                <span key={feat} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-medium shadow-sm">
+                <li key={feat} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full text-sm font-medium shadow-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-500 flex-shrink-0" aria-hidden="true" />
                   {feat}
-                </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
 
@@ -339,7 +339,6 @@ const App: React.FC = () => {
                         onClick={handleClearPrompt}
                         className="absolute top-3 right-3 p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
                         aria-label="Clear prompt"
-                        tabIndex={-1}
                       >
                         <X className="w-4 h-4" aria-hidden="true" />
                       </button>
