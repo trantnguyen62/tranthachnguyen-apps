@@ -646,7 +646,8 @@ app.post('/api/bookmarks/:id', writeRateLimit, (req, res) => {
 app.delete('/api/bookmarks/:id', writeRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
-  bookmarks = bookmarks.filter(b => b !== id);
+  const idx = bookmarks.indexOf(id);
+  if (idx !== -1) bookmarks.splice(idx, 1);
   res.json({ success: true });
 });
 

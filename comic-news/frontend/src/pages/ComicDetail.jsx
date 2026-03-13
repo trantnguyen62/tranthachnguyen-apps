@@ -33,13 +33,14 @@ function ComicDetail() {
         document.title = pageTitle;
 
         // Update OG/Twitter meta tags
+        const canonicalHref = `${window.location.origin}/comic/${id}`;
         const imgUrl = `${window.location.origin}${comicData.coverImage}`;
         setMeta('meta[name="description"]', comicData.description);
         setMeta('meta[property="og:title"]', pageTitle);
         setMeta('meta[property="og:description"]', comicData.description);
         setMeta('meta[property="og:image"]', imgUrl);
         setMeta('meta[property="og:type"]', 'article');
-        setMeta('meta[property="og:url"]', window.location.href);
+        setMeta('meta[property="og:url"]', canonicalHref);
         setMeta('meta[name="twitter:title"]', pageTitle);
         setMeta('meta[name="twitter:description"]', comicData.description);
         setMeta('meta[name="twitter:image"]', imgUrl);
@@ -58,7 +59,7 @@ function ComicDetail() {
         const canonical = document.createElement('link');
         canonical.id = 'canonical-link';
         canonical.rel = 'canonical';
-        canonical.href = `${window.location.origin}/comic/${id}`;
+        canonical.href = canonicalHref;
         document.head.appendChild(canonical);
 
         // JSON-LD structured data
@@ -66,7 +67,7 @@ function ComicDetail() {
         const ld = document.createElement('script');
         ld.id = 'page-jsonld';
         ld.type = 'application/ld+json';
-        const canonicalHref = `${window.location.origin}/comic/${id}`;
+        const today = new Date().toISOString().split('T')[0];
         ld.textContent = JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Article',
@@ -79,8 +80,8 @@ function ComicDetail() {
           genre: comicData.genre,
           inLanguage: 'en-US',
           url: canonicalHref,
-          datePublished: new Date().toISOString().split('T')[0],
-          dateModified: new Date().toISOString().split('T')[0],
+          datePublished: today,
+          dateModified: today,
           aggregateRating: comicData.rating ? {
             '@type': 'AggregateRating',
             ratingValue: comicData.rating,
