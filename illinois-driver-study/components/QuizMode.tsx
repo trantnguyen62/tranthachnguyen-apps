@@ -53,6 +53,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const questionRef = useRef<HTMLHeadingElement>(null);
+  const nextButtonRef = useRef<HTMLButtonElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
@@ -96,6 +97,32 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
       setQuizCompleted(true);
     }
   }, [currentQuestionIndex, questions.length]);
+
+  // Keyboard shortcuts: A/B/C/D to select answer, Enter/ArrowRight to advance
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (quizCompleted) return;
+      if ((e.target as HTMLElement).tagName === 'INPUT') return;
+      if (!showResult) {
+        const keyMap: Record<string, number> = { a: 0, b: 1, c: 2, d: 3 };
+        const idx = keyMap[e.key.toLowerCase()];
+        if (idx !== undefined && idx < question.options.length) {
+          e.preventDefault();
+          handleOptionSelect(idx);
+        }
+      } else if (e.key === 'Enter' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextQuestion();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [quizCompleted, showResult, question.options.length, handleOptionSelect, nextQuestion]);
+
+  // Auto-focus Next button when answer is revealed
+  useEffect(() => {
+    if (showResult) nextButtonRef.current?.focus();
+  }, [showResult]);
 
   const restartQuiz = useCallback(() => {
     setCurrentQuestionIndex(0);
@@ -265,7 +292,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
                 className += "border-slate-100 text-slate-400 opacity-75";
               }
             } else {
-              className += "border-slate-200 hover:border-blue-400 hover:bg-slate-50 text-slate-700";
+              className += "border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 hover:shadow-sm hover:scale-[1.005] text-slate-700";
             }
 
             const ariaLabel = `${String.fromCharCode(65 + idx)}: ${option}${isCorrect ? (language === 'vi' ? ' — Đúng' : ' — Correct') : isWrong ? (language === 'vi' ? ' — Sai' : ' — Incorrect') : ''}`;
@@ -300,6 +327,11 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
             );
           })}
         </div>
+        {!showResult && (
+          <p aria-hidden="true" className="mt-3 text-xs text-slate-400 text-right select-none">
+            {language === 'vi' ? 'Nhấn A–D để chọn' : 'Press A–D to select'}
+          </p>
+        )}
         {showResult && (
           <div aria-live="polite" aria-atomic="true" className="sr-only">
             {selectedOption === question.correctIndex
@@ -332,8 +364,9 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
         {showResult && (
           <div className="mt-5 flex justify-end animate-fade-in-up">
             <button
+              ref={nextButtonRef}
               onClick={nextQuestion}
-              className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md flex items-center justify-center cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md flex items-center justify-center cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 outline-none"
             >
               {currentQuestionIndex === questions.length - 1 ? t.finish : t.next}
               <svg aria-hidden="true" className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
