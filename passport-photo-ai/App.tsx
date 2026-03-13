@@ -5,6 +5,7 @@ import { PassportImage, PassportCheckResult, AppStatus } from './types';
 import { THEME } from './theme';
 
 const CURRENT_YEAR = new Date().getFullYear();
+const CHECK_API_URL = '/api/passport/check';
 
 /**
  * Root application component for PassportLens.
@@ -22,11 +23,13 @@ export default function App() {
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
   const [result, setResult] = useState<PassportCheckResult | null>(null);
   const [showEditor, setShowEditor] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleImageSelected = useCallback((img: PassportImage | null) => {
     setImage(img);
     setResult(null);
     setStatus(AppStatus.IDLE);
+    setErrorMessage(null);
     // Preload the PhotoEditor chunk in the background when a photo is ready
     if (img) void import('./components/PhotoEditor');
   }, []);
@@ -56,17 +59,23 @@ export default function App() {
     if (!image) return;
     setStatus(AppStatus.CHECKING);
     try {
-      const res = await fetch('/api/passport/check', {
+      const res = await fetch(CHECK_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ base64Image: image.data }),
       });
+      if (res.status === 429) throw new Error('rate_limited');
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
       setResult(data);
       setStatus(AppStatus.COMPLETED);
     } catch (e) {
       console.error('Passport check failed:', e);
+      const isRateLimited = e instanceof Error && e.message === 'rate_limited';
+      setErrorMessage(isRateLimited
+        ? 'Too many requests. Please wait a moment and try again.'
+        : 'Could not reach the server. Check your connection and try again. For large images, try reducing the file size below 4 MB.'
+      );
       setStatus(AppStatus.ERROR);
     }
   }, [image]);
@@ -257,7 +266,7 @@ export default function App() {
                 <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
                 <p style={{ color: accentPink, fontWeight: 600, marginBottom: 8 }}>Analysis failed</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', maxWidth: 220, marginBottom: 20 }}>
-                  Could not reach the server. Check your connection and try again. For large images, try reducing the file size below 4 MB.
+                  {errorMessage}
                 </p>
                 <button
                   onClick={handleCheck}

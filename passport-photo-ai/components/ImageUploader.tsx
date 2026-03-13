@@ -9,6 +9,9 @@ interface Props {
   currentImage: PassportImage | null;
 }
 
+/** Maximum pixel dimension (longest edge) for resized images sent to the API. */
+const MAX_IMAGE_DIMENSION = 1500;
+
 /**
  * Handles photo input via file upload, drag-and-drop, or live camera capture.
  *
@@ -43,10 +46,9 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
 
       const img = new Image();
       img.onload = () => {
-        const MAX = 1500;
         let w = img.width, h = img.height;
-        if (w > h) { h = Math.round(h * Math.min(MAX, w) / w); w = Math.min(MAX, w); }
-        else { w = Math.round(w * Math.min(MAX, h) / h); h = Math.min(MAX, h); }
+        if (w > h) { h = Math.round(h * Math.min(MAX_IMAGE_DIMENSION, w) / w); w = Math.min(MAX_IMAGE_DIMENSION, w); }
+        else { w = Math.round(w * Math.min(MAX_IMAGE_DIMENSION, h) / h); h = Math.min(MAX_IMAGE_DIMENSION, h); }
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;

@@ -42,6 +42,30 @@ docker build -t passport-photo-ai .
 docker run -p 5185:5185 -e GEMINI_API_KEY=your_key_here passport-photo-ai
 ```
 
+## 🏗️ Architecture
+
+```
+Browser (React + Vite)
+  │
+  ├─ ImageUploader  ──upload/camera──▶  App.tsx  ──base64 image──▶  POST /api/passport/check
+  │                                                                       │
+  │                                                              Express (passport-proxy.js)
+  │                                                                       │
+  │                                                              Google Gemini 2.0 Flash
+  │                                                                       │
+  │◀──────────── compliance report (compliant, issues, suggestions) ──────┘
+  │
+  └─ PhotoEditor  (browser-only)
+       │
+       ├─ @imgly/background-removal  (WebAssembly, ~20 MB model download on first use)
+       └─ Canvas API  →  600 × 750 px JPEG  (standard passport 2 × 2.5 in at 300 dpi)
+```
+
+The API server also exposes `POST /api/passport/analyze` which returns an overall quality
+score and brightness/contrast adjustment recommendations used to pre-populate the editor sliders.
+Results from `/check` are cached in-memory (SHA-256 keyed, 30-minute TTL) to avoid duplicate
+Gemini calls for the same image.
+
 ## 📁 Project Structure
 
 ```

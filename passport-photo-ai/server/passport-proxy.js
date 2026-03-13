@@ -1,3 +1,22 @@
+/**
+ * passport-proxy.js — Express API server for PassportLens.
+ *
+ * Responsibilities:
+ *  - Serve the Vite-built SPA from `../dist` with aggressive asset caching.
+ *  - Proxy image analysis requests to Google Gemini 2.0 Flash, enforcing:
+ *      • Input validation (MIME type, size limit)
+ *      • Rate limiting (10 requests / IP / minute)
+ *      • Result caching (SHA-256 keyed, 30-minute TTL, max 200 entries)
+ *  - Apply security headers (HSTS, CSP, X-Frame-Options, etc.).
+ *
+ * Endpoints:
+ *  POST /api/passport/check   — ICAO compliance report (compliant, issues, suggestions)
+ *  POST /api/passport/analyze — Quality score + brightness/contrast recommendations
+ *
+ * Environment variables:
+ *  GEMINI_API_KEY  (required) — Google AI Studio key with Gemini API access
+ *  NODE_ENV        (optional) — Set to "production" to restrict CORS to the live domain only
+ */
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
@@ -108,6 +127,13 @@ function setCache(key, result) {
   _checkCache.set(key, { result, expires: Date.now() + CACHE_TTL });
 }
 
+/** Extracts and parses the first JSON object from an AI model response text. Returns `{}` on failure. */
+function parseAIJson(text) {
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return {};
+  try { return JSON.parse(match[0]); } catch { return {}; }
+}
+
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 const MAX_BASE64_LENGTH = 4 * 1024 * 1024 * 1.4; // ~4 MB decoded
 
@@ -145,6 +171,18 @@ function validateImageRequest(req, res) {
   return parsed;
 }
 
+/**
+ * POST /api/passport/check
+ *
+ * Runs an ICAO-aligned compliance check via Gemini and returns a structured report.
+ * Checks performed: plain/uniform background, neutral expression, even lighting,
+ * no glasses glare, and face correctly centred in frame.
+ *
+ * Responses are cached by image hash to avoid redundant API calls.
+ *
+ * Request:  { base64Image: string }  (data URL, max ~4 MB decoded)
+ * Response: { compliant: boolean, summary: string, issues: string[], suggestions: string[] }
+ */
 app.post('/api/passport/check', apiRateLimit, async (req, res) => {
   try {
     const parsed = validateImageRequest(req, res);
@@ -169,9 +207,7 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
     });
     
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    const match = text.match(/\{[\s\S]*\}/);
-    let aiResult = {};
-    try { if (match) aiResult = JSON.parse(match[0]); } catch { /* use default */ }
+    const aiResult = parseAIJson(text);
 
     const result = {
       compliant: !!aiResult.compliant,
@@ -187,6 +223,18 @@ Check: plain background, neutral expression, proper lighting, no glasses glare, 
   }
 });
 
+/**
+ * POST /api/passport/analyze
+ *
+ * Returns a quality score and brightness/contrast deltas that the PhotoEditor
+ * uses to pre-populate its sliders. Results are NOT cached (intentional — the
+ * same image may be re-analysed after manual edits).
+ *
+ * Request:  { base64Image: string }  (data URL, max ~4 MB decoded)
+ * Response: { overallScore: number (0–100),
+ *             autoFixRecommendations: { adjustBrightness: number, adjustContrast: number } }
+ *           adjustBrightness/adjustContrast are percentage deltas (e.g. 5 means +5%).
+ */
 app.post('/api/passport/analyze', apiRateLimit, async (req, res) => {
   try {
     const parsed = validateImageRequest(req, res);
@@ -206,9 +254,7 @@ adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }
     });
     
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    const match = text.match(/\{[\s\S]*\}/);
-    let aiResult = {};
-    try { if (match) aiResult = JSON.parse(match[0]); } catch { /* use default */ }
+    const aiResult = parseAIJson(text);
     const result = {
       overallScore: typeof aiResult.overallScore === 'number' ? Math.min(100, Math.max(0, aiResult.overallScore)) : 70,
       autoFixRecommendations: {
