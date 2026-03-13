@@ -84,8 +84,8 @@ export default function App() {
 
       {showEditor && image && (
         <Suspense fallback={
-          <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
-            <div style={{ width: 20, height: 20, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+          <div role="status" aria-label="Loading photo editor" style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}>
+            <div aria-hidden="true" style={{ width: 20, height: 20, border: '2px solid rgba(255,255,255,0.2)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
           </div>
         }>
           <PhotoEditor
@@ -167,6 +167,7 @@ export default function App() {
               <button
                 onClick={handleOpenEditor}
                 disabled={!image}
+                aria-label={image ? "Fix Background — remove and replace using AI" : "Fix Background — upload a photo first"}
                 title="Remove and replace the background using AI"
                 style={{
                   padding: '16px 12px', borderRadius: 14,
@@ -420,7 +421,7 @@ export default function App() {
           color: 'rgba(255,255,255,0.7)', fontSize: 13
         }}>
           <p>
-            Made with <span aria-hidden="true" style={{ color: accentPink }}>♥</span> by PassportLens · {CURRENT_YEAR}
+            Made with <span aria-hidden="true" style={{ color: accentPink }}>♥</span><span style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', borderWidth: 0 }}>love</span> by PassportLens · {CURRENT_YEAR}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
             100% private — photos are analyzed instantly and never stored, logged, or shared. Background removal runs entirely in your browser.

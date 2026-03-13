@@ -180,8 +180,8 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
             style={{ width: '100%', height: 340, objectFit: 'cover', display: 'block', transform: 'scaleX(-1)' }}
           />
           {/* Face guide overlay */}
-          <div style={{ 
-            position: 'absolute', inset: 0, 
+          <div aria-hidden="true" style={{
+            position: 'absolute', inset: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             pointerEvents: 'none'
           }}>
