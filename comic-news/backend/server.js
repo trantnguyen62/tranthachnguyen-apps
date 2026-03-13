@@ -545,7 +545,7 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>${baseUrl}/library</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
 ${comics.map(c =>
   `  <url><loc>${baseUrl}/comic/${c.id}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
-    <image:image><image:loc>${baseUrl}${c.coverImage}</image:loc><image:title>${escapeHtml(c.title)}</image:title></image:image>
+    <image:image><image:loc>${baseUrl}${c.coverImage}</image:loc><image:title>${escapeHtml(c.title)}</image:title><image:caption>${escapeHtml(c.description)}</image:caption></image:image>
   </url>`
 ).join('\n')}
 </urlset>`;
@@ -708,7 +708,7 @@ app.get('/comic/:id', (req, res) => {
     headline: comic.title,
     description: comic.description,
     author: { '@type': 'Person', name: comic.author },
-    publisher: { '@type': 'Organization', name: 'Comic News', url: baseUrl },
+    publisher: { '@type': 'Organization', name: 'Comic News', url: baseUrl, logo: { '@type': 'ImageObject', url: `${baseUrl}/favicon.svg` } },
     image: imgUrl,
     genre: comic.genre,
     inLanguage: 'en-US',
@@ -738,6 +738,7 @@ app.get('/comic/:id', (req, res) => {
     .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
     .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
     .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
+    .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/,  `$1${escapeHtml(comic.title)}$2`)
     .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
     .replace(
       /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
