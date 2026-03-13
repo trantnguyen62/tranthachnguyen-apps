@@ -507,7 +507,7 @@ function announce(message) {
 }
 
 function loadHighScore() {
-    game.highScore = parseInt(localStorage.getItem('devops-defender-highscore') || '0') || 0;
+    game.highScore = parseInt(localStorage.getItem('devops-defender-highscore') || '0', 10) || 0;
     if (domCache.menuHighScore) domCache.menuHighScore.textContent = game.highScore;
 }
 
@@ -595,7 +595,7 @@ function resizeCanvas() {
 
 function renderTopicGrid() {
     const grid = document.getElementById('topicGrid');
-    grid.innerHTML = '';
+    grid.replaceChildren();
 
     TOPICS.forEach(topic => {
         const card = document.createElement('div');
@@ -1069,7 +1069,7 @@ function showQuestion(enemy) {
     domCache.questionTopic.textContent = topic.name;
     domCache.questionText.textContent = question.q;
 
-    domCache.answerGrid.innerHTML = '';
+    domCache.answerGrid.replaceChildren();
     domCache.answerBtns = [];
 
     answers.forEach((answer, i) => {

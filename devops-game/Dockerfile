@@ -29,4 +29,4 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 EXPOSE 80
-CMD ["serve", "-s", ".", "-l", "80", "--cors", "-c", "serve.json"]
+CMD ["serve", "-s", ".", "-l", "80", "-c", "serve.json"]
