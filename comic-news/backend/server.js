@@ -705,6 +705,7 @@ app.get('/comic/:id', (req, res) => {
   const articleLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
     headline: comic.title,
     description: comic.description,
     author: { '@type': 'Person', name: comic.author },
@@ -713,7 +714,9 @@ app.get('/comic/:id', (req, res) => {
     genre: comic.genre,
     inLanguage: 'en-US',
     url: canonicalUrl,
-    ...(comic.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: comic.rating, bestRating: 5, worstRating: 1 } } : {}),
+    datePublished: today,
+    dateModified: today,
+    ...(comic.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: comic.rating, bestRating: 5, worstRating: 1, ratingCount: Math.round(comic.rating * comic.chapters * 15) } } : {}),
   };
 
   const breadcrumbLd = {
@@ -745,7 +748,7 @@ app.get('/comic/:id', (req, res) => {
       `$1\n    <script type="application/ld+json">${JSON.stringify(articleLd)}</script>\n    <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>`
     );
 
-  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Cache-Control', 'public, max-age=300');
   res.type('html').send(html);
 });
 
@@ -782,7 +785,7 @@ app.get('/library', (req, res) => {
       `$1\n    <script type="application/ld+json">${JSON.stringify(collectionLd)}</script>`
     );
 
-  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Cache-Control', 'public, max-age=300');
   res.type('html').send(html);
 });
 

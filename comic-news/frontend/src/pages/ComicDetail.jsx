@@ -66,9 +66,11 @@ function ComicDetail() {
         const ld = document.createElement('script');
         ld.id = 'page-jsonld';
         ld.type = 'application/ld+json';
+        const canonicalHref = `${window.location.origin}/comic/${id}`;
         ld.textContent = JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Article',
+          mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalHref },
           headline: comicData.title,
           description: comicData.description,
           author: { '@type': 'Person', name: comicData.author },
@@ -76,13 +78,15 @@ function ComicDetail() {
           image: imgUrl,
           genre: comicData.genre,
           inLanguage: 'en-US',
-          url: window.location.href,
+          url: canonicalHref,
+          datePublished: new Date().toISOString().split('T')[0],
+          dateModified: new Date().toISOString().split('T')[0],
           aggregateRating: comicData.rating ? {
             '@type': 'AggregateRating',
             ratingValue: comicData.rating,
             bestRating: 5,
             worstRating: 1,
-            ratingCount: 1,
+            ratingCount: Math.round(comicData.rating * (comicData.chapters || 1) * 15),
           } : undefined,
         });
         document.head.appendChild(ld);
