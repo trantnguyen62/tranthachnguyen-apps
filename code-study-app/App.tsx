@@ -37,6 +37,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<FileNode[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // UI state
   const [showSidebar, setShowSidebar] = useState(true);
@@ -101,6 +102,7 @@ function App() {
   // Handle file selection
   const handleFileSelect = useCallback(async (file: FileNode) => {
     if (file.type !== 'file') return;
+    setSelectedCode('');
 
     const filePath = selectedProject
       ? `${selectedProject.path}/${file.path}`
@@ -184,6 +186,13 @@ function App() {
   const handleTabFiles = useCallback(() => setActiveTab('files'), []);
   const handleTabSearch = useCallback(() => setActiveTab('search'), []);
   const handleToggleSidebar = useCallback(() => setShowSidebar(s => !s), []);
+
+  // Auto-focus search input when switching to Search tab
+  useEffect(() => {
+    if (activeTab === 'search') {
+      requestAnimationFrame(() => searchInputRef.current?.focus());
+    }
+  }, [activeTab]);
 
   const isConnected = connectionState === ConnectionState.CONNECTED;
   const isConnecting = connectionState === ConnectionState.CONNECTING;
@@ -280,8 +289,9 @@ function App() {
             {activeTab === 'files' ? (
               selectedProject ? (
                 isLoadingTree ? (
-                  <div className="flex items-center justify-center py-8" role="status" aria-label="Loading file tree">
-                    <Loader2 className="w-5 h-5 animate-spin text-emerald-400" aria-hidden="true" />
+                  <div className="flex items-center justify-center gap-2 py-8 text-slate-400 text-sm" role="status" aria-label="Loading file tree">
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-400" aria-hidden="true" />
+                    Loading files...
                   </div>
                 ) : (
                   <FileTree
@@ -304,6 +314,7 @@ function App() {
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <input
+                      ref={searchInputRef}
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
