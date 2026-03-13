@@ -94,8 +94,9 @@ function Reader() {
         rafId = null;
         if (scrollContainerRef.current) {
           const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-          const progress = (scrollTop / (scrollHeight - clientHeight)) * 100;
-          setScrollProgress(progress || 0);
+          const scrollable = scrollHeight - clientHeight;
+          const progress = scrollable > 0 ? (scrollTop / scrollable) * 100 : 0;
+          setScrollProgress(progress);
           setShowScrollTop(scrollTop > 500);
         }
       });

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Filter, SortAsc, SearchX } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 import SkeletonCard from '../components/SkeletonCard';
+import { setMeta } from '../utils/meta';
 
 // Module-level cache: genres are static, so we fetch once per page load
 // and skip the network request if the Library component remounts (e.g. nav back).
@@ -28,7 +29,6 @@ function Library() {
     document.title = title;
     document.querySelector('meta[name="description"]')?.setAttribute('content', description);
 
-    const setMeta = (sel, content) => document.querySelector(sel)?.setAttribute('content', content);
     setMeta('meta[property="og:title"]', title);
     setMeta('meta[property="og:description"]', description);
     setMeta('meta[property="og:url"]', url);
@@ -53,18 +53,20 @@ function Library() {
       setGenres(cachedGenres);
       return;
     }
+    const controller = new AbortController();
     const fetchGenres = async () => {
       try {
-        const res = await fetch('/api/genres');
+        const res = await fetch('/api/genres', { signal: controller.signal });
         if (!res.ok) return;
         const data = await res.json();
         cachedGenres = data;
         setGenres(data);
       } catch (error) {
-        console.error('Error fetching genres:', error);
+        if (error.name !== 'AbortError') console.error('Error fetching genres:', error);
       }
     };
     fetchGenres();
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {

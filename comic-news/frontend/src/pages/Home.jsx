@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { TrendingUp, Sparkles, ArrowRight, BookOpen, Bookmark, Monitor } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 import SkeletonCard from '../components/SkeletonCard';
+import { setMeta } from '../utils/meta';
 
 function Home() {
   const [featured, setFeatured] = useState([]);
@@ -16,7 +17,6 @@ function Home() {
     const defaultImg = `${window.location.origin}/comics/love-you-cashier.png`;
     const defaultTitle = 'Comic News - Daily News Turned Into Comics';
     const defaultDesc = "Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you'll actually want to read.";
-    const setMeta = (sel, content) => document.querySelector(sel)?.setAttribute('content', content);
     setMeta('meta[property="og:type"]', 'website');
     setMeta('meta[property="og:title"]', defaultTitle);
     setMeta('meta[property="og:description"]', defaultDesc);

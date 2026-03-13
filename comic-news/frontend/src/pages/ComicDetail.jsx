@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, BookOpen, User, Tag, Bookmark, BookmarkCheck, Play, ArrowLeft, FileText, Image } from 'lucide-react';
+import { setMeta } from '../utils/meta';
 
 function ComicDetail() {
   const { id } = useParams();
@@ -32,7 +33,6 @@ function ComicDetail() {
         document.title = pageTitle;
 
         // Update OG/Twitter meta tags
-        const setMeta = (sel, content) => document.querySelector(sel)?.setAttribute('content', content);
         const imgUrl = `${window.location.origin}${comicData.coverImage}`;
         setMeta('meta[name="description"]', comicData.description);
         setMeta('meta[property="og:title"]', pageTitle);
