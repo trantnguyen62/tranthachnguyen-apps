@@ -26,6 +26,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const expandButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const hasMountedRef = useRef(false);
 
   const closeDialog = () => {
     setIsExpanded(false);
@@ -62,8 +63,13 @@ export const ComparisonView = memo<ComparisonViewProps>(({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isExpanded]);
 
-  // Move focus to close button when fullscreen opens; return focus when it closes
+  // Move focus to close button when fullscreen opens; return focus when it closes.
+  // Skip the initial mount to avoid stealing focus from the rest of the page.
   useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      return;
+    }
     if (isExpanded) {
       closeButtonRef.current?.focus();
     } else {
