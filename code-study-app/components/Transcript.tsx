@@ -138,15 +138,15 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
                 {message.role === 'model' && !message.isFinal && (
                   <span className="inline-flex items-center gap-0.5 mt-1" aria-label="AI is responding">
-                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '0ms' }} aria-hidden="true" />
+                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '150ms' }} aria-hidden="true" />
+                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '300ms' }} aria-hidden="true" />
                   </span>
                 )}
               </div>
               {message.isFinal && <CopyButton text={message.text} />}
             </div>
-            <span className="text-xs text-slate-500 px-1">{formatTime(message.timestamp)}</span>
+            <time dateTime={message.timestamp.toISOString()} className="text-xs text-slate-500 px-1">{formatTime(message.timestamp)}</time>
           </div>
           {message.role === 'user' && (
             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">

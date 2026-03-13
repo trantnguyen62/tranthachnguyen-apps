@@ -225,8 +225,10 @@ function App() {
             }}
           >
             <button
+              id="tab-files"
               role="tab"
               aria-selected={activeTab === 'files'}
+              aria-controls="tabpanel-sidebar"
               tabIndex={activeTab === 'files' ? 0 : -1}
               onClick={handleTabFiles}
               className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
@@ -239,8 +241,10 @@ function App() {
               Files
             </button>
             <button
+              id="tab-search"
               role="tab"
               aria-selected={activeTab === 'search'}
+              aria-controls="tabpanel-sidebar"
               tabIndex={activeTab === 'search' ? 0 : -1}
               onClick={handleTabSearch}
               className={`flex-1 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
@@ -255,7 +259,12 @@ function App() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-2">
+          <div
+            id="tabpanel-sidebar"
+            role="tabpanel"
+            aria-labelledby={activeTab === 'files' ? 'tab-files' : 'tab-search'}
+            className="flex-1 overflow-y-auto p-2"
+          >
             {activeTab === 'files' ? (
               selectedProject ? (
                 isLoadingTree ? (
@@ -473,21 +482,23 @@ function App() {
                   <MessageSquare className="w-4 h-4 text-emerald-400" aria-hidden="true" />
                   <span className="text-sm font-medium">AI Tutor</span>
                 </div>
-                {isConnected ? (
-                  <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
-                    Live
-                  </span>
-                ) : isConnecting ? (
-                  <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-slate-700/50 text-slate-400 rounded-full">
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                    Connecting
-                  </span>
-                ) : (
-                  <span className="text-xs px-2 py-0.5 bg-slate-700/40 text-slate-500 rounded-full border border-slate-700/50">
-                    Idle
-                  </span>
-                )}
+                <span aria-live="polite" aria-atomic="true">
+                  {isConnected ? (
+                    <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                      Live
+                    </span>
+                  ) : isConnecting ? (
+                    <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 bg-slate-700/50 text-slate-400 rounded-full">
+                      <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
+                      Connecting
+                    </span>
+                  ) : (
+                    <span className="text-xs px-2 py-0.5 bg-slate-700/40 text-slate-500 rounded-full border border-slate-700/50">
+                      Idle
+                    </span>
+                  )}
+                </span>
               </div>
               <Visualizer volume={volume} isConnected={isConnected} color="#10B981" />
             </div>
