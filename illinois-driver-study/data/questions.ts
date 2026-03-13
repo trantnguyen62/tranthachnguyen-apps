@@ -428,7 +428,7 @@ export const questionsEn: Question[] = [
     ],
     correctIndex: 1,
     image: "/images/construction.svg",
-    explanation: "Orange background signs are used exclusively in construction and maintenance work zones. They warn drivers of workers, equipment, and changed road conditions ahead."
+    explanation: "Orange background signs are used exclusively in construction and maintenance work zones. They warn drivers of workers, equipment, and changed road conditions ahead. In Illinois, fines for traffic violations committed in active work zones when workers are present are doubled."
   },
   {
     id: 42,
@@ -464,7 +464,7 @@ export const questionsEn: Question[] = [
     ],
     correctIndex: 0,
     image: "/images/do_not_enter.svg",
-    explanation: "The DO NOT ENTER sign prohibits drivers from entering that road or lane. It is commonly used on one-way roads to prevent wrong-way driving."
+    explanation: "The DO NOT ENTER sign prohibits drivers from entering that road or lane. It is commonly posted at one-way road entrances, highway exit ramps, and divided highway median openings. Ignoring this sign causes wrong-way driving, which leads to head-on collisions—among the deadliest crash types on public roads."
   },
   {
     id: 45,
@@ -567,7 +567,7 @@ export const questionsEn: Question[] = [
       "20 feet"
     ],
     correctIndex: 1,
-    explanation: "Illinois law prohibits parking within 15 feet of a fire hydrant to ensure firefighters have unobstructed access in an emergency. Violators may be fined and their vehicle towed."
+    explanation: "Illinois law prohibits parking within 15 feet of a fire hydrant at all times—even briefly—to ensure firefighters have unobstructed hose access in an emergency. Violators may be ticketed and their vehicle towed at the owner's expense."
   },
   {
     id: 54,
@@ -600,7 +600,7 @@ export const questionsEn: Question[] = [
       "30 mph"
     ],
     correctIndex: 0,
-    explanation: "Illinois law sets a maximum speed limit of 20 mph in school zones when children are present or when posted signs indicate reduced speed. Drivers must slow down and watch for pedestrians crossing near schools."
+    explanation: "Illinois law sets a maximum speed limit of 20 mph in school zones when children are present or when posted signs indicate reduced speed. Drivers must slow down and watch for pedestrians crossing near schools. Fines for speeding in a school zone are substantially higher than standard speeding fines, and violations may be enforced by automated speed cameras."
   },
   {
     id: 57,
@@ -1042,7 +1042,7 @@ export const questionsVi: Question[] = [
     ],
     correctIndex: 1,
     image: "/images/construction.svg",
-    explanation: "Biển báo nền cam được dùng riêng trong các khu vực thi công và bảo trì đường. Chúng cảnh báo tài xế về công nhân, thiết bị và điều kiện đường thay đổi phía trước."
+    explanation: "Biển báo nền cam được dùng riêng trong các khu vực thi công và bảo trì đường. Chúng cảnh báo tài xế về công nhân, thiết bị và điều kiện đường thay đổi phía trước. Tại Illinois, tiền phạt vi phạm giao thông trong khu vực thi công đang hoạt động có công nhân hiện diện sẽ bị tăng gấp đôi."
   },
   {
     id: 42,
@@ -1078,7 +1078,7 @@ export const questionsVi: Question[] = [
     ],
     correctIndex: 0,
     image: "/images/do_not_enter.svg",
-    explanation: "Biển DO NOT ENTER cấm tài xế vào đường hoặc làn đó. Thường được dùng trên các đường một chiều để ngăn lái xe đi ngược chiều."
+    explanation: "Biển DO NOT ENTER cấm tài xế vào đường hoặc làn đó. Biển này thường xuất hiện ở lối vào đường một chiều, đường lên của lối ra cao tốc và lối mở giải phân cách. Bỏ qua biển này dẫn đến lái xe ngược chiều, gây ra va chạm trực diện — một trong những loại tai nạn chết người nhất trên đường công cộng."
   },
   {
     id: 45,
@@ -1181,7 +1181,7 @@ export const questionsVi: Question[] = [
       "20 feet"
     ],
     correctIndex: 1,
-    explanation: "Pháp luật Illinois cấm đỗ xe trong vòng 15 feet tính từ trụ cứu hỏa để đảm bảo lính cứu hỏa có thể tiếp cận dễ dàng trong trường hợp khẩn cấp. Người vi phạm có thể bị phạt tiền và xe bị kéo đi."
+    explanation: "Pháp luật Illinois cấm đỗ xe trong vòng 15 feet tính từ trụ cứu hỏa vào mọi lúc — kể cả dừng tạm thời — để đảm bảo lính cứu hỏa có thể tiếp cận vòi cứu hỏa trong trường hợp khẩn cấp. Người vi phạm có thể bị phạt tiền và xe bị kéo đi với chi phí do chủ xe chịu."
   },
   {
     id: 54,
@@ -1214,7 +1214,7 @@ export const questionsVi: Question[] = [
       "30 mph"
     ],
     correctIndex: 0,
-    explanation: "Pháp luật Illinois quy định tốc độ tối đa 20 mph trong khu vực trường học khi có trẻ em hoặc khi biển báo yêu cầu giảm tốc. Tài xế phải giảm tốc và chú ý người đi bộ qua đường gần trường học."
+    explanation: "Pháp luật Illinois quy định tốc độ tối đa 20 mph trong khu vực trường học khi có trẻ em hoặc khi biển báo yêu cầu giảm tốc. Tài xế phải giảm tốc và chú ý người đi bộ qua đường gần trường học. Tiền phạt vi phạm tốc độ trong khu vực trường học cao hơn đáng kể so với mức phạt thông thường, và vi phạm có thể được thực thi bằng camera tốc độ tự động."
   },
   {
     id: 57,
