@@ -311,6 +311,7 @@ function App() {
               )
             ) : (
               <div className="space-y-3">
+                <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} role="search">
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <input
@@ -318,13 +319,13 @@ function App() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                       placeholder="Search by filename or content..."
                       aria-label="Search files"
                       className={`w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${searchQuery ? 'pr-8' : ''}`}
                     />
                     {searchQuery && (
                       <button
+                        type="button"
                         onClick={() => { setSearchQuery(''); setSearchResults([]); }}
                         aria-label="Clear search"
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-400 hover:text-slate-200 transition-colors"
@@ -334,7 +335,7 @@ function App() {
                     )}
                   </div>
                   <button
-                    onClick={handleSearch}
+                    type="submit"
                     disabled={isSearching}
                     aria-label={isSearching ? 'Searching...' : 'Search'}
                     className="px-3 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 disabled:opacity-50"
@@ -342,12 +343,13 @@ function App() {
                     {isSearching ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Search className="w-4 h-4" aria-hidden="true" />}
                   </button>
                 </div>
+                </form>
                 <p className="text-xs text-slate-600 px-1">
                   {selectedProject ? `Searching in ${selectedProject.name}` : 'Searching all projects'}
                 </p>
                 {searchResults.length > 0 ? (
                   <>
-                    <p className="text-xs text-slate-500 px-2">
+                    <p className="text-xs text-slate-500 px-2" aria-live="polite" aria-atomic="true">
                       {searchResults.length} file{searchResults.length !== 1 ? 's' : ''} found
                       {searchResults.length === 50 && (
                         <span className="text-amber-500/80 ml-1">(limit reached — refine your query)</span>
@@ -360,7 +362,7 @@ function App() {
                     />
                   </>
                 ) : searchQuery && !isSearching ? (
-                  <div className="text-center text-slate-500 py-6 space-y-2">
+                  <div className="text-center text-slate-500 py-6 space-y-2" aria-live="polite">
                     <Search className="w-6 h-6 mx-auto opacity-30" aria-hidden="true" />
                     <p className="text-sm">No results found</p>
                     <p className="text-xs text-slate-600">Try a different search term</p>

@@ -127,7 +127,6 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
           )}
           <div className={`max-w-[80%] flex flex-col gap-1 ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
             <div
-              aria-label={`${message.role === 'user' ? 'You' : 'AI Tutor'}: ${message.text}`}
               className={`flex items-start gap-1 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
             >
               <div className={`rounded-2xl px-4 py-2.5 ${
