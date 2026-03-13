@@ -313,14 +313,14 @@ export default function App() {
                 {/* Issues */}
                 {result.issues?.length > 0 && (
                   <div style={{ marginBottom: 20 }}>
-                    <h4 style={{ 
-                      fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em', 
+                    <h3 style={{
+                      fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em',
                       color: accentGold, marginBottom: 12, fontWeight: 600,
                       display: 'flex', alignItems: 'center', gap: 8
                     }}>
                       <span style={{ width: 16, height: 2, background: accentGold, borderRadius: 1 }} />
                       Issues Found
-                    </h4>
+                    </h3>
                     {result.issues.map((issue: string, idx: number) => (
                       <div key={idx} className="result-item" style={{
                         padding: '12px 16px',
@@ -343,14 +343,14 @@ export default function App() {
                 {/* Suggestions */}
                 {result.suggestions?.length > 0 && (
                   <div>
-                    <h4 style={{
+                    <h3 style={{
                       fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.1em',
                       color: accentPurple, marginBottom: 12, fontWeight: 600,
                       display: 'flex', alignItems: 'center', gap: 8
                     }}>
                       <span style={{ width: 16, height: 2, background: accentPurple, borderRadius: 1 }} />
                       How to Fix
-                    </h4>
+                    </h3>
                     {result.suggestions.map((tip: string, idx: number) => (
                       <div key={idx} className="result-item" style={{
                         padding: '12px 16px',
@@ -383,7 +383,7 @@ export default function App() {
                   filter: 'grayscale(80%)'
                 }}>🪪</div>
                 <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.8)' }}>
-                  Upload a photo and tap <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to get instant AI analysis against official passport, visa, and ID requirements — results in seconds.
+                  Upload a photo and tap <strong style={{ color: 'rgba(255,255,255,0.9)' }}>Check Photo</strong> to get instant AI analysis against official passport, visa, and ID requirements — results in seconds.
                 </p>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.8)', marginBottom: 10, fontWeight: 600 }}>

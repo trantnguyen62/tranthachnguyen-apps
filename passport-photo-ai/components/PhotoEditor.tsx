@@ -198,12 +198,12 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <h2 id="editor-title" style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 700, background: `linear-gradient(135deg, #fff 0%, ${accentGold} 60%, ${accentPink} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI Photo Studio</h2>
           <p id="editor-description" className="sr-only">Remove the background from your passport photo and adjust brightness and contrast before saving.</p>
-          <button onClick={onCancel} aria-label="Close editor" style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>×</button>
+          <button onClick={onCancel} aria-label="Close editor" style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.75)', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>×</button>
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 24 }}>
           <div style={{ flex: '1 1 200px', textAlign: 'center' }}>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Original</p>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Original</p>
             <img src={image.data} alt="Original passport photo before processing" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }} />
           </div>
           <div style={{ flex: '1 1 200px', textAlign: 'center' }}>
@@ -228,10 +228,11 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-label="Processing progress"
+                aria-valuetext={`${progress}% — ${progress < 30 ? 'Preparing image' : progress < 80 ? 'Removing background' : progress < 100 ? 'Finalizing' : 'Done'}`}
                 style={{ width: `${progress}%`, height: '100%', background: `linear-gradient(90deg, ${accentPurple}, ${accentPink})`, transition: 'width 0.3s', borderRadius: 2 }}
               />
             </div>
-            <p style={{ fontSize: 12, color: accentPurple, textAlign: 'center', fontWeight: 500 }}>
+            <p aria-hidden="true" style={{ fontSize: 12, color: accentPurple, textAlign: 'center', fontWeight: 500 }}>
               {progress < 30 ? 'Preparing image…' : progress < 80 ? 'Removing background…' : progress < 100 ? 'Finalizing…' : 'Done!'} {progress}%
             </p>
           </div>
@@ -245,7 +246,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)', alignItems: 'flex-start' }}>
           <div style={{ flexShrink: 0 }}>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Background</p>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Background</p>
             <div style={{ display: 'flex', gap: 8 }}>
               {BG_COLORS.map((c) => (
                 <button
@@ -262,17 +263,17 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
           </div>
           <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,0.06)', borderRadius: 1, flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
-            <label htmlFor="brightness-range" style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, display: 'block', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Brightness: {brightness}%</label>
-            <input id="brightness-range" type="range" min="90" max="120" value={brightness} onChange={handleBrightnessChange} disabled={step !== 'done'} style={{ width: '100%', accentColor: accentGold }} />
+            <label htmlFor="brightness-range" style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 10, display: 'block', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Brightness: {brightness}%</label>
+            <input id="brightness-range" type="range" min="90" max="120" value={brightness} onChange={handleBrightnessChange} disabled={step !== 'done'} aria-valuetext={`${brightness}%`} style={{ width: '100%', accentColor: accentGold }} />
           </div>
           <div style={{ flex: 1 }}>
-            <label htmlFor="contrast-range" style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10, display: 'block', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Contrast: {contrast}%</label>
-            <input id="contrast-range" type="range" min="90" max="120" value={contrast} onChange={handleContrastChange} disabled={step !== 'done'} style={{ width: '100%', accentColor: accentGold }} />
+            <label htmlFor="contrast-range" style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 10, display: 'block', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Contrast: {contrast}%</label>
+            <input id="contrast-range" type="range" min="90" max="120" value={contrast} onChange={handleContrastChange} disabled={step !== 'done'} aria-valuetext={`${contrast}%`} style={{ width: '100%', accentColor: accentGold }} />
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-          <button onClick={onCancel} style={{ padding: '11px 22px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500, transition: 'all 0.2s' }}>Cancel</button>
+          <button onClick={onCancel} style={{ padding: '11px 22px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'rgba(255,255,255,0.75)', cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif", fontWeight: 500, transition: 'all 0.2s' }}>Cancel</button>
           {step !== 'done' ? (
             <button onClick={process} disabled={step === 'processing'} style={{ padding: '11px 22px', borderRadius: 10, border: 'none', background: step === 'processing' ? 'rgba(157,78,221,0.4)' : `linear-gradient(135deg, ${accentPurple}, ${accentPink})`, color: '#fff', fontWeight: 600, cursor: step === 'processing' ? 'not-allowed' : 'pointer', fontFamily: "'Space Grotesk', sans-serif", boxShadow: step !== 'processing' ? `0 8px 24px ${accentPurple}44` : 'none', transition: 'all 0.3s' }}>
               {step === 'processing' ? 'Processing...' : 'Auto-Fix'}

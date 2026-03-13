@@ -269,7 +269,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           Upload your passport, visa, or ID photo
         </p>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>Drag &amp; drop or tap to browse</p>
-        <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, marginTop: 8 }}>JPG, PNG, WEBP — max 10 MB</p>
+        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, marginTop: 8 }}>JPG, PNG, WEBP — max 10 MB</p>
       </div>
 
       <button
