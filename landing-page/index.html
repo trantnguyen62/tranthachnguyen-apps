@@ -74,7 +74,7 @@
     </script>
 </head>
 <body class="bg-slate-950 text-slate-50 min-h-screen flex flex-col items-center justify-center p-6 relative overflow-x-hidden">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:font-semibold">Skip to main content</a>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:font-semibold focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-950">Skip to main content</a>
 
     <!-- Background blobs -->
     <div aria-hidden="true" class="blob absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
@@ -97,8 +97,8 @@
             </div>
         </header>
 
-        <nav aria-label="Apps and tools">
-        <h2 class="sr-only">Apps and tools</h2>
+        <nav aria-labelledby="apps-heading">
+        <h2 id="apps-heading" class="sr-only">Apps and tools</h2>
         <ul class="grid grid-cols-1 md:grid-cols-2 gap-8 list-none p-0 m-0" role="list">
 
             <!-- LinguaFlow -->
