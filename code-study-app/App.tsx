@@ -177,10 +177,10 @@ function App() {
   const isConnecting = connectionState === ConnectionState.CONNECTING;
 
   return (
-    <div className="min-h-screen bg-slate-900 flex text-slate-100" id="main-content">
+    <div className="min-h-screen bg-slate-900 flex text-slate-100">
       {/* Sidebar */}
       {showSidebar && (
-        <div className="w-80 bg-slate-800/50 border-r border-slate-700/50 flex flex-col">
+        <nav id="sidebar" aria-label="File browser" className="w-80 bg-slate-800/50 border-r border-slate-700/50 flex flex-col">
           {/* Header */}
           <div className="p-4 border-b border-slate-700/50">
             <div className="flex items-center gap-3 mb-4">
@@ -337,11 +337,11 @@ function App() {
               </div>
             )}
           </div>
-        </div>
+        </nav>
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <main id="main-content" className="flex-1 flex flex-col">
         {/* Top Bar */}
         <div className="h-14 bg-slate-800/30 border-b border-slate-700/50 flex items-center px-4 gap-4">
           <button
@@ -349,6 +349,7 @@ function App() {
             aria-label={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
             title={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
             aria-expanded={showSidebar}
+            aria-controls="sidebar"
             className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
           >
             <ChevronLeft className={`w-5 h-5 transition-transform ${showSidebar ? '' : 'rotate-180'}`} aria-hidden="true" />
@@ -545,7 +546,7 @@ function App() {
             })()}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

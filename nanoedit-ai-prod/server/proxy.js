@@ -25,8 +25,33 @@ const httpsAgent = new https.Agent({ keepAlive: true });
 const fetchOptions = (url) => (url.startsWith('https://') ? { agent: httpsAgent } : { agent: httpAgent });
 
 app.use(compression());
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
+
+// Restrict CORS to the known production origin only
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'https://photoedit.tranthachnguyen.com').split(',');
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server, curl, health checks)
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
+
+// Basic security headers
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+// Limit to 10 MB — sufficient for base64-encoded images up to ~7 MB
+app.use(express.json({ limit: '10mb' }));
 
 /**
  * POST /api/gemini/edit-image
@@ -50,8 +75,20 @@ app.post('/api/gemini/edit-image', async (req, res) => {
   try {
     const { base64Image, mimeType, prompt } = req.body;
 
-    if (!prompt) {
+    if (!prompt || typeof prompt !== 'string') {
       return res.status(400).json({ error: 'Missing prompt field' });
+    }
+    if (prompt.length > 2000) {
+      return res.status(400).json({ error: 'Prompt exceeds maximum length of 2000 characters' });
+    }
+
+    const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+    if (mimeType && !ALLOWED_MIME_TYPES.includes(mimeType)) {
+      return res.status(400).json({ error: 'Unsupported image type' });
+    }
+
+    if (base64Image && typeof base64Image !== 'string') {
+      return res.status(400).json({ error: 'Invalid image data' });
     }
 
     // base64Image is now optional - gemini-web-proxy uses text-only generation
@@ -141,7 +178,7 @@ app.post('/api/gemini/edit-image', async (req, res) => {
     }
     const message = error instanceof Error ? error.message : String(error);
     console.error('[edit-image] Error:', message);
-    return res.status(500).json({ error: message });
+    return res.status(500).json({ error: 'An internal error occurred. Please try again.' });
   }
 });
 
@@ -164,10 +201,9 @@ app.get('/api/status', async (req, res) => {
       geminiProxy: data
     });
   } catch (error) {
+    console.error('[status] Upstream unreachable:', error instanceof Error ? error.message : String(error));
     res.json({
       proxyStatus: 'disconnected',
-      error: error instanceof Error ? error.message : String(error),
-      note: 'Make sure gemini-web-proxy is running on ' + GEMINI_PROXY_URL
     });
   }
 });
