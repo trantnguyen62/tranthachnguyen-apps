@@ -60,7 +60,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
               disabled={disabled}
               aria-pressed={selected.code === lang.code}
               className={`
-                flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200
+                flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400
                 ${selected.code === lang.code
                   ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/20'
                   : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:border-slate-600'}
@@ -96,7 +96,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                   disabled={disabled}
                   aria-pressed={isSelected}
                   className={`
-                    flex items-center gap-2 px-4 py-3 rounded-xl border transition-all duration-200
+                    flex items-center gap-2 px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400
                     ${isSelected
                       ? 'bg-pink-600 border-pink-500 text-white shadow-lg'
                       : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:border-pink-500'}
@@ -130,7 +130,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                   disabled={disabled}
                   aria-pressed={isSelected}
                   className={`
-                    flex flex-col items-start px-4 py-3 rounded-xl border transition-all duration-200
+                    flex flex-col items-start px-4 py-3 rounded-xl border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70
                     ${isSelected
                       ? `${colors.bg} ${colors.border} text-white shadow-lg`
                       : `bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:${colors.border}`}
@@ -171,7 +171,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                   disabled={disabled}
                   aria-pressed={isSelected}
                   className={`
-                    flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200
+                    flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400
                     ${isSelected
                       ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg'
                       : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:border-indigo-500'}

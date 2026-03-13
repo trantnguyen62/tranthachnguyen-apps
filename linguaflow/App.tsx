@@ -245,7 +245,7 @@ function App() {
                <button
                  onClick={() => setErrorDismissed(true)}
                  aria-label="Dismiss error"
-                 className="shrink-0 w-6 h-6 rounded-md flex items-center justify-center hover:bg-red-500/20 transition-colors"
+                 className="shrink-0 w-6 h-6 rounded-md flex items-center justify-center hover:bg-red-500/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
                >
                  <svg className="w-3.5 h-3.5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                </button>
@@ -265,18 +265,19 @@ function App() {
                <button
                  onClick={handleConnect}
                  disabled={isConnecting}
+                 aria-busy={isConnecting}
                  className={`
-                   group relative px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300
-                   ${isConnecting 
-                     ? 'bg-slate-700 text-slate-400 cursor-wait' 
+                   group relative px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900
+                   ${isConnecting
+                     ? 'bg-slate-700 text-slate-400 cursor-wait'
                      : 'bg-white text-slate-900 hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]'}
                  `}
                >
                  {isConnecting ? (
                    <span className="flex items-center gap-2">
-                     <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></span>
-                     <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></span>
-                     <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></span>
+                     <span aria-hidden="true" className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></span>
+                     <span aria-hidden="true" className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></span>
+                     <span aria-hidden="true" className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></span>
                      Connecting
                    </span>
                  ) : (
@@ -373,7 +374,7 @@ function App() {
             <button
               onClick={() => setTranscriptOpen(o => !o)}
               aria-label={transcriptOpen ? 'Collapse transcript' : 'Expand transcript'}
-              className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
+              className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
             >
               <svg className={`w-4 h-4 transition-transform duration-300 ${transcriptOpen ? 'rotate-180' : ''}`} aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
