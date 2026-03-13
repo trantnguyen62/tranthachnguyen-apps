@@ -24,6 +24,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   const [isDragging, setIsDragging] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [cameraMode, setCameraMode] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
   /** Validates, resizes (max 1500 px), and converts a File to a JPEG data URL. */
@@ -73,6 +74,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
    */
   const startCamera = useCallback(async () => {
     setCameraError(null);
+    setCameraLoading(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 960 } }
@@ -88,6 +90,8 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
       } else {
         setCameraError('Unable to access camera. Make sure you are on a secure (HTTPS) connection.');
       }
+    } finally {
+      setCameraLoading(false);
     }
   }, []);
 
@@ -274,18 +278,28 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
 
       <button
         onClick={startCamera}
+        disabled={cameraLoading}
+        aria-busy={cameraLoading}
         style={{
           padding: '16px', borderRadius: 14,
           border: `1px solid ${accentPurple}44`, background: `${accentPurple}11`,
-          color: accentPurple, fontWeight: 600, cursor: 'pointer',
+          color: cameraLoading ? `${accentPurple}88` : accentPurple,
+          fontWeight: 600, cursor: cameraLoading ? 'not-allowed' : 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
           transition: 'all 0.2s ease',
           fontFamily: "'Space Grotesk', sans-serif"
         }}
-        onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = `${accentPurple}22`; el.style.borderColor = `${accentPurple}88`; }}
+        onMouseEnter={e => { if (!cameraLoading) { const el = e.currentTarget as HTMLButtonElement; el.style.background = `${accentPurple}22`; el.style.borderColor = `${accentPurple}88`; } }}
         onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = `${accentPurple}11`; el.style.borderColor = `${accentPurple}44`; }}
       >
-        <span aria-hidden="true">📷</span> Take Photo
+        {cameraLoading ? (
+          <>
+            <span aria-hidden="true" style={{ display: 'inline-block', width: 14, height: 14, border: `2px solid ${accentPurple}44`, borderTopColor: accentPurple, borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+            Requesting camera…
+          </>
+        ) : (
+          <><span aria-hidden="true">📷</span> Take Photo</>
+        )}
       </button>
 
       {cameraError && (

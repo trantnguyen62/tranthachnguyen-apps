@@ -122,9 +122,9 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     contain: layout style paint;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    will-change: transform;
 }
 .glass-card:hover, .glass-card:focus-within {
-    will-change: transform;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 16px 48px rgba(0, 0, 0, 0.4);
 }
 .card-blue:hover, .card-blue:focus-within    { box-shadow: 0 0 0 1px rgba(96,165,250,0.25),  0 16px 48px rgba(59,130,246,0.18); }

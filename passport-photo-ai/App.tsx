@@ -304,7 +304,7 @@ export default function App() {
                         {result.compliant ? 'Photo Passes — Ready to Submit' : 'Issues Found — Here\'s How to Fix'}
                       </h3>
                       <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
-                        {result.summary}
+                        {result.summary || (result.compliant ? 'Your photo meets ICAO biometric standards.' : 'One or more issues were found. See details below.')}
                       </p>
                     </div>
                   </div>
