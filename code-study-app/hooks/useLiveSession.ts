@@ -231,6 +231,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
             }, 100);
           },
           onmessage: async (message: LiveServerMessage) => {
+            // 1. Accumulate streaming transcription tokens (many partial tokens per turn)
             if (message.serverContent?.outputTranscription) {
               const text = message.serverContent.outputTranscription.text;
               if (text) currentOutputTranscriptionRef.current += text;
@@ -239,6 +240,8 @@ export const useLiveSession = (studyContext: StudyContext) => {
               if (text) currentInputTranscriptionRef.current += text;
             }
 
+            // 2. Commit accumulated text to React state once the turn is complete.
+            //    Batching until turnComplete avoids many small re-renders mid-sentence.
             if (message.serverContent?.turnComplete) {
               const userText = currentInputTranscriptionRef.current.trim();
               const modelText = currentOutputTranscriptionRef.current.trim();
@@ -266,6 +269,9 @@ export const useLiveSession = (studyContext: StudyContext) => {
               currentOutputTranscriptionRef.current = '';
             }
 
+            // 3. Schedule audio chunk for gapless playback.
+            //    nextStartTimeRef chains each chunk so they play back-to-back without
+            //    gaps even when network delivery is slightly uneven.
             const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
             if (base64Audio && outputCtx) {
               const audioBuffer = await decodeAudioData(
@@ -297,6 +303,8 @@ export const useLiveSession = (studyContext: StudyContext) => {
               sourcesRef.current.add(source);
             }
 
+            // 4. Barge-in / interrupt: user spoke over the model. Stop all queued audio
+            //    immediately and reset the playback timeline to the present.
             if (message.serverContent?.interrupted) {
               console.log("Interrupted!");
               sourcesRef.current.forEach(src => {

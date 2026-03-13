@@ -21,22 +21,34 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+// Layout: sidebar (nav/search) | main (top-bar + code viewer) | right panel (AI chat)
+// Data flow: selectedFile + selectedCode → studyContext (memo) → useLiveSession
+//            → Gemini Live API via WebSocket proxy
+
 function App() {
-  // State
+  // Project / file data
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [selectedCode, setSelectedCode] = useState<string>('');
+
+  // Search
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<FileNode[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // UI state
   const [showSidebar, setShowSidebar] = useState(true);
   const [activeTab, setActiveTab] = useState<'files' | 'search'>('files');
+
+  // Loading / error
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [isLoadingTree, setIsLoadingTree] = useState(false);
   const [fileLoadError, setFileLoadError] = useState<string | null>(null);
   const [dismissedError, setDismissedError] = useState<string | null>(null);
+
+  // File cache (LRU, capped at 50 entries) and in-flight request controllers
   const fileCache = useRef<Map<string, { content: string; language: string }>>(new Map());
   const fileFetchAbortRef = useRef<AbortController | null>(null);
   const searchAbortRef = useRef<AbortController | null>(null);
