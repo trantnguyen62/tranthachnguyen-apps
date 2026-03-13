@@ -41,9 +41,12 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
 
   // Initialize particles
   useEffect(() => {
+      const canvas = canvasRef.current;
+      const w = canvas ? canvas.width : 300;
+      const h = canvas ? canvas.height : 300;
       particlesRef.current = Array.from({ length: 20 }, () => ({
-          x: Math.random() * 200,
-          y: Math.random() * 200,
+          x: Math.random() * w,
+          y: Math.random() * h,
           r: Math.random() * 3 + 2,
           vx: (Math.random() - 0.5) * 1,
           vy: (Math.random() - 0.5) * 1

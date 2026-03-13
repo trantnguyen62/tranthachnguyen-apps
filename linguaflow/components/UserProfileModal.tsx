@@ -51,6 +51,7 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
       }
     } catch (err) {
       console.error('Error fetching user:', err);
+      setError('Không thể kết nối. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
