@@ -190,7 +190,13 @@ app.get('/health', (req, res) => {
 });
 
 /**
- * Check gemini-web-proxy status
+ * GET /api/status
+ *
+ * Reports whether gemini-web-proxy is reachable.
+ *
+ * Response (200):
+ *   { proxyStatus: 'connected', geminiProxy: <upstream status object> }
+ *   { proxyStatus: 'disconnected' }  — when upstream is unreachable (never throws)
  */
 app.get('/api/status', async (req, res) => {
   try {

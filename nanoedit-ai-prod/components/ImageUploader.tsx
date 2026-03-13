@@ -99,6 +99,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
 
   const startCamera = useCallback(async () => {
     try {
+      // 'environment' prefers the rear camera on mobile; falls back to front camera or webcam.
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
       });
@@ -131,6 +132,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.drawImage(videoRef.current, 0, 0);
+      // 0.85 quality: good visual fidelity with ~30% smaller file vs. lossless
       const data = canvas.toDataURL('image/jpeg', 0.85);
       onImageSelected({ data, mimeType: 'image/jpeg' });
       stopCamera();

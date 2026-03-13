@@ -168,6 +168,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (!e.ctrlKey && !e.metaKey) return;
+      // Don't intercept shortcuts while the user is typing in a form field
       if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
       if (e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
