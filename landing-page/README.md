@@ -7,7 +7,7 @@ The main portfolio landing page for tranthachnguyen.com, showcasing all AI-power
 - **Modern Design** - Glassmorphism cards with smooth animations
 - **Project Showcase** - Cards linking to all available apps
 - **Responsive** - Works on all screen sizes
-- **Fast Loading** - Static HTML with CDN-loaded TailwindCSS
+- **Fast Loading** - Static HTML with hand-inlined Tailwind utility classes (no CDN, no build step)
 
 ## 🚀 Quick Start
 
@@ -56,19 +56,38 @@ landing-page/
 
 ## ➕ Adding a New App Card
 
-Copy this template into `index.html` inside the `<main>` grid section:
+Each card is a `<li data-card>` inside the `<ul>` grid in `<main>`. Copy this
+template and replace the `{color}` placeholders with one of the accent colours
+already used by other cards (`blue`, `emerald`, `purple`, `rose`, `orange`,
+`yellow`, `sky`, `cyan`).
+
+Increment the `animation-delay` by `0.03s` relative to the previous card so
+the entrance animation staggers correctly.
 
 ```html
-<article class="glass-card rounded-2xl p-6 hover:scale-105 transition-transform duration-300" aria-label="App Name">
-  <div class="flex items-center gap-3 mb-3">
-    <span class="text-3xl" role="img" aria-label="emoji description">🔧</span>
-    <h2 class="text-xl font-semibold text-white">App Name</h2>
-  </div>
-  <p class="text-slate-300 text-sm mb-4">Short description of what the app does.</p>
-  <a href="https://your-app-url.com" class="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors" target="_blank" rel="noopener noreferrer">
-    Open App <span aria-hidden="true">→</span>
+<!-- App Name -->
+<li data-card style="animation-delay: 0.XXs">
+  <a href="https://your-app-url.com"
+     target="_blank" rel="noopener noreferrer"
+     aria-label="Launch App Name — Category (opens in new tab)"
+     class="glass-card card-{color} p-8 rounded-2xl border-t-2 border-{color}-500/40
+            hover:scale-[1.02] focus-visible:outline focus-visible:outline-2
+            focus-visible:outline-{color}-400 focus-visible:outline-offset-2
+            group cursor-pointer block">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-2xl font-bold group-hover:text-{color}-400 transition-colors">
+        <span aria-hidden="true" class="mr-2">🔧</span>App Name
+      </h3>
+      <span aria-hidden="true" class="px-3 py-1 bg-{color}-500/20 text-{color}-300 text-xs font-medium rounded-full">Category</span>
+    </div>
+    <p class="text-slate-300 mb-4 leading-relaxed group-hover:text-slate-200 transition-colors">
+      Short description of what the app does.
+    </p>
+    <div class="cta-row flex items-center text-{color}-400 font-semibold mt-4 border-t border-white/10">
+      Launch App <span class="ml-2 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true">↗</span>
+    </div>
   </a>
-</article>
+</li>
 ```
 
 Update `sitemap.xml` with the new app's URL if it lives on the same domain.
@@ -95,7 +114,7 @@ Update `sitemap.xml` with the new app's URL if it lives on the same domain.
 - **X-Frame-Options: DENY** — blocks the page from being embedded in iframes
 - **Referrer-Policy: strict-origin-when-cross-origin** — limits referrer leakage
 - **Permissions-Policy** — disables camera, microphone, geolocation, payment, and USB APIs
-- **Cache-Control** — 1-hour cache for HTML, 7-day cache for CSS assets
+- **Cache-Control** — 1-hour cache for HTML, 30-day cache for CSS assets
 
 ## 🌐 Live Demo
 

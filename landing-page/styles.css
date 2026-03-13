@@ -1,3 +1,12 @@
+/*
+ * styles.css — Landing Page
+ *
+ * Tailwind CSS is NOT loaded from CDN here. Instead, only the utility classes
+ * actually used in index.html are hand-inlined below. This avoids shipping the
+ * full ~3 MB Tailwind stylesheet and removes the need for a build step while
+ * still satisfying the Content-Security-Policy (no external script sources).
+ */
+
 /* ── Tailwind utility replacements (only classes used in this file) ── */
 *,*::before,*::after{box-sizing:border-box}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
@@ -93,7 +102,18 @@
     .md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 /* ── Custom styles ── */
+
+/* Use Inter with a broad system-font fallback chain */
 body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+
+/*
+ * .glass-card — frosted-glass card base
+ * Semi-transparent slate background + backdrop-blur creates the glassmorphism
+ * effect. `contain: layout style paint` limits browser reflow scope for
+ * better paint performance. Hover/focus transitions are handled here once
+ * rather than per-card so each .card-{color} modifier only needs to override
+ * box-shadow colour.
+ */
 .glass-card {
     background: rgba(30, 41, 59, 0.7);
     backdrop-filter: blur(12px);
@@ -115,6 +135,8 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 .card-yellow:hover, .card-yellow:focus-within  { box-shadow: 0 0 0 1px rgba(250,204,21,0.25),  0 16px 48px rgba(234,179,8,0.18); }
 .card-sky:hover, .card-sky:focus-within      { box-shadow: 0 0 0 1px rgba(56,189,248,0.25),   0 16px 48px rgba(14,165,233,0.18); }
 .card-cyan:hover, .card-cyan:focus-within    { box-shadow: 0 0 0 1px rgba(34,211,238,0.25),   0 16px 48px rgba(6,182,212,0.18); }
+
+/* Blue→purple gradient clipped to text for the main heading */
 .gradient-text {
     background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
     background-clip: text;
@@ -127,6 +149,12 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
         background: none;
     }
 }
+/*
+ * Background decoration blobs — large blurred circles animated with
+ * blob-drift / blob-drift-2. Two keyframe sets are used so the blobs move
+ * in opposite directions (top-left vs bottom-right). The negative delay on
+ * .blob-2 starts its animation mid-cycle so the two blobs are never in sync.
+ */
 .blob {
     will-change: transform;
     animation: blob-drift 12s ease-in-out infinite alternate;
@@ -134,7 +162,7 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 .blob-2 {
     animation-name: blob-drift-2;
     animation-duration: 15s;
-    animation-delay: -4s;
+    animation-delay: -4s;  /* start mid-cycle so blobs drift out of phase */
 }
 @keyframes blob-drift {
     from { transform: translate(-50%, -50%) scale(1); }
@@ -144,6 +172,12 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     from { transform: translate(50%, 50%) scale(1); }
     to   { transform: translate(45%, 45%) scale(1.08); }
 }
+
+/*
+ * Card entrance animation — each [data-card] element fades in and rises 18 px.
+ * Staggered animation-delay values are set inline in index.html (0.03 s apart)
+ * so cards cascade in rather than all appearing simultaneously.
+ */
 @keyframes fade-in-up {
     from { opacity: 0; transform: translateY(18px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -178,6 +212,12 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 .glass-card:active {
     transform: scale(0.99);
 }
+/*
+ * Accessibility — honour the OS-level "reduce motion" preference.
+ * Transitions are collapsed to near-zero (not zero, to avoid layout jank in
+ * some browsers) and explicit animations are disabled. `will-change: auto`
+ * removes the compositing hint on .blob since it no longer animates.
+ */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         transition-duration: 0.01ms !important;
