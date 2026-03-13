@@ -3,7 +3,7 @@ import { Modality, LiveServerMessage } from '@google/genai';
 import { ProxyGoogleGenAI } from '../utils/proxyClient';
 import { createBlob, decode, decodeAudioData } from '../utils/audio';
 import { ConnectionState, ChatMessage, LanguageConfig, UserProfile } from '../types';
-import { MODEL_NAME } from '../constants';
+import { MODEL_NAME, TOPIC_NAMES } from '../constants';
 
 
 /**
@@ -99,7 +99,7 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
       scriptProcessorRef.current = null;
     }
 
-    // 5. Close AudioContexts
+    // 6. Close AudioContexts
     if (audioContextsRef.current.input) {
       audioContextsRef.current.input.close();
       audioContextsRef.current.input = null;
@@ -178,20 +178,7 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
       
       // Add topic context if selected
       if (activeLanguage.selectedTopic && activeLanguage.selectedTopic !== 'free') {
-        const topicNames: Record<string, string> = {
-          greetings: 'chào hỏi (greetings)',
-          family: 'gia đình (family)',
-          food: 'đồ ăn, nhà hàng (food)',
-          shopping: 'mua sắm (shopping)',
-          travel: 'du lịch (travel)',
-          work: 'công việc (work)',
-          weather: 'thời tiết (weather)',
-          hobbies: 'sở thích (hobbies)',
-          health: 'sức khỏe (health)',
-          education: 'học tập, trường học (education)',
-          transportation: 'giao thông, đi lại (transportation)',
-        };
-        const topicName = topicNames[activeLanguage.selectedTopic] || activeLanguage.selectedTopic;
+        const topicName = TOPIC_NAMES[activeLanguage.selectedTopic] || activeLanguage.selectedTopic;
         systemInstruction = systemInstruction + `\n\nCHỦ ĐỀ GỢI Ý: Học viên muốn nói về ${topicName}. Hãy hướng dẫn và luyện tập xoay quanh chủ đề này, nhưng vẫn linh hoạt nếu học viên muốn nói về điều khác.`;
       }
       

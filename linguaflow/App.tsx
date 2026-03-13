@@ -298,12 +298,7 @@ function App() {
                          {[1, 2, 3, 4, 5].map((level) => (
                            <button
                              key={level}
-                             onClick={() => {
-                               const newLevel = level;
-                               setDifficultyLevel(newLevel);
-                               const levelNames = ['rất dễ', 'dễ', 'trung bình', 'khó', 'rất khó'];
-                               sendInstruction(`[HỆ THỐNG] Học viên muốn thay đổi độ khó. Hãy điều chỉnh sang mức ${levelNames[newLevel - 1]} (${newLevel}/5). Nói ${newLevel <= 2 ? 'chậm hơn, dùng từ đơn giản hơn' : newLevel >= 4 ? 'nhanh hơn, dùng từ phức tạp hơn' : 'ở mức bình thường'}.`);
-                             }}
+                             onClick={() => adjustDifficulty(level - difficultyLevel)}
                              aria-label={`Độ khó ${level}/5`}
                              aria-pressed={difficultyLevel === level}
                              className="flex items-center justify-center w-6 h-7 rounded transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
@@ -329,11 +324,7 @@ function App() {
                              return (
                                <button
                                  key={i}
-                                 onClick={() => {
-                                   const newRatio = barRatio;
-                                   setVietnameseRatio(newRatio);
-                                   sendInstruction(`[HỆ THỐNG] Học viên muốn thay đổi tỷ lệ ngôn ngữ. Từ giờ hãy nói ${newRatio}% tiếng Việt và ${100 - newRatio}% tiếng Anh.`);
-                                 }}
+                                 onClick={() => adjustLanguageRatio(barRatio - vietnameseRatio)}
                                  aria-label={`${barRatio}% Vietnamese`}
                                  aria-pressed={barRatio === vietnameseRatio}
                                  className="flex items-center justify-center w-5 h-6 rounded transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
