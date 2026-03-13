@@ -175,7 +175,7 @@ function App() {
           </div>
           <div className="flex items-center gap-3">
             {userProfile && (
-              <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0" aria-label={userProfile.name} title={userProfile.name}>
+              <div role="img" className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0" aria-label={`User: ${userProfile.name}`} title={userProfile.name}>
                 {userProfile.name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -203,7 +203,7 @@ function App() {
               ) : (
                 <>
                   <span className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
-                  <span className="text-slate-500">Ready</span>
+                  <span className="text-slate-400">Ready</span>
                 </>
               )}
             </div>

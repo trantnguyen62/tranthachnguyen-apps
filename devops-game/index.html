@@ -195,7 +195,7 @@
 
         <!-- Game Screen -->
         <div id="gameScreen" class="screen hidden">
-            <canvas id="gameCanvas"></canvas>
+            <canvas id="gameCanvas" role="img" aria-label="Game arena: move your ship with arrow keys or WASD, select answers with keys 1–4, pause with P"></canvas>
 
             <!-- HUD -->
             <div class="hud">
@@ -205,7 +205,7 @@
                         <div class="health-fill" id="healthFill"></div>
                         <span class="health-text" id="healthText">100</span>
                     </div>
-                    <div class="shield-bar">
+                    <div class="shield-bar" aria-label="Shield" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="shieldBar">
                         <div class="shield-fill" id="shieldFill"></div>
                     </div>
                 </div>
@@ -232,7 +232,7 @@
             </div>
 
             <!-- Question Panel -->
-            <div class="question-panel hidden" id="questionPanel">
+            <div class="question-panel hidden" id="questionPanel" role="region" aria-labelledby="questionTopic" aria-live="polite">
                 <div class="question-container">
                     <div class="question-topic" id="questionTopic">Docker</div>
                     <div class="question-text" id="questionText">Loading question...</div>

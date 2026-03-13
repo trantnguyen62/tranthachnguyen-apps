@@ -1049,6 +1049,7 @@ function showQuestion(enemy) {
     game.questionTimer = game.mode === 'speedquiz' ? CONFIG.SPEEDQUIZ_QUESTION_TIME : CONFIG.QUESTION_TIME;
     game.selectedAnswer = -1;
     game._lastTimerWidth = 101; // force first timer update
+    game._timerDangerAnnounced = false;
 
     // Show question panel
     domCache.questionPanel.classList.remove('hidden');
@@ -1330,8 +1331,10 @@ function destroyEnemyByShot(enemy) {
 function applyPowerup(type) {
     if (type === 'health') {
         game.player.health = Math.min(game.player.maxHealth, game.player.health + 25);
+        announce('Health power-up collected! +25 HP');
     } else {
         game.player.shield = Math.min(100, game.player.shield + 50);
+        announce('Shield power-up collected! +50 shield');
     }
 
     // Sparkle effect
@@ -1461,6 +1464,8 @@ function updateHUD() {
     if (game.player.shield !== h.shield) {
         h.shield = game.player.shield;
         domCache.shieldFill.style.width = `${game.player.shield}%`;
+        const shieldBar = document.getElementById('shieldBar');
+        if (shieldBar) shieldBar.setAttribute('aria-valuenow', Math.round(game.player.shield));
     }
     if (game.score !== h.score) {
         h.score = game.score;
@@ -1498,6 +1503,10 @@ function updateTimerDisplay() {
     game._lastTimerWidth = w;
     domCache.timerFill.style.width = `${w}%`;
     const isDanger = pct < 0.3;
+    if (isDanger && !game._timerDangerAnnounced) {
+        game._timerDangerAnnounced = true;
+        announce('Warning: time is running out!');
+    }
     domCache.timerFill.classList.toggle('timer-danger', isDanger);
     if (domCache.timerText) {
         domCache.timerText.textContent = `${Math.ceil(game.questionTimer)}s`;
