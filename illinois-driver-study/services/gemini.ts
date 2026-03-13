@@ -78,12 +78,19 @@ export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
   return bytes.buffer;
 };
 
+const IMAGE_CACHE_MAX = 20;
+const imageCache = new Map<string, string>();
+
 /**
  * Generates a study image from a text prompt using Gemini image generation.
  * Requires the user to select a paid API key via AI Studio.
  * Returns a base64-encoded data URL (image/png).
+ * Results are cached in-memory by prompt+size to avoid redundant API calls.
  */
 export const generateStudyImage = async (prompt: string, size: ImageSize): Promise<string> => {
+  const cacheKey = `${prompt}:${size}`;
+  const cached = imageCache.get(cacheKey);
+  if (cached) return cached;
   // Use gemini-3-pro-image-preview for high quality images as requested.
   // This model requires the user to select their own API key.
   const ai = await getAI(true);
@@ -107,8 +114,13 @@ export const generateStudyImage = async (prompt: string, size: ImageSize): Promi
   if (response.candidates?.[0]?.content?.parts) {
     for (const part of response.candidates[0].content.parts) {
       if (part.inlineData) {
-        const base64EncodeString: string = part.inlineData.data;
-        return `data:image/png;base64,${base64EncodeString}`;
+        const dataUrl = `data:image/png;base64,${part.inlineData.data}`;
+        if (imageCache.size >= IMAGE_CACHE_MAX) {
+          const firstKey = imageCache.keys().next().value;
+          if (firstKey !== undefined) imageCache.delete(firstKey);
+        }
+        imageCache.set(cacheKey, dataUrl);
+        return dataUrl;
       }
     }
   }

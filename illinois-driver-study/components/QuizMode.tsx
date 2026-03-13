@@ -76,6 +76,13 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
     };
   }, []);
 
+  // Stop any playing audio and reset state when question changes
+  useEffect(() => {
+    currentSourceRef.current?.stop();
+    currentSourceRef.current = null;
+    setIsPlayingAudio(false);
+  }, [currentQuestionIndex]);
+
   // Move focus to question heading when question changes
   useEffect(() => {
     questionRef.current?.focus();
