@@ -180,7 +180,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
       <div className="relative w-full h-64 sm:h-80 md:h-96 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 group shadow-inner">
         <img
           src={currentImage.data}
-          alt="Original upload"
+          alt="Your uploaded photo"
           className={`w-full h-full object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-40' : 'opacity-100'}`}
         />
         {isProcessing && (
@@ -240,7 +240,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
 
            <button
              onClick={capturePhoto}
-             className="w-16 h-16 rounded-full border-4 border-white flex items-center justify-center bg-white/20 hover:bg-white/40 transition-all active:scale-95"
+             className="w-16 h-16 rounded-full border-4 border-white flex items-center justify-center bg-white/20 hover:bg-white/40 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
              aria-label="Take photo"
            >
              <div className="w-12 h-12 bg-white rounded-full" aria-hidden="true"></div>

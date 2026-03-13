@@ -419,6 +419,7 @@ const App: React.FC = () => {
                       onClick={handleGenerate}
                       disabled={!prompt.trim()}
                       title={!prompt.trim() ? "Enter a prompt above to retry" : undefined}
+                      aria-label="Retry generating image"
                       className="flex-shrink-0 text-xs font-medium px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Retry

@@ -161,7 +161,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                ) : (
                  <img
                    src={processedImage}
-                   alt="AI-processed result"
+                   alt="AI-edited version of your photo"
                    className={`w-full h-full object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-30' : 'opacity-100'}`}
                  />
                )}
