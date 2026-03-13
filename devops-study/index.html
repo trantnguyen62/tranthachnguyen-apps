@@ -51,7 +51,7 @@
       "operatingSystem": "Any",
       "isAccessibleForFree": true,
       "datePublished": "2025-01-01",
-      "dateModified": "2026-03-12",
+      "dateModified": "2026-03-13",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "featureList": ["Flashcards", "Quizzes", "Matching Games", "Command Cheat Sheets", "Progress Tracking"],
       "inLanguage": "en-US",
@@ -130,7 +130,46 @@
             "@type": "Answer",
             "text": "Yes. Your progress is tracked locally in your browser using localStorage. You can see how many cards you have studied and your overall completion percentage across all topics."
           }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the quiz mode work in DevOps Mastery?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Quiz mode presents multiple-choice questions for each DevOps topic. Select the correct answer from four options to test your knowledge. Your score is shown at the end of each quiz session."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the matching game in DevOps Mastery?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The matching game challenges you to pair DevOps terms with their correct definitions against the clock. It reinforces vocabulary and concepts in a fast-paced, engaging format."
+          }
         }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": "DevOps Study Topics",
+      "description": "12 interactive DevOps topics covered in DevOps Mastery",
+      "numberOfItems": 12,
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Docker", "description": "Containerization, Dockerfile, images, volumes, networking, and Docker Compose" },
+        { "@type": "ListItem", "position": 2, "name": "Kubernetes", "description": "Pods, deployments, services, ingress, RBAC, Helm, and cluster management" },
+        { "@type": "ListItem", "position": 3, "name": "CI/CD", "description": "Continuous integration and delivery pipelines, GitHub Actions, Jenkins, GitLab CI" },
+        { "@type": "ListItem", "position": 4, "name": "AWS", "description": "EC2, S3, IAM, Lambda, EKS, RDS, VPC, and core Amazon Web Services" },
+        { "@type": "ListItem", "position": 5, "name": "Terraform", "description": "Infrastructure as code, providers, modules, state management, and HCL syntax" },
+        { "@type": "ListItem", "position": 6, "name": "Git", "description": "Version control workflows, branching strategies, rebasing, and collaboration" },
+        { "@type": "ListItem", "position": 7, "name": "Linux", "description": "System administration, shell scripting, permissions, processes, and networking" },
+        { "@type": "ListItem", "position": 8, "name": "Ansible", "description": "Configuration management, playbooks, roles, inventory, and automation" },
+        { "@type": "ListItem", "position": 9, "name": "Azure", "description": "Azure VMs, AKS, Azure DevOps, ARM templates, and Microsoft cloud services" },
+        { "@type": "ListItem", "position": 10, "name": "DevSecOps", "description": "Security scanning, SAST, DAST, container security, and shift-left practices" },
+        { "@type": "ListItem", "position": 11, "name": "Monitoring", "description": "Prometheus, Grafana, alerting, metrics, logging, and observability" },
+        { "@type": "ListItem", "position": 12, "name": "Networking", "description": "TCP/IP, DNS, load balancing, firewalls, and cloud networking fundamentals" }
       ]
     }
     </script>
@@ -209,6 +248,22 @@
                         <div class="topic-grid" id="topicGrid">
                             <!-- Topic cards will be populated by JS -->
                         </div>
+                        <noscript>
+                            <ul>
+                                <li><strong>Docker</strong> — Containerization, Dockerfile, images, volumes, networking, Docker Compose</li>
+                                <li><strong>Kubernetes</strong> — Pods, deployments, services, ingress, RBAC, Helm, cluster management</li>
+                                <li><strong>CI/CD</strong> — Continuous integration and delivery, GitHub Actions, Jenkins, GitLab CI</li>
+                                <li><strong>AWS</strong> — EC2, S3, IAM, Lambda, EKS, RDS, VPC, and core Amazon Web Services</li>
+                                <li><strong>Terraform</strong> — Infrastructure as code, providers, modules, state management, HCL</li>
+                                <li><strong>Git</strong> — Version control workflows, branching strategies, rebasing, collaboration</li>
+                                <li><strong>Linux</strong> — System administration, shell scripting, permissions, processes, networking</li>
+                                <li><strong>Ansible</strong> — Configuration management, playbooks, roles, inventory, automation</li>
+                                <li><strong>Azure</strong> — Azure VMs, AKS, Azure DevOps, ARM templates, Microsoft cloud services</li>
+                                <li><strong>DevSecOps</strong> — Security scanning, SAST, DAST, container security, shift-left practices</li>
+                                <li><strong>Monitoring</strong> — Prometheus, Grafana, alerting, metrics, logging, observability</li>
+                                <li><strong>Networking</strong> — TCP/IP, DNS, load balancing, firewalls, cloud networking fundamentals</li>
+                            </ul>
+                        </noscript>
                     </div>
                 </section>
 
