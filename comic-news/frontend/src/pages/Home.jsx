@@ -186,21 +186,21 @@ function Home() {
               <BookOpen className="w-7 h-7 text-red-500" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Curated Stories</h3>
-            <p className="text-gray-400">Hand-picked news stories and real-life moments transformed into comics.</p>
+            <p className="text-gray-400">Hand-picked news events and real-life moments — from weather alerts to social disasters — turned into comics worth reading.</p>
           </div>
           <div className="glass-effect rounded-2xl p-6 text-center">
             <div className="w-14 h-14 bg-orange-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Bookmark className="w-7 h-7 text-orange-500" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Your Reading List</h3>
-            <p className="text-gray-400">Save your favorites and pick up exactly where you left off.</p>
+            <p className="text-gray-400">Bookmark the stories that get you. Your reading progress is saved automatically so you can pick up right where you left off.</p>
           </div>
           <div className="glass-effect rounded-2xl p-6 text-center">
             <div className="w-14 h-14 bg-yellow-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Monitor className="w-7 h-7 text-yellow-500" aria-hidden="true" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Visual Storytelling</h3>
-            <p className="text-gray-400">From breaking weather alerts to everyday mishaps — every story gets the comic treatment it deserves.</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Two Ways to Read</h3>
+            <p className="text-gray-400">Read panel-by-panel in comic mode or switch to the full text version — every story supports both.</p>
           </div>
         </div>
       </section>
