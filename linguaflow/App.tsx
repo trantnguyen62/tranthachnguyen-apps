@@ -292,8 +292,8 @@ function App() {
                  {activeLanguage.code === 'en-vi' && (
                    <div className="flex flex-wrap justify-center gap-4">
                      {/* Difficulty Control */}
-                     <div className="flex items-center gap-2 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700">
-                       <span className="text-xs text-slate-400 mr-1">Độ khó:</span>
+                     <div className="flex flex-col items-center gap-1 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700">
+                       <span className="text-xs text-slate-400">Độ khó</span>
                        <div className="flex gap-1 px-1" role="group" aria-label={`Độ khó: ${difficultyLevel}/5`}>
                          {[1, 2, 3, 4, 5].map((level) => (
                            <button
@@ -312,12 +312,16 @@ function App() {
                            </button>
                          ))}
                        </div>
+                       <span className="text-xs text-yellow-400/80 tabular-nums" aria-hidden="true">
+                         {['Rất dễ', 'Dễ', 'Trung bình', 'Khó', 'Rất khó'][difficultyLevel - 1]}
+                       </span>
                      </div>
 
                      {/* Language Ratio Control */}
-                     <div role="group" className="flex items-center gap-3 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700" aria-label={`Language ratio: ${100 - vietnameseRatio}% English, ${vietnameseRatio}% Vietnamese`}>
-                       <span className="text-xs text-slate-400" aria-hidden="true">🇬🇧</span>
-                       <div className="flex flex-col gap-1 items-center">
+                     <div role="group" className="flex flex-col items-center gap-1 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700" aria-label={`Language ratio: ${100 - vietnameseRatio}% English, ${vietnameseRatio}% Vietnamese`}>
+                       <span className="text-xs text-slate-400">Tỷ lệ ngôn ngữ</span>
+                       <div className="flex items-center gap-2">
+                         <span className="text-sm" aria-hidden="true">🇬🇧</span>
                          <div className="flex gap-1">
                            {Array.from({ length: 9 }, (_, i) => {
                              const barRatio = (i + 1) * 10; // 10..90 Vietnamese ratio
@@ -339,9 +343,9 @@ function App() {
                              );
                            })}
                          </div>
-                         <div className="text-xs text-slate-500 tabular-nums" aria-hidden="true">{vietnameseRatio}% 🇻🇳</div>
+                         <span className="text-sm" aria-hidden="true">🇻🇳</span>
                        </div>
-                       <span className="text-xs text-slate-400" aria-hidden="true">🇻🇳</span>
+                       <div className="text-xs text-emerald-400/80 tabular-nums" aria-hidden="true">{100 - vietnameseRatio}% EN · {vietnameseRatio}% VI</div>
                      </div>
                    </div>
                  )}
@@ -350,7 +354,7 @@ function App() {
                  <div className="flex flex-col items-center gap-2">
                    <button
                      onClick={disconnect}
-                     className="px-8 py-4 rounded-full font-semibold text-lg bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-white transition-all duration-300 flex items-center gap-2"
+                     className="px-8 py-4 rounded-full font-semibold text-lg bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-white hover:scale-105 hover:shadow-[0_0_30px_-8px_rgba(239,68,68,0.5)] transition-all duration-300 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50"
                    >
                      <svg className="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                      End Session

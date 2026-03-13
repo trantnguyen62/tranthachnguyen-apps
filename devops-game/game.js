@@ -22,7 +22,8 @@ const CONFIG = {
     FIRE_RATE: 150,        // ms between shots
     ENEMY_MAX_HEALTH: 3,   // hits needed to destroy
     SHOOT_DAMAGE: 1,
-    SHOOT_SCORE: 50        // points for shooting enemy
+    SHOOT_SCORE: 50,       // points for shooting enemy
+    MAX_PARTICLES: 150     // cap to prevent GC churn
 };
 
 // DevOps Questions Database
@@ -309,6 +310,9 @@ const TOPICS = [
     { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2', desc: 'DNS, load balancing, TLS & proxies' }
 ];
 
+// Cached sprite references (populated after asset loading)
+const spriteCache = { player: null, enemy: null, background: null };
+
 // Assets Configuration
 const ASSETS = {
     images: {
@@ -435,6 +439,11 @@ function init() {
 
     // Load assets then initialize
     AssetLoader.loadAll(() => {
+        // Cache sprite references to avoid per-frame object lookups
+        spriteCache.player = AssetLoader.getImage('player');
+        spriteCache.enemy = AssetLoader.getImage('enemy');
+        spriteCache.background = AssetLoader.getImage('background');
+
         setupEventListeners();
         renderTopicGrid();
         resizeCanvas();
@@ -573,7 +582,7 @@ function resizeCanvas() {
     game.canvas.height = window.innerHeight;
 
     // Recompute cached background draw dimensions
-    const bg = AssetLoader.getImage('background');
+    const bg = spriteCache.background;
     if (bg) {
         const scale = Math.max(game.canvas.width / bg.width, game.canvas.height / bg.height);
         game.bgDrawW = bg.width * scale;
@@ -734,10 +743,9 @@ function update() {
             if (!enemy.triggered) {
                 const dx = game.player.x - enemy.x;
                 const dy = game.player.y - enemy.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
                 const collisionThreshold = 45; // Combined radius of player and enemy
 
-                if (distance < collisionThreshold) {
+                if (dx * dx + dy * dy < collisionThreshold * collisionThreshold) {
                     enemy.triggered = true;
                     showQuestion(enemy);
                     return; // Stop processing this enemy
@@ -790,9 +798,8 @@ function update() {
         // Check collision with player
         const dx = p.x - game.player.x;
         const dy = p.y - game.player.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < 40) {
+        if (dx * dx + dy * dy < 1600) { // 40 * 40
             applyPowerup(p.type);
             return false;
         }
@@ -834,7 +841,7 @@ function render() {
     }
 
     // Draw Background Asset
-    const bg = AssetLoader.getImage('background');
+    const bg = spriteCache.background;
     if (bg && game.bgDrawW) {
         ctx.globalAlpha = 0.5; // Dim it slightly so game elements pop
         ctx.drawImage(bg, (game.canvas.width - game.bgDrawW) / 2, (game.canvas.height - game.bgDrawH) / 2, game.bgDrawW, game.bgDrawH);
@@ -911,7 +918,7 @@ function drawPlayer() {
     ctx.translate(p.x, p.y);
 
     // Check for sprite
-    const sprite = AssetLoader.getImage('player');
+    const sprite = spriteCache.player;
 
     if (sprite) {
         // Draw sprite
@@ -986,17 +993,15 @@ function drawEnemy(enemy) {
     ctx.translate(enemy.x, enemy.y);
 
     // Check for sprite
-    const sprite = AssetLoader.getImage('enemy');
+    const sprite = spriteCache.enemy;
 
     if (sprite) {
         // Draw sprite
         const size = 60;
-        // Check if rotated - enemy ships usually point down in this game? 
-        // Original code drew inverted triangle pointing down.
-        // Assuming sprite points UP, we need to rotate 180 deg
+        ctx.save();
         ctx.rotate(Math.PI);
         ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
-        ctx.rotate(-Math.PI); // Reset rotation for text
+        ctx.restore();
     } else {
         // Fallback drawing
         // Glow
@@ -1190,10 +1195,14 @@ function closeQuestion() {
     domCache.questionPanel.classList.add('hidden');
 }
 
+function pushParticle(p) {
+    if (game.particles.length < CONFIG.MAX_PARTICLES) game.particles.push(p);
+}
+
 function destroyEnemy(enemy) {
     // Create explosion particles
     for (let i = 0; i < 20; i++) {
-        game.particles.push({
+        pushParticle({
             x: enemy.x,
             y: enemy.y,
             vx: (Math.random() - 0.5) * 8,
@@ -1233,7 +1242,7 @@ function takeDamage(amount) {
 
     // Create damage particles
     for (let i = 0; i < 10; i++) {
-        game.particles.push({
+        pushParticle({
             x: game.player.x,
             y: game.player.y,
             vx: (Math.random() - 0.5) * 6,
@@ -1273,7 +1282,7 @@ function shoot() {
 
     // Muzzle flash particles
     for (let i = 0; i < 3; i++) {
-        game.particles.push({
+        pushParticle({
             x: game.player.x,
             y: game.player.y - 35,
             vx: (Math.random() - 0.5) * 2,
@@ -1287,7 +1296,7 @@ function shoot() {
 
 function createHitParticles(x, y) {
     for (let i = 0; i < 5; i++) {
-        game.particles.push({
+        pushParticle({
             x, y,
             vx: (Math.random() - 0.5) * 4,
             vy: (Math.random() - 0.5) * 4,
@@ -1301,7 +1310,7 @@ function createHitParticles(x, y) {
 function destroyEnemyByShot(enemy) {
     // Explosion particles
     for (let i = 0; i < 15; i++) {
-        game.particles.push({
+        pushParticle({
             x: enemy.x,
             y: enemy.y,
             vx: (Math.random() - 0.5) * 10,
@@ -1339,7 +1348,7 @@ function applyPowerup(type) {
 
     // Sparkle effect
     for (let i = 0; i < 15; i++) {
-        game.particles.push({
+        pushParticle({
             x: game.player.x,
             y: game.player.y,
             vx: (Math.random() - 0.5) * 5,
@@ -1356,7 +1365,7 @@ function applyPowerup(type) {
 function createScoreParticle(points) {
     // This would create floating score text - simplified here
     for (let i = 0; i < 5; i++) {
-        game.particles.push({
+        pushParticle({
             x: game.player.x + (Math.random() - 0.5) * 50,
             y: game.player.y - 50,
             vx: (Math.random() - 0.5) * 2,
