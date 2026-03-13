@@ -46,7 +46,7 @@ function Bookmarks() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Bookmark className="w-8 h-8 text-red-500" />
+          <Bookmark className="w-8 h-8 text-red-500" aria-hidden="true" />
           <h1 className="text-3xl font-bold text-white">My Bookmarks</h1>
         </div>
         <p className="text-gray-400">Your saved stories, ready when you are</p>
@@ -56,7 +56,7 @@ function Bookmarks() {
       {bookmarks.length === 0 ? (
         <div className="text-center py-20">
           <div className="w-24 h-24 bg-dark-200 rounded-full flex items-center justify-center mx-auto mb-6">
-            <BookOpen className="w-12 h-12 text-gray-500" />
+            <BookOpen className="w-12 h-12 text-gray-500" aria-hidden="true" />
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">No bookmarks yet</h2>
           <p className="text-gray-400 mb-6">Open any story and hit the bookmark icon to save it here.</p>

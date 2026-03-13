@@ -160,7 +160,7 @@ function ComicDetail() {
   return (
     <div className="min-h-screen">
       {/* Hero Background */}
-      <div className="relative h-80 overflow-hidden">
+      <div className="relative h-80 overflow-hidden" aria-hidden="true">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={comic.coverImage?.startsWith('/images/') ? { backgroundImage: `url(${comic.coverImage})` } : {}}
@@ -190,9 +190,9 @@ function ComicDetail() {
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full mb-3 ${
-                  comic.status === 'Ongoing' 
-                    ? 'bg-green-500/20 text-green-400' 
+                <span aria-label={`Status: ${comic.status}`} className={`inline-block px-3 py-1 text-xs font-medium rounded-full mb-3 ${
+                  comic.status === 'Ongoing'
+                    ? 'bg-green-500/20 text-green-400'
                     : 'bg-blue-500/20 text-blue-400'
                 }`}>
                   {comic.status}
