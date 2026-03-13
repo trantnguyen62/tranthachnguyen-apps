@@ -127,7 +127,7 @@ function Home() {
                 className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-xl hover:from-red-600 hover:to-orange-600 transition-all shadow-lg shadow-red-500/40 hover:shadow-xl hover:shadow-red-500/50 hover:scale-105 active:scale-95"
               >
                 Explore Stories
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-5 h-5" aria-hidden="true" />
               </Link>
               <Link
                 to="/bookmarks"
@@ -144,11 +144,11 @@ function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <Sparkles className="w-6 h-6 text-yellow-500" />
+            <Sparkles className="w-6 h-6 text-yellow-500" aria-hidden="true" />
             <h2 className="text-2xl font-bold text-white">Featured Stories</h2>
           </div>
           <Link to="/library" className="text-red-500 hover:text-red-400 flex items-center gap-1 text-sm">
-            View All <ArrowRight className="w-4 h-4" />
+            View All <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -163,11 +163,11 @@ function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <TrendingUp className="w-6 h-6 text-red-500" />
+            <TrendingUp className="w-6 h-6 text-red-500" aria-hidden="true" />
             <h2 className="text-2xl font-bold text-white">Top Rated</h2>
           </div>
           <Link to="/library" className="text-red-500 hover:text-red-400 flex items-center gap-1 text-sm">
-            View All <ArrowRight className="w-4 h-4" />
+            View All <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
@@ -183,21 +183,21 @@ function Home() {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="glass-effect rounded-2xl p-6 text-center">
             <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-7 h-7 text-red-500" />
+              <BookOpen className="w-7 h-7 text-red-500" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Curated Stories</h3>
             <p className="text-gray-400">Hand-picked news stories and real-life moments transformed into comics.</p>
           </div>
           <div className="glass-effect rounded-2xl p-6 text-center">
             <div className="w-14 h-14 bg-orange-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <Bookmark className="w-7 h-7 text-orange-500" />
+              <Bookmark className="w-7 h-7 text-orange-500" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Your Reading List</h3>
             <p className="text-gray-400">Save your favorites and pick up exactly where you left off.</p>
           </div>
           <div className="glass-effect rounded-2xl p-6 text-center">
             <div className="w-14 h-14 bg-yellow-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <Monitor className="w-7 h-7 text-yellow-500" />
+              <Monitor className="w-7 h-7 text-yellow-500" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Visual Storytelling</h3>
             <p className="text-gray-400">From breaking weather alerts to everyday mishaps — every story gets the comic treatment it deserves.</p>

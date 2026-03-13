@@ -127,7 +127,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Don't get rejected at the counter. Free AI check instantly verifies your photo meets official biometric standards — for passports, visas, and ID cards worldwide.<br/>
+            Don't get rejected at the counter. Free AI check instantly verifies your photo meets official ICAO biometric standards — for passports, visas, and ID cards in 100+ countries.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
         </header>
@@ -383,15 +383,15 @@ export default function App() {
                   filter: 'grayscale(80%)'
                 }}>🪪</div>
                 <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.55)' }}>
-                  Upload a photo and tap <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to get instant feedback on whether it meets official passport and visa requirements.
+                  Upload a photo and tap <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to get instant AI analysis against official passport, visa, and ID requirements — results in seconds.
                 </p>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: 10, fontWeight: 600 }}>
-                    What we check
+                    What our AI checks
                   </p>
                   <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>
                     {[
-                      'Face centered, 70–80% of frame height',
+                      'Face fills 70–80% of frame, centered horizontally',
                       'Neutral expression, mouth closed, eyes open',
                       'Plain white or off-white background',
                       'Even lighting, no harsh shadows on face',
@@ -423,7 +423,7 @@ export default function App() {
             Made with <span style={{ color: accentPink }}>♥</span> by PassportLens · {CURRENT_YEAR}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
-            100% private — your photos are processed instantly and never stored, logged, or shared with third parties.
+            100% private — photos are analyzed instantly and never stored, logged, or shared. Background removal runs entirely in your browser.
           </p>
         </footer>
       </div>

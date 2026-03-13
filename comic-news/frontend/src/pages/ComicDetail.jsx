@@ -286,7 +286,7 @@ function ComicDetail() {
                   Comic Version
                 </h2>
                 {/* Seamless vertical scroll container */}
-                <div className="max-h-[70vh] overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-dark-200">
+                <div className="max-h-[70vh] overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-dark-200" aria-label="Comic panels">
                   <div className="flex flex-col">
                     {comic.pages.map((page, index) => (
                       <img
@@ -325,9 +325,9 @@ function ComicDetail() {
                   <div className="mt-8 pt-6 border-t border-white/10">
                     <h3 className="text-lg font-semibold text-white mb-4">Panel Breakdown</h3>
                     <div className="relative">
-                    <div className="grid gap-3 max-h-64 overflow-y-auto pb-6">
+                    <ul className="grid gap-3 max-h-64 overflow-y-auto pb-6" aria-label="Panel breakdown">
                       {comic.panels.map((panel) => (
-                        <div key={panel.id} className="flex gap-3 p-3 bg-dark-200 rounded-lg">
+                        <li key={panel.id} className="flex gap-3 p-3 bg-dark-200 rounded-lg">
                           <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
                             <span className="text-red-400 font-bold text-sm">{panel.id}</span>
                           </div>
@@ -335,9 +335,9 @@ function ComicDetail() {
                             <h4 className="font-medium text-white text-sm">{panel.title}</h4>
                             <p className="text-gray-400 text-xs mt-1">{panel.description}</p>
                           </div>
-                        </div>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                     {comic.panels.length > 3 && (
                       <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/5 to-transparent pointer-events-none rounded-b-lg" aria-hidden="true" />
                     )}
@@ -375,7 +375,7 @@ function ComicDetail() {
                     key={page.id}
                     to={`/read/${comic.id}?page=${index + 1}`}
                     aria-label={`Read page ${index + 1}`}
-                    className="aspect-[2/3] rounded-lg overflow-hidden bg-dark-200 hover:ring-2 hover:ring-red-500 transition-all"
+                    className="aspect-[2/3] rounded-lg overflow-hidden bg-dark-200 hover:ring-2 hover:ring-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-all"
                   >
                     <img
                       src={page.image}
