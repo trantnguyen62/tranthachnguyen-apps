@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, memo, useMemo } from '
 import { GoogleGenAI, LiveServerMessage, Modality, Type, FunctionDeclaration } from '@google/genai';
 import { Language, Question } from '../types';
 import { getQuestions } from '../data/questions';
+import { arrayBufferToBase64 } from '../services/gemini';
 
 const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-09-2025';
 // Tolerance (in seconds) when detecting that all queued audio has finished playing.
@@ -243,12 +244,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
               }
 
               const pcmData = createPcmData(inputData);
-              const uint8 = new Uint8Array(pcmData.buffer);
-              let binary = '';
-              for (let j = 0; j < uint8.length; j += 32768) {
-                binary += String.fromCharCode(...uint8.subarray(j, j + 32768));
-              }
-              const base64Data = btoa(binary);
+              const base64Data = arrayBufferToBase64(pcmData.buffer);
               
               resolvedSessionRef.current?.sendRealtimeInput({
                 media: {

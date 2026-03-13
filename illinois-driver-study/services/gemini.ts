@@ -25,7 +25,7 @@ const getAI = async (requireSelection: boolean = false) => {
 };
 
 /** Encodes an ArrayBuffer as a base64 string for use in Gemini API inline data payloads. */
-function arrayBufferToBase64(buffer: ArrayBuffer) {
+export function arrayBufferToBase64(buffer: ArrayBuffer) {
   const bytes = new Uint8Array(buffer);
   let binary = '';
   for (let i = 0; i < bytes.length; i += 32768) {
@@ -71,7 +71,8 @@ export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
     bytes[i] = binaryString.charCodeAt(i);
   }
   if (ttsCache.size >= TTS_CACHE_MAX) {
-    ttsCache.delete(ttsCache.keys().next().value!);
+    const firstKey = ttsCache.keys().next().value;
+    if (firstKey !== undefined) ttsCache.delete(firstKey);
   }
   ttsCache.set(text, bytes.buffer);
   return bytes.buffer;
