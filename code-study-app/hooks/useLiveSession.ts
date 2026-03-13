@@ -338,6 +338,12 @@ export const useLiveSession = (studyContext: StudyContext) => {
         }
       }).catch((err: unknown) => {
         console.error("Session promise rejected:", err);
+        if (sessionPromiseRef.current === sessionPromise) {
+          const errorMessage = err instanceof Error ? err.message : "Failed to establish session";
+          setError(errorMessage);
+          setConnectionState(ConnectionState.ERROR);
+          disconnect();
+        }
       });
 
     } catch (err: unknown) {
