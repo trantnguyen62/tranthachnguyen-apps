@@ -306,14 +306,16 @@ function App() {
                              }}
                              aria-label={`Độ khó ${level}/5`}
                              aria-pressed={difficultyLevel === level}
-                             className={`w-2.5 h-5 rounded-full transition-all duration-150 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 ${level <= difficultyLevel ? 'bg-yellow-500' : 'bg-slate-600 hover:bg-slate-500'}`}
-                           />
+                             className="flex items-center justify-center w-6 h-7 rounded transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+                           >
+                             <span aria-hidden="true" className={`w-2.5 h-5 rounded-full block transition-all duration-150 hover:scale-110 ${level <= difficultyLevel ? 'bg-yellow-500' : 'bg-slate-600 hover:bg-slate-500'}`} />
+                           </button>
                          ))}
                        </div>
                      </div>
 
                      {/* Language Ratio Control */}
-                     <div className="flex items-center gap-3 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700" aria-label={`Language ratio: ${100 - vietnameseRatio}% English, ${vietnameseRatio}% Vietnamese`}>
+                     <div role="group" className="flex items-center gap-3 bg-slate-800 rounded-xl px-4 py-2 border border-slate-700" aria-label={`Language ratio: ${100 - vietnameseRatio}% English, ${vietnameseRatio}% Vietnamese`}>
                        <span className="text-xs text-slate-400" aria-hidden="true">🇬🇧</span>
                        <div className="flex flex-col gap-1 items-center">
                          <div className="flex gap-1">
@@ -330,8 +332,10 @@ function App() {
                                  }}
                                  aria-label={`${barRatio}% Vietnamese`}
                                  aria-pressed={barRatio === vietnameseRatio}
-                                 className={`w-2 h-4 rounded-sm transition-all duration-150 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${isActive ? 'bg-emerald-500' : 'bg-slate-600 hover:bg-slate-500'}`}
-                               />
+                                 className="flex items-center justify-center w-5 h-6 rounded transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+                               >
+                                 <span aria-hidden="true" className={`w-2 h-4 rounded-sm block transition-all duration-150 hover:scale-110 ${isActive ? 'bg-emerald-500' : 'bg-slate-600 hover:bg-slate-500'}`} />
+                               </button>
                              );
                            })}
                          </div>

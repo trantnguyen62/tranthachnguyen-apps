@@ -56,7 +56,7 @@ const Transcript = memo<Props>(({ messages }) => {
         </div>
         <div>
           <p className="text-sm text-slate-400">Your conversation will appear here.</p>
-          <p className="text-xs text-slate-600 mt-1">Start speaking to see your dialogue in real time.</p>
+          <p className="text-xs text-slate-500 mt-1">Start speaking to see your dialogue in real time.</p>
         </div>
       </div>
     );
@@ -79,7 +79,7 @@ const Transcript = memo<Props>(({ messages }) => {
             {msg.text}
           </div>
           <div className={`flex items-center gap-1 mt-1 px-1 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-slate-400">
               {msg.role === 'user' ? 'You' : 'AI Tutor'} · {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
             <CopyButton text={msg.text} />
