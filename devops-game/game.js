@@ -427,7 +427,10 @@ let game = {
     lastFireTime: 0,
 
     // HUD dirty-check cache (avoids redundant DOM writes every frame)
-    _hud: {}
+    _hud: {},
+
+    // Reusable Map for particle color batching (avoids per-frame allocations)
+    _particleGroups: new Map()
 };
 
 // Initialize game on load
@@ -851,15 +854,18 @@ function render() {
     // Draw stars (keep them as they add nice depth over the background)
     ctx.fillStyle = '#ffffff';
     ctx.globalAlpha = 0.7;
-    game.stars.forEach(star => {
+    ctx.beginPath();
+    for (const star of game.stars) {
         const d = star.size * 2;
-        ctx.fillRect(star.x - star.size, star.y - star.size, d, d);
-    });
+        ctx.rect(star.x - star.size, star.y - star.size, d, d);
+    }
+    ctx.fill();
     ctx.globalAlpha = 1.0;
 
     // Draw particles, batched by color to reduce fillStyle changes per frame
     if (game.particles.length > 0) {
-        const colorGroups = new Map();
+        const colorGroups = game._particleGroups;
+        colorGroups.clear();
         for (const p of game.particles) {
             let group = colorGroups.get(p.color);
             if (!group) { group = []; colorGroups.set(p.color, group); }
@@ -891,16 +897,17 @@ function render() {
         drawEnemy(enemy);
     });
 
-    // Draw projectiles
+    // Draw projectiles (single path + fill for all projectiles)
     if (game.projectiles.length > 0) {
         ctx.fillStyle = '#00d4ff';
         ctx.shadowColor = '#00d4ff';
         ctx.shadowBlur = 10;
-        game.projectiles.forEach(p => {
-            ctx.beginPath();
+        ctx.beginPath();
+        for (const p of game.projectiles) {
+            ctx.moveTo(p.x + 5, p.y);
             ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-            ctx.fill();
-        });
+        }
+        ctx.fill();
         ctx.shadowBlur = 0;
     }
 

@@ -106,6 +106,7 @@ body {
     background-size: 50px 50px;
     transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
     animation: gridMove 20s linear infinite;
+    will-change: transform;
 }
 
 @keyframes gridMove {
@@ -143,6 +144,7 @@ body {
     background-size: 160px 160px;
     opacity: 0.35;
     animation: twinkle 5s ease-in-out infinite alternate;
+    will-change: opacity;
 }
 
 .stars3 {
@@ -158,6 +160,7 @@ body {
     background-size: 220px 220px;
     opacity: 0.4;
     animation: twinkle 7s ease-in-out infinite alternate-reverse;
+    will-change: opacity;
 }
 
 @keyframes twinkle {
