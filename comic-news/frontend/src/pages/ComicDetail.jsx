@@ -201,24 +201,28 @@ function ComicDetail() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-6 mt-4 text-gray-300">
+            <dl className="flex flex-wrap items-center gap-6 mt-4 text-gray-300">
               <div className="flex items-center gap-2">
+                <dt className="sr-only">Author</dt>
                 <User className="w-5 h-5 text-gray-400" aria-hidden="true" />
-                <span>{comic.author}</span>
+                <dd>{comic.author}</dd>
               </div>
               <div className="flex items-center gap-2">
+                <dt className="sr-only">Genre</dt>
                 <Tag className="w-5 h-5 text-gray-400" aria-hidden="true" />
-                <span>{comic.genre}</span>
+                <dd>{comic.genre}</dd>
               </div>
               <div className="flex items-center gap-2">
+                <dt className="sr-only">Rating</dt>
                 <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" aria-hidden="true" />
-                <span aria-label={`Rating: ${comic.rating}`}>{comic.rating}</span>
+                <dd>{comic.rating}</dd>
               </div>
               <div className="flex items-center gap-2">
+                <dt className="sr-only">Chapters</dt>
                 <BookOpen className="w-5 h-5 text-gray-400" aria-hidden="true" />
-                <span>{comic.chapters} Chapters</span>
+                <dd>{comic.chapters} Chapters</dd>
               </div>
-            </div>
+            </dl>
 
             <p className="text-gray-400 mt-6 text-lg leading-relaxed">
               {comic.description}
@@ -265,12 +269,12 @@ function ComicDetail() {
               >
                 {isBookmarked ? (
                   <>
-                    <BookmarkCheck className="w-5 h-5" />
+                    <BookmarkCheck className="w-5 h-5" aria-hidden="true" />
                     Bookmarked
                   </>
                 ) : (
                   <>
-                    <Bookmark className="w-5 h-5" />
+                    <Bookmark className="w-5 h-5" aria-hidden="true" />
                     Add Bookmark
                   </>
                 )}

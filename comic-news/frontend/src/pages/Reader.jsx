@@ -303,6 +303,7 @@ function Reader() {
             <p className="text-gray-500 mb-4">End of comic</p>
             <Link
               to={`/comic/${id}`}
+              aria-label={`Back to ${comic.title} details`}
               className="inline-block px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors"
             >
               Back to Details
