@@ -1,4 +1,4 @@
-import React, { memo, useState, useMemo } from 'react';
+import React, { memo, useState, useMemo, useEffect } from 'react';
 import { getQuestions } from '../data/questions';
 import { Language } from '../types';
 
@@ -32,15 +32,21 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
   const questions = useMemo(() => getQuestions(language), [language]);
   const t = TRANSLATIONS[language];
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 200);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const q = debouncedSearch.trim().toLowerCase();
     if (!q) return questions;
     return questions.filter(qn =>
       qn.text.toLowerCase().includes(q) ||
       qn.options.some(o => o.toLowerCase().includes(q))
     );
-  }, [questions, search]);
+  }, [questions, debouncedSearch]);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
