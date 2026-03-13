@@ -307,7 +307,7 @@ const TOPICS = [
     { id: 'ansible', name: 'Ansible', icon: '🔧', color: '#ee0000', desc: 'Playbooks, roles, inventory & idempotency' },
     { id: 'azure', name: 'Azure', icon: '🔷', color: '#0078d4', desc: 'AKS, Functions, DevOps & resource management' },
     { id: 'devsecops', name: 'DevSecOps', icon: '🔒', color: '#dc2626', desc: 'SAST, DAST, scanning & zero trust' },
-    { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2', desc: 'DNS, load balancing, TLS & proxies' }
+    { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2', desc: 'DNS, load balancing, TLS, proxies & service mesh' }
 ];
 
 // Cached sprite references (populated after asset loading)
