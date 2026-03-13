@@ -51,13 +51,16 @@ linguaflow/
 ├── App.tsx             # Main React component
 ├── index.html          # Entry HTML file
 ├── index.tsx           # React entry point
-├── components/         # UI components
-├── hooks/              # Custom React hooks (audio, WebSocket)
-├── utils/              # Utility functions
+├── constants.ts        # Language configs, voices, and conversation topics
+├── types.ts            # TypeScript interfaces and enums
+├── components/         # UI components (Visualizer, Transcript, LanguageSelector, UserProfileModal)
+├── hooks/              # Custom React hooks (useLiveSession — audio + WebSocket lifecycle)
+├── utils/              # Utility functions (audio codec, proxy client, XSS sanitization)
 ├── server/             # Backend servers
-│   ├── api-server.js   # REST API
-│   ├── websocket-proxy.js  # WebSocket for live audio
-│   └── logger.js       # Shared logging utility
+│   ├── api-server.js       # REST API for learner profiles (port 3002)
+│   ├── websocket-proxy.js  # WebSocket gateway to Gemini Live API (port 3001)
+│   ├── logger.js           # Shared security logging utility
+│   └── websocket-proxy.test.js  # Security tests for the proxy
 ├── data/               # User session data (users.json)
 └── Dockerfile*         # Docker configurations
 ```

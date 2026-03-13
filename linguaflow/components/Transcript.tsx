@@ -1,3 +1,11 @@
+/**
+ * Transcript — scrollable conversation log that displays finalised turns from
+ * both the user and the AI tutor.
+ *
+ * Auto-scrolls to the newest message whenever the `messages` array grows.
+ * Each message bubble includes a copy-to-clipboard button that appears on hover.
+ * The component is memoised so it only re-renders when the message list changes.
+ */
 import React, { useEffect, useRef, memo, useState, useCallback } from 'react';
 import { ChatMessage } from '../types';
 
