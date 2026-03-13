@@ -142,6 +142,56 @@
             "@type": "Answer",
             "text": "Yes. PassportLens includes an AI-powered background removal and replacement tool. You can replace any background with the required plain white or off-white colour directly in your browser."
           }
+        },
+        {
+          "@type": "Question",
+          "name": "What are ICAO passport photo requirements?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ICAO (International Civil Aviation Organization) biometric passport photo standards require: face occupying 70–80% of frame height, centered; neutral expression with mouth closed and eyes fully open; plain white or off-white background; even lighting without shadows; no glasses; sharp focus; and no head coverings except for religious reasons. These standards are used by 100+ countries for passports, visas, and national ID cards."
+          }
+        }
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Check if Your Passport Photo Meets Official Requirements",
+      "description": "Use PassportLens to instantly verify your passport or visa photo complies with ICAO biometric standards for 100+ countries.",
+      "totalTime": "PT1M",
+      "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "0" },
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Upload your passport photo",
+          "text": "Click the upload area or drag and drop your passport or visa photo. You can also use your device camera to take a photo directly."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Run the AI compliance check",
+          "text": "Click the \"Check Photo\" button. The AI checks your photo against official ICAO biometric passport standards in seconds."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Review the results",
+          "text": "PassportLens lists any issues found — such as incorrect background, poor lighting, glasses, or face positioning — and shows how to fix each one."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Fix the background if needed",
+          "text": "If your background is not plain white, click \"Fix Background\" to use the built-in AI background removal tool and replace it in your browser instantly."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "Re-check and submit",
+          "text": "After making fixes, click \"Re-check Photo\" to confirm your photo now meets all requirements before submitting your passport or visa application."
         }
       ]
     }
@@ -151,10 +201,22 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="root"></div>
     <noscript>
-      <div style="font-family:sans-serif;max-width:600px;margin:40px auto;padding:20px;text-align:center">
-        <h1>PassportLens — AI Passport Photo Checker &amp; Editor</h1>
-        <p>Don't get rejected at the counter. PassportLens is a free AI tool that instantly checks your passport or visa photo against official biometric standards for 100+ countries.</p>
-        <p>Please enable JavaScript to use PassportLens.</p>
+      <div style="font-family:sans-serif;max-width:640px;margin:40px auto;padding:20px">
+        <h1>PassportLens — Free AI Passport Photo Checker &amp; Editor</h1>
+        <p>Don't get rejected at the counter. PassportLens is a free AI tool that instantly checks your passport or visa photo against official ICAO biometric standards for 100+ countries, including the US, UK, EU, Canada, and Australia.</p>
+        <h2>What PassportLens checks</h2>
+        <ul>
+          <li>Face fills 70–80% of frame, centered horizontally</li>
+          <li>Neutral expression, mouth closed, eyes open and visible</li>
+          <li>Plain white or off-white background</li>
+          <li>Even lighting with no harsh shadows on the face</li>
+          <li>Sharp focus — no blur or pixelation</li>
+          <li>No glasses, tinted lenses, or lens reflections</li>
+          <li>No unauthorized head coverings</li>
+        </ul>
+        <h2>Is it free?</h2>
+        <p>Yes — PassportLens is completely free. Your photos are never stored or shared; background removal runs entirely in your browser.</p>
+        <p><strong>Please enable JavaScript to use PassportLens.</strong></p>
       </div>
     </noscript>
     <script type="module" src="/index.tsx"></script>
