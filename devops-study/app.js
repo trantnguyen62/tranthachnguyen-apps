@@ -1890,7 +1890,14 @@ resource "aws_ecs_service" "app" {
                 { term: 'Git Submodule', definition: 'A repository embedded within another repository at a specific commit, used to include external dependencies with version pinning.' },
                 { term: 'Squash Commits', definition: 'Combining multiple commits into a single one during a rebase or merge to keep the branch history clean.' },
                 { term: 'Fast-forward Merge', definition: 'A merge where Git simply moves the branch pointer forward because there is a linear path from the target to the source branch.' },
-                { term: 'Three-way Merge', definition: 'A merge that creates a new merge commit when branches have diverged, using the common ancestor as a reference.' }
+                { term: 'Three-way Merge', definition: 'A merge that creates a new merge commit when branches have diverged, using the common ancestor as a reference.' },
+                { term: 'Git Flow', definition: 'A branching strategy using long-lived branches (main, develop) plus short-lived feature, release, and hotfix branches. Well-suited for versioned software releases.' },
+                { term: 'Trunk-Based Development', definition: 'A branching strategy where all developers commit frequently to a single shared branch (trunk/main). Enables true continuous integration by avoiding long-lived feature branches.' },
+                { term: 'Detached HEAD', definition: 'A state where HEAD points directly to a commit SHA instead of a branch name. Changes made here are not on any branch and can be lost unless a new branch is created.' },
+                { term: 'Git LFS', definition: 'Git Large File Storage — an extension that replaces large binary files (images, videos, datasets) with small text pointers, storing the actual content on a separate LFS server.' },
+                { term: 'Git Worktree', definition: 'Allows multiple working directories to be checked out from the same repository simultaneously, each on a different branch. Useful for reviewing PRs without stashing current work.' },
+                { term: 'Protected Branch', definition: 'A repository setting that restricts who can push or force-push to a branch, and can enforce required reviews, status checks, and signed commits before merging.' },
+                { term: 'CODEOWNERS', definition: 'A file (typically at .github/CODEOWNERS) mapping file paths to responsible individuals or teams. When a PR touches those paths, the owners are automatically requested as reviewers.' }
             ],
             quiz: [
                 {
@@ -1952,6 +1959,26 @@ resource "aws_ecs_service" "app" {
                     question: 'What does git bisect help you find?',
                     options: ['Duplicate files', 'The commit that introduced a bug', 'Merge conflicts', 'Deleted branches'],
                     correct: 1
+                },
+                {
+                    question: 'What is Trunk-Based Development?',
+                    options: ['Using a develop branch for all work', 'Using many long-lived feature branches', 'Committing frequently to a single shared main branch', 'A strategy exclusive to open-source projects'],
+                    correct: 2
+                },
+                {
+                    question: 'What is a Detached HEAD state in Git?',
+                    options: ['A corrupted repository', 'A branch with no commits', 'HEAD pointing directly to a commit instead of a branch', 'A merge conflict state'],
+                    correct: 2
+                },
+                {
+                    question: 'What does Git LFS replace in a repository?',
+                    options: ['Commit messages', 'Branch names', 'The git config file', 'Large binary files with lightweight text pointers'],
+                    correct: 3
+                },
+                {
+                    question: 'What is a CODEOWNERS file used for?',
+                    options: ['Listing contributors for the README', 'Encrypting repository secrets', 'Auto-requesting reviews from owners when their files are changed in a PR', 'Setting branch protection rules'],
+                    correct: 2
                 }
             ],
             codebase: [
@@ -2171,7 +2198,14 @@ save_work() {
                 { term: 'awk', definition: 'A text-processing tool for pattern scanning and report generation. Operates on fields within lines (e.g., awk \'{print $1}\' to print the first column).' },
                 { term: 'sed', definition: 'Stream Editor - processes text line by line, commonly used for find-and-replace (e.g., sed \'s/old/new/g\' file).' },
                 { term: 'ulimit', definition: 'Sets resource limits for user processes such as max open file descriptors, max processes, and max memory. Important for tuning high-load servers.' },
-                { term: 'journalctl', definition: 'Queries and displays logs from the systemd journal. Use -u to filter by service, -f to follow in real time, and --since to filter by time.' }
+                { term: 'journalctl', definition: 'Queries and displays logs from the systemd journal. Use -u to filter by service, -f to follow in real time, and --since to filter by time.' },
+                { term: 'tmux', definition: 'A terminal multiplexer that lets you create, split, and manage multiple terminal sessions within a single window. Sessions persist after disconnecting, making it essential for long-running remote tasks.' },
+                { term: 'rsync', definition: 'A fast file transfer and synchronization tool that only transmits the changed parts of files (delta transfer). Works locally or over SSH. Common usage: rsync -avz src/ user@host:/dest/' },
+                { term: 'lsof', definition: 'List Open Files — shows all files currently opened by processes, including sockets and pipes (Linux treats everything as a file). Useful for finding which process is using a port: lsof -i :8080' },
+                { term: 'strace', definition: 'A diagnostic tool that intercepts and logs system calls and signals made by a process. Invaluable for debugging why a program is failing or hanging: strace -p <PID>' },
+                { term: 'nice / renice', definition: 'Commands to set or adjust the CPU scheduling priority of a process. Niceness ranges from -20 (highest priority, root only) to 19 (lowest). Containers and batch jobs often run at higher nice values.' },
+                { term: 'Swap', definition: 'Disk space used as overflow virtual memory when RAM is exhausted. Can be a dedicated partition or a swap file. Managed with swapon/swapoff; monitored with free -h or swapon --show.' },
+                { term: 'cgroups', definition: 'Control Groups — a Linux kernel feature that limits and isolates the CPU, memory, disk I/O, and network resources consumed by a group of processes. The foundation that makes containers (Docker, Kubernetes) possible.' }
             ],
             quiz: [
                 {
@@ -2228,6 +2262,26 @@ save_work() {
                     question: 'What does an inode store?',
                     options: ['The file name and contents', 'File metadata like permissions and disk location (not the file name)', 'User login information', 'Network configuration'],
                     correct: 1
+                },
+                {
+                    question: 'What is the primary purpose of cgroups in Linux?',
+                    options: ['Managing user groups in /etc/group', 'Providing a graphical control panel', 'Encrypting filesystem data', 'Limiting and isolating CPU, memory, and I/O for process groups'],
+                    correct: 3
+                },
+                {
+                    question: 'What makes rsync efficient for file transfers?',
+                    options: ['It uses UDP instead of TCP', 'It compresses with gzip by default', 'It only transfers the changed parts of files (delta transfer)', 'It runs transfers in parallel threads'],
+                    correct: 2
+                },
+                {
+                    question: 'What does lsof -i :8080 show?',
+                    options: ['Firewall rules for port 8080', 'The process currently listening on or connected to port 8080', 'All files in /var/log', 'Network interfaces with MTU 8080'],
+                    correct: 1
+                },
+                {
+                    question: 'What happens to a tmux session when you disconnect from SSH?',
+                    options: ['It is immediately killed', 'It pauses until reconnected', 'It continues running and can be reattached later', 'It saves to disk and exits'],
+                    correct: 2
                 }
             ],
             codebase: [

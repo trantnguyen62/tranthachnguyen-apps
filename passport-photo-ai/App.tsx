@@ -121,7 +121,7 @@ export default function App() {
             </h1>
           </div>
           <p style={{
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgba(255,255,255,0.8)',
             fontSize: '1.1rem',
             maxWidth: 520,
             margin: '0 auto',
@@ -242,7 +242,7 @@ export default function App() {
                     <div key={i} style={{ height: 44, borderRadius: 10, background: 'rgba(255,255,255,0.03)', width: `${w * 100}%`, animation: `pulse 1.5s ease-in-out ${0.4 + i * 0.2}s infinite` }} />
                   ))}
                 </div>
-                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 16, letterSpacing: '0.03em' }}>
+                <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 16, letterSpacing: '0.03em' }}>
                   Checking against official passport standards&hellip;
                 </p>
               </div>
@@ -255,7 +255,7 @@ export default function App() {
               }}>
                 <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
                 <p style={{ color: accentPink, fontWeight: 600, marginBottom: 8 }}>Analysis failed</p>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', maxWidth: 220, marginBottom: 20 }}>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', maxWidth: 220, marginBottom: 20 }}>
                   Could not reach the server. Check your connection and try again. For large images, try reducing the file size below 4 MB.
                 </p>
                 <button
@@ -375,21 +375,21 @@ export default function App() {
                 height: 350,
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
-                color: 'rgba(255,255,255,0.4)',
+                color: 'rgba(255,255,255,0.7)',
                 textAlign: 'center'
               }}>
                 <div aria-hidden="true" style={{
                   fontSize: 64, marginBottom: 16, opacity: 0.4,
                   filter: 'grayscale(80%)'
                 }}>🪪</div>
-                <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.55)' }}>
+                <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.8)' }}>
                   Upload a photo and tap <strong style={{ color: 'rgba(255,255,255,0.65)' }}>Check Photo</strong> to get instant AI analysis against official passport, visa, and ID requirements — results in seconds.
                 </p>
                 <div style={{ textAlign: 'left' }}>
-                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: 10, fontWeight: 600 }}>
+                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.8)', marginBottom: 10, fontWeight: 600 }}>
                     What our AI checks
                   </p>
-                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>
+                  <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>
                     {[
                       'Face fills 70–80% of frame, centered horizontally',
                       'Neutral expression, mouth closed, eyes open',
@@ -400,7 +400,7 @@ export default function App() {
                       'No head coverings (except for religious reasons)',
                     ].map((item, i) => (
                       <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                        <span style={{ flexShrink: 0, width: 16, height: 16, borderRadius: '50%', background: `${accentGold}18`, border: `1px solid ${accentGold}44`, color: accentGold, fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>
+                        <span aria-hidden="true" style={{ flexShrink: 0, width: 16, height: 16, borderRadius: '50%', background: `${accentGold}18`, border: `1px solid ${accentGold}44`, color: accentGold, fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>
                         {item}
                       </li>
                     ))}
@@ -417,10 +417,10 @@ export default function App() {
           marginTop: 60, textAlign: 'center', 
           padding: '24px 0', 
           borderTop: '1px solid rgba(255,255,255,0.06)',
-          color: 'rgba(255,255,255,0.5)', fontSize: 13
+          color: 'rgba(255,255,255,0.7)', fontSize: 13
         }}>
           <p>
-            Made with <span style={{ color: accentPink }}>♥</span> by PassportLens · {CURRENT_YEAR}
+            Made with <span aria-hidden="true" style={{ color: accentPink }}>♥</span> by PassportLens · {CURRENT_YEAR}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
             100% private — photos are analyzed instantly and never stored, logged, or shared. Background removal runs entirely in your browser.

@@ -203,7 +203,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
             style={{
               flex: 1, padding: '14px', borderRadius: 12,
               border: '1px solid rgba(255,255,255,0.1)', background: 'transparent',
-              color: 'rgba(255,255,255,0.6)', fontWeight: 500, cursor: 'pointer',
+              color: 'rgba(255,255,255,0.85)', fontWeight: 500, cursor: 'pointer',
               fontFamily: "'Space Grotesk', sans-serif"
             }}
           >
@@ -268,8 +268,8 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
         <p style={{ color: '#F8F8F8', fontWeight: 600, marginBottom: 6, fontFamily: "'Syne', sans-serif" }}>
           Upload your passport, visa, or ID photo
         </p>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>Drag &amp; drop or tap to browse</p>
-        <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, marginTop: 8 }}>JPG, PNG, WEBP — max 10 MB</p>
+        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>Drag &amp; drop or tap to browse</p>
+        <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, marginTop: 8 }}>JPG, PNG, WEBP — max 10 MB</p>
       </div>
 
       <button
