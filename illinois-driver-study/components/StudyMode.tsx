@@ -1,3 +1,10 @@
+/**
+ * StudyMode — read-only reference list of all 58 questions with answers shown.
+ *
+ * Provides a debounced (200 ms) text search that filters by question text or
+ * any answer option, so users can quickly look up specific rules without
+ * scrolling through the full list.
+ */
 import React, { memo, useState, useMemo, useEffect } from 'react';
 import { getQuestions } from '../data/questions';
 import { Language } from '../types';

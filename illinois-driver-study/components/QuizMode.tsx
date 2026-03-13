@@ -1,3 +1,15 @@
+/**
+ * QuizMode — timed, scored quiz over all 58 official Illinois DMV questions.
+ *
+ * Flow: question → user selects option → instant right/wrong feedback + explanation
+ *       → next question → … → results screen with pass/fail at 80% threshold.
+ *
+ * Audio: lazily imports the Gemini TTS service on first play. A single shared
+ * AudioContext is kept alive across questions and closed on unmount to avoid
+ * resource leaks.
+ *
+ * Keyboard shortcuts: A/B/C/D select an answer; Enter or → advances.
+ */
 import React, { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 import { getQuestions } from '../data/questions';
 import { Language } from '../types';

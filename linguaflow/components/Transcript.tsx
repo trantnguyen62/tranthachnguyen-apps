@@ -51,7 +51,7 @@ const Transcript = memo<Props>(({ messages }) => {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    endRef.current?.scrollIntoView({ behavior: 'auto' });
   }, [messages]);
 
   if (messages.length === 0) {

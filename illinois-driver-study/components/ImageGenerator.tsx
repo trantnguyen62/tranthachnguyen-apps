@@ -1,3 +1,14 @@
+/**
+ * ImageGenerator — AI-powered driving scenario visualizer.
+ *
+ * Sends a free-text prompt to the Gemini image-generation model
+ * (gemini-3-pro-image-preview, a paid endpoint) and renders the returned
+ * base64 image inline. Users can choose between 1 K, 2 K, and 4 K output
+ * sizes; higher sizes cost more API credits.
+ *
+ * Note: the generate button stays disabled until a non-empty prompt is
+ * entered, preventing accidental blank submissions.
+ */
 import React, { useState } from 'react';
 import { generateStudyImage } from '../services/gemini';
 import { ImageSize, Language } from '../types';

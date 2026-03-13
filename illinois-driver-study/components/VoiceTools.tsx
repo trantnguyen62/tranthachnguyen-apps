@@ -1,3 +1,11 @@
+/**
+ * VoiceTools — microphone-based study note recorder.
+ *
+ * Records audio via the MediaRecorder API (webm format), then sends the
+ * resulting Blob to the Gemini transcription service and displays the text.
+ * Microphone tracks are stopped immediately after recording ends to release
+ * the hardware.
+ */
 import React, { useState, useRef } from 'react';
 import { transcribeAudio } from '../services/gemini';
 import { Language } from '../types';
