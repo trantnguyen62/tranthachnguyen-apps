@@ -43,6 +43,37 @@ const PORT = 3002;
 const DATA_DIR = path.join(__dirname, '../data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 
+// Rate limiting: max requests per IP per time window
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 60;
+const apiRateLimitMap = new Map(); // IP -> [timestamps]
+
+function apiRateLimit(req, res, next) {
+  const ip = req.headers['cf-connecting-ip'] ||
+    req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    req.socket.remoteAddress ||
+    'unknown';
+  const now = Date.now();
+  const timestamps = (apiRateLimitMap.get(ip) || []).filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+  if (timestamps.length >= RATE_LIMIT_MAX_REQUESTS) {
+    logger.security('API rate limit exceeded', { ip });
+    return res.status(429).json({ error: 'Too many requests' });
+  }
+  timestamps.push(now);
+  apiRateLimitMap.set(ip, timestamps);
+  next();
+}
+
+// Periodically clean up stale rate-limit entries
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, timestamps] of apiRateLimitMap.entries()) {
+    const recent = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+    if (recent.length === 0) apiRateLimitMap.delete(ip);
+    else apiRateLimitMap.set(ip, recent);
+  }
+}, RATE_LIMIT_WINDOW_MS).unref();
+
 // Middleware
 app.use(cors({
   origin: [
@@ -53,7 +84,8 @@ app.use(cors({
   ],
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '64kb' }));
+app.use(apiRateLimit);
 
 // Ensure data directory and file exist
 async function initDataStore() {
@@ -107,6 +139,9 @@ app.get('/api/users/search', async (req, res) => {
     const { name } = req.query;
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
+    }
+    if (typeof name !== 'string' || name.length > 100) {
+      return res.status(400).json({ error: 'Invalid name parameter' });
     }
 
     const data = await readUsers();
@@ -207,6 +242,11 @@ app.patch('/api/users/:id', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // Validate notes length if provided
+    if (updates.notes !== undefined && (typeof updates.notes !== 'string' || updates.notes.length > 10000)) {
+      return res.status(400).json({ error: 'Notes must be a string of 10000 characters or fewer' });
+    }
+
     // Update allowed fields
     const allowedFields = ['lessonNumber', 'wordsLearned', 'notes', 'totalSessions'];
     for (const field of allowedFields) {
@@ -236,6 +276,9 @@ app.post('/api/users/:id/words', async (req, res) => {
     if (!Array.isArray(words)) {
       return res.status(400).json({ error: 'Words must be an array' });
     }
+    if (words.length > 500) {
+      return res.status(400).json({ error: 'Too many words in a single request (max 500)' });
+    }
 
     const data = await readUsers();
     const user = data.users[id];
@@ -244,9 +287,9 @@ app.post('/api/users/:id/words', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Add new words (avoid duplicates, skip non-strings)
+    // Add new words (avoid duplicates, skip non-strings, enforce word length)
     const existingWords = new Set(user.wordsLearned);
-    words.forEach(word => { if (typeof word === 'string') existingWords.add(word.toLowerCase()); });
+    words.forEach(word => { if (typeof word === 'string' && word.length <= 100) existingWords.add(word.toLowerCase()); });
     user.wordsLearned = Array.from(existingWords);
     user.lastSessionDate = new Date().toISOString();
 
@@ -283,11 +326,14 @@ app.post('/api/users/:id/session', async (req, res) => {
 
     if (wordsLearned && Array.isArray(wordsLearned)) {
       const existingWords = new Set(user.wordsLearned);
-      wordsLearned.forEach(word => { if (typeof word === 'string') existingWords.add(word.toLowerCase()); });
+      wordsLearned.forEach(word => { if (typeof word === 'string' && word.length <= 100) existingWords.add(word.toLowerCase()); });
       user.wordsLearned = Array.from(existingWords);
     }
 
     if (notes) {
+      if (typeof notes !== 'string' || notes.length > 10000) {
+        return res.status(400).json({ error: 'Notes must be a string of 10000 characters or fewer' });
+      }
       user.notes = notes;
     }
 

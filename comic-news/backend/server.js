@@ -483,7 +483,10 @@ I now wait for other people to laugh first. This is not cowardice. It is calibra
   }
 ];
 
-// In-memory bookmarks storage
+// In-memory bookmarks and reading progress.
+// NOTE: These are process-scoped — data is lost on server restart and is shared
+// across all users. Limits (500 bookmarks, 1000 progress entries) are enforced
+// in the write endpoints to prevent unbounded memory growth.
 let bookmarks = [];
 let readingProgress = {};
 

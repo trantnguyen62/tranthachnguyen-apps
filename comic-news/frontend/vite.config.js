@@ -18,6 +18,8 @@ export default defineConfig({
     target: 'es2020',
     rollupOptions: {
       output: {
+        // Split vendor and icon libraries into separate chunks so browsers
+        // can cache them independently from app code between deployments.
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           icons: ['lucide-react'],

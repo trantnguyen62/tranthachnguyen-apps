@@ -2,6 +2,16 @@ import { Link } from 'react-router-dom';
 import { Star, BookOpen } from 'lucide-react';
 import { useState, memo } from 'react';
 
+/**
+ * Card thumbnail for a single comic. Handles three image states:
+ *  - loading: animated skeleton pulse shown until the image resolves
+ *  - error:   fallback placeholder with a "No image" label
+ *  - loaded:  fades the image in and enables hover effects
+ *
+ * Wrapped in React.memo so the parent grid doesn't re-render unchanged cards.
+ *
+ * @param {{ comic: object }} props
+ */
 function ComicCard({ comic }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
