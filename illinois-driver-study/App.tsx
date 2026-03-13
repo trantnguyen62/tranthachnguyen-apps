@@ -32,6 +32,8 @@ const TRANSLATIONS = {
   }
 } as const;
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 // Memoized NavButton component
 const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: string; currentMode: AppMode; onClick: (mode: AppMode) => void }>(({
   targetMode, icon, label, currentMode, onClick
@@ -171,7 +173,7 @@ const App: React.FC = () => {
 
       <footer className="bg-white border-t border-slate-200 py-6 mt-auto">
         <div className="max-w-5xl mx-auto px-4 text-center text-slate-400 text-sm">
-          <p>© {new Date().getFullYear()} {t.footerText}</p>
+          <p>© {CURRENT_YEAR} {t.footerText}</p>
           <p className="mt-1">{t.footerSub}</p>
           {language === 'en' && (
             <p className="mt-2 text-xs text-slate-500 max-w-xl mx-auto">
