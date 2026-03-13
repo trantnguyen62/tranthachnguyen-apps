@@ -33,7 +33,7 @@ const QUESTIONS = {
         { q: "Which file defines a Docker image's build instructions?", a: ["Dockerfile", "docker-compose.yml", "config.json", "image.yaml"], c: 0 },
         { q: "What is a Docker container?", a: ["A lightweight isolated environment", "A full virtual machine with its own kernel", "A static binary compiled for one OS", "A cloud VM instance"], c: 0 },
         { q: "Which command lists all running containers?", a: ["docker ps", "docker list", "docker show", "docker containers"], c: 0 },
-        { q: "What does 'docker pull' do?", a: ["Downloads an image from a registry", "Uploads an image", "Creates a container", "Removes a container"], c: 0 },
+        { q: "What happens when you run 'docker run' with an image not present locally?", a: ["Docker automatically pulls it from the registry", "Docker returns an error and exits", "Docker builds it from the nearest Dockerfile", "Docker uses a cached empty image"], c: 0 },
         { q: "What is Docker Compose used for?", a: ["Multi-container applications", "Building images", "Network configuration", "Security scanning"], c: 0 },
         { q: "Which command gracefully stops a container by sending SIGTERM first?", a: ["docker stop", "docker kill", "docker end", "docker halt"], c: 0 },
         { q: "What is a Docker volume?", a: ["Persistent data storage", "Network interface", "CPU allocation", "Memory limit"], c: 0 },
@@ -47,7 +47,7 @@ const QUESTIONS = {
         { q: "What does 'docker logs' show?", a: ["Container output logs", "System logs", "Build logs", "Network logs"], c: 0 },
         { q: "What is the difference between ADD and COPY?", a: ["ADD can extract archives", "ADD is faster", "COPY is deprecated", "No difference"], c: 0 },
         { q: "What does 'docker network create' do?", a: ["Creates custom network", "Lists networks", "Removes network", "Inspects network"], c: 0 },
-        { q: "What is a Docker layer?", a: ["Read-only filesystem diff", "Network layer", "Security layer", "API layer"], c: 0 },
+        { q: "Which Dockerfile instruction is most likely to invalidate the build cache for all subsequent layers?", a: ["COPY . .", "FROM ubuntu:22.04", "ENV APP_PORT=8080", "EXPOSE 8080"], c: 0 },
         { q: "What does '--rm' flag do in docker run?", a: ["Removes container after exit", "Runs in read mode", "Enables root mode", "Uses RAM mount"], c: 0 }
     ],
     kubernetes: [
@@ -65,7 +65,7 @@ const QUESTIONS = {
         { q: "What does kubelet do?", a: ["Runs containers on nodes", "Manages the API", "Stores cluster state", "Routes traffic"], c: 0 },
         { q: "What is etcd used for in Kubernetes?", a: ["Cluster state storage", "Container runtime", "Load balancing", "Pod scheduling"], c: 0 },
         { q: "What is a PersistentVolumeClaim?", a: ["Request for storage", "Network policy", "Security context", "Resource limit"], c: 0 },
-        { q: "What does 'kubectl describe' show?", a: ["Detailed resource info", "Resource list", "Logs", "Metrics"], c: 0 },
+        { q: "A pod shows status 'OOMKilled'. What is the most likely cause?", a: ["Container exceeded its memory limit", "Container exceeded its CPU limit", "Image failed to pull from registry", "Liveness probe failed repeatedly"], c: 0 },
         { q: "What is a ReplicaSet?", a: ["Ensures Pod count", "Manages secrets", "Routes traffic", "Stores config"], c: 0 },
         { q: "What is a NodePort service?", a: ["Exposes port on all nodes", "Internal only", "Load balancer", "External DNS"], c: 0 },
         { q: "What is kubectl rollout?", a: ["Manages deployments", "Creates pods", "Deletes services", "Scales clusters"], c: 0 },
@@ -80,7 +80,7 @@ const QUESTIONS = {
         { q: "What triggers a CI pipeline?", a: ["Code commit/push", "Server restart", "User login", "Database query"], c: 0 },
         { q: "What is a build artifact?", a: ["Output of build process", "Source code", "Configuration file", "Log file"], c: 0 },
         { q: "What is GitOps?", a: ["Git as source of truth for infrastructure", "Git hosting service", "Git GUI tool", "Git branching strategy"], c: 0 },
-        { q: "What is a deployment environment?", a: ["Where application runs", "Code editor", "Build tool", "Testing framework"], c: 0 },
+        { q: "What is the primary purpose of a staging environment in a CI/CD pipeline?", a: ["Production-like testing before a release", "Speeding up the build process", "Storing build artifacts long-term", "Running unit tests in isolation"], c: 0 },
         { q: "What does 'fail fast' mean in CI/CD?", a: ["Detect failures early in the pipeline", "Deploy quickly to production", "Skip non-critical tests for speed", "Fail silently without blocking deploys"], c: 0 },
         { q: "What is blue-green deployment?", a: ["Two identical environments", "Color-coded logs", "Branch naming", "Error highlighting"], c: 0 },
         { q: "What is a canary deployment?", a: ["Gradual rollout to subset", "Fast deployment", "Rollback strategy", "Testing approach"], c: 0 },
@@ -113,7 +113,7 @@ const QUESTIONS = {
         { q: "What is SQS?", a: ["Simple Queue Service", "Secure Query Service", "Storage Queue System", "Server Query Service"], c: 0 },
         { q: "What is an Availability Zone?", a: ["Isolated data center", "Service type", "Pricing tier", "Account region"], c: 0 },
         { q: "What is Fargate?", a: ["Serverless containers", "Database service", "Storage tier", "Network type"], c: 0 },
-        { q: "What is AWS CLI?", a: ["Command-line tool", "GUI console", "Mobile app", "Desktop app"], c: 0 },
+        { q: "What is the key difference between an IAM Role and an IAM User?", a: ["Roles are assumed temporarily; users have long-term credentials", "Roles have more permissions than users by default", "Users can assume roles but roles cannot be assumed", "Roles require MFA while users do not"], c: 0 },
         { q: "What is ElastiCache?", a: ["In-memory caching", "File storage", "Compute service", "Database backup"], c: 0 }
     ],
     terraform: [
@@ -161,7 +161,7 @@ const QUESTIONS = {
         { q: "What is a Git submodule?", a: ["Repository inside repository", "Branch type", "Commit type", "Tag type"], c: 0 }
     ],
     linux: [
-        { q: "What does 'ls' command do?", a: ["Lists directory contents", "Creates file", "Deletes file", "Moves file"], c: 0 },
+        { q: "What does the sticky bit (chmod +t) on a directory do?", a: ["Prevents users from deleting files they don't own", "Makes all files in it executable", "Hides the directory from other users", "Sets default permissions for new files"], c: 0 },
         { q: "Which command displays the full path of the current working directory?", a: ["pwd", "ls -la", "echo $SHELL", "cd --show"], c: 0 },
         { q: "What does 'grep' do?", a: ["Searches text patterns", "Creates files", "Compresses files", "Lists processes"], c: 0 },
         { q: "What does 'chmod' modify?", a: ["File permissions", "File owner", "File name", "File size"], c: 0 },
@@ -289,7 +289,7 @@ const QUESTIONS = {
         { q: "What is ICMP used for?", a: ["Error messages and diagnostics", "File transfer", "Email delivery", "Web content delivery"], c: 0 },
         { q: "What is an API Gateway?", a: ["Manages and routes API requests", "Network switch", "DNS server", "Firewall"], c: 0 },
         { q: "What is anycast routing?", a: ["One IP, nearest of many servers", "One IP, one fixed server", "Many IPs, one server", "Broadcast to all servers"], c: 0 },
-        { q: "What is network latency?", a: ["Delay in data transmission", "Bandwidth limit", "Packet loss rate", "Connection timeout"], c: 0 },
+        { q: "Which HTTP status code means the server understood the request but refuses to authorize it?", a: ["403 Forbidden", "401 Unauthorized", "404 Not Found", "429 Too Many Requests"], c: 0 },
         { q: "What is a service mesh?", a: ["Infrastructure for service-to-service communication", "Physical network cabling", "DNS management system", "Hardware load balancer"], c: 0 }
     ]
 };
