@@ -220,7 +220,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
               fontFamily: "'Space Grotesk', sans-serif"
             }}
           >
-            📸 Capture
+            <span aria-hidden="true">📸</span> Capture
           </button>
         </div>
       </div>
@@ -263,7 +263,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px',
           fontSize: 28
         }}>
-          🖼️
+          <span aria-hidden="true">🖼️</span>
         </div>
         <p style={{ color: '#F8F8F8', fontWeight: 600, marginBottom: 6, fontFamily: "'Syne', sans-serif" }}>
           Upload your passport, visa, or ID photo
@@ -285,7 +285,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
         onMouseEnter={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = `${accentPurple}22`; el.style.borderColor = `${accentPurple}88`; }}
         onMouseLeave={e => { const el = e.currentTarget as HTMLButtonElement; el.style.background = `${accentPurple}11`; el.style.borderColor = `${accentPurple}44`; }}
       >
-        📷 Take Photo
+        <span aria-hidden="true">📷</span> Take Photo
       </button>
 
       {cameraError && (

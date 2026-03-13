@@ -204,7 +204,7 @@ export default function App() {
               >
                 {status === AppStatus.CHECKING ? (
                   <>
-                    <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                    <span aria-hidden="true" style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                     Checking...
                   </>
                 ) : (
@@ -417,7 +417,7 @@ export default function App() {
           marginTop: 60, textAlign: 'center', 
           padding: '24px 0', 
           borderTop: '1px solid rgba(255,255,255,0.06)',
-          color: 'rgba(255,255,255,0.3)', fontSize: 13
+          color: 'rgba(255,255,255,0.5)', fontSize: 13
         }}>
           <p>
             Made with <span style={{ color: accentPink }}>♥</span> by PassportLens · {CURRENT_YEAR}

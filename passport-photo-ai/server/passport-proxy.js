@@ -10,11 +10,20 @@ import crypto from 'crypto';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: `${__dirname}/../.env.local` });
 
+if (!process.env.GEMINI_API_KEY) {
+  console.error('ERROR: GEMINI_API_KEY is not set. Server cannot start without it.');
+  process.exit(1);
+}
+
 const app = express();
 app.set('trust proxy', 1);
 app.use(compression());
+const allowedOrigins = ['https://passportphoto.tranthachnguyen.com'];
+if (process.env.NODE_ENV !== 'production') {
+  allowedOrigins.push('http://localhost:5186', 'http://localhost:5173');
+}
 app.use(cors({
-  origin: ['https://passportphoto.tranthachnguyen.com', 'http://localhost:5186', 'http://localhost:5173'],
+  origin: allowedOrigins,
   methods: ['POST'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -74,9 +83,9 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const _checkCache = new Map(); // hash -> { result, expires }
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 const CACHE_MAX = 200;
-/** Returns a 16-character hex prefix of the SHA-256 hash of the base64 image data. */
+/** Returns the full SHA-256 hex hash of the base64 image data. */
 function getCacheKey(data) {
-  return crypto.createHash('sha256').update(data).digest('hex').slice(0, 16);
+  return crypto.createHash('sha256').update(data).digest('hex');
 }
 
 /** Returns the cached result for `key`, or `null` if missing or expired. */
@@ -218,10 +227,5 @@ adjustBrightness/adjustContrast are % to add (e.g., 5 means +5%)` }
 app.get('/{*splat}', (req, res) => {
   res.sendFile(join(distPath, 'index.html'));
 });
-
-if (!process.env.GEMINI_API_KEY) {
-  console.error('ERROR: GEMINI_API_KEY is not set. Server cannot start without it.');
-  process.exit(1);
-}
 
 app.listen(5185, () => console.log('API on port 5185, Key: Yes'));
