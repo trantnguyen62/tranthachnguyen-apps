@@ -68,6 +68,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const optionsLengthRef = useRef(4);
 
   useEffect(() => {
     return () => {
@@ -97,6 +98,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
   const questions = useMemo(() => getQuestions(language), [language]);
   const question = questions[currentQuestionIndex];
   const t = TRANSLATIONS[language];
+  optionsLengthRef.current = question.options.length;
 
   const handleOptionSelect = useCallback((index: number) => {
     if (showResult) return;
@@ -125,7 +127,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
       if (!showResult) {
         const keyMap: Record<string, number> = { a: 0, b: 1, c: 2, d: 3 };
         const idx = keyMap[e.key.toLowerCase()];
-        if (idx !== undefined && idx < question.options.length) {
+        if (idx !== undefined && idx < optionsLengthRef.current) {
           e.preventDefault();
           handleOptionSelect(idx);
         }
@@ -136,7 +138,7 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [quizCompleted, showResult, question.options.length, handleOptionSelect, nextQuestion]);
+  }, [quizCompleted, showResult, handleOptionSelect, nextQuestion]);
 
   // Auto-focus Next button when answer is revealed
   useEffect(() => {
