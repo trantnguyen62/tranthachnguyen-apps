@@ -42,6 +42,7 @@ npm run dev
 |---|---|---|---|
 | `VITE_PROXY_URL` | Frontend | `http://localhost:5174` | URL of the local proxy server |
 | `GEMINI_PROXY_URL` | Proxy server (`.env.local`) | `http://localhost:3000` | URL of the gemini-web-proxy instance |
+| `ALLOWED_ORIGINS` | Proxy server (`.env.local`) | `https://photoedit.tranthachnguyen.com` | Comma-separated list of allowed CORS origins; add `http://localhost:5173` for local development |
 
 ### Architecture
 
