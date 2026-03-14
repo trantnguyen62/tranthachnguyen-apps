@@ -505,7 +505,7 @@ function App() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-emerald-400" aria-hidden="true" />
-                  <span className="text-sm font-medium">AI Tutor</span>
+                  <h2 className="text-sm font-medium">AI Tutor</h2>
                 </div>
                 <span aria-live="polite" aria-atomic="true">
                   {isConnected ? (

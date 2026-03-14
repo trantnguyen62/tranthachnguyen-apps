@@ -108,7 +108,10 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
             )}
             <span className="text-slate-200 font-medium flex-shrink-0">{file.name}</span>
           </span>
-          <span className={`text-xs px-2 py-0.5 rounded font-medium flex-shrink-0 ${LANG_COLORS[file.language] || 'bg-slate-600/50 text-slate-400'}`}>
+          <span
+            className={`text-xs px-2 py-0.5 rounded font-medium flex-shrink-0 ${LANG_COLORS[file.language] || 'bg-slate-600/50 text-slate-400'}`}
+            aria-label={`Language: ${file.language}`}
+          >
             {file.language}
           </span>
           <span className="text-xs text-slate-500 flex-shrink-0">{lines.length.toLocaleString()} lines</span>
