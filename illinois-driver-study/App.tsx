@@ -13,6 +13,11 @@ const LivePractice = lazy(() =>
   import('./components/LivePractice').then(m => ({ default: m.LivePractice }))
 );
 
+// Static icon elements defined at module level so NavButton memo checks pass (stable references)
+const ICON_QUIZ = <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>;
+const ICON_STUDY = <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
+const ICON_LIVE = <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>;
+
 // Static translations moved outside component
 const TRANSLATIONS = {
   en: {
@@ -36,6 +41,17 @@ const TRANSLATIONS = {
 } as const;
 
 const CURRENT_YEAR = new Date().getFullYear();
+
+// Shared Suspense fallback — extracted to avoid duplicating the same JSX three times
+const LoadingFallback: React.FC<{ language: Language }> = ({ language }) => (
+  <div role="status" className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
+    <svg aria-hidden="true" className="w-8 h-8 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+    <span className="text-sm">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span>
+  </div>
+);
 
 // Memoized NavButton component
 const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: string; currentMode: AppMode; onClick: (mode: AppMode) => void }>(({
@@ -136,42 +152,42 @@ const App: React.FC = () => {
 
       <main id="main-content" className="max-w-5xl mx-auto px-4 py-6 w-full flex-grow flex flex-col">
         <nav aria-label="Study modes" className="flex flex-wrap gap-3 mb-8 justify-center">
-          <NavButton 
-            targetMode={AppMode.QUIZ} 
+          <NavButton
+            targetMode={AppMode.QUIZ}
             currentMode={mode}
             onClick={handleModeChange}
             label={t.quizMode}
-            icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>}
+            icon={ICON_QUIZ}
           />
-          <NavButton 
-            targetMode={AppMode.STUDY} 
+          <NavButton
+            targetMode={AppMode.STUDY}
             currentMode={mode}
             onClick={handleModeChange}
             label={t.studyList}
-            icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>}
+            icon={ICON_STUDY}
           />
-          <NavButton 
-            targetMode={AppMode.LIVE_PRACTICE} 
+          <NavButton
+            targetMode={AppMode.LIVE_PRACTICE}
             currentMode={mode}
             onClick={handleModeChange}
             label={t.livePractice}
-            icon={<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>}
+            icon={ICON_LIVE}
           />
         </nav>
 
         <div className="flex-grow animate-fade-in">
           {mode === AppMode.QUIZ && (
-            <Suspense fallback={<div role="status" className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400"><svg aria-hidden="true" className="w-8 h-8 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg><span className="text-sm">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span></div>}>
+            <Suspense fallback={<LoadingFallback language={language} />}>
               <QuizMode language={language} />
             </Suspense>
           )}
           {mode === AppMode.STUDY && (
-            <Suspense fallback={<div role="status" className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400"><svg aria-hidden="true" className="w-8 h-8 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg><span className="text-sm">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span></div>}>
+            <Suspense fallback={<LoadingFallback language={language} />}>
               <StudyMode language={language} />
             </Suspense>
           )}
           {mode === AppMode.LIVE_PRACTICE && (
-            <Suspense fallback={<div role="status" className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400"><svg aria-hidden="true" className="w-8 h-8 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg><span className="text-sm">{language === 'vi' ? 'Đang tải...' : 'Loading...'}</span></div>}>
+            <Suspense fallback={<LoadingFallback language={language} />}>
               <LivePractice language={language} />
             </Suspense>
           )}

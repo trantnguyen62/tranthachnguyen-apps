@@ -5,6 +5,9 @@ const MODEL_TTS = "gemini-2.5-flash-preview-tts";
 const MODEL_IMAGE = "gemini-3-pro-image-preview";
 const MODEL_FLASH = "gemini-2.5-flash";
 
+/** Singleton GoogleGenAI client — reused across all API calls to avoid repeated allocation. */
+let _ai: GoogleGenAI | null = null;
+
 /**
  * Returns a GoogleGenAI client configured with the environment API key.
  * When `requireSelection` is true (e.g. for paid image generation models),
@@ -21,7 +24,8 @@ const getAI = async (requireSelection: boolean = false) => {
        }
     }
   }
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (!_ai) _ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  return _ai;
 };
 
 /** Encodes an ArrayBuffer as a base64 string for use in Gemini API inline data payloads. */
