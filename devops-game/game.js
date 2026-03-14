@@ -1131,7 +1131,7 @@ function checkAnswer(index) {
         handleCorrectAnswer();
     } else {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
-        announce(`Wrong. The correct answer is: ${correctText}`);
+        announce(`Wrong! −${CONFIG.DAMAGE_WRONG} HP. The correct answer is: ${correctText}`);
         handleWrongAnswer();
     }
 
@@ -1199,6 +1199,7 @@ function handleTimeout() {
     const btns = domCache.answerBtns;
     btns[game.currentQuestion.correctIndex].classList.add('correct');
 
+    announce(`Time's up! −${CONFIG.DAMAGE_TIMEOUT} HP.`);
     takeDamage(CONFIG.DAMAGE_TIMEOUT);
 
     // Show explanation if available
