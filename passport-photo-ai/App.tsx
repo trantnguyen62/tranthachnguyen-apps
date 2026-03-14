@@ -138,7 +138,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Don't get rejected at the counter. Free AI check instantly verifies your photo meets official ICAO biometric standards — for passports, visas, and ID cards in 100+ countries.<br/>
+            Don't get rejected at the counter. Free AI instantly verifies your photo meets official ICAO biometric standards — for passports, visas, and ID cards in 100+ countries.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
 
@@ -285,7 +285,7 @@ export default function App() {
                   ))}
                 </div>
                 <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 16, letterSpacing: '0.03em' }}>
-                  Checking against official passport standards&hellip;
+                  Analyzing your photo against official ICAO biometric standards&hellip;
                 </p>
               </div>
             ) : status === AppStatus.ERROR ? (
@@ -460,7 +460,7 @@ export default function App() {
                   filter: 'grayscale(80%)'
                 }}>🪪</div>
                 <p style={{ fontSize: 15, maxWidth: 240, lineHeight: 1.6, marginBottom: 20, color: 'rgba(255,255,255,0.8)' }}>
-                  Upload a photo and tap <strong style={{ color: 'rgba(255,255,255,0.9)' }}>Check Photo</strong> to get instant AI analysis against official passport, visa, and ID requirements — results in seconds.
+                  Upload your photo and tap <strong style={{ color: 'rgba(255,255,255,0.9)' }}>Check Photo</strong> for AI analysis against official passport, visa, and ID photo requirements — results in seconds.
                 </p>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.8)', marginBottom: 10, fontWeight: 600 }}>
