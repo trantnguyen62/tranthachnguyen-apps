@@ -108,6 +108,9 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   // Tracks the scheduled end time of the last audio buffer so consecutive chunks
   // are queued back-to-back without gaps or overlap.
   const nextStartTimeRef = useRef<number>(0);
+  // Tracks all currently scheduled/playing output audio sources so they can be
+  // stopped immediately when the server signals an interruption.
+  const activeOutputSourcesRef = useRef<AudioBufferSourceNode[]>([]);
   const sessionRef = useRef<any>(null);
   const resolvedSessionRef = useRef<any>(null);
   const lastVolumeRef = useRef<number>(0);
@@ -140,6 +143,8 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       outputAudioContextRef.current = null;
     }
 
+    activeOutputSourcesRef.current.forEach(s => { try { s.stop(); } catch { /* already ended */ } });
+    activeOutputSourcesRef.current = [];
     resolvedSessionRef.current = null;
     lastVolumeRef.current = 0;
     nextStartTimeRef.current = 0;
@@ -313,11 +318,13 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
                const source = ctx.createBufferSource();
                source.buffer = audioBuffer;
                source.connect(ctx.destination);
+               activeOutputSourcesRef.current.push(source);
                source.start(nextStartTimeRef.current);
 
                nextStartTimeRef.current += audioBuffer.duration;
 
                source.onended = () => {
+                 activeOutputSourcesRef.current = activeOutputSourcesRef.current.filter(s => s !== source);
                  const currentCtx = outputAudioContextRef.current;
                  if (currentCtx && currentCtx.currentTime >= nextStartTimeRef.current - AUDIO_END_TOLERANCE) {
                     setStatus('connected');
@@ -326,6 +333,8 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
              }
 
              if (message.serverContent?.interrupted) {
+               activeOutputSourcesRef.current.forEach(s => { try { s.stop(); } catch { /* already ended */ } });
+               activeOutputSourcesRef.current = [];
                nextStartTimeRef.current = 0;
                setStatus('connected');
              }
