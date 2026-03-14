@@ -113,13 +113,12 @@ function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-extrabold mb-6">
-              <span className="gradient-text">Daily News</span>
+              <span className="gradient-text">Real Stories</span>
               <br />
               <span className="text-white">Turned Into Comics</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-              Real news events. Real-life moments. All brought to life through comics —
-              from weather alerts to everyday awkwardness, one panel at a time.
+              News events, awkward moments, and stories you recognize — brought to life one panel at a time.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link

@@ -88,7 +88,7 @@ const comics = [
     author: "National Weather Service",
     genre: "News",
     coverImage: "/images/evanston-cold-weather.png",
-    description: "Saturday's cold gets substantially worse overnight with temperatures dropping to zero in Evanston and dangerous wind chill values. Wind gusts to 25 mph and hazardous travel conditions south of I-80 make this one worth staying home for.",
+    description: "Saturday at noon: 10 degrees. Overnight: zero. Wind chill of minus 8. The National Weather Service would like a word about your weekend plans.",
     rating: 4.7,
     chapters: 1,
     status: "Completed",
