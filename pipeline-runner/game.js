@@ -35,7 +35,8 @@ const CONFIG = {
     PLAYER_SIZE: 50,        // Player sprite bounding box (px)
     OBSTACLE_WIDTH: 100,    // Width of each obstacle column (px)
     QUESTION_INTERVAL: 5,   // Gates passed before a quiz question is triggered
-    QUESTION_TIME: 12       // Seconds allowed to answer a quiz question
+    QUESTION_TIME: 12,      // Seconds allowed to answer a quiz question
+    TERMINAL_VELOCITY: 12   // Maximum downward velocity (px/frame) to prevent tunneling
 };
 
 // DevOps Topics with learnable commands/concepts
@@ -716,6 +717,7 @@ function startGame() {
     game.floatingTexts = [];
     game.learnedItems = [];
     game.contentQueue = [];
+    game.questionQueue = [];
     game.questionActive = false;
     game.currentQuestion = null;
     if (game.questionTimerInterval) {
@@ -771,6 +773,7 @@ function gameLoop() {
 
 function update() {
     game.player.velocity += CONFIG.GRAVITY;
+    if (game.player.velocity > CONFIG.TERMINAL_VELOCITY) game.player.velocity = CONFIG.TERMINAL_VELOCITY;
     game.player.y += game.player.velocity;
     game.player.rotation = Math.min(Math.max(game.player.velocity * 2.5, -20), 60);
 
@@ -1089,7 +1092,15 @@ function checkCollision() {
 function showQuestion() {
     const questions = QUESTIONS[game.selectedTopic];
     if (!questions || questions.length === 0) return;
-    const question = questions[Math.floor(Math.random() * questions.length)];
+    if (game.questionQueue.length === 0) {
+        const indices = Array.from({ length: questions.length }, (_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+        }
+        game.questionQueue = indices;
+    }
+    const question = questions[game.questionQueue.pop()];
 
     const answers = question.a.map((text, originalIndex) => ({ text, originalIndex }));
     for (let i = answers.length - 1; i > 0; i--) {

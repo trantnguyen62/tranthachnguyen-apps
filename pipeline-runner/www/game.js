@@ -35,7 +35,8 @@ const CONFIG = {
     PLAYER_SIZE: 50,        // Player sprite bounding box (px)
     OBSTACLE_WIDTH: 100,    // Width of each obstacle column (px)
     QUESTION_INTERVAL: 5,   // Gates passed before a quiz question is triggered
-    QUESTION_TIME: 12       // Seconds allowed to answer a quiz question
+    QUESTION_TIME: 12,      // Seconds allowed to answer a quiz question
+    TERMINAL_VELOCITY: 12   // Maximum downward velocity (px/frame) to prevent tunneling
 };
 
 // DevOps Topics with learnable commands/concepts
@@ -450,6 +451,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     game.canvas = document.getElementById('gameCanvas');
+    if (!game.canvas) return;
     game.ctx = game.canvas.getContext('2d', { alpha: false });
 
     // Cache frequently accessed DOM elements to avoid repeated lookups
@@ -494,8 +496,10 @@ function loadProgress() {
     const rawLearned = parseInt(localStorage.getItem('pipeline-runner-learned') || '0', 10);
     game.bestScore = (isNaN(rawBest) || rawBest < 0) ? 0 : Math.min(rawBest, 1e7);
     game.totalLearned = (isNaN(rawLearned) || rawLearned < 0) ? 0 : Math.min(rawLearned, 1e7);
-    document.getElementById('bestScore').textContent = game.bestScore;
-    document.getElementById('totalLearned').textContent = game.totalLearned;
+    const elBest = document.getElementById('bestScore');
+    const elLearned = document.getElementById('totalLearned');
+    if (elBest) elBest.textContent = game.bestScore;
+    if (elLearned) elLearned.textContent = game.totalLearned;
 }
 
 function saveProgress() {
@@ -513,6 +517,7 @@ function saveProgress() {
 
 function renderTopicButtons() {
     const container = document.getElementById('topicButtons');
+    if (!container) return;
     container.innerHTML = '';
 
     TOPICS.forEach((topic, index) => {
@@ -559,7 +564,8 @@ function selectTopic(topicId) {
     game.contentQueue = []; // reset queue so it refills for the new topic
     updateTopicCache();
     renderTopicButtons();
-    document.querySelector('.icon-preview').textContent = game.topicCache.topic.icon;
+    const iconPreview = document.querySelector('.icon-preview');
+    if (iconPreview) iconPreview.textContent = game.topicCache.topic.icon;
     const selectedBtn = document.querySelector('.topic-btn.selected');
     if (selectedBtn) selectedBtn.focus();
 }
@@ -711,6 +717,7 @@ function startGame() {
     game.floatingTexts = [];
     game.learnedItems = [];
     game.contentQueue = [];
+    game.questionQueue = [];
     game.questionActive = false;
     game.currentQuestion = null;
     if (game.questionTimerInterval) {
@@ -766,6 +773,7 @@ function gameLoop() {
 
 function update() {
     game.player.velocity += CONFIG.GRAVITY;
+    if (game.player.velocity > CONFIG.TERMINAL_VELOCITY) game.player.velocity = CONFIG.TERMINAL_VELOCITY;
     game.player.y += game.player.velocity;
     game.player.rotation = Math.min(Math.max(game.player.velocity * 2.5, -20), 60);
 
@@ -1084,7 +1092,15 @@ function checkCollision() {
 function showQuestion() {
     const questions = QUESTIONS[game.selectedTopic];
     if (!questions || questions.length === 0) return;
-    const question = questions[Math.floor(Math.random() * questions.length)];
+    if (game.questionQueue.length === 0) {
+        const indices = Array.from({ length: questions.length }, (_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+        }
+        game.questionQueue = indices;
+    }
+    const question = questions[game.questionQueue.pop()];
 
     const answers = question.a.map((text, originalIndex) => ({ text, originalIndex }));
     for (let i = answers.length - 1; i > 0; i--) {
@@ -1496,6 +1512,7 @@ const AdManager = {
         const timerDisplay = document.getElementById('rewardedAdTimer');
         const skipBtn = document.getElementById('skipAdBtn');
 
+        if (!modal || !timerDisplay || !skipBtn) return;
         modal.classList.remove('hidden');
         this.remainingTime = 5;
         timerDisplay.textContent = this.remainingTime;
