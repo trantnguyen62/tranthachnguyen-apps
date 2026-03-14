@@ -142,6 +142,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
 
     resolvedSessionRef.current = null;
     lastVolumeRef.current = 0;
+    nextStartTimeRef.current = 0;
     setIsActive(false);
     setStatus('idle');
     setVolume(0);
@@ -343,7 +344,8 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       console.error("Connection failed", err);
       setStatus('idle');
       setIsActive(false);
-      setSessionError(t.mic_permission);
+      const isPermissionError = err instanceof Error && err.name === 'NotAllowedError';
+      setSessionError(isPermissionError ? t.mic_permission : (err instanceof Error ? err.message : String(err)));
     }
   };
 
