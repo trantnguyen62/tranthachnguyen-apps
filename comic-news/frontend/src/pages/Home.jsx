@@ -14,7 +14,7 @@ function Home() {
     document.title = 'Comic News - Daily News Turned Into Comics';
 
     // Reset OG/Twitter tags to site defaults
-    const defaultImg = `${window.location.origin}/comics/love-you-cashier.png`;
+    const defaultImg = `${window.location.origin}/images/love-you-cashier.png`;
     const defaultTitle = 'Comic News - Daily News Turned Into Comics';
     const defaultDesc = "Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you'll actually want to read.";
     setMeta('meta[property="og:type"]', 'website');

@@ -716,7 +716,9 @@ app.get('/comic/:id', (req, res) => {
   const comic = comics.find(c => c.id === id);
   if (!comic || !indexHtmlTemplate) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    return res.sendFile(join(__dirname, 'dist', 'index.html'));
+    return res.sendFile(join(__dirname, 'dist', 'index.html'), (err) => {
+      if (err && !res.headersSent) res.status(500).end();
+    });
   }
 
   const pageTitle = `${comic.title} - Comic News`;
@@ -779,7 +781,9 @@ app.get('/comic/:id', (req, res) => {
 app.get('/library', (req, res) => {
   if (!indexHtmlTemplate) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    return res.sendFile(join(__dirname, 'dist', 'index.html'));
+    return res.sendFile(join(__dirname, 'dist', 'index.html'), (err) => {
+      if (err && !res.headersSent) res.status(500).end();
+    });
   }
 
   const pageTitle = 'Story Library - Comic News';
@@ -834,7 +838,9 @@ app.get('/library', (req, res) => {
 // SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.sendFile(join(__dirname, 'dist', 'index.html'));
+  res.sendFile(join(__dirname, 'dist', 'index.html'), (err) => {
+    if (err && !res.headersSent) res.status(500).end();
+  });
 });
 
 app.listen(PORT, () => {

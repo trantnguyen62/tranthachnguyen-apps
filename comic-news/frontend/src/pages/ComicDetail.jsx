@@ -7,6 +7,7 @@ function ComicDetail() {
   const { id } = useParams();
   const [comic, setComic] = useState(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isBookmarking, setIsBookmarking] = useState(false);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(1);
 
@@ -123,6 +124,8 @@ function ComicDetail() {
   }, [id]);
 
   const toggleBookmark = async () => {
+    if (isBookmarking) return;
+    setIsBookmarking(true);
     try {
       const method = isBookmarked ? 'DELETE' : 'POST';
       const res = await fetch(`/api/bookmarks/${id}`, { method });
@@ -131,6 +134,8 @@ function ComicDetail() {
       }
     } catch (error) {
       console.error('Error toggling bookmark:', error);
+    } finally {
+      setIsBookmarking(false);
     }
   };
 
@@ -260,9 +265,10 @@ function ComicDetail() {
               </Link>
               <button
                 onClick={toggleBookmark}
+                disabled={isBookmarking}
                 aria-pressed={isBookmarked}
                 aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-                className={`inline-flex items-center gap-2 px-6 py-4 rounded-xl font-medium transition-all ${
+                className={`inline-flex items-center gap-2 px-6 py-4 rounded-xl font-medium transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
                   isBookmarked
                     ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                     : 'glass-effect text-gray-300 hover:text-white'
