@@ -353,7 +353,7 @@ export const questionsEn: Question[] = [
       "Take your foot off the accelerator and let your vehicle slow down."
     ],
     correctIndex: 2,
-    explanation: "During hydroplaning, the tires lose contact with the road surface. Lifting your foot off the accelerator allows the vehicle to naturally slow down and the tires to regain grip without causing a spin."
+    explanation: "During hydroplaning, water pressure lifts the tires off the road, causing a complete loss of traction. Lift your foot off the accelerator to let the vehicle slow naturally until tires regain contact. Do not brake hard — locking the wheels on a frictionless surface will cause an uncontrolled spin."
   },
   {
     id: 35,
@@ -545,7 +545,7 @@ export const questionsEn: Question[] = [
       "Maintain your current speed and proceed through the intersection."
     ],
     correctIndex: 1,
-    explanation: "A yellow signal warns that the light is about to turn red. You must stop before entering the intersection if you can do so safely. Only continue through if stopping would require sudden braking that could cause a rear-end collision. Speeding up to beat a red light is dangerous and illegal."
+    explanation: "A yellow signal warns that the light is about to turn red. Stop before the intersection if you can do so safely. Never accelerate to beat a red light — this is dangerous and illegal. If you are already past the stop line when the light turns yellow, proceed through safely rather than stopping abruptly in the middle of the intersection."
   },
   {
     id: 52,
@@ -600,7 +600,7 @@ export const questionsEn: Question[] = [
       "30 mph"
     ],
     correctIndex: 0,
-    explanation: "Illinois law sets a maximum speed limit of 20 mph in school zones when children are present or when posted signs indicate reduced speed. Drivers must slow down and watch for pedestrians crossing near schools. Fines for speeding in a school zone are substantially higher than standard speeding fines, and violations may be enforced by automated speed cameras."
+    explanation: "Illinois law sets a maximum speed limit of 20 mph in school zones during school hours and at times posted on the school zone signs (typically before and after school on school days). The reduced limit applies regardless of whether you can see children — slow down whenever school zone signs are active. Fines for speeding in school zones are substantially higher than standard violations and may be enforced by automated speed cameras."
   },
   {
     id: 57,
@@ -705,7 +705,7 @@ export const questionsVi: Question[] = [
       "Bạn không được vượt qua vạch vàng để vượt xe khác."
     ],
     correctIndex: 2,
-    explanation: "Vạch vàng liền nét ở phía bạn của vạch giữa đường có nghĩa là bạn đang ở vùng cấm vượt. Bạn không được vượt qua vạch đó để vượt xe khác."
+    explanation: "Vạch vàng liền nét ở phía bạn của vạch giữa đường đánh dấu vùng cấm vượt — thường xuất hiện ở đường cong, dốc hoặc nơi tầm nhìn hạn chế, là nơi có nguy cơ đâm đầu cao nhất. Bạn không được vượt qua vạch đó để vượt xe khác."
   },
   {
     id: 9,
@@ -768,7 +768,7 @@ export const questionsVi: Question[] = [
       "Giữ chân trên bàn đạp phanh để đèn đỏ dễ nhìn thấy hơn."
     ],
     correctIndex: 0,
-    explanation: "Trong sương mù, dùng đèn cốt vì đèn pha xa phản xạ lại sương mù và làm giảm tầm nhìn. Lái với tốc độ đủ chậm để có thể dừng trong khoảng cách bạn nhìn thấy phía trước."
+    explanation: "Trong sương mù, dùng đèn cốt — đèn pha xa phản xạ lại các hạt nước và tạo ra ánh sáng lóa làm giảm tầm nhìn. Lái với tốc độ đủ chậm để có thể dừng trong khoảng cách bạn nhìn thấy rõ phía trước. Ví dụ, nếu tầm nhìn chỉ 100 feet, tốc độ của bạn phải đủ chậm để dừng trong 100 feet đó."
   },
   {
     id: 15,
@@ -967,7 +967,7 @@ export const questionsVi: Question[] = [
       "Nhả chân ga và để xe chậm lại."
     ],
     correctIndex: 2,
-    explanation: "Khi bị trượt nước, lốp xe mất tiếp xúc với mặt đường. Nhấc chân khỏi ga giúp xe giảm tốc tự nhiên và lốp lấy lại độ bám mà không gây quay đầu xe."
+    explanation: "Khi trượt nước, áp lực nước nâng lốp xe khỏi mặt đường, gây mất độ bám hoàn toàn. Nhấc chân khỏi ga để xe giảm tốc tự nhiên cho đến khi lốp xe lấy lại tiếp xúc với mặt đường. Không phanh gấp — khóa bánh xe trên mặt đường không có ma sát sẽ gây quay vòng mất kiểm soát."
   },
   {
     id: 35,
@@ -1159,7 +1159,7 @@ export const questionsVi: Question[] = [
       "Giữ nguyên tốc độ và tiếp tục qua giao lộ."
     ],
     correctIndex: 1,
-    explanation: "Đèn vàng cảnh báo đèn sắp chuyển đỏ. Bạn phải dừng lại trước giao lộ nếu có thể làm an toàn. Chỉ tiếp tục đi nếu dừng lại sẽ phải phanh gấp có thể gây tai nạn đuôi xe. Tăng tốc để 'qua kịp' đèn đỏ là nguy hiểm và bất hợp pháp."
+    explanation: "Đèn vàng cảnh báo đèn sắp chuyển đỏ. Dừng lại trước giao lộ nếu có thể làm an toàn. Không bao giờ tăng tốc để 'qua kịp' đèn đỏ — điều này nguy hiểm và bất hợp pháp. Nếu bạn đã vượt qua vạch dừng khi đèn chuyển vàng, hãy tiếp tục qua giao lộ an toàn thay vì dừng đột ngột giữa giao lộ."
   },
   {
     id: 52,
@@ -1214,7 +1214,7 @@ export const questionsVi: Question[] = [
       "30 mph"
     ],
     correctIndex: 0,
-    explanation: "Pháp luật Illinois quy định tốc độ tối đa 20 mph trong khu vực trường học khi có trẻ em hoặc khi biển báo yêu cầu giảm tốc. Tài xế phải giảm tốc và chú ý người đi bộ qua đường gần trường học. Tiền phạt vi phạm tốc độ trong khu vực trường học cao hơn đáng kể so với mức phạt thông thường, và vi phạm có thể được thực thi bằng camera tốc độ tự động."
+    explanation: "Pháp luật Illinois quy định tốc độ tối đa 20 mph trong khu vực trường học trong giờ học và vào các thời điểm ghi trên biển báo khu vực trường học (thường trước và sau giờ học trong các ngày đi học). Giới hạn tốc độ áp dụng dù bạn có nhìn thấy trẻ em hay không — hãy giảm tốc khi biển khu vực trường học đang có hiệu lực. Tiền phạt vi phạm tốc độ trong khu trường học cao hơn đáng kể so với mức thông thường và có thể được thực thi bằng camera tốc độ tự động."
   },
   {
     id: 57,
