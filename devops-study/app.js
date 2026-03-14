@@ -3784,6 +3784,7 @@ function updateHeaderStats() {
 function renderSidebarTopics() {
     const topicList = document.getElementById('topicList');
     topicList.innerHTML = '';
+    sidebarItemMap.clear();
 
     const fragment = document.createDocumentFragment();
     devopsData.topics.forEach(topic => {
@@ -3807,6 +3808,7 @@ function renderSidebarTopics() {
         li.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectTopic(topic); }
         });
+        sidebarItemMap.set(topic.id, li);
         fragment.appendChild(li);
     });
     topicList.appendChild(fragment);
@@ -3815,7 +3817,7 @@ function renderSidebarTopics() {
 // Update a single sidebar topic's progress bar without rebuilding the whole list
 function updateSidebarTopicProgress(topicId) {
     const progress = calculateTopicProgress(topicId);
-    const item = document.querySelector(`.topic-item[data-id="${topicId}"]`);
+    const item = sidebarItemMap.get(topicId);
     if (!item) return;
     const fill = item.querySelector('.topic-progress-fill');
     if (fill) fill.style.width = progress + '%';
@@ -3855,11 +3857,10 @@ function createTopicCard(topic) {
 
 // Render topic grid on welcome screen
 function renderTopicGrid() {
-    const topicGrid = document.getElementById('topicGrid');
-    topicGrid.innerHTML = '';
+    dom.topicGrid.innerHTML = '';
     const fragment = document.createDocumentFragment();
     devopsData.topics.forEach(topic => fragment.appendChild(createTopicCard(topic)));
-    topicGrid.appendChild(fragment);
+    dom.topicGrid.appendChild(fragment);
 }
 
 // Select a topic
@@ -3906,6 +3907,9 @@ function goBack() {
 
 // Cached DOM elements (populated in init)
 let dom = {};
+
+// Sidebar item Map for O(1) lookups (populated in renderSidebarTopics)
+const sidebarItemMap = new Map();
 
 // Cached tab buttons (set once DOM is ready)
 let _cachedTabBtns = null;
@@ -4518,11 +4522,10 @@ function studyCards() {
 // Search functionality
 function handleSearch(event) {
     const query = event.target.value.toLowerCase().trim();
-    const searchResultInfo = document.getElementById('searchResultInfo');
 
     if (!query) {
-        searchResultInfo.hidden = true;
-        searchResultInfo.textContent = '';
+        dom.searchResultInfo.hidden = true;
+        dom.searchResultInfo.textContent = '';
         renderTopicGrid();
         return;
     }
@@ -4544,13 +4547,12 @@ function handleSearch(event) {
     });
 
     // Re-render topic grid with filtered results
-    const topicGrid = document.getElementById('topicGrid');
-    topicGrid.innerHTML = '';
+    dom.topicGrid.innerHTML = '';
 
     if (results.length === 0) {
-        searchResultInfo.hidden = true;
-        searchResultInfo.textContent = '';
-        topicGrid.innerHTML = `
+        dom.searchResultInfo.hidden = true;
+        dom.searchResultInfo.textContent = '';
+        dom.topicGrid.innerHTML = `
             <div class="empty-state" role="status">
                 <span class="empty-state-icon" aria-hidden="true">🔍</span>
                 <p class="empty-state-title">No results found</p>
@@ -4560,12 +4562,12 @@ function handleSearch(event) {
     }
 
     const topicWord = results.length === 1 ? 'topic' : 'topics';
-    searchResultInfo.textContent = `${results.length} ${topicWord} found`;
-    searchResultInfo.hidden = false;
+    dom.searchResultInfo.textContent = `${results.length} ${topicWord} found`;
+    dom.searchResultInfo.hidden = false;
 
     const searchFragment = document.createDocumentFragment();
     results.forEach(({ topic }) => searchFragment.appendChild(createTopicCard(topic)));
-    topicGrid.appendChild(searchFragment);
+    dom.topicGrid.appendChild(searchFragment);
 }
 
 // Initialize app
@@ -4602,6 +4604,8 @@ function init() {
         commandsView: document.getElementById('commandsView'),
         matchView: document.getElementById('matchView'),
         codebaseView: document.getElementById('codebaseView'),
+        topicGrid: document.getElementById('topicGrid'),
+        searchResultInfo: document.getElementById('searchResultInfo'),
     };
 
     loadProgress();
@@ -4695,6 +4699,14 @@ function init() {
         }
     });
 }
+
+// Load Google Fonts asynchronously to avoid render-blocking
+(function loadFonts() {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap';
+    document.head.appendChild(link);
+})();
 
 // Start the app when DOM is ready
 document.addEventListener('DOMContentLoaded', init);
