@@ -11,7 +11,7 @@
 *,*::before,*::after{box-sizing:border-box}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
 .focus\:not-sr-only:focus{position:static;width:auto;height:auto;padding:0;margin:0;overflow:visible;clip:auto;white-space:normal}
-.block{display:block}.inline-block{display:inline-block}.inline-flex{display:inline-flex}
+.block{display:block}.inline-flex{display:inline-flex}
 .flex{display:flex}.grid{display:grid}
 .flex-col{flex-direction:column}.items-center{align-items:center}
 .justify-center{justify-content:center}.justify-between{justify-content:space-between}
@@ -95,8 +95,8 @@
 .group:hover .group-hover\:text-slate-200,.group:focus-within .group-hover\:text-slate-200{color:#e2e8f0}
 .group:hover .group-hover\:translate-x-1,.group:focus-within .group-hover\:translate-x-1{--tw-tx:.25rem;transform:translateX(var(--tw-tx,0)) translateY(var(--tw-ty,0))}
 .group:hover .group-hover\:-translate-y-0\.5,.group:focus-within .group-hover\:-translate-y-0\.5{--tw-ty:-.125rem;transform:translateX(var(--tw-tx,0)) translateY(var(--tw-ty,0))}
-.focus-visible\:outline:focus-visible{outline-style:solid}.focus-visible\:outline-2:focus-visible{outline-width:3px}
-.focus-visible\:outline-offset-2:focus-visible{outline-offset:3px}
+.focus-visible\:outline:focus-visible{outline-style:solid}.focus-visible\:outline-2:focus-visible{outline-width:2px}
+.focus-visible\:outline-offset-2:focus-visible{outline-offset:2px}
 .focus-visible\:outline-blue-400:focus-visible{outline-color:#60a5fa}
 .focus-visible\:outline-emerald-400:focus-visible{outline-color:#34d399}.focus-visible\:outline-purple-400:focus-visible{outline-color:#c084fc}
 .focus-visible\:outline-rose-400:focus-visible{outline-color:#fb7185}.focus-visible\:outline-orange-400:focus-visible{outline-color:#fb923c}
@@ -127,7 +127,7 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     border: 1px solid rgba(255, 255, 255, 0.1);
     contain: layout style paint;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     will-change: transform;
 }
 .glass-card:hover, .glass-card:focus-within {
