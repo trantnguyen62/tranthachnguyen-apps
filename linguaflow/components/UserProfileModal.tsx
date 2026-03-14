@@ -173,8 +173,12 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
                     <div className="text-xs text-slate-400">Buổi học</div>
                   </div>
                   <div className="bg-slate-800 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold text-amber-400">⭐</div>
-                    <div className="text-xs text-slate-400">Tiếp tục nào!</div>
+                    <div className="text-2xl font-bold text-amber-400">
+                      {existingProfile.totalSessions > 0
+                        ? Math.round(existingProfile.wordsLearned.length / existingProfile.totalSessions)
+                        : 0}
+                    </div>
+                    <div className="text-xs text-slate-400">Từ/buổi học</div>
                   </div>
                 </div>
 
