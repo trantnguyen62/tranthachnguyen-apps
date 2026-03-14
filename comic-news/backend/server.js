@@ -535,6 +535,12 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;');
 }
 
+// Safely serialize an object as JSON for embedding in an HTML <script> tag.
+// Escapes </ to prevent </script> from terminating the script block prematurely.
+function safeJsonLd(obj) {
+  return JSON.stringify(obj).replace(/</g, '\\u003c');
+}
+
 let indexHtmlTemplate = '';
 try {
   indexHtmlTemplate = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
@@ -750,7 +756,7 @@ app.get('/comic/:id', (req, res) => {
     .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
     .replace(
       /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
-      `$1\n    <script type="application/ld+json">${JSON.stringify(articleLd)}</script>\n    <script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>`
+      `$1\n    <script type="application/ld+json">${safeJsonLd(articleLd)}</script>\n    <script type="application/ld+json">${safeJsonLd(breadcrumbLd)}</script>`
     );
 
   res.set('Cache-Control', 'public, max-age=300');
@@ -803,7 +809,7 @@ app.get('/library', (req, res) => {
   }
   html = html.replace(
     /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
-    `$1\n    <script type="application/ld+json">${JSON.stringify(collectionLd)}</script>`
+    `$1\n    <script type="application/ld+json">${safeJsonLd(collectionLd)}</script>`
   );
 
   res.set('Cache-Control', 'public, max-age=300');
