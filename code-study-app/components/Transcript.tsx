@@ -21,8 +21,8 @@ function CopyButton({ text }: { text: string }) {
       className="opacity-30 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded hover:bg-slate-600/50 flex-shrink-0 self-start mt-0.5"
     >
       {copied
-        ? <Check className="w-3 h-3 text-green-400" />
-        : <Copy className="w-3 h-3 text-slate-500" />}
+        ? <Check className="w-3 h-3 text-green-400" aria-hidden="true" />
+        : <Copy className="w-3 h-3 text-slate-500" aria-hidden="true" />}
     </button>
   );
 }
@@ -112,7 +112,7 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
       role="log"
       aria-label="Conversation transcript"
       aria-live="polite"
-      aria-relevant="additions"
+      aria-relevant="additions text"
       className="flex-1 overflow-y-auto space-y-4 pr-2"
     >
       {messages.map((message) => (
@@ -122,7 +122,7 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
         >
           {message.role === 'model' && (
             <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
-              <Bot className="w-4 h-4 text-emerald-400" />
+              <Bot className="w-4 h-4 text-emerald-400" aria-hidden="true" />
             </div>
           )}
           <div className={`max-w-[80%] flex flex-col gap-1 ${message.role === 'user' ? 'items-end' : 'items-start'}`}>

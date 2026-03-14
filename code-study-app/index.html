@@ -69,6 +69,17 @@
       .animate-bounce-subtle {
         animation: bounce-subtle 1.5s ease-in-out infinite;
       }
+      /* Respect reduced-motion preference */
+      @media (prefers-reduced-motion: reduce) {
+        .visualizer-idle-bar,
+        .animate-bounce-subtle,
+        .animate-bounce {
+          animation: none !important;
+        }
+        * {
+          transition-duration: 0.01ms !important;
+        }
+      }
       /* Custom scrollbar */
       ::-webkit-scrollbar {
         width: 6px;
