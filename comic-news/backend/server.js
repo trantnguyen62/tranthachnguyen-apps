@@ -24,7 +24,7 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; frame-ancestors 'none'");
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
@@ -524,7 +524,12 @@ const genresETag = `"${_dataHash}-genres"`;
 const featuredETag = `"${_dataHash}-featured"`;
 const comicETags = new Map(comics.map(c => [c.id, `"${_dataHash}-${c.id}"`]));
 
-const baseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
+const _rawBaseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
+if (!/^https?:\/\/[a-zA-Z0-9.-]+(:\d+)?$/.test(_rawBaseUrl)) {
+  console.error(`Invalid BASE_URL: "${_rawBaseUrl}". Must be https://hostname or http://hostname[:port].`);
+  process.exit(1);
+}
+const baseUrl = _rawBaseUrl;
 const today = new Date().toISOString().split('T')[0];
 
 function escapeHtml(str) {
@@ -548,13 +553,14 @@ try {
   if (err.code !== 'ENOENT') console.error('Failed to read dist/index.html:', err);
 }
 
+const _escapedBaseUrl = escapeHtml(baseUrl);
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>${baseUrl}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>${baseUrl}/library</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>${_escapedBaseUrl}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>${_escapedBaseUrl}/library</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
 ${comics.map(c =>
-  `  <url><loc>${baseUrl}/comic/${c.id}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
-    <image:image><image:loc>${baseUrl}${c.coverImage}</image:loc><image:title>${escapeHtml(c.title)}</image:title><image:caption>${escapeHtml(c.description)}</image:caption></image:image>
+  `  <url><loc>${_escapedBaseUrl}/comic/${c.id}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
+    <image:image><image:loc>${_escapedBaseUrl}${escapeHtml(c.coverImage)}</image:loc><image:title>${escapeHtml(c.title)}</image:title><image:caption>${escapeHtml(c.description)}</image:caption></image:image>
   </url>`
 ).join('\n')}
 </urlset>`;
