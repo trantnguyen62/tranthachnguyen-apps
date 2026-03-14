@@ -38,6 +38,8 @@ const PASSPORT_PROMPT = "Convert this into a professional passport photo: solid 
 
 const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement", "Always Free · No Account Needed"];
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 
 /**
  * Root application component for NanoEdit AI.
@@ -482,7 +484,7 @@ const App: React.FC = () => {
             NanoEdit AI is a free AI-powered image editor. Remove backgrounds, retouch portraits, create passport photos, and apply artistic filters — all with simple text prompts.
           </p>
           <p className="text-slate-400 text-xs">
-            &copy; {new Date().getFullYear()} NanoEdit AI &middot; Powered by Google Gemini &middot; Free online photo editor
+            &copy; {CURRENT_YEAR} NanoEdit AI &middot; Powered by Google Gemini &middot; Free online photo editor
           </p>
         </div>
       </footer>

@@ -39,13 +39,14 @@ const compressImage = (file: File): Promise<{ data: string; mimeType: string }> 
           height = MAX_DIMENSION;
         }
       }
+      const outMime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
-      const ctx = canvas.getContext('2d');
+      // alpha: false lets the browser skip alpha-channel computation for JPEG output
+      const ctx = canvas.getContext('2d', { alpha: outMime !== 'image/png' ? false : true });
       if (!ctx) { reject(new Error('Canvas unavailable')); return; }
       ctx.drawImage(img, 0, 0, width, height);
-      const outMime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
       const data = outMime === 'image/jpeg'
         ? canvas.toDataURL('image/jpeg', 0.85)
         : canvas.toDataURL('image/png');
@@ -132,7 +133,8 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
     const canvas = document.createElement('canvas');
     canvas.width = videoWidth;
     canvas.height = videoHeight;
-    const ctx = canvas.getContext('2d');
+    // alpha: false — JPEG output doesn't support transparency; skip alpha overhead
+    const ctx = canvas.getContext('2d', { alpha: false });
     if (ctx) {
       ctx.drawImage(videoRef.current, 0, 0);
       // 0.85 quality: good visual fidelity with ~30% smaller file vs. lossless

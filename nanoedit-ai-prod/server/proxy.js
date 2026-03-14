@@ -20,8 +20,8 @@ const GEMINI_PROXY_URL = process.env.GEMINI_PROXY_URL || 'http://localhost:3000'
 
 // Keep-alive agents reuse TCP connections to the upstream proxy, reducing
 // per-request connection overhead (especially important for local loopback).
-const httpAgent = new http.Agent({ keepAlive: true });
-const httpsAgent = new https.Agent({ keepAlive: true });
+const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10, maxFreeSockets: 5 });
+const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 10, maxFreeSockets: 5 });
 const fetchOptions = (url) => (url.startsWith('https://') ? { agent: httpsAgent } : { agent: httpAgent });
 
 app.use(compression());
