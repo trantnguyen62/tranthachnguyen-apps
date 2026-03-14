@@ -450,6 +450,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     game.canvas = document.getElementById('gameCanvas');
+    if (!game.canvas) return;
     game.ctx = game.canvas.getContext('2d', { alpha: false });
 
     // Cache frequently accessed DOM elements to avoid repeated lookups
@@ -494,8 +495,10 @@ function loadProgress() {
     const rawLearned = parseInt(localStorage.getItem('pipeline-runner-learned') || '0', 10);
     game.bestScore = (isNaN(rawBest) || rawBest < 0) ? 0 : Math.min(rawBest, 1e7);
     game.totalLearned = (isNaN(rawLearned) || rawLearned < 0) ? 0 : Math.min(rawLearned, 1e7);
-    document.getElementById('bestScore').textContent = game.bestScore;
-    document.getElementById('totalLearned').textContent = game.totalLearned;
+    const elBest = document.getElementById('bestScore');
+    const elLearned = document.getElementById('totalLearned');
+    if (elBest) elBest.textContent = game.bestScore;
+    if (elLearned) elLearned.textContent = game.totalLearned;
 }
 
 function saveProgress() {
@@ -513,6 +516,7 @@ function saveProgress() {
 
 function renderTopicButtons() {
     const container = document.getElementById('topicButtons');
+    if (!container) return;
     container.innerHTML = '';
 
     TOPICS.forEach((topic, index) => {
@@ -559,7 +563,8 @@ function selectTopic(topicId) {
     game.contentQueue = []; // reset queue so it refills for the new topic
     updateTopicCache();
     renderTopicButtons();
-    document.querySelector('.icon-preview').textContent = game.topicCache.topic.icon;
+    const iconPreview = document.querySelector('.icon-preview');
+    if (iconPreview) iconPreview.textContent = game.topicCache.topic.icon;
     const selectedBtn = document.querySelector('.topic-btn.selected');
     if (selectedBtn) selectedBtn.focus();
 }
@@ -1496,6 +1501,7 @@ const AdManager = {
         const timerDisplay = document.getElementById('rewardedAdTimer');
         const skipBtn = document.getElementById('skipAdBtn');
 
+        if (!modal || !timerDisplay || !skipBtn) return;
         modal.classList.remove('hidden');
         this.remainingTime = 5;
         timerDisplay.textContent = this.remainingTime;
