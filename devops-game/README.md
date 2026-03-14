@@ -69,12 +69,40 @@ docker run -p 8080:80 devops-game
 
 ```
 devops-game/
-├── index.html      # Main HTML file
-├── game.js         # Game logic (Canvas-based)
-├── styles.css      # Styling
-├── assets/         # Game assets (images, etc.)
-└── Dockerfile      # Docker configuration
+├── index.html      # Main HTML — all screens, ARIA roles, Open Graph & schema.org metadata
+├── game.js         # Game engine — config, questions database, game loop, rendering
+├── styles.css      # Styling — CSS custom properties, keyframe animations, responsive layout
+├── assets/         # Sprites and background images
+└── Dockerfile      # Multi-stage build; runs as non-root, adds security headers
 ```
+
+## 🏗️ Architecture
+
+The game runs entirely in the browser with no build step.
+
+- **Rendering** — HTML5 Canvas 2D API. A `requestAnimationFrame` loop calls `update()` then `render()` every frame. The canvas is sized to the viewport on load and on resize.
+- **State** — A single mutable `game` object holds all runtime state (player, enemies, particles, score, etc.). Config constants live in `CONFIG`; they are the only tuning knobs needed for most mechanical changes.
+- **Questions** — `QUESTIONS[topicId]` is an array of objects `{ q, a, c, e }`. Answers are Fisher-Yates shuffled at display time, so `c` must always index the correct item in the original `a` array.
+- **HUD** — DOM-based overlay on top of the canvas. A dirty-check cache (`game._hud`) prevents redundant DOM writes every frame.
+- **Persistence** — High score only, stored in `localStorage` under the key `devops-defender-highscore`.
+- **Accessibility** — ARIA live region (`aria-live="polite"`) announces question results to screen readers. All interactive elements have `aria-label` attributes and keyboard equivalents.
+
+## ➕ Adding Questions or Topics
+
+**Add questions to an existing topic** — append objects to the relevant array in `QUESTIONS`:
+
+```js
+{ q: "Your question?", a: ["Correct", "Wrong A", "Wrong B", "Wrong C"], c: 0, e: "Explanation shown after answering." }
+```
+
+**Add a new topic:**
+
+1. Add a new key to `QUESTIONS` with at least 5 question objects.
+2. Add a matching entry to the `TOPICS` array:
+   ```js
+   { id: 'yourtopic', name: 'Your Topic', icon: '🔥', color: '#hexcolor', desc: 'Short description' }
+   ```
+That's all — the topic card, Practice mode selector, and Adventure progression pick it up automatically.
 
 ## 🌐 Live Demo
 

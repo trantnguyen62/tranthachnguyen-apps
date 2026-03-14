@@ -26,7 +26,24 @@ const CONFIG = {
     MAX_PARTICLES: 150     // cap to prevent GC churn
 };
 
-// DevOps Questions Database
+/**
+ * Questions database, keyed by topic ID.
+ *
+ * Each entry is an array of question objects with the following shape:
+ *   q  {string}   - Question text displayed to the player
+ *   a  {string[]} - Array of exactly 4 answer choices
+ *   c  {number}   - Zero-based index of the correct answer in `a`
+ *   e  {string}   - Explanation shown after the player answers
+ *
+ * At runtime the answer array is Fisher-Yates shuffled, so `c` must
+ * always point to the correct item in the *original* `a` array order.
+ *
+ * To add a new topic:
+ *   1. Add a key here with at least 5 question objects.
+ *   2. Add a matching entry to the TOPICS array (id, name, icon, color, desc).
+ *
+ * To add questions to an existing topic, append objects to the relevant array.
+ */
 const QUESTIONS = {
     docker: [
         { q: "What command creates AND starts a container from an image?", a: ["docker run", "docker start", "docker create", "docker build"], c: 0, e: "docker run = create + start in one step; docker create only creates, docker start only starts an existing stopped container." },
@@ -436,6 +453,11 @@ let game = {
 // Initialize game on load
 document.addEventListener('DOMContentLoaded', init);
 
+/**
+ * Bootstrap the game: load image assets, cache DOM references, wire up event
+ * listeners, and render the initial main-menu state.
+ * Called once on DOMContentLoaded.
+ */
 function init() {
     game.canvas = document.getElementById('gameCanvas');
     game.ctx = game.canvas.getContext('2d');
@@ -635,7 +657,11 @@ function showScreen(screenId) {
     document.getElementById(screenId).classList.remove('hidden');
 }
 
-// Start game
+/**
+ * Reset all game state and begin a new session.
+ * @param {'adventure'|'endless'|'speedquiz'|'practice'} mode - Game mode to start.
+ * @param {string|null} topicId - Required for 'practice' mode; the TOPICS id to drill.
+ */
 function startGame(mode, topicId = null) {
     game.mode = mode;
     game.running = true;
@@ -699,7 +725,11 @@ function hideAllOverlays() {
     domCache.questionPanel.classList.add('hidden');
 }
 
-// Main game loop
+/**
+ * Main game loop driven by requestAnimationFrame.
+ * Calls update() then render() every frame unless the game is paused.
+ * Stores the animation frame ID in game.animationId so it can be cancelled.
+ */
 function gameLoop() {
     if (!game.running) return;
 
@@ -1042,6 +1072,12 @@ function drawEnemy(enemy) {
 }
 
 // Question system
+/**
+ * Display a question panel triggered by the given enemy.
+ * Picks a random question from the current zone's pool, Fisher-Yates shuffles
+ * the answer choices, and tracks which shuffled index is correct.
+ * @param {object} enemy - The enemy object that triggered the question.
+ */
 function showQuestion(enemy) {
     const topic = TOPICS[game.currentZone];
     const questions = QUESTIONS[topic.id];
@@ -1098,6 +1134,11 @@ function showQuestion(enemy) {
     }
 }
 
+/**
+ * Register the player's answer selection and schedule answer checking.
+ * Idempotent — ignores calls after the first selection.
+ * @param {number} index - Zero-based index into the shuffled answer array.
+ */
 function selectAnswer(index) {
     if (!game.questionActive || game.selectedAnswer !== -1) return;
 
@@ -1149,6 +1190,11 @@ function checkAnswer(index) {
     }, closeDelay);
 }
 
+/**
+ * Award points for a correct answer.
+ * Points = BASE_SCORE [+ SPEED_BONUS if answered in < 5s] × streak multiplier.
+ * Streak multiplier increases by STREAK_MULTIPLIER every 3 consecutive correct answers.
+ */
 function handleCorrectAnswer() {
     game.correctAnswers++;
     game.streak++;
@@ -1226,6 +1272,11 @@ function closeQuestion() {
     }
 }
 
+/**
+ * Add a particle to the pool, respecting the MAX_PARTICLES cap.
+ * The cap prevents GC pressure from unbounded array growth during heavy combat.
+ * @param {object} p - Particle object: {x, y, vx, vy, size, color, life}.
+ */
 function pushParticle(p) {
     if (game.particles.length < CONFIG.MAX_PARTICLES) game.particles.push(p);
 }
@@ -1409,6 +1460,11 @@ function createScoreParticle(points) {
 }
 
 // Wave management
+/**
+ * Spawn the next wave of enemies for the current zone.
+ * Enemy count grows with wave number: base + floor(wave / 2).
+ * Each enemy is staggered 500 ms apart so they enter one at a time.
+ */
 function spawnWave() {
     if (!game.running || game.paused) return;
 
@@ -1493,7 +1549,11 @@ function nextZone() {
     setTimeout(() => spawnWave(), 1000);
 }
 
-// HUD updates
+/**
+ * Sync the HUD DOM with current game state.
+ * Uses a dirty-check cache (game._hud) to skip DOM writes when values haven't
+ * changed, avoiding unnecessary layout reflows every animation frame.
+ */
 function updateHUD() {
     const h = game._hud;
     const health = Math.round(game.player.health);
