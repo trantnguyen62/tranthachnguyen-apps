@@ -10,7 +10,7 @@ RUN convert player_ship.png  -resize 160x160  -strip player_ship.png  && \
     convert background.png   -resize 900x900  -strip background.png
 
 FROM node:20-alpine
-RUN npm install -g serve
+RUN npm install -g serve@14.2.6
 RUN addgroup -g 1001 -S appgroup && adduser -S appuser -u 1001 -G appgroup
 WORKDIR /app
 COPY index.html styles.css game.js robots.txt sitemap.xml ./
@@ -27,7 +27,10 @@ RUN cat > serve.json << 'SERVEJSON'
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "Content-Security-Policy", "value": "default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; frame-ancestors 'none'" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
+        { "key": "Cross-Origin-Resource-Policy", "value": "same-origin" },
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" }
       ]
     },
     { "source": "**/*.css",  "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }] },

@@ -1690,13 +1690,4 @@ function gameOver(victory = false) {
     announce(`${resultMsg} Final score: ${game.score}.`);
 }
 
-// Add CSS for shake animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        20%, 60% { transform: translateX(-5px); }
-        40%, 80% { transform: translateX(5px); }
-    }
-`;
-document.head.appendChild(style);
+// shake animation defined in styles.css
