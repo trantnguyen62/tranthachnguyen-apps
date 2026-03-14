@@ -5,8 +5,10 @@ import { Button } from './components/Button';
 import { generateEditedImage } from './services/geminiService';
 import { ProcessedImage, AppStatus } from './types';
 
+// Lazy-load ComparisonView so its code is only downloaded once the user has a result to compare.
 const ComparisonView = lazy(() => import('./components/ComparisonView').then(m => ({ default: m.ComparisonView })));
 
+// Each history entry holds a full base64 image string; cap at 10 to avoid excessive memory use.
 const MAX_HISTORY = 10;
 
 const PROCESSING_MESSAGES = [

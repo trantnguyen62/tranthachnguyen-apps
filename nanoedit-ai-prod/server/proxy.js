@@ -135,23 +135,26 @@ app.post('/api/gemini/edit-image', async (req, res) => {
 
     console.log('[edit-image] Success! Got response from gemini-web-proxy');
 
-    // Extract image from response
-    // The gemini-web-proxy returns images in the 'images' array as URLs or base64
+    // Extract image from response.
+    // gemini-web-proxy returns an 'images' array whose entries can be either:
+    //   - base64 data URIs  (e.g. "data:image/png;base64,…") — returned directly
+    //   - regular HTTPS URLs — also returned directly; the client renders them via <img src>
+    //   - blob: URLs        — these are browser-scoped and inaccessible server-side;
+    //                         we still forward them so the client can attempt to render them,
+    //                         though they will typically fail outside the originating browser tab.
+    // In all cases we return the first image as `imageData` for simplicity.
     if (data.images && data.images.length > 0) {
-      // If images are returned as blob URLs, we need to handle differently
-      // For now, return the first image
       const imageData = data.images[0];
 
-      // If it's already a data URL, return as-is
       if (imageData.startsWith('data:')) {
+        // Base64 data URI — safe to return as-is
         return res.json({
           success: true,
           imageData: imageData
         });
       }
 
-      // If it's a blob URL, we can't access it from server-side
-      // Return text response with instructions
+      // HTTP(S) URL or blob URL — pass through; client handles rendering
       console.log('[edit-image] Image URL:', imageData.substring(0, 100));
       return res.json({
         success: true,

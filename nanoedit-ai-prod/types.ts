@@ -2,6 +2,7 @@
 export interface ProcessedImage {
   /** Full data URL including the MIME prefix, ready for use in `<img src>` or download links. */
   data: string;
+  /** MIME type of the image (e.g. `'image/png'`, `'image/jpeg'`). Used when forwarding to the proxy. */
   mimeType: string;
 }
 

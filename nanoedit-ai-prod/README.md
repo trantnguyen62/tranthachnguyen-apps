@@ -56,6 +56,14 @@ Browser (Vite :5173)
 
 ### Run with Docker
 
+Three Dockerfiles are provided:
+
+| File | What it builds | When to use |
+|------|---------------|-------------|
+| `Dockerfile` | Frontend + proxy server in one image | Simple single-host deployments |
+| `Dockerfile.web` | Frontend only (serves static files) | When proxy runs on a separate host |
+| `Dockerfile.api` | Proxy server only | Paired with `Dockerfile.web` or a custom frontend |
+
 ```bash
 # Build and run the combined image (frontend + proxy server)
 docker build -t nanoedit-ai .
@@ -132,9 +140,11 @@ Request body (JSON):
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `prompt` | string | **Yes** | Natural language edit instruction |
+| `prompt` | string | **Yes** | Natural language edit instruction (max 2000 characters) |
 | `base64Image` | string | No | Base64 data URI of the source image (e.g. `data:image/png;base64,...`) |
-| `mimeType` | string | No | MIME type of the image; defaults to `image/png` |
+| `mimeType` | string | No | MIME type of the image (`image/png`, `image/jpeg`, `image/webp`, `image/gif`); defaults to `image/png` |
+
+> **Note:** The proxy accepts request bodies up to 10 MB, which accommodates base64-encoded images up to ~7 MB.
 
 Success response (`200`):
 ```json
