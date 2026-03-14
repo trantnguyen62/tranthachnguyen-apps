@@ -13,6 +13,8 @@ const PORT = 3006;
 
 // Base path for the codebase
 const CODEBASE_PATH = path.resolve(__dirname, '../../');
+// Resolved once at startup to avoid repeated blocking realpathSync on every file request
+const REAL_CODEBASE_PATH = fs.realpathSync(CODEBASE_PATH);
 
 // Directories and files to ignore
 const IGNORED_DIRS = [
@@ -63,24 +65,26 @@ app.use((_req, res, next) => {
   next();
 });
 
+// Pre-computed language map — defined once at module load, not per call
+const LANG_MAP = {
+  '.ts': 'typescript',
+  '.tsx': 'typescript',
+  '.js': 'javascript',
+  '.jsx': 'javascript',
+  '.json': 'json',
+  '.html': 'html',
+  '.css': 'css',
+  '.md': 'markdown',
+  '.py': 'python',
+  '.sh': 'bash',
+  '.yml': 'yaml',
+  '.yaml': 'yaml',
+};
+
 // Get language from file extension
 function getLanguage(filename) {
   const ext = path.extname(filename).toLowerCase();
-  const langMap = {
-    '.ts': 'typescript',
-    '.tsx': 'typescript',
-    '.js': 'javascript',
-    '.jsx': 'javascript',
-    '.json': 'json',
-    '.html': 'html',
-    '.css': 'css',
-    '.md': 'markdown',
-    '.py': 'python',
-    '.sh': 'bash',
-    '.yml': 'yaml',
-    '.yaml': 'yaml',
-  };
-  return langMap[ext] || 'text';
+  return LANG_MAP[ext] || 'text';
 }
 
 // Recursively build file tree
@@ -135,25 +139,29 @@ function buildFileTree(dirPath, basePath = '') {
 
 // Get list of projects
 app.get('/api/projects', (req, res) => {
+  if (projectsCache && Date.now() - projectsCacheTs < PROJECTS_CACHE_TTL) {
+    return res.json(projectsCache);
+  }
+
   const projects = [];
-  
+
   try {
     const entries = fs.readdirSync(CODEBASE_PATH, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       if (IGNORED_DIRS.includes(entry.name)) continue;
       if (entry.name.startsWith('.')) continue;
       if (entry.name === 'services') continue;
       if (entry.name === 'code-study-app') continue;
-      
+
       const projectPath = path.join(CODEBASE_PATH, entry.name);
       const hasPackageJson = fs.existsSync(path.join(projectPath, 'package.json'));
       const hasIndexHtml = fs.existsSync(path.join(projectPath, 'index.html'));
-      
+
       if (hasPackageJson || hasIndexHtml) {
         let description = '';
-        
+
         // Try to read description from package.json
         if (hasPackageJson) {
           try {
@@ -161,7 +169,7 @@ app.get('/api/projects', (req, res) => {
             description = pkg.description || '';
           } catch (e) {}
         }
-        
+
         projects.push({
           name: entry.name,
           path: entry.name,
@@ -172,13 +180,18 @@ app.get('/api/projects', (req, res) => {
   } catch (err) {
     console.error('Error reading projects:', err.message);
   }
-  
+
+  projectsCache = projects;
+  projectsCacheTs = Date.now();
   res.json(projects);
 });
 
-// Simple in-memory cache for file trees (TTL: 60s)
+// Simple in-memory cache for file trees and projects list
 const treeCache = new Map();
 const TREE_CACHE_TTL = 300_000;
+let projectsCache = null;
+let projectsCacheTs = 0;
+const PROJECTS_CACHE_TTL = 60_000;
 const SEARCH_RESULTS_LIMIT = 50;
 
 // Get file tree for a project
@@ -220,8 +233,7 @@ app.get('/api/file', async (req, res) => {
   try {
     // Resolve symlinks and re-validate to prevent path traversal via symlinks
     const realPath = fs.realpathSync(fullPath);
-    const realBase = fs.realpathSync(CODEBASE_PATH);
-    if (!realPath.startsWith(realBase + path.sep)) {
+    if (!realPath.startsWith(REAL_CODEBASE_PATH + path.sep)) {
       return res.status(403).json({ error: 'Access denied' });
     }
 

@@ -64,7 +64,8 @@ devops-study/
 ├── styles.css          # Styling
 ├── styles.min.css      # Minified version (generated)
 ├── serve.json          # Static server config with security headers
-└── Dockerfile          # Docker configuration
+├── Dockerfile          # Docker configuration
+└── package.json        # Dev dependencies (terser, clean-css-cli)
 ```
 
 ## 🛠️ Development
@@ -89,4 +90,4 @@ Progress is stored in `localStorage` under the key `devops-mastery-progress`.
 
 ## 📄 License
 
-© 2025 Tran Thach Nguyen. All rights reserved.
+© 2026 Tran Thach Nguyen. All rights reserved.

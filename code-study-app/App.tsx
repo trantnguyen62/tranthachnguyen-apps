@@ -197,6 +197,14 @@ function App() {
   const isConnected = connectionState === ConnectionState.CONNECTED;
   const isConnecting = connectionState === ConnectionState.CONNECTING;
 
+  // Memoize selected code preview to avoid split/slice on every render
+  const selectedCodePreview = useMemo(() => {
+    if (!selectedCode) return null;
+    const MAX_PREVIEW_LINES = 8;
+    const codeLines = selectedCode.split('\n');
+    return { codeLines, previewLines: codeLines.slice(0, MAX_PREVIEW_LINES), hiddenLines: Math.max(0, codeLines.length - MAX_PREVIEW_LINES) };
+  }, [selectedCode]);
+
   return (
     <div className="min-h-screen bg-slate-900 flex text-slate-100">
       {/* Sidebar */}

@@ -29,7 +29,8 @@ All study content lives in `app.js` inside the `devopsData.topics` array. Each t
     ],
     codebase: [              // optional: code/config examples
         {
-            name: 'example.yaml',
+            title: 'Example Config',     // display title shown in UI
+            filename: 'example.yaml',    // filename shown as label
             language: 'yaml',
             description: 'One-line description',
             code: `multi-line
