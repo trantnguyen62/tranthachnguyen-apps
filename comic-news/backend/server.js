@@ -699,6 +699,7 @@ app.get('/api/featured', (req, res) => {
 
 // robots.txt
 app.get('/robots.txt', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=86400');
   res.type('text/plain');
   res.send(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /bookmarks\nDisallow: /read/\n\nSitemap: ${baseUrl}/sitemap.xml\n`);
 });
@@ -771,7 +772,9 @@ app.get('/comic/:id', (req, res) => {
     .replace(
       /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
       `$1\n    <script type="application/ld+json">${safeJsonLd(articleLd)}</script>\n    <script type="application/ld+json">${safeJsonLd(breadcrumbLd)}</script>`
-    );
+    )
+    .replace(/<meta property="og:image:width" content="[^"]*" \/>\n?/, '')
+    .replace(/<meta property="og:image:height" content="[^"]*" \/>\n?/, '');
 
   res.set('Cache-Control', 'public, max-age=3600');
   res.type('html').send(html);
@@ -826,10 +829,13 @@ app.get('/library', (req, res) => {
       .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
       .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/,  `$1Story Library - Comic News$2`);
   }
-  html = html.replace(
-    /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
-    `$1\n    <script type="application/ld+json">${safeJsonLd(collectionLd)}</script>`
-  );
+  html = html
+    .replace(
+      /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
+      `$1\n    <script type="application/ld+json">${safeJsonLd(collectionLd)}</script>`
+    )
+    .replace(/<meta property="og:image:width" content="[^"]*" \/>\n?/, '')
+    .replace(/<meta property="og:image:height" content="[^"]*" \/>\n?/, '');
 
   res.set('Cache-Control', 'public, max-age=3600');
   res.type('html').send(html);
