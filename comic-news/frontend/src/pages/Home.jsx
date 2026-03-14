@@ -11,12 +11,12 @@ function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    document.title = 'Comic News - Daily News Turned Into Comics';
+    document.title = 'Comic News - Real Stories Turned Into Comics';
 
     // Reset OG/Twitter tags to site defaults
     const defaultImg = `${window.location.origin}/images/love-you-cashier.png`;
-    const defaultTitle = 'Comic News - Daily News Turned Into Comics';
-    const defaultDesc = "Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you'll actually want to read.";
+    const defaultTitle = 'Comic News - Real Stories Turned Into Comics';
+    const defaultDesc = "News events, awkward moments, and stories you recognize — brought to life through comics, one panel at a time.";
     setMeta('meta[property="og:type"]', 'website');
     setMeta('meta[property="og:title"]', defaultTitle);
     setMeta('meta[property="og:description"]', defaultDesc);
@@ -45,7 +45,7 @@ function Home() {
       '@type': 'WebSite',
       name: 'Comic News',
       url: `${window.location.origin}/`,
-      description: 'Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you\'ll actually want to read.',
+      description: 'News events, awkward moments, and stories you recognize — brought to life through comics, one panel at a time.',
       potentialAction: {
         '@type': 'SearchAction',
         target: { '@type': 'EntryPoint', urlTemplate: `${window.location.origin}/library?search={search_term_string}` },
