@@ -189,7 +189,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
           properties: {
             id: {
               type: Type.NUMBER,
-              description: 'The ID of the question (1-58) to display.',
+              description: `The ID of the question (1-${allQuestions.length}) to display.`,
             },
           },
           required: ['id'],
@@ -294,24 +294,27 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
              // Handle Audio Output
              const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
              if (base64Audio) {
+               const ctx = outputAudioContextRef.current;
+               if (!ctx || ctx.state === 'closed') return;
                setStatus('speaking');
-               
-               nextStartTimeRef.current = Math.max(nextStartTimeRef.current, outputAudioContext.currentTime);
-               
+
+               nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
+
                const audioBuffer = decodeAudioData(
                  decodeBase64(base64Audio),
-                 outputAudioContext
+                 ctx
                );
-               
-               const source = outputAudioContext.createBufferSource();
+
+               const source = ctx.createBufferSource();
                source.buffer = audioBuffer;
-               source.connect(outputNode);
+               source.connect(ctx.destination);
                source.start(nextStartTimeRef.current);
-               
+
                nextStartTimeRef.current += audioBuffer.duration;
-               
+
                source.onended = () => {
-                 if (outputAudioContext.currentTime >= nextStartTimeRef.current - AUDIO_END_TOLERANCE) {
+                 const currentCtx = outputAudioContextRef.current;
+                 if (currentCtx && currentCtx.currentTime >= nextStartTimeRef.current - AUDIO_END_TOLERANCE) {
                     setStatus('connected');
                  }
                };
