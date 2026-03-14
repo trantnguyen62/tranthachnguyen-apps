@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5187;
 
 const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://comic-news.tranthachnguyen.com';
 app.set('trust proxy', 1);
-app.use(compression());
+app.use(compression({ level: 9 }));
 app.use(cors({ origin: allowedOrigin, optionsSuccessStatus: 200 }));
 app.use(express.json({ limit: '10kb' }));
 
@@ -57,7 +57,12 @@ function writeRateLimit(req, res, next) {
   entry.count++;
   next();
 }
-app.use('/images', express.static(join(__dirname, 'images'), { maxAge: '30d' }));
+app.use('/images', express.static(join(__dirname, 'images'), {
+  maxAge: '365d',
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+}));
 
 // Serve static frontend (for Docker deployment)
 // Vite hashes JS/CSS filenames, so they can be cached immutably for 1 year
@@ -567,7 +572,7 @@ ${comics.map(c =>
 
 // Get all comics
 app.get('/api/comics', (req, res) => {
-  res.set('Cache-Control', 'public, max-age=300');
+  res.set('Cache-Control', 'public, max-age=3600');
   const { genre, search, sort } = req.query;
 
   // Fast path: no filters — serve precomputed results with ETag
@@ -614,7 +619,7 @@ app.get('/api/comics/:id', (req, res) => {
   const comic = comics.find(c => c.id === id);
   if (!comic) return res.status(404).json({ error: 'Comic not found' });
   const etag = comicETags.get(id);
-  res.set('Cache-Control', 'public, max-age=300');
+  res.set('Cache-Control', 'public, max-age=3600');
   res.set('ETag', etag);
   if (req.headers['if-none-match'] === etag) return res.status(304).end();
   res.json(comic);
@@ -686,7 +691,7 @@ app.post('/api/progress/:id', writeRateLimit, (req, res) => {
 
 // Featured/Popular comics
 app.get('/api/featured', (req, res) => {
-  res.set('Cache-Control', 'public, max-age=300');
+  res.set('Cache-Control', 'public, max-age=3600');
   res.set('ETag', featuredETag);
   if (req.headers['if-none-match'] === featuredETag) return res.status(304).end();
   res.json(featuredComics);
@@ -766,7 +771,7 @@ app.get('/comic/:id', (req, res) => {
       `$1\n    <script type="application/ld+json">${safeJsonLd(articleLd)}</script>\n    <script type="application/ld+json">${safeJsonLd(breadcrumbLd)}</script>`
     );
 
-  res.set('Cache-Control', 'public, max-age=300');
+  res.set('Cache-Control', 'public, max-age=3600');
   res.type('html').send(html);
 });
 
@@ -822,7 +827,7 @@ app.get('/library', (req, res) => {
     `$1\n    <script type="application/ld+json">${safeJsonLd(collectionLd)}</script>`
   );
 
-  res.set('Cache-Control', 'public, max-age=300');
+  res.set('Cache-Control', 'public, max-age=3600');
   res.type('html').send(html);
 });
 
