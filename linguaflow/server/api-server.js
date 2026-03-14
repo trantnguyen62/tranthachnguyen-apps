@@ -129,6 +129,18 @@ function generateId(name) {
   return name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
+// Validate user ID format to prevent prototype pollution (__proto__, constructor, etc.)
+const VALID_ID_RE = /^[a-z0-9][a-z0-9_-]{0,199}$/;
+function isValidUserId(id) {
+  return typeof id === 'string' && VALID_ID_RE.test(id);
+}
+
+// Strip null bytes and control characters from user-supplied strings
+function sanitizeInput(str) {
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+}
+
 // ============================================================================
 // API ROUTES
 // ============================================================================
@@ -168,6 +180,9 @@ app.get('/api/users/search', async (req, res) => {
 app.get('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidUserId(id)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
     const data = await readUsers();
     const user = data.users[id];
 
@@ -194,7 +209,7 @@ app.post('/api/users', async (req, res) => {
     }
 
     const data = await readUsers();
-    const normalizedName = name.trim();
+    const normalizedName = sanitizeInput(name.trim());
     
     // Check if user already exists
     const existingUser = Object.values(data.users).find(
@@ -233,8 +248,11 @@ app.post('/api/users', async (req, res) => {
 app.patch('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidUserId(id)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
     const updates = req.body;
-    
+
     const data = await readUsers();
     const user = data.users[id];
 
@@ -271,6 +289,9 @@ app.patch('/api/users/:id', async (req, res) => {
 app.post('/api/users/:id/words', async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidUserId(id)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
     const { words } = req.body;
 
     if (!Array.isArray(words)) {
@@ -308,6 +329,9 @@ app.post('/api/users/:id/words', async (req, res) => {
 app.post('/api/users/:id/session', async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidUserId(id)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
     const { lessonCompleted, wordsLearned, notes } = req.body;
 
     const data = await readUsers();

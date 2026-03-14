@@ -183,16 +183,22 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
       }
       
       if (userProfile) {
+        // Strip newlines and prompt-injection patterns from user-controlled fields
+        const safeName = userProfile.name.replace(/[\r\n\t]/g, ' ').replace(/[<>]/g, '').slice(0, 100);
+        const safeWords = userProfile.wordsLearned
+          .slice(-20)
+          .map(w => w.replace(/[\r\n,]/g, ' ').slice(0, 50))
+          .join(', ') || 'Chưa có';
         const profileContext = `
 THÔNG TIN HỌC VIÊN:
-- Tên: ${userProfile.name}
+- Tên: ${safeName}
 - Bài học hiện tại: ${userProfile.lessonNumber}
 - Số từ đã học: ${userProfile.wordsLearned.length}
-- Các từ đã học: ${userProfile.wordsLearned.slice(-20).join(', ') || 'Chưa có'}
+- Các từ đã học: ${safeWords}
 - Số buổi học: ${userProfile.totalSessions}
 - Lần học gần nhất: ${userProfile.lastSessionDate ? new Date(userProfile.lastSessionDate).toLocaleDateString('vi-VN') : 'Lần đầu'}
 
-Hãy chào ${userProfile.name} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài học từ lần trước' : 'bắt đầu bài học đầu tiên'}.
+Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài học từ lần trước' : 'bắt đầu bài học đầu tiên'}.
 `;
         systemInstruction = systemInstruction + '\n\n' + profileContext;
       }

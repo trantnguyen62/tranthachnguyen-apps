@@ -17,7 +17,17 @@ export default defineConfig(({ mode }) => {
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
-        'Permissions-Policy': 'geolocation=(), microphone=(self), camera=()'
+        'Permissions-Policy': 'geolocation=(), microphone=(self), camera=()',
+        'Content-Security-Policy': [
+          "default-src 'self'",
+          "script-src 'self' 'unsafe-eval'",
+          "style-src 'self' 'unsafe-inline'",
+          "connect-src 'self' ws://localhost:3001 wss://linguaflow.tranthachnguyen.com ws://linguaflow.tranthachnguyen.com http://localhost:3002",
+          "media-src 'self' blob:",
+          "img-src 'self' data:",
+          "worker-src 'self' blob:",
+          "frame-ancestors 'none'",
+        ].join('; ')
       },
       proxy: {
         '/api': {
