@@ -330,7 +330,7 @@ app.get('/api/search', async (req, res) => {
   }
 
   await searchDir(searchPath);
-  res.json(results);
+  res.json(results.slice(0, SEARCH_RESULTS_LIMIT));
 });
 
 app.listen(PORT, () => {

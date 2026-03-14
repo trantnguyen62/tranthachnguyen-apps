@@ -525,7 +525,7 @@ function App() {
                   )}
                 </span>
               </div>
-              <Visualizer volume={volume} isConnected={isConnected} color="#10B981" />
+              <Visualizer volume={volume} isConnected={isConnected} />
             </div>
 
             {/* Transcript */}

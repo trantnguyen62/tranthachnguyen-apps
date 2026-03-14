@@ -3,7 +3,6 @@ import { memo, useMemo } from 'react';
 interface VisualizerProps {
   volume: { input: number; output: number };
   isConnected: boolean;
-  color?: string;
 }
 
 const BARS = 12;
