@@ -476,7 +476,8 @@ function init() {
         _resizeTimer = setTimeout(() => { _resizeTimer = null; resizeCanvas(); }, 150);
     });
 
-    // Suspend the rAF loop when the tab is hidden to save CPU
+    // Suspend the rAF loop and obstacle spawning when the tab is hidden to save CPU
+    // and prevent obstacle pile-up (spawned obstacles freeze in place while physics is paused)
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             if (game.animationId) {
@@ -484,9 +485,28 @@ function init() {
                 game.animationId = null;
                 game._loopSuspended = true;
             }
+            if (game.obstacleInterval) {
+                clearInterval(game.obstacleInterval);
+                game.obstacleInterval = null;
+                game._obstacleSuspended = true;
+            }
         } else if (game._loopSuspended) {
             game._loopSuspended = false;
             if (game.running && !game.questionActive) gameLoop();
+            if (game._obstacleSuspended) {
+                game._obstacleSuspended = false;
+                if (game.running && !game.paused) {
+                    game.obstacleInterval = setInterval(spawnObstacle, CONFIG.OBSTACLE_SPAWN_RATE);
+                }
+            }
+        }
+    });
+
+    // Clean up ad timer on page exit to avoid dangling intervals
+    window.addEventListener('pagehide', () => {
+        if (AdManager.rewardedAdTimer) {
+            clearInterval(AdManager.rewardedAdTimer);
+            AdManager.rewardedAdTimer = null;
         }
     });
 }
@@ -1263,8 +1283,8 @@ function handleTimeout() {
         panel.classList.add('modal-shake');
     }
 
-    const btns = document.querySelectorAll('.answer-btn');
-    const correctBtn = game.currentQuestion && btns[game.currentQuestion.correctIndex];
+    const btns = game.currentQuestion && game.currentQuestion.btns;
+    const correctBtn = btns && btns[game.currentQuestion.correctIndex];
     if (correctBtn) {
         correctBtn.classList.add('correct');
         correctBtn.setAttribute('aria-label',
