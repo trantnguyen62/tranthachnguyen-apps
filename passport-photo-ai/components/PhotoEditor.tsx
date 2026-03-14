@@ -274,21 +274,24 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
             <input id="brightness-range" type="range" min="90" max="120" value={brightness} onChange={handleBrightnessChange} disabled={step !== 'done'} aria-valuetext={`${brightness}%`} style={{ width: '100%', accentColor: accentGold }} />
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
               <label htmlFor="contrast-range" style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Contrast: {contrast}%</label>
-              {step === 'done' && (brightness !== 105 || contrast !== 108) && (
-                <button
-                  onClick={() => { setBrightness(105); setContrast(108); }}
-                  style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 8px', fontFamily: "'Space Grotesk', sans-serif", textDecoration: 'underline', transition: 'color 0.15s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.7)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.4)'; }}
-                >
-                  Reset
-                </button>
-              )}
             </div>
             <input id="contrast-range" type="range" min="90" max="120" value={contrast} onChange={handleContrastChange} disabled={step !== 'done'} aria-valuetext={`${contrast}%`} style={{ width: '100%', accentColor: accentGold }} />
           </div>
+          {step === 'done' && (brightness !== 105 || contrast !== 108) && (
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: -8 }}>
+              <button
+                onClick={() => { setBrightness(105); setContrast(108); }}
+                title="Reset brightness and contrast to defaults"
+                style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: "'Space Grotesk', sans-serif", textDecoration: 'underline', transition: 'color 0.15s' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.7)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.4)'; }}
+              >
+                Reset adjustments
+              </button>
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
