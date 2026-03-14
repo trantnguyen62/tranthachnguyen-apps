@@ -68,7 +68,7 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-5 px-4">
           <div className="w-14 h-14 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto">
-            <Bot className="w-7 h-7 text-emerald-500/50" />
+            <Bot className="w-7 h-7 text-emerald-500/50" aria-hidden="true" />
           </div>
           <div>
             <p className="text-slate-300 font-semibold mb-1">AI Tutor ready</p>

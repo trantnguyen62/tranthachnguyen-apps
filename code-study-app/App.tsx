@@ -328,7 +328,7 @@ function App() {
                         type="button"
                         onClick={() => { setSearchQuery(''); setSearchResults([]); }}
                         aria-label="Clear search"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded text-slate-400 hover:text-slate-200 transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-slate-400 hover:text-slate-200 transition-colors"
                       >
                         <X className="w-3.5 h-3.5" aria-hidden="true" />
                       </button>
@@ -344,7 +344,7 @@ function App() {
                   </button>
                 </div>
                 </form>
-                <p className="text-xs text-slate-600 px-1">
+                <p className="text-xs text-slate-400 px-1">
                   {selectedProject ? `Searching in ${selectedProject.name}` : 'Searching all projects'}
                 </p>
                 {searchResults.length > 0 ? (
@@ -391,7 +391,7 @@ function App() {
           
           {selectedFile ? (
             <div className="flex items-center gap-1.5 text-sm min-w-0">
-              <Code2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <Code2 className="w-4 h-4 text-emerald-400 flex-shrink-0" aria-hidden="true" />
               <div className="flex items-center min-w-0 code-font">
                 {selectedProject && (
                   <span className="text-slate-500 text-xs hidden sm:inline flex-shrink-0">
@@ -457,7 +457,7 @@ function App() {
             <button
               onClick={() => setDismissedError(error)}
               aria-label="Dismiss error"
-              className="p-0.5 hover:bg-red-500/20 rounded transition-colors flex-shrink-0"
+              className="p-1.5 hover:bg-red-500/20 rounded transition-colors flex-shrink-0"
             >
               <X className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -519,7 +519,7 @@ function App() {
                       Connecting
                     </span>
                   ) : (
-                    <span className="text-xs px-2 py-0.5 bg-slate-700/40 text-slate-500 rounded-full border border-slate-700/50">
+                    <span className="text-xs px-2 py-0.5 bg-slate-700/40 text-slate-400 rounded-full border border-slate-700/50">
                       Idle
                     </span>
                   )}
@@ -556,7 +556,7 @@ function App() {
                     </div>
                     <button
                       onClick={() => setSelectedCode('')}
-                      className="text-xs text-slate-500 hover:text-red-400 transition-colors p-1 rounded hover:bg-red-400/10"
+                      className="text-xs text-slate-500 hover:text-red-400 transition-colors p-1.5 rounded hover:bg-red-400/10"
                       aria-label="Clear selected code context"
                     >
                       <X className="w-3 h-3" aria-hidden="true" />
@@ -566,7 +566,7 @@ function App() {
                     <div className="p-3 overflow-x-auto">
                       {previewLines.map((line, i) => (
                         <div key={i} className="flex leading-5">
-                          <span className="w-6 text-right pr-2 text-slate-600 select-none flex-shrink-0">{i + 1}</span>
+                          <span className="w-6 text-right pr-2 text-slate-600 select-none flex-shrink-0" aria-hidden="true">{i + 1}</span>
                           <span className="whitespace-pre">{line || ' '}</span>
                         </div>
                       ))}
