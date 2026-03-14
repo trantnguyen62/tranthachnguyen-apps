@@ -30,6 +30,7 @@ declare global {
 }
 
 const MAX_FILE_CHARS = 12000;
+const MAX_MESSAGES = 200;
 
 let messageCounter = 0;
 const nextMessageId = (role: string) => `${++messageCounter}-${role}`;
@@ -52,6 +53,7 @@ export const useLiveSession = (studyContext: StudyContext) => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const volumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastInputVolumeRef = useRef(0);
+  const lastOutputVolumeRef = useRef(0);
   
   // Use ref for study context to avoid recreating connect callback
   const studyContextRef = useRef(studyContext);
@@ -224,9 +226,14 @@ export const useLiveSession = (studyContext: StudyContext) => {
                 analyser.getByteFrequencyData(dataArray);
                 let sum = 0;
                 for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-                setVolume(prev => ({ ...prev, output: (sum / dataArray.length) / 255 }));
-              } else {
-                setVolume(prev => prev.output > 0 ? { ...prev, output: 0 } : prev);
+                const newOutputVolume = (sum / dataArray.length) / 255;
+                if (Math.abs(newOutputVolume - lastOutputVolumeRef.current) > 0.01) {
+                  lastOutputVolumeRef.current = newOutputVolume;
+                  setVolume(prev => ({ ...prev, output: newOutputVolume }));
+                }
+              } else if (lastOutputVolumeRef.current > 0) {
+                lastOutputVolumeRef.current = 0;
+                setVolume(prev => ({ ...prev, output: 0 }));
               }
             }, 100);
           },
@@ -247,22 +254,16 @@ export const useLiveSession = (studyContext: StudyContext) => {
               const modelText = currentOutputTranscriptionRef.current.trim();
 
               if (userText) {
-                setMessages(prev => [...prev, {
-                  id: nextMessageId('user'),
-                  role: 'user',
-                  text: userText,
-                  timestamp: new Date(),
-                  isFinal: true
-                }]);
+                setMessages(prev => {
+                  const next = [...prev, { id: nextMessageId('user'), role: 'user' as const, text: userText, timestamp: new Date(), isFinal: true }];
+                  return next.length > MAX_MESSAGES ? next.slice(next.length - MAX_MESSAGES) : next;
+                });
               }
               if (modelText) {
-                setMessages(prev => [...prev, {
-                  id: nextMessageId('model'),
-                  role: 'model',
-                  text: modelText,
-                  timestamp: new Date(),
-                  isFinal: true
-                }]);
+                setMessages(prev => {
+                  const next = [...prev, { id: nextMessageId('model'), role: 'model' as const, text: modelText, timestamp: new Date(), isFinal: true }];
+                  return next.length > MAX_MESSAGES ? next.slice(next.length - MAX_MESSAGES) : next;
+                });
               }
 
               currentInputTranscriptionRef.current = '';
