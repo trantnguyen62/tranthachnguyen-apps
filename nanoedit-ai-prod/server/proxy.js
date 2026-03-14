@@ -29,11 +29,11 @@ const fetchOptions = (url) => (url.startsWith('https://') ? { agent: httpsAgent 
 app.use(compression());
 
 // Restrict CORS to the known production origin only
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'https://photoedit.tranthachnguyen.com').split(',');
+const ALLOWED_ORIGINS = new Set((process.env.ALLOWED_ORIGINS || 'https://photoedit.tranthachnguyen.com').split(','));
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (server-to-server, curl, health checks)
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+    if (!origin || ALLOWED_ORIGINS.has(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, useRef, lazy, Suspense, memo } from 'react';
 import { Sparkles, Wand2, Command, AlertCircle, Info, RotateCcw, RotateCw, History, UserSquare2, Scissors, Sun, PenLine, Zap, Film, X, CheckCircle2 } from 'lucide-react';
 import { ImageUploader } from './components/ImageUploader';
 import { Button } from './components/Button';
@@ -40,6 +40,21 @@ const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+/** Cycles through processing messages without re-rendering the parent App. */
+const ProcessingMessage = memo(() => {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIdx(prev => (prev + 1) % PROCESSING_MESSAGES.length), 3500);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5" role="status" aria-live="polite" aria-atomic="true">
+      <Sparkles className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
+      {PROCESSING_MESSAGES[idx]}
+    </span>
+  );
+});
+
 
 /**
  * Root application component for NanoEdit AI.
@@ -63,31 +78,13 @@ const App: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [errorDismissed, setErrorDismissed] = useState(false);
-  const [processingMsgIdx, setProcessingMsgIdx] = useState(0);
   const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const processingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     return () => {
       if (downloadTimerRef.current !== null) clearTimeout(downloadTimerRef.current);
-      if (processingIntervalRef.current !== null) clearInterval(processingIntervalRef.current);
     };
   }, []);
-
-  // Cycle through processing messages to make the wait feel shorter
-  useEffect(() => {
-    if (status === AppStatus.PROCESSING) {
-      setProcessingMsgIdx(0);
-      processingIntervalRef.current = setInterval(() => {
-        setProcessingMsgIdx(prev => (prev + 1) % PROCESSING_MESSAGES.length);
-      }, 3500);
-    } else {
-      if (processingIntervalRef.current !== null) clearInterval(processingIntervalRef.current);
-    }
-    return () => {
-      if (processingIntervalRef.current !== null) clearInterval(processingIntervalRef.current);
-    };
-  }, [status]);
 
   // Derived state
   const currentImage = history[historyIndex] ?? null;
@@ -358,10 +355,7 @@ const App: React.FC = () => {
                   </div>
                   <div className="px-2 pb-2 flex justify-between items-center gap-2">
                     {status === AppStatus.PROCESSING ? (
-                      <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5" role="status" aria-live="polite" aria-atomic="true">
-                        <Sparkles className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
-                        {PROCESSING_MESSAGES[processingMsgIdx]}
-                      </span>
+                      <ProcessingMessage />
                     ) : (
                       <span id="prompt-hint" className="text-xs text-slate-400 pl-2 flex items-center gap-2">
                         <span className="hidden sm:flex items-center gap-1.5">

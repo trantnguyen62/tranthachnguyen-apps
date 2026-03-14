@@ -121,6 +121,8 @@ function App() {
   const [elapsed, setElapsed] = useState(0);
   const [errorDismissed, setErrorDismissed] = useState(false);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const prevMessageCountRef = useRef(0);
 
   useEffect(() => {
     if (error) setErrorDismissed(false);
@@ -149,6 +151,19 @@ function App() {
       setTranscriptOpen(true);
     }
   }, [messages.length]);
+
+  // Track unread messages when transcript panel is collapsed
+  useEffect(() => {
+    if (!transcriptOpen && messages.length > prevMessageCountRef.current) {
+      setUnreadCount(c => c + (messages.length - prevMessageCountRef.current));
+    }
+    prevMessageCountRef.current = messages.length;
+  }, [messages.length, transcriptOpen]);
+
+  // Clear unread count when panel opens
+  useEffect(() => {
+    if (transcriptOpen) setUnreadCount(0);
+  }, [transcriptOpen]);
 
   const handleCloseModal = useCallback(() => {
     setShowProfileModal(false);
@@ -388,12 +403,17 @@ function App() {
             )}
             <button
               onClick={() => setTranscriptOpen(o => !o)}
-              aria-label={transcriptOpen ? 'Collapse transcript' : 'Expand transcript'}
-              className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              aria-label={transcriptOpen ? 'Collapse transcript' : `Expand transcript${unreadCount > 0 ? `, ${unreadCount} new message${unreadCount > 1 ? 's' : ''}` : ''}`}
+              className="md:hidden relative w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
             >
               <svg className={`w-4 h-4 transition-transform duration-300 ${transcriptOpen ? 'rotate-180' : ''}`} aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
               </svg>
+              {!transcriptOpen && unreadCount > 0 && (
+                <span aria-hidden="true" className="absolute -top-1 -right-1 min-w-[14px] h-[14px] bg-blue-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
           </div>
         </div>
