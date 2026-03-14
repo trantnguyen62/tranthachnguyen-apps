@@ -143,6 +143,13 @@ function App() {
     return () => clearInterval(interval);
   }, [sessionStart]);
 
+  // Auto-open transcript on mobile when the first message arrives
+  useEffect(() => {
+    if (messages.length === 1) {
+      setTranscriptOpen(true);
+    }
+  }, [messages.length]);
+
   const handleCloseModal = useCallback(() => {
     setShowProfileModal(false);
   }, []);
@@ -225,11 +232,13 @@ function App() {
                    <span role="img" aria-hidden="true">{activeLanguage.flag}</span>
                    <span>Listening...</span>
                  </>
-               ) : 'Practice real conversations with AI'}
+               ) : isConnecting ? 'Connecting to your AI tutor…' : 'Practice real conversations with AI'}
              </h2>
              <p className="text-slate-400 text-sm max-w-md mx-auto">
                {isConnected
                  ? `Your AI tutor is listening. Speak naturally — you'll get real-time pronunciation guidance and corrections.`
+                 : isConnecting
+                 ? 'Setting up your session. This usually takes a few seconds.'
                  : 'Choose a language below, then press Start Conversation. Your AI tutor will speak with you, guide your pronunciation, and help you improve.'}
              </p>
            </div>
@@ -252,11 +261,11 @@ function App() {
              </div>
            )}
 
-           {!isConnected && !isConnecting && (
-              <LanguageSelector 
-                selected={activeLanguage} 
-                onSelect={setActiveLanguage} 
-                disabled={isConnected || isConnecting}
+           {!isConnected && (
+              <LanguageSelector
+                selected={activeLanguage}
+                onSelect={setActiveLanguage}
+                disabled={isConnecting}
               />
            )}
 
