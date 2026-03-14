@@ -542,52 +542,46 @@ function App() {
             </div>
 
             {/* Selected Code Context */}
-            {selectedCode && (() => {
-              const codeLines = selectedCode.split('\n');
-              const MAX_PREVIEW_LINES = 8;
-              const previewLines = codeLines.slice(0, MAX_PREVIEW_LINES);
-              const hiddenLines = codeLines.length - MAX_PREVIEW_LINES;
-              return (
-                <div className="p-4 border-t border-emerald-500/20">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
-                      <span className="text-xs text-emerald-400 font-medium">Context</span>
-                      <span className="text-xs px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded border border-emerald-500/20">
-                        {codeLines.length} line{codeLines.length !== 1 ? 's' : ''}
+            {selectedCodePreview && (
+              <div className="p-4 border-t border-emerald-500/20">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                    <span className="text-xs text-emerald-400 font-medium">Context</span>
+                    <span className="text-xs px-1.5 py-0.5 bg-emerald-500/10 text-emerald-400 rounded border border-emerald-500/20">
+                      {selectedCodePreview.codeLines.length} line{selectedCodePreview.codeLines.length !== 1 ? 's' : ''}
+                    </span>
+                    {selectedFile && (
+                      <span className="text-xs text-slate-500 code-font truncate max-w-[10rem]" title={selectedFile.name}>
+                        {selectedFile.name}
                       </span>
-                      {selectedFile && (
-                        <span className="text-xs text-slate-500 code-font truncate max-w-[10rem]" title={selectedFile.name}>
-                          {selectedFile.name}
-                        </span>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => setSelectedCode('')}
-                      className="text-xs text-slate-500 hover:text-red-400 transition-colors p-1.5 rounded hover:bg-red-400/10"
-                      aria-label="Clear selected code context"
-                    >
-                      <X className="w-3 h-3" aria-hidden="true" />
-                    </button>
-                  </div>
-                  <div className="bg-slate-900/60 rounded-lg text-xs code-font text-slate-300 border border-emerald-500/20 overflow-hidden">
-                    <div className="p-3 overflow-x-auto">
-                      {previewLines.map((line, i) => (
-                        <div key={i} className="flex leading-5">
-                          <span className="w-6 text-right pr-2 text-slate-600 select-none flex-shrink-0" aria-hidden="true">{i + 1}</span>
-                          <span className="whitespace-pre">{line || ' '}</span>
-                        </div>
-                      ))}
-                    </div>
-                    {hiddenLines > 0 && (
-                      <div className="px-3 py-1.5 bg-slate-800/50 border-t border-emerald-500/10 text-slate-500">
-                        +{hiddenLines} more line{hiddenLines !== 1 ? 's' : ''}
-                      </div>
                     )}
                   </div>
+                  <button
+                    onClick={() => setSelectedCode('')}
+                    className="text-xs text-slate-500 hover:text-red-400 transition-colors p-1.5 rounded hover:bg-red-400/10"
+                    aria-label="Clear selected code context"
+                  >
+                    <X className="w-3 h-3" aria-hidden="true" />
+                  </button>
                 </div>
-              );
-            })()}
+                <div className="bg-slate-900/60 rounded-lg text-xs code-font text-slate-300 border border-emerald-500/20 overflow-hidden">
+                  <div className="p-3 overflow-x-auto">
+                    {selectedCodePreview.previewLines.map((line, i) => (
+                      <div key={i} className="flex leading-5">
+                        <span className="w-6 text-right pr-2 text-slate-600 select-none flex-shrink-0" aria-hidden="true">{i + 1}</span>
+                        <span className="whitespace-pre">{line || ' '}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {selectedCodePreview.hiddenLines > 0 && (
+                    <div className="px-3 py-1.5 bg-slate-800/50 border-t border-emerald-500/10 text-slate-500">
+                      +{selectedCodePreview.hiddenLines} more line{selectedCodePreview.hiddenLines !== 1 ? 's' : ''}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
