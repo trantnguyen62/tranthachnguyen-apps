@@ -188,7 +188,9 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
         className="w-full h-full"
         role="img"
         aria-label={isActive ? 'Audio visualizer — conversation is active' : 'Audio visualizer — idle'}
-      />
+      >
+        {isActive ? 'Audio visualizer — conversation is active' : 'Audio visualizer — idle'}
+      </canvas>
     </div>
   );
 });

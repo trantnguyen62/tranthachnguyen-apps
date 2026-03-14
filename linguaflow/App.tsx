@@ -161,7 +161,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col md:flex-row text-slate-100 overflow-hidden">
-      
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-slate-900 focus:rounded-lg focus:font-semibold focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
+
       {/* Left Panel: Controls & Visuals */}
       <div className="flex-1 flex flex-col p-6 gap-8 relative z-10">
         
@@ -209,7 +215,7 @@ function App() {
                 </>
               ) : (
                 <>
-                  <span className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
+                  <span aria-hidden="true" className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
                   <span className="text-slate-400">Ready</span>
                 </>
               )}
@@ -218,7 +224,7 @@ function App() {
         </div>
 
         {/* Main Interaction Area */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-8 min-h-[300px]">
+        <div id="main-content" className="flex-1 flex flex-col items-center justify-center gap-8 min-h-[300px]">
            <Visualizer 
              volume={volume} 
              isActive={isConnected}
