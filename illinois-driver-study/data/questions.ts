@@ -91,7 +91,7 @@ export const questionsEn: Question[] = [
       "You must not cross the yellow line to pass another vehicle."
     ],
     correctIndex: 2,
-    explanation: "A solid yellow line on your side of the centerline means you are in a no-passing zone. You must not cross it to pass another vehicle."
+    explanation: "A solid yellow line on your side of the centerline marks a no-passing zone — typically placed on curves, hills, or areas with limited sight distance where head-on collisions are most likely. You must not cross it to pass another vehicle."
   },
   {
     id: 9,
@@ -154,7 +154,7 @@ export const questionsEn: Question[] = [
       "Keep your foot on the brake pedal so your red lights will be seen more easily."
     ],
     correctIndex: 0,
-    explanation: "In fog, use low beams because high beams reflect off the fog and reduce visibility. Drive slowly enough that you can stop within the distance you can see ahead."
+    explanation: "In fog, use low beams — high beams reflect off water droplets and create glare that actually reduces visibility. Drive slowly enough that you can stop within the distance you can see clearly ahead. For example, if visibility is only 100 feet, your speed must be slow enough to stop within 100 feet."
   },
   {
     id: 15,
