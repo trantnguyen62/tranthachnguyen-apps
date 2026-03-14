@@ -133,6 +133,7 @@ function Home() {
                 to="/bookmarks"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 transition-all hover:scale-105 active:scale-95"
               >
+                <Bookmark className="w-5 h-5" aria-hidden="true" />
                 My Bookmarks
               </Link>
             </div>

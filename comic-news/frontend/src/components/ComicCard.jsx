@@ -60,6 +60,11 @@ function ComicCard({ comic }) {
           {comic.title}
         </h3>
         <p className="text-sm text-gray-400 truncate">{comic.author}</p>
+        {comic.genre && (
+          <span className="inline-block mt-1 px-2 py-0.5 text-xs text-gray-400 bg-white/5 border border-white/10 rounded-full truncate max-w-full">
+            {comic.genre}
+          </span>
+        )}
         <div className="flex items-center gap-3 mt-2">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" aria-hidden="true" />
