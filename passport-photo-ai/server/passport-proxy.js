@@ -79,7 +79,11 @@ function apiRateLimit(req, res, next) {
   if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + 60_000; }
   entry.count++;
   _rateMap.set(ip, entry);
-  if (entry.count > 10) return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  if (entry.count > 10) {
+    const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
+    res.setHeader('Retry-After', retryAfter);
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
   next();
 }
 // Periodically clean up stale entries to prevent memory growth
@@ -100,8 +104,8 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // Simple result cache: avoid duplicate Gemini API calls for the same image
 const _checkCache = new Map(); // hash -> { result, expires }
-const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
-const CACHE_MAX = 200;
+const CACHE_TTL = 60 * 60 * 1000; // 60 minutes
+const CACHE_MAX = 1000;
 /** Returns the full SHA-256 hex hash of the base64 image data. */
 function getCacheKey(data) {
   return crypto.createHash('sha256').update(data).digest('hex');
