@@ -58,6 +58,7 @@ const App: React.FC = () => {
   const [status, setStatus] = useState<AppStatus>(AppStatus.IDLE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [errorDismissed, setErrorDismissed] = useState(false);
   const [processingMsgIdx, setProcessingMsgIdx] = useState(0);
   const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const processingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -102,6 +103,7 @@ const App: React.FC = () => {
       setStatus(AppStatus.IDLE);
     }
     setErrorMsg(null);
+    setErrorDismissed(false);
     setPrompt('');
   }, []);
 
@@ -145,6 +147,7 @@ const App: React.FC = () => {
       console.error(err);
       const message = err instanceof Error ? err.message : "Something went wrong. Please try a different prompt or image.";
       setErrorMsg(message);
+      setErrorDismissed(false);
       setStatus(AppStatus.ERROR);
     }
   }, [currentImage, prompt, history, historyIndex, status]);
@@ -300,7 +303,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleUndo}
                       disabled={!canUndo}
-                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       title="Undo (Ctrl+Z)"
                       aria-label="Undo — go back one version (Ctrl+Z)"
                     >
@@ -312,7 +315,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleRedo}
                       disabled={!canRedo}
-                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       title="Redo (Ctrl+Y)"
                       aria-label="Redo — go forward one version (Ctrl+Y)"
                     >
@@ -407,22 +410,31 @@ const App: React.FC = () => {
                 </div>
 
                 {/* Error Message */}
-                {errorMsg && (
+                {errorMsg && !errorDismissed && (
                   <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">Unable to generate — try again</p>
                       <p className="text-sm opacity-90">{errorMsg}</p>
                     </div>
-                    <button
-                      onClick={handleGenerate}
-                      disabled={!prompt.trim()}
-                      title={!prompt.trim() ? "Enter a prompt above to retry" : undefined}
-                      aria-label="Retry generating image"
-                      className="flex-shrink-0 text-xs font-medium px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      Retry
-                    </button>
+                    <div className="flex-shrink-0 flex items-center gap-1">
+                      <button
+                        onClick={handleGenerate}
+                        disabled={!prompt.trim()}
+                        title={!prompt.trim() ? "Enter a prompt above to retry" : undefined}
+                        aria-label="Retry generating image"
+                        className="text-xs font-medium px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Retry
+                      </button>
+                      <button
+                        onClick={() => setErrorDismissed(true)}
+                        aria-label="Dismiss error"
+                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                      >
+                        <X className="w-4 h-4" aria-hidden="true" />
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

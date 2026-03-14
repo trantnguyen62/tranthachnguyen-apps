@@ -499,12 +499,16 @@ function loadProgress() {
 }
 
 function saveProgress() {
-    if (game.score > game.bestScore) {
-        game.bestScore = game.score;
-        localStorage.setItem('pipeline-runner-best', game.bestScore);
+    try {
+        if (game.score > game.bestScore) {
+            game.bestScore = game.score;
+            localStorage.setItem('pipeline-runner-best', game.bestScore);
+        }
+        game.totalLearned += game.learnedItems.length;
+        localStorage.setItem('pipeline-runner-learned', game.totalLearned);
+    } catch (e) {
+        // localStorage unavailable (e.g. private browsing quota exceeded)
     }
-    game.totalLearned += game.learnedItems.length;
-    localStorage.setItem('pipeline-runner-learned', game.totalLearned);
 }
 
 function renderTopicButtons() {
@@ -1069,6 +1073,7 @@ function checkCollision() {
 // Question System
 function showQuestion() {
     const questions = QUESTIONS[game.selectedTopic];
+    if (!questions || questions.length === 0) return;
     const question = questions[Math.floor(Math.random() * questions.length)];
 
     const answers = question.a.map((text, originalIndex) => ({ text, originalIndex }));
@@ -1233,9 +1238,12 @@ function handleTimeout() {
     }
 
     const btns = document.querySelectorAll('.answer-btn');
-    btns[game.currentQuestion.correctIndex].classList.add('correct');
-    btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
-        `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
+    const correctBtn = game.currentQuestion && btns[game.currentQuestion.correctIndex];
+    if (correctBtn) {
+        correctBtn.classList.add('correct');
+        correctBtn.setAttribute('aria-label',
+            `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
+    }
 
     const feedbackEl = document.getElementById('answerFeedback');
     if (feedbackEl) {
@@ -1588,6 +1596,11 @@ const AdManager = {
         const resumeHandler = (e) => {
             if (!game.running || !game.paused) return;
 
+            // Remove listeners immediately to prevent double-fire on touch devices
+            // (touchstart and click both fire on a single tap)
+            game.canvas.removeEventListener('click', resumeHandler);
+            game.canvas.removeEventListener('touchstart', resumeHandler);
+
             // Enable invincibility for 3 seconds (longer to give player time)
             game.respawnInvincible = true;
             if (game.respawnInvincibleTimeout) clearTimeout(game.respawnInvincibleTimeout);
@@ -1612,10 +1625,6 @@ const AdManager = {
             }, 1500);
 
             showTip('❤️ Extra life granted! 3s invincibility active!');
-
-            // Remove this handler
-            game.canvas.removeEventListener('click', resumeHandler);
-            game.canvas.removeEventListener('touchstart', resumeHandler);
         };
 
         game.canvas.addEventListener('click', resumeHandler);
