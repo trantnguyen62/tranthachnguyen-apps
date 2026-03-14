@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { ImageUploader } from './components/ImageUploader';
 const PhotoEditor = lazy(() => import('./components/PhotoEditor').then(m => ({ default: m.PhotoEditor })));
 import { PassportImage, PassportCheckResult, AppStatus } from './types';
@@ -24,6 +24,7 @@ export default function App() {
   const [result, setResult] = useState<PassportCheckResult | null>(null);
   const [showEditor, setShowEditor] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const resultsRef = useRef<HTMLElement>(null);
 
   const handleImageSelected = useCallback((img: PassportImage | null) => {
     setImage(img);
@@ -58,6 +59,7 @@ export default function App() {
   const handleCheck = useCallback(async () => {
     if (!image) return;
     setStatus(AppStatus.CHECKING);
+    resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     try {
       const res = await fetch(CHECK_API_URL, {
         method: 'POST',
@@ -73,7 +75,7 @@ export default function App() {
       console.error('Passport check failed:', e);
       const isRateLimited = e instanceof Error && e.message === 'rate_limited';
       setErrorMessage(isRateLimited
-        ? 'Too many requests. Please wait a moment and try again.'
+        ? 'Too many requests. Please wait about 1 minute and try again.'
         : 'Could not reach the server. Check your connection and try again. For large images, try reducing the file size below 4 MB.'
       );
       setStatus(AppStatus.ERROR);
@@ -225,10 +227,10 @@ export default function App() {
           </section>
 
           {/* Right: Results Section */}
-          <section style={{ 
-            background: darkBg, 
+          <section ref={resultsRef} style={{
+            background: darkBg,
             backdropFilter: 'blur(20px)',
-            borderRadius: 24, 
+            borderRadius: 24,
             padding: 28,
             border: '1px solid rgba(255,255,255,0.08)',
             minHeight: 'clamp(260px, 40vh, 450px)'

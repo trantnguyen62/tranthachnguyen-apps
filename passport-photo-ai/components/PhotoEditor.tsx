@@ -228,13 +228,18 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-label="Processing progress"
-                aria-valuetext={`${progress}% — ${progress < 30 ? 'Preparing image' : progress < 80 ? 'Removing background' : progress < 100 ? 'Finalizing' : 'Done'}`}
+                aria-valuetext={`${progress}% — ${progress <= 10 ? 'Preparing image' : progress <= 30 ? 'Loading AI model' : progress < 80 ? 'Removing background' : progress < 100 ? 'Finalizing' : 'Done'}`}
                 style={{ width: `${progress}%`, height: '100%', background: `linear-gradient(90deg, ${accentPurple}, ${accentPink})`, transition: 'width 0.3s', borderRadius: 2 }}
               />
             </div>
             <p aria-hidden="true" style={{ fontSize: 12, color: accentPurple, textAlign: 'center', fontWeight: 500 }}>
-              {progress < 30 ? 'Preparing image…' : progress < 80 ? 'Removing background…' : progress < 100 ? 'Finalizing…' : 'Done!'} {progress}%
+              {progress <= 10 ? 'Preparing image…' : progress <= 30 ? 'Loading AI model…' : progress < 80 ? 'Removing background…' : progress < 100 ? 'Finalizing…' : 'Done!'} {progress}%
             </p>
+            {progress <= 30 && (
+              <p aria-hidden="true" style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: 4 }}>
+                First-time setup downloads the AI model (~20 MB)
+              </p>
+            )}
           </div>
         )}
 
