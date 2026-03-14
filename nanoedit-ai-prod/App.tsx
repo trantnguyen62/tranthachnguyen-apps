@@ -170,6 +170,12 @@ const App: React.FC = () => {
     }
   }, [canRedo]);
 
+  // Use refs so the keyboard listener is registered once and stays current
+  const canUndoRef = useRef(canUndo);
+  const canRedoRef = useRef(canRedo);
+  useEffect(() => { canUndoRef.current = canUndo; }, [canUndo]);
+  useEffect(() => { canRedoRef.current = canRedo; }, [canRedo]);
+
   // Global keyboard shortcuts for undo/redo
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -178,13 +184,13 @@ const App: React.FC = () => {
       if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
       if (e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        if (canUndo) {
+        if (canUndoRef.current) {
           setHistoryIndex(prev => prev - 1);
           setErrorMsg(null);
         }
       } else if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) {
         e.preventDefault();
-        if (canRedo) {
+        if (canRedoRef.current) {
           setHistoryIndex(prev => prev + 1);
           setErrorMsg(null);
         }
@@ -192,7 +198,7 @@ const App: React.FC = () => {
     };
     document.addEventListener('keydown', handleGlobalKeyDown);
     return () => document.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [canUndo, canRedo]);
+  }, []);
 
   /** Triggers a browser download of the current image and briefly shows a success toast. */
   const handleDownload = useCallback(() => {

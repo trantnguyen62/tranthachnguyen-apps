@@ -18,6 +18,8 @@ const PORT = 5174;
 // URL of the gemini-web-proxy server
 const GEMINI_PROXY_URL = process.env.GEMINI_PROXY_URL || 'http://localhost:3000';
 
+const ALLOWED_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif']);
+
 // Keep-alive agents reuse TCP connections to the upstream proxy, reducing
 // per-request connection overhead (especially important for local loopback).
 const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10, maxFreeSockets: 5 });
