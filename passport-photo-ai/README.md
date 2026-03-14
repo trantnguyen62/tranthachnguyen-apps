@@ -16,7 +16,7 @@ Automatically crop and format your photos to meet strict passport and visa requi
 ### Prerequisites
 
 - Node.js >= 18.x
-- Gemini API Key
+- Gemini API Key — get one free at [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ### Run Locally
 
@@ -64,7 +64,8 @@ Browser (React + Vite)
 The API server also exposes `POST /api/passport/analyze` which returns an overall quality
 score and brightness/contrast adjustment recommendations used to pre-populate the editor sliders.
 Results from `/check` are cached in-memory (SHA-256 keyed, 30-minute TTL) to avoid duplicate
-Gemini calls for the same image.
+Gemini calls for the same image. The `/check` endpoint caps Gemini output at 512 tokens;
+`/analyze` uses the model default.
 
 ## 📁 Project Structure
 
@@ -129,7 +130,7 @@ Both endpoints accept `{ base64Image: string }` (data URL) and are rate-limited 
 |---------|-----|
 | "Camera access denied" | Allow camera permission in the browser address bar, then try again |
 | "Unable to access camera" | Camera requires a secure (HTTPS) connection; `localhost` is exempt |
-| "Image too large" error | Resize the image to under 4 MB before uploading |
+| "Image too large" error | Use an image under 10 MB; the app pre-scales it before sending to the API |
 | Analysis returns no result | Verify `GEMINI_API_KEY` is set and the API server is running on port 5185 |
 | Background removal stalls | The first run downloads ML model weights (~20 MB); wait for the progress bar to complete |
 
