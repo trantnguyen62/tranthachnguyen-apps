@@ -11,8 +11,11 @@ import { Upload, X, Camera } from 'lucide-react';
 import { ProcessedImage } from '../types';
 
 interface ImageUploaderProps {
+  /** Called with the selected/captured image, or `null` when the image is removed. */
   onImageSelected: (image: ProcessedImage | null) => void;
+  /** The image currently displayed in the loaded view; `null` shows the upload/camera UI. */
   currentImage: ProcessedImage | null;
+  /** When `true`, the remove button is hidden and the image is dimmed (edit in progress). */
   isProcessing?: boolean;
 }
 

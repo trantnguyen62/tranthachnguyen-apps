@@ -7,10 +7,15 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import { Download, Maximize2, X, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
 
 interface ComparisonViewProps {
+  /** Base64 data URI of the original (unedited) image. */
   originalImage: string;
+  /** Base64 data URI or URL of the AI-processed result. */
   processedImage: string;
+  /** MIME type of the processed result; determines whether an `<img>` or `<video>` is rendered. Defaults to `'image/png'`. */
   processedMimeType?: string;
+  /** Called when the user clicks a Download button. */
   onDownload: () => void;
+  /** When `true`, shows a loading overlay on the processed panel. */
   isProcessing?: boolean;
 }
 

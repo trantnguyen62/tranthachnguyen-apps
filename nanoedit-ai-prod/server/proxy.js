@@ -67,9 +67,10 @@ app.use(express.json({ limit: '10mb' }));
  *   @returns {{ success: true, imageData: string }} Base64 data URI or URL of the edited image.
  *
  * Errors:
- *   - 400 Missing `prompt`.
- *   - 500 gemini-web-proxy returned no image or an upstream error.
- *   - 500 Upstream request timed out (110 s limit).
+ *   - 400 Missing or invalid `prompt` (also: unsupported MIME type, invalid image data).
+ *   - 502 gemini-web-proxy returned a non-JSON response.
+ *   - 504 Upstream request timed out (110 s limit).
+ *   - 500 gemini-web-proxy returned no image, or an unexpected internal error.
  */
 app.post('/api/gemini/edit-image', async (req, res) => {
   try {
