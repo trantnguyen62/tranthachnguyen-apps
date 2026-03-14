@@ -822,7 +822,10 @@ function update() {
         p.y += p.vy;
         p.life -= 0.02;
         p.vy += 0.1;
-        if (p.life <= 0) game.particles.splice(i, 1);
+        if (p.life <= 0) {
+            game.particles[i] = game.particles[game.particles.length - 1];
+            game.particles.pop();
+        }
     }
 
     // Check collision (skip if invincible after respawn)
