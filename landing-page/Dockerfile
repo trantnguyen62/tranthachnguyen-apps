@@ -12,6 +12,7 @@ COPY --chown=appuser:appgroup styles.css ./
 COPY --chown=appuser:appgroup robots.txt ./
 COPY --chown=appuser:appgroup sitemap.xml ./
 COPY --chown=appuser:appgroup serve.json ./
+COPY --chown=appuser:appgroup fonts/ ./fonts/
 USER appuser
 EXPOSE 80
 CMD ["serve", "-s", ".", "-l", "80"]
