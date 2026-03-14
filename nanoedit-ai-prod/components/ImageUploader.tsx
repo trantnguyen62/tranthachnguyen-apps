@@ -300,7 +300,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
             </p>
           </div>
 
-          <div className="flex items-center w-full max-w-xs">
+          <div className="flex items-center w-full max-w-xs" aria-hidden="true">
             <div className="flex-grow h-px bg-slate-200"></div>
             <span className="px-3 text-xs font-medium text-slate-500 uppercase">Or</span>
             <div className="flex-grow h-px bg-slate-200"></div>
