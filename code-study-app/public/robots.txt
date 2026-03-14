@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-# Sitemap: https://tranthachnguyen.com/sitemap.xml
+Sitemap: https://tranthachnguyen.com/sitemap.xml
