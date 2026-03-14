@@ -4340,6 +4340,8 @@ function renderQuizQuestion() {
     question.options.forEach((option, index) => {
         const btn = document.createElement('button');
         btn.className = 'quiz-option';
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('aria-checked', 'false');
         btn.setAttribute('aria-label', `Option ${letters[index]}: ${option}`);
         btn.innerHTML = `
             <span class="option-letter">${letters[index]}</span>
@@ -4378,6 +4380,9 @@ function selectAnswer(selectedIndex) {
     dom.quizOptions.querySelectorAll('.quiz-option').forEach((opt, index) => {
         opt.disabled = true;
         const optionText = question.options[index];
+        if (index === selectedIndex) {
+            opt.setAttribute('aria-checked', 'true');
+        }
         if (index === question.correct) {
             opt.classList.add('correct');
             opt.setAttribute('aria-label', `Correct answer - Option ${letters[index]}: ${optionText}`);
