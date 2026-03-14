@@ -454,6 +454,7 @@ function init() {
         // Cache frequently accessed DOM elements
         domCache.healthFill    = document.getElementById('healthFill');
         domCache.healthText    = document.getElementById('healthText');
+        domCache.healthBar     = document.getElementById('healthBar');
         domCache.shieldFill    = document.getElementById('shieldFill');
         domCache.scoreValue    = document.getElementById('scoreValue');
         domCache.streakValue   = document.getElementById('streakValue');
@@ -1090,6 +1091,11 @@ function showQuestion(enemy) {
         domCache.answerGrid.appendChild(btn);
         domCache.answerBtns.push(btn);
     });
+
+    // Move focus to first answer so keyboard users can immediately select
+    if (domCache.answerBtns.length > 0) {
+        domCache.answerBtns[0].focus();
+    }
 }
 
 function selectAnswer(index) {
@@ -1448,6 +1454,7 @@ function completeWave() {
     } else {
         // Next wave
         domCache.waveNumber.textContent = game.currentWave;
+        announce(`Wave ${game.currentWave}`);
         setTimeout(() => spawnWave(), 2000);
     }
 }
@@ -1493,6 +1500,7 @@ function updateHUD() {
         h.health = health;
         domCache.healthFill.style.width = `${game.player.health}%`;
         domCache.healthText.textContent = health;
+        domCache.healthBar.setAttribute('aria-valuenow', health);
     }
     if (game.player.shield !== h.shield) {
         h.shield = game.player.shield;
