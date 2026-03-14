@@ -1502,8 +1502,10 @@ function updateHUD() {
     if (game.currentZone !== h.zone) {
         h.zone = game.currentZone;
         const topic = TOPICS[game.currentZone];
-        domCache.levelLabel.textContent = `ZONE ${game.currentZone + 1}`;
-        domCache.levelName.textContent = topic.name;
+        if (topic) {
+            domCache.levelLabel.textContent = `ZONE ${game.currentZone + 1}`;
+            domCache.levelName.textContent = topic.name;
+        }
     }
     if (game.currentWave !== h.wave) {
         h.wave = game.currentWave;
@@ -1557,7 +1559,8 @@ function resumeGame() {
 
 function restartGame() {
     hideAllOverlays();
-    startGame(game.mode, game.mode === 'practice' ? TOPICS[game.currentZone].id : null);
+    const zoneIndex = Math.min(game.currentZone, TOPICS.length - 1);
+    startGame(game.mode, game.mode === 'practice' ? TOPICS[zoneIndex].id : null);
 }
 
 function quitToMenu() {
