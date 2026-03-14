@@ -704,6 +704,18 @@ body {
     animation: shake 0.4s ease;
 }
 
+.question-explanation {
+    font-size: 0.78rem;
+    color: var(--nano-cyan);
+    background: rgba(0, 243, 255, 0.06);
+    border-left: 3px solid var(--nano-cyan);
+    border-radius: 0 4px 4px 0;
+    padding: 0.45rem 0.7rem;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+}
+
 .question-timer {
     position: absolute;
     top: 0;
