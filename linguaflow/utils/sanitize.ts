@@ -1,4 +1,12 @@
-// Input sanitization utilities for XSS prevention
+/**
+ * Input sanitisation helpers used throughout the app to prevent XSS.
+ *
+ * Functions:
+ *   - escapeHtml     — HTML-encodes special characters (safe for innerHTML / dangerouslySetInnerHTML)
+ *   - sanitizeText   — strips script tags, event handlers, and javascript: URIs then escapes
+ *   - isTextSafe     — lightweight guard that returns false if any dangerous pattern is detected
+ *   - truncateText   — clamps text to a maximum byte length (default 1 000 characters)
+ */
 
 // Pre-compiled regex patterns to avoid recompilation on every call
 const SCRIPT_TAG_RE = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
@@ -7,9 +15,9 @@ const JAVASCRIPT_PROTO_RE = /javascript:/gi;
 const HTML_CHARS_RE = /[&<>"'/]/g;
 
 /**
- * Escapes HTML special characters to prevent XSS attacks
- * @param {string} text - The text to sanitize
- * @returns {string} - Sanitized text safe for HTML rendering
+ * Escapes HTML special characters to prevent XSS attacks.
+ * @param text - The text to escape.
+ * @returns Escaped text safe for HTML rendering.
  */
 export function escapeHtml(text: string): string {
     if (!text) return '';
@@ -27,10 +35,10 @@ export function escapeHtml(text: string): string {
 }
 
 /**
- * Sanitizes text for safe display in the UI
- * Removes any potentially dangerous content
- * @param {string} text - The text to sanitize
- * @returns {string} - Sanitized text
+ * Sanitises text for safe display in the UI by removing potentially dangerous
+ * content (script tags, event handlers, javascript: URIs) then HTML-escaping.
+ * @param text - The text to sanitise.
+ * @returns Sanitised text safe for display.
  */
 export function sanitizeText(text: string): string {
     if (!text) return '';
@@ -51,9 +59,9 @@ export function sanitizeText(text: string): string {
 }
 
 /**
- * Validates that a string doesn't contain malicious content
- * @param {string} text - The text to validate
- * @returns {boolean} - True if text appears safe
+ * Returns `false` if the string contains any recognised XSS pattern
+ * (script tags, inline event handlers, javascript: or data:text/html URIs).
+ * @param text - The text to check.
  */
 export function isTextSafe(text: string): boolean {
     if (!text) return true;
@@ -74,10 +82,9 @@ export function isTextSafe(text: string): boolean {
 }
 
 /**
- * Truncates text to a maximum length
- * @param {string} text - The text to truncate
- * @param {number} maxLength - Maximum length
- * @returns {string} - Truncated text
+ * Truncates `text` to `maxLength` characters, appending `"…"` when clipped.
+ * @param text      - The text to truncate.
+ * @param maxLength - Maximum number of characters to keep (default 1 000).
  */
 export function truncateText(text: string, maxLength: number = 1000): string {
     if (!text) return '';

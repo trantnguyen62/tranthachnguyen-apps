@@ -1,3 +1,14 @@
+/**
+ * Application-wide constants: supported languages, voices, conversation topics,
+ * and the Gemini model identifier.
+ *
+ * Exports:
+ *   - FEMALE_VOICES       — voice options shown in the voice picker (en-vi course only)
+ *   - CONVERSATION_TOPICS — topic chips shown in the topic picker
+ *   - LANGUAGES           — full language / course configurations including system prompts
+ *   - MODEL_NAME          — Gemini Live Audio model used for all sessions
+ *   - TOPIC_NAMES         — bilingual topic label lookup used when building system prompts
+ */
 import { LanguageConfig, VoiceOption, TopicOption } from './types';
 
 export const FEMALE_VOICES: VoiceOption[] = [
@@ -223,8 +234,14 @@ Bắt đầu bằng tiếng Anh và hỏi học viên muốn cải thiện đi�
   }
 ];
 
+/** Gemini Live Audio model used for all conversation sessions. */
 export const MODEL_NAME = 'gemini-2.5-flash-native-audio-dialog';
 
+/**
+ * Bilingual (Vietnamese · English) display labels for each topic id.
+ * Used by `useLiveSession` to inject a topic hint into the system prompt when the
+ * user selects a specific conversation topic rather than free talk.
+ */
 export const TOPIC_NAMES: Record<string, string> = {
   greetings: 'chào hỏi (greetings)',
   family: 'gia đình (family)',

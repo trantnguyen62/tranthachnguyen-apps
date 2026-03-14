@@ -1,4 +1,13 @@
-// Centralized logging for security events
+/**
+ * Centralised security-aware logger shared by the WebSocket proxy and API server.
+ *
+ * Writes timestamped entries to stdout/stderr with four levels:
+ *   INFO, WARN, ERROR, SECURITY
+ *
+ * Entries are also kept in an in-memory circular buffer (last 1 000 entries) so
+ * that recent logs can be inspected at runtime without reading disk files.
+ * A singleton instance is exported; import it as `import logger from './logger.js'`.
+ */
 const LOG_LEVELS = {
     INFO: 'INFO',
     WARN: 'WARN',
@@ -12,6 +21,12 @@ class Logger {
         this.maxLogs = 1000; // Keep last 1000 logs in memory
     }
 
+    /**
+     * Core log method. Writes to console and appends to the in-memory buffer.
+     * @param {string} level    - One of the LOG_LEVELS values.
+     * @param {string} message  - Human-readable log message.
+     * @param {object} metadata - Optional structured context (e.g. ip, userId).
+     */
     log(level, message, metadata = {}) {
         const logEntry = {
             timestamp: new Date().toISOString(),
@@ -57,14 +72,14 @@ class Logger {
         this.log(LOG_LEVELS.SECURITY, message, metadata);
     }
 
-    // Get recent security events
+    /** Returns the most recent `limit` SECURITY-level log entries. */
     getSecurityLogs(limit = 100) {
         return this.logs
             .filter(log => log.level === LOG_LEVELS.SECURITY)
             .slice(-limit);
     }
 
-    // Get all recent logs
+    /** Returns the most recent `limit` log entries across all levels. */
     getRecentLogs(limit = 100) {
         return this.logs.slice(-limit);
     }

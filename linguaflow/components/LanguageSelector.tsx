@@ -1,3 +1,14 @@
+/**
+ * LanguageSelector — control panel for choosing the active language / course,
+ * voice, difficulty level, and conversation topic.
+ *
+ * Rendered above the session controls in App.tsx and disabled while a live
+ * session is running (to prevent mid-session config changes).
+ *
+ * The voice picker and topic picker only render for the Vietnamese-to-English
+ * course (`en-vi`); the level picker renders for any language that defines a
+ * `levels` array in its `LanguageConfig`.
+ */
 import React, { memo, useCallback } from 'react';
 import { LANGUAGES, FEMALE_VOICES, CONVERSATION_TOPICS } from '../constants';
 import { LanguageConfig, DifficultyLevel } from '../types';
