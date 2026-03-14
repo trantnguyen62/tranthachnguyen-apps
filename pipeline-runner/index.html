@@ -341,7 +341,7 @@
                 </div>
                 <div class="question-text" id="questionText"></div>
                 <div class="answer-grid" id="answerGrid"></div>
-                <div class="keyboard-hint" id="keyboardHint" aria-hidden="true">Press <kbd>1</kbd>–<kbd>4</kbd> to answer</div>
+                <div class="keyboard-hint" id="keyboardHint">Press <kbd>1</kbd>–<kbd>4</kbd> to answer</div>
             </div>
         </div>
 
@@ -370,7 +370,7 @@
                     <div class="rank-title" id="rankTitle">Junior DevOps</div>
                 </div>
 
-                <div class="learned-fact" id="learnedFact">
+                <div class="learned-fact" id="learnedFact" aria-live="polite">
                     <span class="fact-label"><span aria-hidden="true">📚</span> Key Takeaway:</span>
                     <span class="fact-text" id="factText"></span>
                 </div>
@@ -398,7 +398,7 @@
                 <div class="rewarded-ad-video">
                     <p><span aria-hidden="true">🎬</span> Video Ad Playing...</p>
                 </div>
-                <div class="rewarded-ad-timer" id="rewardedAdTimer">5</div>
+                <div class="rewarded-ad-timer" id="rewardedAdTimer" role="timer" aria-live="polite" aria-label="Ad timer: 5 seconds remaining">5</div>
                 <button type="button" class="skip-ad-btn" id="skipAdBtn" disabled onclick="AdManager.skipAd()">
                     Skip in 5s
                 </button>

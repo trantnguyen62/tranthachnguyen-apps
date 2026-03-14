@@ -319,7 +319,7 @@
                     <div class="rank-title" id="rankTitle">Junior DevOps</div>
                 </div>
 
-                <div class="learned-fact" id="learnedFact">
+                <div class="learned-fact" id="learnedFact" aria-live="polite">
                     <span class="fact-label"><span aria-hidden="true">📚</span> You Learned:</span>
                     <span class="fact-text" id="factText"></span>
                 </div>
@@ -348,7 +348,7 @@
                     <p><span aria-hidden="true">🎬</span> Video Ad Playing...</p>
                     <p style="font-size: 0.8rem; margin-top: 0.5rem;">(Demo Mode - Real ads coming soon!)</p>
                 </div>
-                <div class="rewarded-ad-timer" id="rewardedAdTimer">5</div>
+                <div class="rewarded-ad-timer" id="rewardedAdTimer" role="timer" aria-live="polite" aria-label="Ad timer: 5 seconds remaining">5</div>
                 <button type="button" class="skip-ad-btn" id="skipAdBtn" disabled onclick="AdManager.skipAd()">
                     Skip in 5s
                 </button>

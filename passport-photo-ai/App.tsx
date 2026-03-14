@@ -141,6 +141,36 @@ export default function App() {
             Don't get rejected at the counter. Free AI check instantly verifies your photo meets official ICAO biometric standards — for passports, visas, and ID cards in 100+ countries.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
+
+          {/* Dynamic step progress indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 20, flexWrap: 'wrap' }} aria-label="Current step">
+            {([
+              { step: 1, label: 'Upload', color: accentGold, done: !!image, active: !image },
+              { step: 2, label: 'Check', color: accentPink, done: !!result, active: !!image && !result && status === AppStatus.IDLE },
+              { step: 3, label: 'Fix', color: accentPurple, done: false, active: !!result },
+            ] as const).map(({ step, label, color, done, active }, i) => (
+              <React.Fragment key={step}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: active || done ? 1 : 0.38, transition: 'opacity 0.4s ease' }}>
+                  <div style={{
+                    width: 26, height: 26, borderRadius: '50%',
+                    background: done ? color : active ? `${color}28` : 'rgba(255,255,255,0.05)',
+                    border: `1.5px solid ${done || active ? color : 'rgba(255,255,255,0.1)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 11, fontWeight: 700,
+                    color: done ? '#fff' : active ? color : 'rgba(255,255,255,0.25)',
+                    transition: 'all 0.4s ease',
+                    boxShadow: active ? `0 0 10px ${color}44` : 'none',
+                  }}>
+                    {done ? '✓' : step}
+                  </div>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: active || done ? color : 'rgba(255,255,255,0.3)', transition: 'color 0.4s ease' }}>
+                    {label}
+                  </span>
+                </div>
+                {i < 2 && <div style={{ width: 18, height: 1.5, background: 'rgba(255,255,255,0.1)', borderRadius: 1 }} />}
+              </React.Fragment>
+            ))}
+          </div>
         </header>
 
         {/* Main Content */}
@@ -382,7 +412,42 @@ export default function App() {
                   </div>
                 )}
               </div>
+            ) : image ? (
+              /* Image loaded — prompt user to run the check */
+              <div style={{
+                height: 350,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                textAlign: 'center', gap: 16,
+                animation: 'fadeSlideIn 0.45s ease'
+              }}>
+                <div aria-hidden="true" style={{
+                  width: 64, height: 64, borderRadius: 20,
+                  background: `linear-gradient(135deg, ${accentPink}22, ${accentGold}22)`,
+                  border: `1px solid ${accentPink}44`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 28, animation: 'ctaPulse 2.5s ease-in-out infinite'
+                }}>🔍</div>
+                <div>
+                  <p style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.92)', marginBottom: 8, fontFamily: "'Syne', sans-serif" }}>
+                    Photo ready to check!
+                  </p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 220 }}>
+                    Tap <strong style={{ color: accentPink }}>Check Photo</strong> to instantly verify it meets official biometric standards.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 280 }}>
+                  {['Face size & position', 'Lighting & shadows', 'Background', 'Expression & eyes', 'Sharpness'].map((tag) => (
+                    <span key={tag} style={{
+                      fontSize: 11, padding: '4px 10px', borderRadius: 20,
+                      background: `${accentGold}12`, border: `1px solid ${accentGold}28`,
+                      color: 'rgba(255,255,255,0.55)'
+                    }}>{tag}</span>
+                  ))}
+                </div>
+              </div>
             ) : (
+              /* No image yet — show checklist of what the AI verifies */
               <div style={{
                 height: 350,
                 display: 'flex', flexDirection: 'column',
