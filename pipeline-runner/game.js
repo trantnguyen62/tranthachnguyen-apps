@@ -450,7 +450,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     game.canvas = document.getElementById('gameCanvas');
-    game.ctx = game.canvas.getContext('2d');
+    game.ctx = game.canvas.getContext('2d', { alpha: false });
 
     // Cache frequently accessed DOM elements to avoid repeated lookups
     game.elScore   = document.getElementById('currentScore');
@@ -1412,7 +1412,7 @@ function updateTopicCache() {
     const obstacleCanvas = document.createElement('canvas');
     obstacleCanvas.width = gateWidth;
     obstacleCanvas.height = game.height || 800;
-    const oc = obstacleCanvas.getContext('2d');
+    const oc = obstacleCanvas.getContext('2d', { alpha: false });
     const oGrad = oc.createLinearGradient(0, 0, gateWidth, 0);
     oGrad.addColorStop(0, topic.color);
     oGrad.addColorStop(0.5, lightColor20);

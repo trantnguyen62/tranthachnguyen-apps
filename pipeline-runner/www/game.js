@@ -450,7 +450,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     game.canvas = document.getElementById('gameCanvas');
-    game.ctx = game.canvas.getContext('2d');
+    game.ctx = game.canvas.getContext('2d', { alpha: false });
 
     // Cache frequently accessed DOM elements to avoid repeated lookups
     game.elScore   = document.getElementById('currentScore');
@@ -499,12 +499,16 @@ function loadProgress() {
 }
 
 function saveProgress() {
-    if (game.score > game.bestScore) {
-        game.bestScore = game.score;
-        localStorage.setItem('pipeline-runner-best', game.bestScore);
+    try {
+        if (game.score > game.bestScore) {
+            game.bestScore = game.score;
+            localStorage.setItem('pipeline-runner-best', game.bestScore);
+        }
+        game.totalLearned += game.learnedItems.length;
+        localStorage.setItem('pipeline-runner-learned', game.totalLearned);
+    } catch (e) {
+        // localStorage unavailable (e.g. private browsing quota exceeded)
     }
-    game.totalLearned += game.learnedItems.length;
-    localStorage.setItem('pipeline-runner-learned', game.totalLearned);
 }
 
 function renderTopicButtons() {
@@ -520,6 +524,7 @@ function renderTopicButtons() {
         // Roving tabindex: only the selected button is in the tab order
         btn.tabIndex = topic.id === game.selectedTopic ? 0 : -1;
         btn.textContent = `${topic.icon} ${topic.name}`;
+        btn.dataset.topicIndex = index;
         btn.onclick = () => selectTopic(topic.id);
         btn.addEventListener('keydown', handleTopicKeydown);
         container.appendChild(btn);
@@ -527,18 +532,18 @@ function renderTopicButtons() {
 }
 
 function handleTopicKeydown(e) {
-    const btns = Array.from(document.querySelectorAll('.topic-btn'));
-    const currentIndex = btns.indexOf(e.currentTarget);
+    const currentIndex = parseInt(e.currentTarget.dataset.topicIndex, 10);
+    const count = TOPICS.length;
     let nextIndex = -1;
 
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        nextIndex = (currentIndex + 1) % btns.length;
+        nextIndex = (currentIndex + 1) % count;
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        nextIndex = (currentIndex - 1 + btns.length) % btns.length;
+        nextIndex = (currentIndex - 1 + count) % count;
     } else if (e.key === 'Home') {
         nextIndex = 0;
     } else if (e.key === 'End') {
-        nextIndex = btns.length - 1;
+        nextIndex = count - 1;
     }
 
     if (nextIndex >= 0) {
@@ -783,6 +788,7 @@ function update() {
             obs.passed = true;
             game.score++;
             game.elScore.textContent = game.score;
+            pulseStat(game.elScore);
 
             // Show learned content as floating text
             game.learnedItems.push(obs.content);
@@ -793,7 +799,10 @@ function update() {
             }
         }
 
-        if (obs.x <= -CONFIG.OBSTACLE_WIDTH * 2) obstacles.splice(i, 1);
+        if (obs.x <= -CONFIG.OBSTACLE_WIDTH * 2) {
+            obstacles[i] = obstacles[obstacles.length - 1];
+            obstacles.pop();
+        }
     }
 
     // Update floating texts
@@ -801,7 +810,10 @@ function update() {
         const ft = game.floatingTexts[i];
         ft.y -= 1;
         ft.life -= 0.015;
-        if (ft.life <= 0) game.floatingTexts.splice(i, 1);
+        if (ft.life <= 0) {
+            game.floatingTexts[i] = game.floatingTexts[game.floatingTexts.length - 1];
+            game.floatingTexts.pop();
+        }
     }
 
     for (let i = game.particles.length - 1; i >= 0; i--) {
@@ -810,7 +822,10 @@ function update() {
         p.y += p.vy;
         p.life -= 0.02;
         p.vy += 0.1;
-        if (p.life <= 0) game.particles.splice(i, 1);
+        if (p.life <= 0) {
+            game.particles[i] = game.particles[game.particles.length - 1];
+            game.particles.pop();
+        }
     }
 
     // Check collision (skip if invincible after respawn)
@@ -978,6 +993,11 @@ function drawPlayer(ctx) {
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rotation * DEG_TO_RAD);
 
+    // Flash player during respawn invincibility (every 150ms)
+    if (game.respawnInvincible) {
+        ctx.globalAlpha = Math.floor(Date.now() / 150) % 2 === 0 ? 0.35 : 1;
+    }
+
     ctx.drawImage(playerCanvas, -playerOX, -playerOY);
 
     if (p.velocity < 0) {
@@ -1063,6 +1083,7 @@ function checkCollision() {
 // Question System
 function showQuestion() {
     const questions = QUESTIONS[game.selectedTopic];
+    if (!questions || questions.length === 0) return;
     const question = questions[Math.floor(Math.random() * questions.length)];
 
     const answers = question.a.map((text, originalIndex) => ({ text, originalIndex }));
@@ -1196,6 +1217,7 @@ function checkAnswer(index) {
 
         game.score += 5;
         game.elScore.textContent = game.score;
+        pulseStat(game.elScore);
 
         // Award a life for correct answer!
         game.lives++;
@@ -1217,10 +1239,21 @@ function handleTimeout() {
     game.streak = 0;
     game.elStreak.textContent = '0';
 
+    // Shake the panel to signal time's up
+    const panel = document.querySelector('.question-panel');
+    if (panel) {
+        panel.classList.remove('modal-shake');
+        void panel.offsetWidth;
+        panel.classList.add('modal-shake');
+    }
+
     const btns = document.querySelectorAll('.answer-btn');
-    btns[game.currentQuestion.correctIndex].classList.add('correct');
-    btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
-        `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
+    const correctBtn = game.currentQuestion && btns[game.currentQuestion.correctIndex];
+    if (correctBtn) {
+        correctBtn.classList.add('correct');
+        correctBtn.setAttribute('aria-label',
+            `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
+    }
 
     const feedbackEl = document.getElementById('answerFeedback');
     if (feedbackEl) {
@@ -1248,6 +1281,15 @@ function closeQuestion() {
         // Return focus to canvas so keyboard events (Space) still work
         if (game.canvas) game.canvas.focus({ preventScroll: true });
     }
+}
+
+// Briefly pulse a HUD element with a CSS class, then remove it
+function pulseStat(el) {
+    if (!el) return;
+    el.classList.remove('score-bump');
+    // Force reflow so re-adding the class restarts the animation
+    void el.offsetWidth;
+    el.classList.add('score-bump');
 }
 
 // Tips
@@ -1370,7 +1412,7 @@ function updateTopicCache() {
     const obstacleCanvas = document.createElement('canvas');
     obstacleCanvas.width = gateWidth;
     obstacleCanvas.height = game.height || 800;
-    const oc = obstacleCanvas.getContext('2d');
+    const oc = obstacleCanvas.getContext('2d', { alpha: false });
     const oGrad = oc.createLinearGradient(0, 0, gateWidth, 0);
     oGrad.addColorStop(0, topic.color);
     oGrad.addColorStop(0.5, lightColor20);
@@ -1564,6 +1606,11 @@ const AdManager = {
         const resumeHandler = (e) => {
             if (!game.running || !game.paused) return;
 
+            // Remove listeners immediately to prevent double-fire on touch devices
+            // (touchstart and click both fire on a single tap)
+            game.canvas.removeEventListener('click', resumeHandler);
+            game.canvas.removeEventListener('touchstart', resumeHandler);
+
             // Enable invincibility for 3 seconds (longer to give player time)
             game.respawnInvincible = true;
             if (game.respawnInvincibleTimeout) clearTimeout(game.respawnInvincibleTimeout);
@@ -1588,10 +1635,6 @@ const AdManager = {
             }, 1500);
 
             showTip('❤️ Extra life granted! 3s invincibility active!');
-
-            // Remove this handler
-            game.canvas.removeEventListener('click', resumeHandler);
-            game.canvas.removeEventListener('touchstart', resumeHandler);
         };
 
         game.canvas.addEventListener('click', resumeHandler);
