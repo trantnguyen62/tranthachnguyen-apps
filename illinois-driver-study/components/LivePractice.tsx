@@ -197,10 +197,14 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
         },
       };
 
-      // Prepare context with all questions
-      const questionsContext = allQuestions.map(q => 
-        `ID: ${q.id}\nQuestion: ${q.text}\nOptions: ${q.options.join(', ')}\nCorrect Answer: ${q.options[q.correctIndex]}`
-      ).join('\n---\n');
+      // Prepare context with all questions in compact format to minimize token usage.
+      // Format: "id. Question text [A: opt | B: opt* | C: opt]" where * marks the correct answer.
+      const questionsContext = allQuestions.map(q => {
+        const opts = q.options.map((o, i) =>
+          `${String.fromCharCode(65 + i)}: ${o}${i === q.correctIndex ? '*' : ''}`
+        ).join(' | ');
+        return `${q.id}. ${q.text} [${opts}]`;
+      }).join('\n');
 
       const config = {
         model: LIVE_MODEL,
