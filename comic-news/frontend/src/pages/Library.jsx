@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Filter, SortAsc, SearchX } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 import SkeletonCard from '../components/SkeletonCard';
@@ -11,6 +11,7 @@ let cachedGenres = null;
 
 function Library() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [comics, setComics] = useState([]);
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState('All');
@@ -185,6 +186,14 @@ function Library() {
           <SearchX className="w-12 h-12 text-gray-600 mx-auto mb-4" aria-hidden="true" />
           <p className="text-gray-400 text-lg">No stories found</p>
           <p className="text-gray-500 mt-2">Try adjusting your filters or search query</p>
+          {(selectedGenre !== 'All' || searchQuery) && (
+            <button
+              onClick={() => { setSelectedGenre('All'); navigate('/library'); }}
+              className="mt-6 px-6 py-2 bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg text-sm hover:bg-red-500/20 transition-colors"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
