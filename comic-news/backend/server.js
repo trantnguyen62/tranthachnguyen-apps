@@ -746,6 +746,7 @@ app.get('/comic/:id', (req, res) => {
     .replace(/(<meta property="og:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
     .replace(/(<meta property="og:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
     .replace(/(<meta property="og:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
+    .replace(/(<meta property="og:image:secure_url" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
     .replace(/(<meta property="og:url" content=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
     .replace(/(<meta property="og:image:alt" content=")[^"]*(")/,  `$1${escapeHtml(comic.title)}$2`)
     .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
@@ -805,7 +806,10 @@ app.get('/library', (req, res) => {
   if (libraryImgUrl) {
     html = html
       .replace(/(<meta property="og:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
-      .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`);
+      .replace(/(<meta property="og:image:secure_url" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
+      .replace(/(<meta property="og:image:alt" content=")[^"]*(")/,  `$1Story Library - Comic News$2`)
+      .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
+      .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/,  `$1Story Library - Comic News$2`);
   }
   html = html.replace(
     /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
