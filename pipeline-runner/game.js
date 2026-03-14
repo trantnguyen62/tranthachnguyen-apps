@@ -524,6 +524,7 @@ function renderTopicButtons() {
         // Roving tabindex: only the selected button is in the tab order
         btn.tabIndex = topic.id === game.selectedTopic ? 0 : -1;
         btn.textContent = `${topic.icon} ${topic.name}`;
+        btn.dataset.topicIndex = index;
         btn.onclick = () => selectTopic(topic.id);
         btn.addEventListener('keydown', handleTopicKeydown);
         container.appendChild(btn);
@@ -531,18 +532,18 @@ function renderTopicButtons() {
 }
 
 function handleTopicKeydown(e) {
-    const btns = Array.from(document.querySelectorAll('.topic-btn'));
-    const currentIndex = btns.indexOf(e.currentTarget);
+    const currentIndex = parseInt(e.currentTarget.dataset.topicIndex, 10);
+    const count = TOPICS.length;
     let nextIndex = -1;
 
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        nextIndex = (currentIndex + 1) % btns.length;
+        nextIndex = (currentIndex + 1) % count;
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        nextIndex = (currentIndex - 1 + btns.length) % btns.length;
+        nextIndex = (currentIndex - 1 + count) % count;
     } else if (e.key === 'Home') {
         nextIndex = 0;
     } else if (e.key === 'End') {
-        nextIndex = btns.length - 1;
+        nextIndex = count - 1;
     }
 
     if (nextIndex >= 0) {
@@ -798,7 +799,10 @@ function update() {
             }
         }
 
-        if (obs.x <= -CONFIG.OBSTACLE_WIDTH * 2) obstacles.splice(i, 1);
+        if (obs.x <= -CONFIG.OBSTACLE_WIDTH * 2) {
+            obstacles[i] = obstacles[obstacles.length - 1];
+            obstacles.pop();
+        }
     }
 
     // Update floating texts
@@ -806,7 +810,10 @@ function update() {
         const ft = game.floatingTexts[i];
         ft.y -= 1;
         ft.life -= 0.015;
-        if (ft.life <= 0) game.floatingTexts.splice(i, 1);
+        if (ft.life <= 0) {
+            game.floatingTexts[i] = game.floatingTexts[game.floatingTexts.length - 1];
+            game.floatingTexts.pop();
+        }
     }
 
     for (let i = game.particles.length - 1; i >= 0; i--) {
