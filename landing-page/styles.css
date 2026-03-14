@@ -35,13 +35,13 @@
 .h-96{height:24rem}.h-px{height:1px}.h-1\.5{height:.375rem}
 .min-h-screen{min-height:100vh}
 .max-w-5xl{max-width:64rem}.max-w-2xl{max-width:42rem}
-.p-0{padding:0}.p-6{padding:1.5rem}.p-8{padding:2rem}
+.p-0{padding:0}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}
 .px-3{padding-left:.75rem;padding-right:.75rem}
 .focus\:px-4:focus{padding-left:1rem;padding-right:1rem}
 .py-1{padding-top:.25rem;padding-bottom:.25rem}
 .focus\:py-2:focus{padding-top:.5rem;padding-bottom:.5rem}
 .m-0{margin:0}.mx-auto{margin-left:auto;margin-right:auto}
-.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-16{margin-bottom:4rem}
+.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-12{margin-bottom:3rem}.mb-16{margin-bottom:4rem}
 .mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-20{margin-top:5rem}
 .mr-2{margin-right:.5rem}.ml-2{margin-left:.5rem}
 .text-center{text-align:center}
@@ -115,6 +115,9 @@
     .md\:text-3xl{font-size:1.875rem;line-height:2.25rem}
     .md\:text-7xl{font-size:4.5rem;line-height:1}
     .md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .md\:p-6{padding:1.5rem}
+    .md\:p-8{padding:2rem}
+    .md\:mb-16{margin-bottom:4rem}
 }
 /* ── Custom styles ── */
 
@@ -136,20 +139,20 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     border: 1px solid rgba(255, 255, 255, 0.1);
     contain: layout style paint;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-top-color 0.3s ease;
     will-change: transform;
 }
 .glass-card:hover, .glass-card:focus-within {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 16px 48px rgba(0, 0, 0, 0.4);
 }
-.card-blue:hover, .card-blue:focus-within { box-shadow: 0 0 0 1px rgba(96,165,250,0.25), 0 16px 48px rgba(59,130,246,0.18); }
-.card-emerald:hover, .card-emerald:focus-within { box-shadow: 0 0 0 1px rgba(52,211,153,0.25), 0 16px 48px rgba(16,185,129,0.18); }
-.card-purple:hover, .card-purple:focus-within { box-shadow: 0 0 0 1px rgba(167,139,250,0.25), 0 16px 48px rgba(139,92,246,0.18); }
-.card-rose:hover, .card-rose:focus-within { box-shadow: 0 0 0 1px rgba(251,113,133,0.25), 0 16px 48px rgba(244,63,94,0.18); }
-.card-orange:hover, .card-orange:focus-within { box-shadow: 0 0 0 1px rgba(251,146,60,0.25), 0 16px 48px rgba(249,115,22,0.18); }
-.card-yellow:hover, .card-yellow:focus-within { box-shadow: 0 0 0 1px rgba(250,204,21,0.25), 0 16px 48px rgba(234,179,8,0.18); }
-.card-sky:hover, .card-sky:focus-within { box-shadow: 0 0 0 1px rgba(56,189,248,0.25), 0 16px 48px rgba(14,165,233,0.18); }
-.card-cyan:hover, .card-cyan:focus-within { box-shadow: 0 0 0 1px rgba(34,211,238,0.25), 0 16px 48px rgba(6,182,212,0.18); }
+.card-blue:hover, .card-blue:focus-within { box-shadow: 0 0 0 1px rgba(96,165,250,0.25), 0 16px 48px rgba(59,130,246,0.18); border-top-color: rgba(59,130,246,0.7); }
+.card-emerald:hover, .card-emerald:focus-within { box-shadow: 0 0 0 1px rgba(52,211,153,0.25), 0 16px 48px rgba(16,185,129,0.18); border-top-color: rgba(16,185,129,0.7); }
+.card-purple:hover, .card-purple:focus-within { box-shadow: 0 0 0 1px rgba(167,139,250,0.25), 0 16px 48px rgba(139,92,246,0.18); border-top-color: rgba(168,85,247,0.7); }
+.card-rose:hover, .card-rose:focus-within { box-shadow: 0 0 0 1px rgba(251,113,133,0.25), 0 16px 48px rgba(244,63,94,0.18); border-top-color: rgba(244,63,94,0.7); }
+.card-orange:hover, .card-orange:focus-within { box-shadow: 0 0 0 1px rgba(251,146,60,0.25), 0 16px 48px rgba(249,115,22,0.18); border-top-color: rgba(249,115,22,0.7); }
+.card-yellow:hover, .card-yellow:focus-within { box-shadow: 0 0 0 1px rgba(250,204,21,0.25), 0 16px 48px rgba(234,179,8,0.18); border-top-color: rgba(234,179,8,0.7); }
+.card-sky:hover, .card-sky:focus-within { box-shadow: 0 0 0 1px rgba(56,189,248,0.25), 0 16px 48px rgba(14,165,233,0.18); border-top-color: rgba(14,165,233,0.7); }
+.card-cyan:hover, .card-cyan:focus-within { box-shadow: 0 0 0 1px rgba(34,211,238,0.25), 0 16px 48px rgba(6,182,212,0.18); border-top-color: rgba(6,182,212,0.7); }
 
 /* Blue→purple gradient clipped to text for the main heading */
 .gradient-text {
@@ -208,7 +211,7 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 }
 .glass-card:hover .cta-row,
 .glass-card:focus-within .cta-row {
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(255, 255, 255, 0.09);
 }
 .pulse-dot {
     position: relative;
