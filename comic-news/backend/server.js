@@ -746,6 +746,7 @@ app.get('/comic/:id', (req, res) => {
     .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
     .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
     .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/,  `$1${escapeHtml(comic.title)}$2`)
+    .replace(/(<meta name="keywords" content=")[^"]*(")/,  `$1${escapeHtml([comic.genre, comic.author, 'comic news', 'visual storytelling', 'news comics'].join(', '))}$2`)
     .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
     .replace(
       /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
@@ -767,15 +768,26 @@ app.get('/library', (req, res) => {
   const pageDesc = 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
   const canonicalUrl = `${baseUrl}/library`;
 
+  const topComic = featuredComics[0];
+  const libraryImgUrl = topComic ? `${baseUrl}${topComic.coverImage}` : null;
+
   const collectionLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: pageTitle,
     url: canonicalUrl,
     description: pageDesc,
+    hasPart: comicsSortedByRating.slice(0, 20).map(c => ({
+      '@type': 'Article',
+      headline: c.title,
+      url: `${baseUrl}/comic/${c.id}`,
+      image: `${baseUrl}${c.coverImage}`,
+      author: { '@type': 'Person', name: c.author },
+      genre: c.genre,
+    })),
   };
 
-  const html = indexHtmlTemplate
+  let html = indexHtmlTemplate
     .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(pageTitle)}</title>`)
     .replace(/(<meta name="description" content=")[^"]*(")/,  `$1${escapeHtml(pageDesc)}$2`)
     .replace(/(<meta property="og:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
@@ -783,11 +795,16 @@ app.get('/library', (req, res) => {
     .replace(/(<meta property="og:url" content=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
     .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
     .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(pageDesc)}$2`)
-    .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
-    .replace(
-      /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
-      `$1\n    <script type="application/ld+json">${JSON.stringify(collectionLd)}</script>`
-    );
+    .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`);
+  if (libraryImgUrl) {
+    html = html
+      .replace(/(<meta property="og:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
+      .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`);
+  }
+  html = html.replace(
+    /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
+    `$1\n    <script type="application/ld+json">${JSON.stringify(collectionLd)}</script>`
+  );
 
   res.set('Cache-Control', 'public, max-age=300');
   res.type('html').send(html);
