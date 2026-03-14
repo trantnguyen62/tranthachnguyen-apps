@@ -27,7 +27,9 @@ npm install
 
 # Set up environment
 cp .env.local.example .env.local
-# Edit .env.local and set GEMINI_PROXY_URL to your gemini-web-proxy URL
+# Edit .env.local:
+#   - Set GEMINI_PROXY_URL to your gemini-web-proxy URL
+#   - Uncomment and update ALLOWED_ORIGINS to include http://localhost:5173 (required to avoid CORS errors in local dev)
 
 # Start the proxy server (port 5174)
 node server/proxy.js
@@ -96,6 +98,15 @@ nanoedit-ai-prod/
 4. Use undo/redo to navigate your edit history
 5. Preview before/after, then download your result
 
+**Keyboard shortcuts:**
+
+| Shortcut | Action |
+|----------|--------|
+| `Enter` | Generate edited image |
+| `Shift+Enter` | Insert newline in prompt |
+| `Ctrl+Z` | Undo last edit |
+| `Ctrl+Y` / `Ctrl+Shift+Z` | Redo |
+
 ### Proxy Server Endpoints
 
 | Method | Path | Description |
@@ -103,6 +114,17 @@ nanoedit-ai-prod/
 | `POST` | `/api/gemini/edit-image` | Edit an image with a text prompt |
 | `GET` | `/api/status` | Check connectivity to gemini-web-proxy |
 | `GET` | `/health` | Proxy server health check |
+
+#### `GET /api/status`
+
+Response when upstream is reachable:
+```json
+{ "proxyStatus": "connected", "geminiProxy": { ... } }
+```
+Response when upstream is unreachable:
+```json
+{ "proxyStatus": "disconnected" }
+```
 
 #### `POST /api/gemini/edit-image`
 
