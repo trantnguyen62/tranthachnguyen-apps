@@ -125,18 +125,28 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
 
   const capturePhoto = useCallback(() => {
     if (!videoRef.current) return;
-    const { videoWidth, videoHeight } = videoRef.current;
-    if (!videoWidth || !videoHeight) {
+    let { videoWidth: width, videoHeight: height } = videoRef.current;
+    if (!width || !height) {
       setError("Camera is not ready yet. Please wait a moment.");
       return;
     }
+    // Apply same MAX_DIMENSION cap as file uploads to keep payload size consistent
+    if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+      if (width >= height) {
+        height = Math.round((height * MAX_DIMENSION) / width);
+        width = MAX_DIMENSION;
+      } else {
+        width = Math.round((width * MAX_DIMENSION) / height);
+        height = MAX_DIMENSION;
+      }
+    }
     const canvas = document.createElement('canvas');
-    canvas.width = videoWidth;
-    canvas.height = videoHeight;
+    canvas.width = width;
+    canvas.height = height;
     // alpha: false — JPEG output doesn't support transparency; skip alpha overhead
     const ctx = canvas.getContext('2d', { alpha: false });
     if (ctx) {
-      ctx.drawImage(videoRef.current, 0, 0);
+      ctx.drawImage(videoRef.current, 0, 0, width, height);
       // 0.85 quality: good visual fidelity with ~30% smaller file vs. lossless
       const data = canvas.toDataURL('image/jpeg', 0.85);
       onImageSelected({ data, mimeType: 'image/jpeg' });

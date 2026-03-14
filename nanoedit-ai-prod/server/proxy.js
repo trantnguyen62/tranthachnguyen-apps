@@ -85,8 +85,7 @@ app.post('/api/gemini/edit-image', async (req, res) => {
       return res.status(400).json({ error: 'Prompt exceeds maximum length of 2000 characters' });
     }
 
-    const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
-    if (mimeType && !ALLOWED_MIME_TYPES.includes(mimeType)) {
+    if (mimeType && !ALLOWED_MIME_TYPES.has(mimeType)) {
       return res.status(400).json({ error: 'Unsupported image type' });
     }
 
