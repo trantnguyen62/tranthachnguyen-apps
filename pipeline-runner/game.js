@@ -1240,7 +1240,7 @@ function checkAnswer(index) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
         feedbackEl.textContent = correct
             ? 'Correct!'
-            : `Incorrect. The correct answer was: ${correctText}`;
+            : `Not quite — the correct answer was: ${correctText}`;
     }
 
     game.questionsAnswered++;
@@ -1294,7 +1294,7 @@ function handleTimeout() {
     const feedbackEl = document.getElementById('answerFeedback');
     if (feedbackEl) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
-        feedbackEl.textContent = `Time's up! The correct answer was: ${correctText}`;
+        feedbackEl.textContent = `Time's up! No worries — the correct answer was: ${correctText}`;
     }
 
     game.lastLearnedFact = game.currentQuestion.fact || "Time's up! Try to answer faster.";
@@ -1370,7 +1370,7 @@ function gameOver() {
         const randomLearned = game.learnedItems[Math.floor(Math.random() * game.learnedItems.length)];
         document.getElementById('factText').textContent = `${randomLearned.cmd}: ${randomLearned.desc}`;
     } else {
-        document.getElementById('factText').textContent = game.lastLearnedFact || "Keep playing to build your DevOps knowledge!";
+        document.getElementById('factText').textContent = game.lastLearnedFact || "Answer questions during the run to unlock DevOps insights!";
     }
 
     // Store the timeout so it can be cancelled if user continues with extra life
