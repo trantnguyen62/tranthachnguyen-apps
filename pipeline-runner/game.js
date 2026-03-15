@@ -1267,7 +1267,7 @@ function checkAnswer(index) {
         // Award a life for correct answer!
         game.lives++;
         game.elLives.textContent = game.lives;
-        showTip(`✅ Correct!${game.streak > 1 ? ` 🔥 ${game.streak}-answer streak!` : ''} +1 life (${game.lives} total).`);
+        showTip(`✅ Correct! ${game.streak > 1 ? `🔥 ${game.streak}-answer streak! ` : ''}+1 life (${game.lives} total).`);
 
         game.lastLearnedFact = game.currentQuestion.fact || "Great job! Keep learning!";
     } else {
@@ -1303,7 +1303,7 @@ function handleTimeout() {
     const feedbackEl = game.elFeedback;
     if (feedbackEl) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
-        feedbackEl.textContent = `⏰ Time's up! The correct answer is: ${correctText}`;
+        feedbackEl.textContent = `⏰ Time's up! Correct answer: ${correctText}.`;
     }
 
     game.lastLearnedFact = game.currentQuestion.fact || "Time's up! Try to answer faster.";
@@ -1379,7 +1379,7 @@ function gameOver() {
         const randomLearned = game.learnedItems[Math.floor(Math.random() * game.learnedItems.length)];
         document.getElementById('factText').textContent = `${randomLearned.cmd}: ${randomLearned.desc}`;
     } else {
-        document.getElementById('factText').textContent = game.lastLearnedFact || "Answer quiz questions during gameplay to learn DevOps commands and concepts!";
+        document.getElementById('factText').textContent = game.lastLearnedFact || "Keep playing to unlock DevOps knowledge — each quiz answer teaches a real command or concept.";
     }
 
     // Store the timeout so it can be cancelled if user continues with extra life
@@ -1396,7 +1396,7 @@ function useLife() {
     game.elLives.textContent = game.lives;
 
     game.respawnInvincible = true;
-    showTip(`❤️ Used 1 life! ${game.lives} remaining — get correct answers to earn more.`);
+    showTip(`❤️ Life lost! ${game.lives} remaining — answer quiz questions correctly to earn more.`);
 
     // Reset player position to safe spot
     game.player.y = game.height / 2;
@@ -1648,7 +1648,7 @@ const AdManager = {
         gameLoop();
 
         // Show "Tap to Continue" tip that stays until tap
-        showTip('Tap or press Space to resume — 3s of invincibility incoming!');
+        showTip('Tap or press Space to resume — 3 seconds of invincibility ahead!');
 
         // Set up one-time tap handler to resume gameplay
         const resumeHandler = (e) => {
@@ -1665,7 +1665,7 @@ const AdManager = {
             game.respawnInvincibleTimeout = setTimeout(() => {
                 game.respawnInvincible = false;
                 game.respawnInvincibleTimeout = null;
-                showTip('⚠️ Invincibility ended — eyes on the pipeline!');
+                showTip('⚠️ Invincibility ended — stay alert!');
             }, 3000);
 
             // Unpause the game
