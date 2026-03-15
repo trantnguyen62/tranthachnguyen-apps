@@ -850,8 +850,7 @@ function update() {
         }
 
         if (obs.x <= -CONFIG.OBSTACLE_WIDTH * 2) {
-            obstacles[i] = obstacles[obstacles.length - 1];
-            obstacles.pop();
+            obstacles.splice(i, 1);
         }
     }
 
@@ -1588,9 +1587,11 @@ const AdManager = {
 
         // Disable the watch ad button
         const watchAdBtn = document.getElementById('watchAdBtn');
-        watchAdBtn.classList.add('disabled');
-        watchAdBtn.textContent = '✓ Reward Claimed';
-        watchAdBtn.onclick = null;
+        if (watchAdBtn) {
+            watchAdBtn.classList.add('disabled');
+            watchAdBtn.textContent = '✓ Reward Claimed';
+            watchAdBtn.onclick = null;
+        }
 
         // Continue the game
         this.continueGame();
