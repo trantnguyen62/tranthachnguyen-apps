@@ -231,13 +231,17 @@ app.get('/api/file', async (req, res) => {
   }
 
   try {
-    // Resolve symlinks and re-validate to prevent path traversal via symlinks
-    const realPath = fs.realpathSync(fullPath);
+    // Resolve symlinks and stat in parallel — avoids blocking the event loop and
+    // saves a round-trip compared to two sequential async calls.
+    const [realPath, stat] = await Promise.all([
+      fs.promises.realpath(fullPath),
+      fs.promises.stat(fullPath),
+    ]);
+
     if (!realPath.startsWith(REAL_CODEBASE_PATH + path.sep)) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const stat = await fs.promises.stat(fullPath);
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     if (stat.size > MAX_FILE_SIZE) {
       return res.status(413).json({ error: 'File too large' });
