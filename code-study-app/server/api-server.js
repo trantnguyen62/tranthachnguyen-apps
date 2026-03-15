@@ -183,6 +183,7 @@ app.get('/api/projects', (req, res) => {
 
   projectsCache = projects;
   projectsCacheTs = Date.now();
+  res.set('Cache-Control', `public, max-age=${Math.floor(PROJECTS_CACHE_TTL / 1000)}`);
   res.json(projects);
 });
 
@@ -204,11 +205,13 @@ app.get('/api/projects/:project/tree', (req, res) => {
 
   const cached = treeCache.get(req.params.project);
   if (cached && Date.now() - cached.ts < TREE_CACHE_TTL) {
+    res.set('Cache-Control', `public, max-age=${Math.floor(TREE_CACHE_TTL / 1000)}`);
     return res.json(cached.tree);
   }
 
   const tree = buildFileTree(projectPath);
   treeCache.set(req.params.project, { tree, ts: Date.now() });
+  res.set('Cache-Control', `public, max-age=${Math.floor(TREE_CACHE_TTL / 1000)}`);
   res.json(tree);
 });
 
@@ -250,6 +253,7 @@ app.get('/api/file', async (req, res) => {
     const content = await fs.promises.readFile(fullPath, 'utf-8');
     const language = getLanguage(filePath);
 
+    res.set('Cache-Control', 'public, max-age=3600');
     res.json({
       path: filePath,
       content,
@@ -295,6 +299,7 @@ app.get('/api/search', async (req, res) => {
     }
 
     const subdirSearches = [];
+    const contentChecks = [];
 
     for (const entry of entries) {
       if (results.length >= SEARCH_RESULTS_LIMIT) break;
@@ -323,24 +328,30 @@ app.get('/api/search', async (req, res) => {
           continue;
         }
 
-        // Search in content — skip large files (> 512KB) to keep search fast
-        try {
-          const stat = await fs.promises.stat(fullPath);
-          if (stat.size <= 512 * 1024) {
-            const content = await fs.promises.readFile(fullPath, 'utf-8');
-            if (content.toLowerCase().includes(query)) {
-              results.push({
-                name: entry.name,
-                path: relativePath,
-                type: 'file',
-                language: getLanguage(entry.name),
-                matchType: 'content'
-              });
-            }
-          }
-        } catch (e) {}
+        // Queue for parallel content search — skip large files (> 512KB)
+        contentChecks.push({ name: entry.name, fullPath, relativePath });
       }
     }
+
+    // Search file contents in parallel within this directory
+    await Promise.all(contentChecks.map(async ({ name, fullPath, relativePath }) => {
+      if (results.length >= SEARCH_RESULTS_LIMIT) return;
+      try {
+        const stat = await fs.promises.stat(fullPath);
+        if (stat.size <= 512 * 1024) {
+          const content = await fs.promises.readFile(fullPath, 'utf-8');
+          if (content.toLowerCase().includes(query) && results.length < SEARCH_RESULTS_LIMIT) {
+            results.push({
+              name,
+              path: relativePath,
+              type: 'file',
+              language: getLanguage(name),
+              matchType: 'content'
+            });
+          }
+        }
+      } catch (e) {}
+    }));
 
     // Traverse subdirectories in parallel rather than sequentially
     if (subdirSearches.length > 0) {

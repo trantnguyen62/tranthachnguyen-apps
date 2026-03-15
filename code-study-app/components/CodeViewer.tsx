@@ -32,6 +32,10 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   const rafRef = useRef<number>(0);
 
   const lines = useMemo(() => file?.content?.split('\n') || [], [file?.content]);
+  const dirPath = useMemo(() => {
+    if (!file?.path.includes('/')) return null;
+    return file.path.split('/').slice(0, -1).join('/') + '/';
+  }, [file?.path]);
 
   // Reset scroll and measure viewport when file changes
   useEffect(() => {
@@ -107,9 +111,9 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
       <div className="flex items-center justify-between px-4 py-2 bg-slate-700/50 border-b border-slate-600/50">
         <div className="flex items-center gap-2 min-w-0">
           <span className="code-font text-sm min-w-0 flex items-baseline gap-0">
-            {file.path.includes('/') && (
+            {dirPath && (
               <span className="text-slate-500 text-xs truncate hidden sm:inline">
-                {file.path.split('/').slice(0, -1).join('/')}/
+                {dirPath}
               </span>
             )}
             <span className="text-slate-200 font-medium flex-shrink-0">{file.name}</span>
