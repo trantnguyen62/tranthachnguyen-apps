@@ -403,19 +403,23 @@ function App() {
           {selectedFile ? (
             <div className="flex items-center gap-1.5 text-sm min-w-0">
               <Code2 className="w-4 h-4 text-emerald-400 flex-shrink-0" aria-hidden="true" />
-              <div className="flex items-center min-w-0 code-font">
+              <div
+                className="flex items-center min-w-0 code-font"
+                aria-label={`Current file: ${selectedProject ? selectedProject.name + '/' : ''}${selectedFile.path}`}
+              >
+                <span className="sr-only">{selectedProject ? selectedProject.name + '/' : ''}{selectedFile.path}</span>
                 {selectedProject && (
-                  <span className="text-slate-500 text-xs hidden sm:inline flex-shrink-0">
+                  <span className="text-slate-500 text-xs hidden sm:inline flex-shrink-0" aria-hidden="true">
                     {selectedProject.name}
                     <span className="mx-1 text-slate-600">/</span>
                   </span>
                 )}
                 {selectedFile.path.includes('/') && (
-                  <span className="text-slate-500 truncate text-xs hidden sm:block">
+                  <span className="text-slate-500 truncate text-xs hidden sm:block" aria-hidden="true">
                     {selectedFile.path.split('/').slice(0, -1).join('/')}/
                   </span>
                 )}
-                <span className="text-slate-200 font-medium flex-shrink-0 text-sm">{selectedFile.name}</span>
+                <span className="text-slate-200 font-medium flex-shrink-0 text-sm" aria-hidden="true">{selectedFile.name}</span>
               </div>
             </div>
           ) : (
@@ -543,6 +547,18 @@ function App() {
             <div className="flex-1 p-4 flex flex-col overflow-hidden">
               <Transcript messages={messages} />
             </div>
+
+            {/* Screen-reader announcement for code context changes */}
+            <span
+              className="sr-only"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {selectedCodePreview
+                ? `${selectedCodePreview.codeLines.length} line${selectedCodePreview.codeLines.length !== 1 ? 's' : ''} of code added to AI context`
+                : ''}
+            </span>
 
             {/* Selected Code Context */}
             {selectedCodePreview && (

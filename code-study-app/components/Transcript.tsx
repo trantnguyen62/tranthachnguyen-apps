@@ -24,15 +24,20 @@ function CopyButton({ text }: { text: string }) {
     timerRef.current = setTimeout(() => setCopied(false), 1500);
   }, [text]);
   return (
-    <button
-      onClick={handle}
-      aria-label={copied ? 'Copied' : 'Copy message'}
-      className="opacity-30 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded hover:bg-slate-600/50 flex-shrink-0 self-start mt-0.5"
-    >
-      {copied
-        ? <Check className="w-3 h-3 text-green-400" aria-hidden="true" />
-        : <Copy className="w-3 h-3 text-slate-500" aria-hidden="true" />}
-    </button>
+    <>
+      <span className="sr-only" role="status" aria-live="assertive" aria-atomic="true">
+        {copied ? 'Copied to clipboard' : ''}
+      </span>
+      <button
+        onClick={handle}
+        aria-label={copied ? 'Copied' : 'Copy message'}
+        className="opacity-30 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded hover:bg-slate-600/50 flex-shrink-0 self-start mt-0.5"
+      >
+        {copied
+          ? <Check className="w-3 h-3 text-green-400" aria-hidden="true" />
+          : <Copy className="w-3 h-3 text-slate-500" aria-hidden="true" />}
+      </button>
+    </>
   );
 }
 
@@ -158,7 +163,7 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
           </div>
           {message.role === 'user' && (
             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
-              <User className="w-4 h-4 text-blue-400" />
+              <User className="w-4 h-4 text-blue-400" aria-hidden="true" />
             </div>
           )}
         </div>
