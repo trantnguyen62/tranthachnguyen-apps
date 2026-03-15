@@ -91,7 +91,7 @@ const comics = [
     genre: "News",
     publishedDate: "2025-01-15",
     coverImage: "/images/evanston-cold-weather.png",
-    description: "Saturday at noon: 10 degrees. Overnight: zero. Wind chill of minus 8. The National Weather Service would like a word about your weekend plans.",
+    description: "Saturday at noon: 10 degrees. Overnight: zero. Wind chill of minus 8. The National Weather Service has some thoughts about your weekend plans.",
     rating: 4.7,
     chapters: 1,
     status: "Completed",
@@ -126,21 +126,19 @@ Conditions are expected to be worse to the south of the immediate Chicago area �
     chapters: 1,
     status: "Completed",
     hasTextVersion: true,
-    textStory: `Started a business relationship with a great guy. Met his wife who I had sex with in my 20s.
+    textStory: `Five years ago, just before Covid, I was contacted by a guy looking into our services. We started doing business on a regular basis. He always paid on time. Great customer and great person. Over time we got to know each other — baseball games, bars, lunch. We became friends in many ways. I genuinely like him.
 
-As per the title.
+A month ago we had a larger function at our local Board of Trade. It is there that I was introduced to his wife.
 
-Five years ago just before Covid I was contacted by a guy. He was looking into our services. We started doing business on a regular basis. He always paid on time. Great customer and person. We got to know each other. Baseball games, bars, lunch… etc.
+I recognized her immediately.
 
-We became friends in many ways. I genuinely like him as a person.
+We had met in 1996. Saw each other a few times, and then one thing led to another — a relationship that lasted just under a year. We got along well. I had hoped for something more serious, but she wanted something casual and we went our separate ways quietly. No contact in almost 30 years.
 
-A month ago we had a larger function at our local Board of Trade.
+When we were introduced, I could tell by her eyes that she recognized me too. I played along that I did not know her. We made small talk. Later she admitted to remembering and said she was glad to see me. But she does not want her husband of 16 years to know of her past. They have a 13-year-old daughter. I respect her decision. It was a long time ago, and I genuinely like them both.
 
-It is there that I was introduced to his wife. As per the title. I have not seen her in decades. We met in 1996. Saw each other a few times. Then one thing lead to another. A sexual relationship that lasted just under 1 year. We got along. I was hoping to start a relationship with her but she wanted an open relationship. She was promiscuous and told me so. She was hoping to have fun and "snag" a professional athlete. We went our separate ways and never had contact in almost 30 years.
+About a week later she found me on social media. Then email — vague, but the implication was clear. Nostalgia edging toward something reckless. I didn't reply. She called. I declined and explained my reasons: it isn't good business, and more than that, I had come to know and respect her husband.
 
-Not until that event. When introduced, I could tell by her eyes that she recognized me immediately. I quickly caught on and played along that I did not know her. We all made small talk later and she admitted to remembering and liked seeing me. But she does not want her husband of 16 years to know of her sexual past. They have a 13 year old daughter. I respect her decision. It was long ago and I like both her and her husband.
-
-About a week later she creeped me on social media. Then email. Inferring things. Basically she is nostalgic for those times and she wants to start an affair. I did not reply. I later received a call from her where I declined and stated my reasons. It is not good business, plus I got to know and respect her husband. For context: I am in my early 50s. Single. Never married or children.`,
+I am in my early 50s. Single. Never married. I have no regrets about how I handled it.`,
     pages: [
       { id: 1, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_1.png", caption: "A great business contact — reliable, punctual, and easy to like" },
       { id: 2, image: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_2.png", caption: "Friendship grows beyond business — baseball games, bars, genuine connection" },
@@ -464,7 +462,7 @@ I now wait. I wait for the thank you. I do not rush it. Some things need to arri
     genre: "Slice of Life",
     publishedDate: "2025-01-30",
     coverImage: "/images/laughed-wrong-part.svg",
-    description: "I had misread the tone. I thought the worst was already behind them. I was wrong — the worst was the part I laughed at. She stopped talking. I nodded with great seriousness for the remainder of the evening.",
+    description: "I thought it was a funny story. It was not a funny story. She stopped mid-sentence. Every face at the table turned toward me. I nodded with great seriousness for the remainder of the evening.",
     rating: 4.6,
     chapters: 1,
     status: "Completed",
