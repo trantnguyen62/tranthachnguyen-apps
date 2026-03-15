@@ -34,6 +34,7 @@ docker run -p 8080:80 landing-page
 landing-page/
 ├── index.html      # Main HTML file with all content
 ├── styles.css      # Additional custom styles
+├── fonts/          # Self-hosted Inter font files (woff2, multiple unicode ranges)
 ├── Dockerfile      # Docker configuration
 ├── serve.json      # Security headers and cache rules for `npx serve`
 ├── robots.txt      # Crawler instructions for SEO
@@ -95,8 +96,8 @@ Update `sitemap.xml` with the new app's URL if it lives on the same domain.
 ## 🛠️ Tech Stack
 
 - **Framework**: Static HTML
-- **Styling**: TailwindCSS (CDN)
-- **Fonts**: Inter (Google Fonts)
+- **Styling**: TailwindCSS utilities (hand-inlined — no CDN, no build step)
+- **Fonts**: Inter (self-hosted woff2, no external requests)
 
 ## 🎨 Design
 
@@ -109,7 +110,7 @@ Update `sitemap.xml` with the new app's URL if it lives on the same domain.
 
 `serve.json` sets the following response headers:
 
-- **CSP** — restricts resources to `self`, Google Fonts, and disables framing/forms/scripts
+- **CSP** — restricts resources to `self` only (fonts, styles, images); disables scripts, framing, and forms
 - **X-Content-Type-Options: nosniff** — prevents MIME-type sniffing
 - **X-Frame-Options: DENY** — blocks the page from being embedded in iframes
 - **Referrer-Policy: strict-origin-when-cross-origin** — limits referrer leakage
