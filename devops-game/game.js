@@ -937,23 +937,33 @@ function render() {
         });
     }
 
-    // Draw enemies
+    // Draw enemies (sprites/shapes)
     game.enemies.forEach(enemy => {
         drawEnemy(enemy);
     });
 
+    // Draw enemy icons in a single batched pass (one font setup for all enemies)
+    if (game.enemies.length > 0) {
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        game.enemies.forEach(enemy => {
+            ctx.save();
+            ctx.translate(enemy.x, enemy.y);
+            ctx.fillText(enemy.icon, 0, 50);
+            ctx.restore();
+        });
+    }
+
     // Draw projectiles (single path + fill for all projectiles)
     if (game.projectiles.length > 0) {
         ctx.fillStyle = '#00d4ff';
-        ctx.shadowColor = '#00d4ff';
-        ctx.shadowBlur = 10;
         ctx.beginPath();
         for (const p of game.projectiles) {
             ctx.moveTo(p.x + 5, p.y);
             ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
         }
         ctx.fill();
-        ctx.shadowBlur = 0;
     }
 
     // Draw player
@@ -1074,12 +1084,6 @@ function drawEnemy(enemy) {
         ctx.fill();
         ctx.stroke();
     }
-
-    // Topic icon
-    ctx.font = '20px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(enemy.icon, 0, 50); // Move text below ship
 
     ctx.restore();
 }
