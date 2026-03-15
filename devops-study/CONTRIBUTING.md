@@ -31,7 +31,9 @@ All study content lives in `app.js` inside the `devopsData.topics` array. Each t
         {
             title: 'Example Config',     // display title shown in UI
             filename: 'example.yaml',    // filename shown as label
-            language: 'yaml',
+            language: 'yaml',            // used for syntax highlighting label; common values:
+                                         // 'yaml', 'bash', 'dockerfile', 'hcl', 'json',
+                                         // 'python', 'javascript', 'go', 'text'
             description: 'One-line description',
             code: `multi-line
 code here`
@@ -43,10 +45,10 @@ code here`
 
 ### Guidelines
 
-- **Flashcards**: Keep definitions under 2 sentences. Aim for 20–100 cards per topic.
-- **Quiz questions**: Each question needs exactly 4 options and one correct answer. Always include an explanation.
-- **Commands**: Include only commands a practitioner would actually run. Omit obvious flags.
-- **Code examples**: Prefer real-world, minimal examples over toy snippets.
+- **Flashcards**: Keep definitions under 2 sentences. Aim for 20–100 cards per topic. The `term` should be a noun or short phrase; the `definition` should answer "what is it and why does it matter".
+- **Quiz questions**: Each question needs exactly 4 options (`options` array length must be 4) and one correct answer (`correct` is a 0-based index). Always include an `explanation`. Avoid "all of the above" / "none of the above" options.
+- **Commands**: Include only commands a practitioner would actually run. Omit obvious flags. The `desc` should describe the effect, not just restate the command name.
+- **Code examples**: Prefer real-world, minimal examples over toy snippets. Include comments inside the code block where the intent is not obvious.
 
 ## Adding a New Topic
 

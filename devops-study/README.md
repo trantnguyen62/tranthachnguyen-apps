@@ -84,6 +84,19 @@ npx cleancss -o styles.min.css styles.css
 
 Progress is stored in `localStorage` under the key `devops-mastery-progress`.
 
+## 🔧 Troubleshooting
+
+**Progress not saving / resetting unexpectedly**
+- Progress is stored in `localStorage` under `devops-mastery-progress`. Private/incognito windows do not persist it across sessions.
+- To manually reset progress, run in the browser console: `localStorage.removeItem('devops-mastery-progress')`
+
+**Blank page or broken layout**
+- Open the browser DevTools console and check for errors. The app requires a modern browser (Chrome 80+, Firefox 75+, Safari 13.1+, Edge 80+).
+- If opening `index.html` directly from disk (`file://`), some browsers block localStorage — use `npx serve .` instead.
+
+**Minified files out of sync**
+- After editing `app.js` or `styles.css`, regenerate the `.min.*` files before deploying (see [Development](#️-development) above). Serving stale minified files is the most common cause of production-only bugs.
+
 ## 🌐 Live Demo
 
 [devopsstudy.tranthachnguyen.com](https://devopsstudy.tranthachnguyen.com)
