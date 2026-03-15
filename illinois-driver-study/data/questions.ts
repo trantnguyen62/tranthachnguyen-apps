@@ -231,7 +231,7 @@ export const questionsEn: Question[] = [
     text: "The '2-Second Rule' works like this: when the vehicle ahead of you passes a fixed object like a tree, etc., if you begin counting, 'one thousand one, one thousand two' then if you reach the same tree before you have finished saying 'one thousand two,' you are following too closely.",
     options: ["True", "False"],
     correctIndex: 0,
-    explanation: "The 2-second counting method is the minimum baseline described in the Illinois Rules of the Road. If you reach the fixed object before finishing the count of 'one thousand two,' you are following too closely. Increase your following distance in bad weather, heavy traffic, or low visibility."
+    explanation: "The counting technique described here correctly identifies following-too-closely behavior. However, the current Illinois Rules of the Road recommends a minimum of 3 seconds of following distance under normal conditions — not 2. If you reach the fixed object before finishing your count, you are too close. Always increase this gap further in bad weather, heavy traffic, or low visibility."
   },
   {
     id: 23,
@@ -845,7 +845,7 @@ export const questionsVi: Question[] = [
     text: "Quy tắc '2 Giây' hoạt động như sau: khi xe phía trước bạn vượt qua một vật cố định như cái cây, nếu bạn bắt đầu đếm 'một ngàn một, một ngàn hai' và bạn đến cái cây đó trước khi đếm xong, bạn đang đi quá gần.",
     options: ["Đúng", "Sai"],
     correctIndex: 0,
-    explanation: "Phương pháp đếm 2 giây là ngưỡng tối thiểu được mô tả trong Quy tắc Giao thông Illinois. Nếu bạn đến vật cố định trước khi đếm xong 'một ngàn hai,' bạn đang đi quá gần. Hãy tăng khoảng cách trong điều kiện thời tiết xấu, giao thông đông hoặc tầm nhìn hạn chế."
+    explanation: "Kỹ thuật đếm được mô tả đây giúp xác định khi nào bạn đang đi quá gần. Tuy nhiên, Quy tắc Giao thông Illinois hiện tại khuyến nghị tối thiểu 3 giây khoảng cách an toàn trong điều kiện bình thường — không phải 2 giây. Nếu bạn đến vật cố định trước khi đếm xong, bạn đang đi quá gần. Hãy tăng khoảng cách hơn nữa trong điều kiện thời tiết xấu, giao thông đông hoặc tầm nhìn hạn chế."
   },
   {
     id: 23,
