@@ -4,7 +4,7 @@
  * and video output when the processed result is a video MIME type.
  */
 import React, { useState, useEffect, useRef, memo } from 'react';
-import { Download, Maximize2, X, ArrowRight, Play, Loader2, Sparkles } from 'lucide-react';
+import { Download, Maximize2, X, ArrowRight, ArrowDown, Play, Loader2, Sparkles } from 'lucide-react';
 
 interface ComparisonViewProps {
   /** Base64 data URI of the original (unedited) image. */
@@ -136,6 +136,9 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           
           {/* Original */}
           <div className="space-y-3">
+            {!isExpanded && (
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider" aria-hidden="true">Before</p>
+            )}
              <div className={`relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>
                <img
                  src={originalImage}
@@ -152,13 +155,18 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           <div className="lg:hidden flex items-center gap-3 text-xs font-medium text-slate-500" aria-hidden="true">
             <div className="flex-1 h-px bg-slate-200" />
             <span className="flex items-center gap-1.5 text-brand-600">
-              <ArrowRight className="w-3 h-3" /> AI Result
+              <ArrowDown className="w-3 h-3" /> AI Result
             </span>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
 
           {/* Processed (Image or Video) */}
           <div className="space-y-3 relative">
+            {!isExpanded && (
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wider" aria-hidden="true">
+                {isProcessing ? 'Generating…' : 'After AI Edit'}
+              </p>
+            )}
              <div className={`relative rounded-xl overflow-hidden border-2 bg-slate-100 shadow-xl transition-colors ${isProcessing ? 'border-brand-400 animate-pulse' : 'border-brand-500'} ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>
                {isVideo ? (
                  <video

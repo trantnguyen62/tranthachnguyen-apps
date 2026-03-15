@@ -320,7 +320,8 @@ const App: React.FC = () => {
                       <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
                     <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full select-none mx-0.5" aria-label={`Version ${historyIndex + 1} of ${history.length}`} title={historyIndex === 0 ? 'Original upload' : `AI edit ${historyIndex} of ${history.length - 1}`}>
-                      {historyIndex + 1} / {history.length}
+                      {historyIndex === 0 ? 'Original' : `Edit ${historyIndex}`}
+                      {history.length > 1 && <span className="text-slate-400 ml-1 font-normal">/ {history.length - 1}</span>}
                     </span>
                     <button
                       onClick={handleRedo}
