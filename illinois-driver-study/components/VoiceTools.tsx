@@ -60,8 +60,8 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
 
       mediaRecorderRef.current.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        stream.getTracks().forEach(track => track.stop()); // Release mic immediately
         await handleTranscription(blob);
-        stream.getTracks().forEach(track => track.stop()); // Clean up
       };
 
       mediaRecorderRef.current.start();

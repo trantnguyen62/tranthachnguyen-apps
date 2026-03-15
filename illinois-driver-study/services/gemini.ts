@@ -79,7 +79,7 @@ export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
     if (firstKey !== undefined) ttsCache.delete(firstKey);
   }
   ttsCache.set(text, bytes.buffer);
-  return bytes.buffer;
+  return bytes.buffer.slice(0); // Return a copy so decodeAudioData does not detach the cached buffer
 };
 
 const IMAGE_CACHE_MAX = 20;
