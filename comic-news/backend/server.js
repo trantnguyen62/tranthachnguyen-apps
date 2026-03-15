@@ -634,7 +634,7 @@ app.get('/api/comics/:id', readRateLimit, (req, res) => {
 });
 
 // Get genres
-app.get('/api/genres', (req, res) => {
+app.get('/api/genres', readRateLimit, (req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
   res.set('ETag', genresETag);
   if (req.headers['if-none-match'] === genresETag) return res.status(304).end();
@@ -642,7 +642,7 @@ app.get('/api/genres', (req, res) => {
 });
 
 // Bookmarks
-app.get('/api/bookmarks', (req, res) => {
+app.get('/api/bookmarks', readRateLimit, (req, res) => {
   res.set('Cache-Control', 'no-store');
   const bookmarkedComics = comics
     .filter(c => bookmarks.includes(c.id))
@@ -650,7 +650,7 @@ app.get('/api/bookmarks', (req, res) => {
   res.json(bookmarkedComics);
 });
 
-app.get('/api/bookmarks/check/:id', (req, res) => {
+app.get('/api/bookmarks/check/:id', readRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   res.set('Cache-Control', 'no-store');
@@ -677,7 +677,7 @@ app.delete('/api/bookmarks/:id', writeRateLimit, (req, res) => {
 });
 
 // Reading progress
-app.get('/api/progress/:id', (req, res) => {
+app.get('/api/progress/:id', readRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   res.set('Cache-Control', 'no-store');
@@ -698,7 +698,7 @@ app.post('/api/progress/:id', writeRateLimit, (req, res) => {
 });
 
 // Featured/Popular comics
-app.get('/api/featured', (req, res) => {
+app.get('/api/featured', readRateLimit, (req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
   res.set('ETag', featuredETag);
   if (req.headers['if-none-match'] === featuredETag) return res.status(304).end();
