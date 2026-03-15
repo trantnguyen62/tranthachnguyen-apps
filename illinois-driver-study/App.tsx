@@ -148,7 +148,7 @@ const App: React.FC = () => {
              <button
                onClick={toggleLanguage}
                aria-label={language === 'en' ? 'Switch to Vietnamese' : 'Chuyển sang tiếng Anh'}
-               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white hover:border-slate-300 hover:shadow-sm transition-all duration-150"
+               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white hover:border-slate-300 hover:shadow-sm transition-all duration-150 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 outline-none"
              >
                <span aria-hidden="true">{language === 'en' ? '🇺🇸' : '🇻🇳'}</span>
                <span>{language === 'en' ? 'EN' : 'VN'}</span>

@@ -461,10 +461,10 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       <button
         onClick={isActive ? stopSession : startSession}
         aria-label={isActive ? (language === 'vi' ? 'Kết thúc phiên luyện tập' : 'End practice session') : (language === 'vi' ? 'Bắt đầu phiên luyện tập' : 'Start practice session')}
-        className={`px-8 py-3 rounded-full text-lg font-bold shadow-lg transition-all transform hover:-translate-y-1 ${
+        className={`px-8 py-3 rounded-full text-lg font-bold shadow-lg transition-all transform hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-offset-2 outline-none ${
           isActive
-            ? 'bg-red-500 hover:bg-red-600 text-white'
-            : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+            ? 'bg-red-500 hover:bg-red-600 text-white focus-visible:ring-red-400'
+            : 'bg-indigo-600 hover:bg-indigo-700 text-white focus-visible:ring-indigo-400'
         }`}
       >
         {isActive ? t.stop : t.start}

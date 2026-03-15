@@ -206,18 +206,18 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
           <p className={`text-lg font-semibold mb-6 ${passed ? 'text-green-600' : 'text-amber-600'}`}>{passed ? t.passing : t.needsWork}</p>
 
           <div className="flex justify-center gap-8 mb-6">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600">{score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
+            <div className="text-center" aria-label={`${score} ${t.correct} out of ${questions.length}`}>
+              <div aria-hidden="true" className="text-4xl font-bold text-green-600">{score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
               <div className="text-sm text-slate-500 mt-1">{t.correct}</div>
             </div>
-            <div className="w-px bg-slate-200" />
-            <div className="text-center">
-              <div className="text-4xl font-bold text-red-400">{questions.length - score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
+            <div aria-hidden="true" className="w-px bg-slate-200" />
+            <div className="text-center" aria-label={`${questions.length - score} ${t.incorrect} out of ${questions.length}`}>
+              <div aria-hidden="true" className="text-4xl font-bold text-red-400">{questions.length - score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
               <div className="text-sm text-slate-500 mt-1">{t.incorrect}</div>
             </div>
-            <div className="w-px bg-slate-200" />
-            <div className="text-center">
-              <div className={`text-4xl font-bold ${passed ? 'text-green-600' : 'text-amber-600'}`}>{pct}%</div>
+            <div aria-hidden="true" className="w-px bg-slate-200" />
+            <div className="text-center" aria-label={`${t.yourScore}: ${pct}%`}>
+              <div aria-hidden="true" className={`text-4xl font-bold ${passed ? 'text-green-600' : 'text-amber-600'}`}>{pct}%</div>
               <div className="text-sm text-slate-500 mt-1">{t.yourScore}</div>
             </div>
           </div>
@@ -239,14 +239,14 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
             {!passed && onSwitchToStudy && (
               <button
                 onClick={onSwitchToStudy}
-                className="px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors"
+                className="px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 outline-none"
               >
                 {t.reviewStudy}
               </button>
             )}
             <button
               onClick={restartQuiz}
-              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 outline-none"
             >
               {t.retake}
             </button>
@@ -362,7 +362,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
           })}
         </div>
         {!showResult && (
-          <p aria-hidden="true" className="mt-3 text-xs text-slate-400 text-right select-none">
+          <p className="mt-3 text-xs text-slate-400 text-right select-none">
             {language === 'vi' ? 'Nhấn A–D để chọn' : 'Press A–D to select'}
           </p>
         )}
