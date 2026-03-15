@@ -57,8 +57,28 @@ An AI-powered code study application that helps you learn and understand your co
 
 ## Example Questions
 
-- "What does this file do?"
-- "Explain the useLiveSession hook"
-- "How does the WebSocket connection work?"
-- "What patterns are used in this code?"
-- "How can I improve this function?"
+**Understanding a file:**
+- "What does this file do and how does it fit into the project?"
+- "What are the most important things to pay attention to here?"
+- "Walk me through the data flow in this component"
+
+**Going deeper:**
+- "Why is this logic in a custom hook instead of the component?"
+- "What problem does this cache solve, and what are its trade-offs?"
+- "Are there any potential bugs or edge cases in this code?"
+
+**Architecture and patterns:**
+- "Give me a high-level overview of this project's architecture"
+- "How do the frontend and backend communicate?"
+- "What design patterns are used here and why?"
+- "How does this compare to the pattern used in LinguaFlow?"
+
+**Server-side code:**
+- "Why does this run on the server instead of in the browser?"
+- "How does this API route handle errors?"
+- "What happens if the external API call fails?"
+
+**Learning concepts:**
+- "Explain React.memo — when is it actually worth using?"
+- "What's the difference between useCallback and useMemo here?"
+- "How does virtual scrolling work in the code viewer?"
