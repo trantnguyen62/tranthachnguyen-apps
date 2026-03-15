@@ -55,6 +55,8 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
   const streamRef = useRef<MediaStream | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const inputVolumeRef = useRef<number>(0);
+  // Caches the resolved session object so audio callbacks avoid repeated .then() allocations
+  const sessionRef = useRef<any>(null);
 
   const disconnect = useCallback(() => {
     // 1. Close session if possible (wrapper doesn't expose close explicitly on promise, but we stop sending)
@@ -81,19 +83,22 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
       streamRef.current = null;
     }
 
-    // 4. Disconnect analyser
+    // 4. Clear resolved session ref
+    sessionRef.current = null;
+
+    // 5. Disconnect analyser
     if (analyserRef.current) {
       analyserRef.current.disconnect();
       analyserRef.current = null;
     }
 
-    // 5. Disconnect ScriptProcessor
+    // 6. Disconnect ScriptProcessor
     if (scriptProcessorRef.current) {
       scriptProcessorRef.current.disconnect();
       scriptProcessorRef.current = null;
     }
 
-    // 6. Close AudioContexts
+    // 7. Close AudioContexts
     if (audioContextsRef.current.input) {
       audioContextsRef.current.input.close();
       audioContextsRef.current.input = null;
@@ -242,8 +247,9 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
               inputVolumeRef.current = Math.min(rms * 5, 1); // Boost for visibility, clamped to [0,1]
 
               const pcmBlob = createBlob(inputData);
-              if (sessionPromiseRef.current) {
-                sessionPromiseRef.current.then(session => session.sendRealtimeInput({ media: pcmBlob }));
+              // Use cached session ref to avoid allocating a new Promise chain on every audio chunk
+              if (sessionRef.current) {
+                sessionRef.current.sendRealtimeInput({ media: pcmBlob });
               }
             };
 
@@ -353,9 +359,12 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
       });
 
       sessionPromiseRef.current = sessionPromise;
-      
-      // Handle promise rejection (WebSocket connection failure)
-      sessionPromise.catch((err: any) => {
+
+      // Cache the resolved session so audio callbacks can call it directly
+      // without creating a new Promise chain on every audio chunk
+      sessionPromise.then(session => {
+        sessionRef.current = session;
+      }).catch((err: any) => {
         console.error("Session promise rejected:", err);
         // The onerror callback should have already handled this,
         // but we catch here to prevent unhandled rejection warnings
@@ -390,17 +399,15 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
   }, [disconnect]);
 
   const sendInstruction = useCallback((instruction: string) => {
-    if (sessionPromiseRef.current) {
-      sessionPromiseRef.current.then(session => {
-        try {
-          session.sendClientContent({
-            turns: [{ role: 'user', parts: [{ text: instruction }] }],
-            turnComplete: true
-          });
-        } catch (e) {
-          console.warn("Error sending instruction:", e);
-        }
-      }).catch(() => { });
+    if (sessionRef.current) {
+      try {
+        sessionRef.current.sendClientContent({
+          turns: [{ role: 'user', parts: [{ text: instruction }] }],
+          turnComplete: true
+        });
+      } catch (e) {
+        console.warn("Error sending instruction:", e);
+      }
     }
   }, []);
 
