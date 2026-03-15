@@ -146,7 +146,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
         background: '#0D0D0D',
         boxShadow: `0 8px 32px rgba(0,0,0,0.4)`
       }}>
-        <img src={currentImage.data} alt="Your uploaded passport photo" style={{ width: '100%', maxHeight: 400, objectFit: 'contain', display: 'block' }} />
+        <img src={currentImage.data} alt="Your uploaded passport photo" loading="lazy" style={{ width: '100%', maxHeight: 400, objectFit: 'contain', display: 'block' }} />
         <button
           onClick={handleClear}
           aria-label="Remove photo"

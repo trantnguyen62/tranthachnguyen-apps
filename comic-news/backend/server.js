@@ -25,38 +25,40 @@ app.use((req, res, next) => {
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; frame-ancestors 'none'");
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
   next();
 });
 
-// Simple in-memory rate limiter for write endpoints
-const writeRateLimits = new Map();
-const WRITE_WINDOW_MS = 60_000;
-const WRITE_MAX_REQUESTS = 30;
-// Purge stale entries every 5 minutes to prevent unbounded memory growth
-setInterval(() => {
-  const cutoff = Date.now() - WRITE_WINDOW_MS;
-  for (const [key, entry] of writeRateLimits) {
-    if (entry.start < cutoff) writeRateLimits.delete(key);
-  }
-}, 5 * 60_000).unref();
-function writeRateLimit(req, res, next) {
-  const key = req.ip;
-  const now = Date.now();
-  const entry = writeRateLimits.get(key);
-  if (!entry || now - entry.start > WRITE_WINDOW_MS) {
-    writeRateLimits.set(key, { start: now, count: 1 });
-    return next();
-  }
-  if (entry.count >= WRITE_MAX_REQUESTS) {
-    return res.status(429).json({ error: 'Too many requests' });
-  }
-  entry.count++;
-  next();
+// Simple in-memory rate limiter factory
+function makeRateLimiter(windowMs, maxRequests) {
+  const store = new Map();
+  setInterval(() => {
+    const cutoff = Date.now() - windowMs;
+    for (const [key, entry] of store) {
+      if (entry.start < cutoff) store.delete(key);
+    }
+  }, 5 * 60_000).unref();
+  return function rateLimit(req, res, next) {
+    const key = req.ip;
+    const now = Date.now();
+    const entry = store.get(key);
+    if (!entry || now - entry.start > windowMs) {
+      store.set(key, { start: now, count: 1 });
+      return next();
+    }
+    if (entry.count >= maxRequests) {
+      return res.status(429).json({ error: 'Too many requests' });
+    }
+    entry.count++;
+    next();
+  };
 }
+
+const writeRateLimit = makeRateLimiter(60_000, 30);
+const readRateLimit = makeRateLimiter(60_000, 120);
 app.use('/images', express.static(join(__dirname, 'images'), {
   maxAge: '365d',
   setHeaders: (res) => {
@@ -570,10 +572,16 @@ ${comics.map(c =>
 ).join('\n')}
 </urlset>`;
 
+const VALID_SORT_VALUES = new Set(['', 'rating', 'title', 'default']);
+
 // Get all comics
-app.get('/api/comics', (req, res) => {
+app.get('/api/comics', readRateLimit, (req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
   const { genre, search, sort } = req.query;
+
+  if (sort !== undefined && !VALID_SORT_VALUES.has(sort)) {
+    return res.status(400).json({ error: 'Invalid sort value' });
+  }
 
   // Fast path: no filters — serve precomputed results with ETag
   if (!genre && !search) {
@@ -613,7 +621,7 @@ app.get('/api/comics', (req, res) => {
 });
 
 // Get single comic with pages
-app.get('/api/comics/:id', (req, res) => {
+app.get('/api/comics/:id', readRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   const comic = comics.find(c => c.id === id);

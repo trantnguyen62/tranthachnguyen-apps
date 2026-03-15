@@ -25,6 +25,7 @@ export default function App() {
   const [showEditor, setShowEditor] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const resultsRef = useRef<HTMLElement>(null);
+  const checkAbortRef = useRef<AbortController | null>(null);
 
   const handleImageSelected = useCallback((img: PassportImage | null) => {
     setImage(img);
@@ -58,6 +59,10 @@ export default function App() {
 
   const handleCheck = useCallback(async () => {
     if (!image) return;
+    // Cancel any in-flight request before starting a new one
+    checkAbortRef.current?.abort();
+    const controller = new AbortController();
+    checkAbortRef.current = controller;
     setStatus(AppStatus.CHECKING);
     resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     try {
@@ -65,6 +70,7 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ base64Image: image.data }),
+        signal: controller.signal,
       });
       if (res.status === 429) throw new Error('rate_limited');
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
@@ -72,6 +78,7 @@ export default function App() {
       setResult(data);
       setStatus(AppStatus.COMPLETED);
     } catch (e) {
+      if (e instanceof Error && e.name === 'AbortError') return;
       console.error('Passport check failed:', e);
       const isRateLimited = e instanceof Error && e.message === 'rate_limited';
       setErrorMessage(isRateLimited

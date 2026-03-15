@@ -116,16 +116,19 @@ function getCached(key) {
   const entry = _checkCache.get(key);
   if (!entry) return null;
   if (Date.now() > entry.expires) { _checkCache.delete(key); return null; }
+  // Move to end (most-recently-used) for LRU eviction
+  _checkCache.delete(key);
+  _checkCache.set(key, entry);
   return entry.result;
 }
 
 /**
  * Stores a result in the cache with a TTL of `CACHE_TTL` ms.
- * Evicts the oldest entry (insertion order) when the cache is full.
+ * Evicts the least-recently-used entry when the cache is full.
  */
 function setCache(key, result) {
   if (_checkCache.size >= CACHE_MAX) {
-    // Evict oldest entry
+    // Evict least-recently-used entry (first in insertion order)
     _checkCache.delete(_checkCache.keys().next().value);
   }
   _checkCache.set(key, { result, expires: Date.now() + CACHE_TTL });

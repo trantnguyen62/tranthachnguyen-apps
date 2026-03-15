@@ -204,12 +204,12 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginBottom: 24 }}>
           <div style={{ flex: '1 1 200px', textAlign: 'center' }}>
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Original</p>
-            <img src={image.data} alt="Original passport photo before processing" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }} />
+            <img src={image.data} alt="Original passport photo before processing" loading="lazy" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }} />
           </div>
           <div style={{ flex: '1 1 200px', textAlign: 'center' }}>
             <p style={{ fontSize: 11, color: '#10B981', marginBottom: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Result</p>
             {result ? (
-              <img src={result} alt="Processed passport photo with background removed" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(16,185,129,0.2)' }} />
+              <img src={result} alt="Processed passport photo with background removed" loading="lazy" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 12, border: '1px solid rgba(16,185,129,0.2)' }} />
             ) : (
               <div style={{ height: 200, background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px dashed rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>
                 <span style={{ fontSize: 28, opacity: 0.5 }}>✨</span>
