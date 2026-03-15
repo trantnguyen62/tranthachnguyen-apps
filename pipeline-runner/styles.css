@@ -173,6 +173,7 @@ body {
 }
 
 .topic-btn {
+    position: relative;
     background: rgba(26, 39, 68, 0.9);
     border: 2px solid #334566;
     border-radius: 10px;
@@ -199,9 +200,13 @@ body {
 }
 
 .topic-btn.selected::after {
-    content: ' ✓';
-    font-size: 0.75rem;
-    opacity: 0.8;
+    content: '✓';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 0.65rem;
+    opacity: 0.9;
+    line-height: 1;
 }
 
 .start-btn {
@@ -287,7 +292,7 @@ body {
     align-items: flex-start;
     padding: 20px 25px 40px;
     pointer-events: none;
-    background: linear-gradient(180deg, rgba(12, 18, 34, 0.65) 0%, transparent 100%);
+    background: linear-gradient(180deg, rgba(12, 18, 34, 0.78) 0%, rgba(12, 18, 34, 0.15) 70%, transparent 100%);
 }
 
 .hud-left,
@@ -541,11 +546,11 @@ body {
     border-color: #60a5fa;
     background: rgba(96, 165, 250, 0.1);
     color: #ffffff;
-    transform: translateX(3px);
+    transform: translateY(-2px);
 }
 
 .answer-btn:active:not(.disabled) {
-    transform: translateX(3px) scale(0.97);
+    transform: translateY(0px) scale(0.98);
     background: rgba(96, 165, 250, 0.18);
 }
 
@@ -734,6 +739,9 @@ body {
     font-size: 3rem;
     margin-bottom: 0.4rem;
     filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+    animation: float 2.5s ease-in-out infinite;
+    will-change: transform;
+    display: inline-block;
 }
 
 .rank-title {
