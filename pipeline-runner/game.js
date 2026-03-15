@@ -1172,7 +1172,7 @@ function showQuestion() {
     startQuestionTimer();
 
     // Move focus to the first answer button for keyboard/screen reader users
-    const firstAnswer = document.querySelector('#answerGrid .answer-btn');
+    const firstAnswer = game.currentQuestion && game.currentQuestion.btns && game.currentQuestion.btns[0];
     if (firstAnswer) firstAnswer.focus();
 }
 
@@ -1194,7 +1194,7 @@ function startQuestionTimer() {
 
         // Announce only at key thresholds to avoid flooding screen readers
         if (game.questionTimer === 5 || game.questionTimer === 3) {
-            const feedbackEl = document.getElementById('answerFeedback');
+            const feedbackEl = game.elFeedback;
             if (feedbackEl) feedbackEl.textContent = `${game.questionTimer} seconds remaining`;
         }
 
@@ -1238,7 +1238,7 @@ function checkAnswer(index) {
             `Wrong answer: ${game.currentQuestion.shuffledAnswers[index].text}`);
     }
 
-    const feedbackEl = document.getElementById('answerFeedback');
+    const feedbackEl = game.elFeedback;
     if (feedbackEl) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
         feedbackEl.textContent = correct
@@ -1279,7 +1279,7 @@ function handleTimeout() {
     game.elStreak.textContent = '0';
 
     // Shake the panel to signal time's up
-    const panel = document.querySelector('.question-panel');
+    const panel = game.elQuestionPanel;
     if (panel) {
         panel.classList.remove('modal-shake');
         void panel.offsetWidth;
@@ -1294,7 +1294,7 @@ function handleTimeout() {
             `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
     }
 
-    const feedbackEl = document.getElementById('answerFeedback');
+    const feedbackEl = game.elFeedback;
     if (feedbackEl) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
         feedbackEl.textContent = `⏰ Time's up! The correct answer is: ${correctText}`;
