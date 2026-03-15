@@ -151,7 +151,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           {/* Mobile separator */}
           <div className="lg:hidden flex items-center gap-3 text-xs font-medium text-slate-500" aria-hidden="true">
             <div className="flex-1 h-px bg-slate-200" />
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1.5 text-brand-600">
               <ArrowRight className="w-3 h-3" /> AI Result
             </span>
             <div className="flex-1 h-px bg-slate-200" />

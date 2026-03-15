@@ -40,17 +40,20 @@ const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-/** Cycles through processing messages without re-rendering the parent App. */
+/** Cycles through processing messages and shows elapsed seconds without re-rendering the parent App. */
 const ProcessingMessage = memo(() => {
   const [idx, setIdx] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setIdx(prev => (prev + 1) % PROCESSING_MESSAGES.length), 3500);
-    return () => clearInterval(id);
+    const msgId = setInterval(() => setIdx(prev => (prev + 1) % PROCESSING_MESSAGES.length), 3500);
+    const timerId = setInterval(() => setElapsed(prev => prev + 1), 1000);
+    return () => { clearInterval(msgId); clearInterval(timerId); };
   }, []);
   return (
     <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5" role="status" aria-live="polite" aria-atomic="true">
       <Sparkles className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
       {PROCESSING_MESSAGES[idx]}
+      <span className="text-slate-400 tabular-nums">{elapsed}s</span>
     </span>
   );
 });
@@ -316,8 +319,8 @@ const App: React.FC = () => {
                     >
                       <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
-                    <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full select-none mx-0.5" aria-label={`Version ${historyIndex + 1} of ${history.length}`}>
-                      {historyIndex + 1}/{history.length}
+                    <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full select-none mx-0.5" aria-label={`Version ${historyIndex + 1} of ${history.length}`} title={historyIndex === 0 ? 'Original upload' : `AI edit ${historyIndex} of ${history.length - 1}`}>
+                      {historyIndex + 1} / {history.length}
                     </span>
                     <button
                       onClick={handleRedo}
@@ -342,6 +345,7 @@ const App: React.FC = () => {
                       placeholder="E.g., 'Remove the background' or 'Make it a professional headshot'"
                       className="w-full p-4 pr-10 text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent rounded-lg text-base"
                       rows={3}
+                      maxLength={2000}
                     />
                     {prompt && (
                       <button
@@ -361,7 +365,7 @@ const App: React.FC = () => {
                         <span className="hidden sm:flex items-center gap-1.5">
                           <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate <span className="text-slate-300">·</span> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Shift+Enter</kbd> for newline
                         </span>
-                        <span className={`tabular-nums transition-all ${prompt.length > 0 ? 'opacity-100' : 'opacity-0'} ${prompt.length > 400 ? 'text-amber-500 font-medium' : ''}`}>{prompt.length} chars</span>
+                        <span className={`tabular-nums transition-all ${prompt.length > 0 ? 'opacity-100' : 'opacity-0'} ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-400'}`}>{prompt.length} / 2000</span>
                       </span>
                     )}
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
@@ -451,7 +455,12 @@ const App: React.FC = () => {
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 h-full">
                 <div className="flex items-center gap-2 mb-4 text-slate-500 text-sm" aria-label={`Edit ${historyIndex} of ${history.length - 1}`}>
                   <History className="w-4 h-4" aria-hidden="true" />
-                  <span aria-hidden="true">Edit {historyIndex} of {history.length - 1}</span>
+                  <span aria-hidden="true">
+                    {history.length - 1 === 1 ? 'Edit 1' : `Edit ${historyIndex} of ${history.length - 1}`}
+                  </span>
+                  {history.length > 2 && (
+                    <span className="text-xs text-slate-400">— use undo/redo to compare versions</span>
+                  )}
                 </div>
                 <Suspense fallback={null}>
                   <ComparisonView
