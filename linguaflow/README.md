@@ -11,6 +11,20 @@ An AI-powered language learning partner that helps you practice conversation wit
 - **Progress Tracking** - Track your learning journey
 - **Transcription** - See what you and the AI are saying
 
+## 🏗️ How It Works
+
+```
+Browser  ──(WebSocket)──▶  ws-proxy (port 3001)  ──▶  Gemini Live Audio API
+   │                                                          │
+   │◀─────────────── audio + transcription ──────────────────┘
+   │
+   └──(HTTP)──▶  api-server (port 3002)  ──▶  data/users.json
+```
+
+- **WebSocket proxy** keeps your Gemini API key server-side and never exposes it to the browser. It also enforces rate limiting and origin validation.
+- **API server** stores learner profiles (name, lesson number, words learned) so the AI tutor can personalise each session.
+- **Frontend** captures microphone audio as PCM16 at 16 kHz, streams it to the proxy, and plays back Gemini's PCM16 responses at 24 kHz using the Web Audio API.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -41,7 +55,7 @@ npm run dev
 
 ```bash
 docker build -t linguaflow .
-docker run -p 3000:3000 linguaflow
+docker run -p 3000:3000 -e GEMINI_API_KEY=your_api_key_here linguaflow
 ```
 
 ## 📁 Project Structure
