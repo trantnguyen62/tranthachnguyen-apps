@@ -41,7 +41,6 @@ import { MODEL_NAME, TOPIC_NAMES } from '../constants';
 export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: UserProfile | null) => {
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [volume, setVolume] = useState({ input: 0, output: 0 });
   const [error, setError] = useState<string | null>(null);
 
   // Refs for audio context and session management
@@ -55,7 +54,6 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const outputVolumeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const inputVolumeRef = useRef<number>(0);
 
   const disconnect = useCallback(() => {
@@ -83,11 +81,7 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
       streamRef.current = null;
     }
 
-    // 4. Stop output volume polling and disconnect analyser
-    if (outputVolumeIntervalRef.current) {
-      clearInterval(outputVolumeIntervalRef.current);
-      outputVolumeIntervalRef.current = null;
-    }
+    // 4. Disconnect analyser
     if (analyserRef.current) {
       analyserRef.current.disconnect();
       analyserRef.current = null;
@@ -109,9 +103,9 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
       audioContextsRef.current.output = null;
     }
 
+    inputVolumeRef.current = 0;
     setConnectionState(ConnectionState.DISCONNECTED);
     nextStartTimeRef.current = 0;
-    setVolume({ input: 0, output: 0 });
   }, []);
 
   const connect = useCallback(async () => {
@@ -226,20 +220,12 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
             console.log("Connection opened successfully");
             setConnectionState(ConnectionState.CONNECTED);
 
-            // Setup shared analyser for output volume — created once per session
+            // Setup shared analyser for output volume — sampled by Visualizer's RAF
+            // loop directly, avoiding React state updates on every poll tick.
             const analyser = outputCtx.createAnalyser();
             analyser.fftSize = 256;
             analyser.connect(outputCtx.destination);
             analyserRef.current = analyser;
-
-            // Single polling interval for combined volume visualisation
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
-            outputVolumeIntervalRef.current = setInterval(() => {
-              analyser.getByteFrequencyData(dataArray);
-              let sum = 0;
-              for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-              setVolume({ input: inputVolumeRef.current, output: sum / dataArray.length / 255 });
-            }, 250);
 
             // Setup Audio Processing
             const source = inputCtx.createMediaStreamSource(stream);
@@ -329,9 +315,6 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
 
               source.addEventListener('ended', () => {
                 sourcesRef.current.delete(source);
-                if (sourcesRef.current.size === 0) {
-                  setVolume(prev => ({ ...prev, output: 0 }));
-                }
               });
 
               source.start(nextStartTimeRef.current);
@@ -347,7 +330,6 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
               });
               sourcesRef.current.clear();
               nextStartTimeRef.current = 0;
-              setVolume(prev => ({ ...prev, output: 0 }));
             }
           },
           onclose: () => {
@@ -428,7 +410,8 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
     disconnect,
     sendInstruction,
     messages,
-    volume,
+    analyserRef,
+    inputVolumeRef,
     error
   };
 };

@@ -46,14 +46,15 @@ function App() {
   const sessionRecordedRef = useRef(false);
   const pendingConnectRef = useRef(false);
   
-  const { 
-    connectionState, 
-    connect, 
-    disconnect, 
+  const {
+    connectionState,
+    connect,
+    disconnect,
     sendInstruction,
-    messages, 
-    volume, 
-    error 
+    messages,
+    analyserRef,
+    inputVolumeRef,
+    error
   } = useLiveSession(activeLanguage, userProfile);
 
   const adjustDifficulty = useCallback((delta: number) => {
@@ -240,8 +241,9 @@ function App() {
 
         {/* Main Interaction Area */}
         <div id="main-content" className="flex-1 flex flex-col items-center justify-center gap-8 min-h-[300px]">
-           <Visualizer 
-             volume={volume} 
+           <Visualizer
+             analyserRef={analyserRef}
+             inputVolumeRef={inputVolumeRef}
              isActive={isConnected}
              color={visualizerColor}
            />

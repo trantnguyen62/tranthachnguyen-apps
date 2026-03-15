@@ -12,31 +12,36 @@
  * updates that do not affect its props.
  */
 import React, { useEffect, useRef, memo } from 'react';
-import { AudioVolume } from '../types';
 
 interface VisualizerProps {
-  /** Normalised [0, 1] volume for microphone input and speaker output. */
-  volume: AudioVolume;
+  /**
+   * Ref to the Web Audio AnalyserNode for the output stream. Sampled each
+   * animation frame instead of via a React state polling interval, so volume
+   * changes never cause a React re-render.
+   */
+  analyserRef: React.MutableRefObject<AnalyserNode | null>;
+  /** Ref to the latest normalised [0, 1] microphone RMS volume. */
+  inputVolumeRef: React.MutableRefObject<number>;
   /** Whether a live session is currently running. Controls idle vs. active animation. */
   isActive: boolean;
   /** CSS colour string for the active glow (passed from the selected language theme). */
   color: string;
 }
 
-const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
+const Visualizer = memo<VisualizerProps>(({ analyserRef, inputVolumeRef, isActive, color }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const requestRef = useRef<number | null>(null);
   const particlesRef = useRef<Array<{x: number, y: number, r: number, vx: number, vy: number}>>([]);
-  const volumeRef = useRef<AudioVolume>(volume);
   const colorRef = useRef<string>(color);
+  // Reusable typed array for analyser data — allocated once per analyser fftSize
+  const dataArrayRef = useRef<Uint8Array | null>(null);
   const prefersReducedMotionRef = useRef(
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
 
-  // Sync volume and color into refs so the animation loop reads latest values
-  // without being restarted on every volume update.
-  useEffect(() => { volumeRef.current = volume; }, [volume]);
+  // Sync color into a ref so the animation loop reads the latest value without
+  // being restarted on every color change.
   useEffect(() => { colorRef.current = color; }, [color]);
 
   // Initialize particles
@@ -104,13 +109,24 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
 
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const maxRadius = 100;
 
+    // Sample output volume from the AnalyserNode each frame — no React state
+    // involved, so volume changes never trigger a re-render.
+    const analyser = analyserRef.current;
+    let outputVol = 0;
+    if (analyser) {
+      if (!dataArrayRef.current || dataArrayRef.current.length !== analyser.frequencyBinCount) {
+        dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
+      }
+      analyser.getByteFrequencyData(dataArrayRef.current);
+      let sum = 0;
+      for (let i = 0; i < dataArrayRef.current.length; i++) sum += dataArrayRef.current[i];
+      outputVol = sum / dataArrayRef.current.length / 255;
+    }
     // Prefer input volume (user speaking) over output volume (AI speaking).
     // The 0.05 threshold ignores microphone noise floor so the visualizer
     // reacts to the AI when the user is silent.
-    const vol = volumeRef.current;
-    const currentVol = vol.input > 0.05 ? vol.input : vol.output;
+    const currentVol = inputVolumeRef.current > 0.05 ? inputVolumeRef.current : outputVol;
     // Scale ranges from 1× (silence) to 2.5× (max volume), capped to avoid
     // the glow exceeding the canvas bounds at high volumes.
     const scale = 1 + Math.min(currentVol * 2, 1.5); // Cap scale
@@ -125,8 +141,10 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
     ctx.arc(centerX, centerY, 60 * scale, 0, Math.PI * 2);
     ctx.fill();
 
-    // Draw orbiting particles
-    particlesRef.current.forEach((p, i) => {
+    // Draw orbiting particles — hoist shared canvas state outside the loop to
+    // avoid redundant assignments on every particle (20× per frame).
+    ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(0.5 + currentVol, 1)})`;
+    particlesRef.current.forEach((p) => {
         p.x += p.vx * scale;
         p.y += p.vy * scale;
 
@@ -136,23 +154,24 @@ const Visualizer = memo<VisualizerProps>(({ volume, isActive, color }) => {
         if (p.y < 0) { p.y = 0; p.vy = Math.abs(p.vy); }
         else if (p.y > canvas.height) { p.y = canvas.height; p.vy = -Math.abs(p.vy); }
 
-        // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r * scale, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(0.5 + currentVol, 1)})`;
         ctx.fill();
-        
-        // Draw spokes from each particle to the centre when volume is loud
-        // enough (> 0.3) to add a dynamic "active" feel at higher volumes.
-        if (currentVol > 0.3) {
-             ctx.beginPath();
-             ctx.moveTo(centerX, centerY);
-             ctx.lineTo(p.x, p.y);
-             ctx.strokeStyle = `rgba(255, 255, 255, 0.1)`;
-             ctx.lineWidth = 1;
-             ctx.stroke();
-        }
     });
+
+    // Draw spokes from each particle to the centre when volume is loud enough
+    // (> 0.3) to add a dynamic "active" feel at higher volumes. Batch all 20
+    // spokes into a single path + stroke call instead of 20 separate strokes.
+    if (currentVol > 0.3) {
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 1;
+        particlesRef.current.forEach((p) => {
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(p.x, p.y);
+        });
+        ctx.stroke();
+    }
 
     requestRef.current = requestAnimationFrame(animate);
   };
