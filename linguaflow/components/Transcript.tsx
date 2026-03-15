@@ -73,7 +73,7 @@ const Transcript = memo<Props>(({ messages }) => {
   return (
     <div role="log" aria-live="polite" aria-label="Conversation transcript" className="flex flex-col gap-3 p-4 overflow-y-auto h-full">
       {messages.map((msg) => (
-        <div
+        <article
           key={msg.id}
           aria-label={`${msg.role === 'user' ? 'You' : 'AI Tutor'}: ${msg.text}`}
           className={`msg-fade-in group flex flex-col max-w-[85%] ${msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'}`}
@@ -96,7 +96,7 @@ const Transcript = memo<Props>(({ messages }) => {
             </span>
             <CopyButton text={msg.text} />
           </div>
-        </div>
+        </article>
       ))}
       <div ref={endRef} />
     </div>

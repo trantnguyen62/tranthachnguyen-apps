@@ -13,7 +13,7 @@
  *   4. In both cases `onProfileReady` is called with the resolved UserProfile,
  *      which the parent passes into useLiveSession to include in the system prompt.
  */
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { UserProfile } from '../types';
 
 interface Props {
@@ -30,6 +30,18 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [existingProfile, setExistingProfile] = useState<UserProfile | null>(null);
+  const triggerRef = useRef<Element | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Save and restore focus when the modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement;
+    } else if (triggerRef.current instanceof HTMLElement) {
+      triggerRef.current.focus();
+      triggerRef.current = null;
+    }
+  }, [isOpen]);
 
   // Check for saved profile in localStorage
   useEffect(() => {
@@ -100,8 +112,27 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
     setExistingProfile(null);
   }, []);
 
-  const handleBackdropKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') onClose();
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+      return;
+    }
+    if (e.key !== 'Tab' || !contentRef.current) return;
+
+    const focusable = contentRef.current.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }, [onClose]);
 
   if (!isOpen) return null;
@@ -122,9 +153,9 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
       aria-labelledby="profile-modal-title"
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
-      onKeyDown={handleBackdropKeyDown}
+      onKeyDown={handleKeyDown}
     >
-      <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div ref={contentRef} className="bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
           <h2 id="profile-modal-title" className="text-xl font-bold text-white">
