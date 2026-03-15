@@ -125,21 +125,13 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
 
   const capturePhoto = useCallback(() => {
     if (!videoRef.current) return;
-    let { videoWidth: width, videoHeight: height } = videoRef.current;
-    if (!width || !height) {
+    const { videoWidth, videoHeight } = videoRef.current;
+    if (!videoWidth || !videoHeight) {
       setError("Camera is not ready yet. Please wait a moment.");
       return;
     }
     // Apply same MAX_DIMENSION cap as file uploads to keep payload size consistent
-    if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-      if (width >= height) {
-        height = Math.round((height * MAX_DIMENSION) / width);
-        width = MAX_DIMENSION;
-      } else {
-        width = Math.round((width * MAX_DIMENSION) / height);
-        height = MAX_DIMENSION;
-      }
-    }
+    const { width, height } = capDimensions(videoWidth, videoHeight);
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;

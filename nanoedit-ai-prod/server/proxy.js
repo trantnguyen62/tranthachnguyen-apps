@@ -95,8 +95,6 @@ app.post('/api/gemini/edit-image', async (req, res) => {
 
     // base64Image is now optional - gemini-web-proxy uses text-only generation
 
-    console.log(`[edit-image] prompt="${prompt.substring(0, 80)}"`);
-
     // Call the gemini-web-proxy /api/edit-image endpoint
     const upstreamController = new AbortController();
     const upstreamTimeout = setTimeout(() => upstreamController.abort(), 110_000);
@@ -134,8 +132,6 @@ app.post('/api/gemini/edit-image', async (req, res) => {
       });
     }
 
-    console.log('[edit-image] Success! Got response from gemini-web-proxy');
-
     // Extract image from response.
     // gemini-web-proxy returns an 'images' array whose entries can be either:
     //   - base64 data URIs  (e.g. "data:image/png;base64,…") — returned directly
@@ -156,7 +152,6 @@ app.post('/api/gemini/edit-image', async (req, res) => {
       }
 
       // HTTP(S) URL or blob URL — pass through; client handles rendering
-      console.log('[edit-image] Image URL:', imageData.substring(0, 100));
       return res.json({
         success: true,
         imageData: imageData,
@@ -166,7 +161,6 @@ app.post('/api/gemini/edit-image', async (req, res) => {
 
     // If no images but we have text response (maybe Gemini described what to do)
     if (data.text) {
-      console.log('[edit-image] Got text response, no images');
       return res.status(500).json({
         error: 'Gemini responded with text but no generated image. Try rephrasing your prompt.',
         text: data.text
