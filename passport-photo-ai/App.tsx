@@ -145,7 +145,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Don't get rejected at the counter. Free AI instantly verifies your photo meets official ICAO biometric standards — for passports, visas, and ID cards in 100+ countries.<br/>
+            Don't get rejected at the counter. Free AI instantly verifies your photo meets official ICAO biometric standards — accepted for passports, visas, and ID cards in 100+ countries.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
 
@@ -359,6 +359,11 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* AI disclaimer */}
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginBottom: 20, lineHeight: 1.5 }}>
+                  AI-powered guidance only — always verify with official requirements before submitting your application.
+                </p>
+
                 {/* Issues */}
                 {result.issues?.length > 0 && (
                   <div style={{ marginBottom: 20 }}>
@@ -444,7 +449,7 @@ export default function App() {
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 280 }}>
-                  {['Face size & position', 'Lighting & shadows', 'Background', 'Expression & eyes', 'Sharpness'].map((tag) => (
+                  {['Face size & position', 'Lighting & shadows', 'Background', 'Expression & eyes', 'Sharpness', 'Glasses & headwear'].map((tag) => (
                     <span key={tag} style={{
                       fontSize: 11, padding: '4px 10px', borderRadius: 20,
                       background: `${accentGold}12`, border: `1px solid ${accentGold}28`,
@@ -508,6 +513,9 @@ export default function App() {
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
             100% private — photos are analyzed instantly and never stored, logged, or shared. Background removal runs entirely in your browser.
+          </p>
+          <p style={{ marginTop: 6, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+            Compliance checks powered by Google Gemini AI. Results are for guidance only, not an official guarantee.
           </p>
         </footer>
       </div>
