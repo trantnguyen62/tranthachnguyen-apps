@@ -22,6 +22,15 @@ interface ImageUploaderProps {
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_DIMENSION = 2048; // Max px on longest side before compressing
 
+/** Cap both dimensions so the longest side does not exceed MAX_DIMENSION. */
+const capDimensions = (width: number, height: number): { width: number; height: number } => {
+  if (width <= MAX_DIMENSION && height <= MAX_DIMENSION) return { width, height };
+  if (width >= height) {
+    return { width: MAX_DIMENSION, height: Math.round((height * MAX_DIMENSION) / width) };
+  }
+  return { width: Math.round((width * MAX_DIMENSION) / height), height: MAX_DIMENSION };
+};
+
 /** Resize + compress an image file using canvas, capping the longest side at MAX_DIMENSION. */
 const compressImage = (file: File): Promise<{ data: string; mimeType: string }> =>
   new Promise((resolve, reject) => {
@@ -29,16 +38,7 @@ const compressImage = (file: File): Promise<{ data: string; mimeType: string }> 
     const img = new Image();
     img.onload = () => {
       URL.revokeObjectURL(objectUrl);
-      let { width, height } = img;
-      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-        if (width >= height) {
-          height = Math.round((height * MAX_DIMENSION) / width);
-          width = MAX_DIMENSION;
-        } else {
-          width = Math.round((width * MAX_DIMENSION) / height);
-          height = MAX_DIMENSION;
-        }
-      }
+      const { width, height } = capDimensions(img.width, img.height);
       const outMime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
       const canvas = document.createElement('canvas');
       canvas.width = width;
