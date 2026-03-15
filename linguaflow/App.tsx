@@ -208,32 +208,31 @@ function App() {
                 {userProfile.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <div className="flex items-center gap-2 text-xs" aria-live="polite" aria-atomic="true">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="sr-only" aria-live="polite" aria-atomic="true">
+                {isConnected ? 'Connected' : isConnecting ? 'Connecting' : 'Ready'}
+              </span>
               {isConnected ? (
-                <>
-                  <span className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 rounded-full px-2 py-0.5">
-                    <span aria-hidden="true" className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    <span className="text-green-400 font-mono tabular-nums">{formatElapsed(elapsed)}</span>
+                <span aria-hidden="true" className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 rounded-full px-2 py-0.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                   </span>
-                </>
+                  <span className="text-green-400 font-mono tabular-nums">{formatElapsed(elapsed)}</span>
+                </span>
               ) : isConnecting ? (
-                <>
-                  <span className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-full px-2 py-0.5">
-                    <span aria-hidden="true" className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-                    </span>
-                    <span className="text-yellow-400">Connecting</span>
+                <span aria-hidden="true" className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-full px-2 py-0.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
                   </span>
-                </>
+                  <span className="text-yellow-400">Connecting</span>
+                </span>
               ) : (
-                <>
-                  <span aria-hidden="true" className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
+                <span aria-hidden="true" className="flex items-center gap-1.5">
+                  <span className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
                   <span className="text-slate-400">Ready</span>
-                </>
+                </span>
               )}
             </div>
           </div>
@@ -391,9 +390,9 @@ function App() {
       </div>
 
       {/* Right Panel: Transcript */}
-      <div className={`w-full md:w-96 border-t md:border-t-0 md:border-l border-slate-800 bg-slate-900/50 backdrop-blur-sm flex flex-col md:h-screen transition-all duration-300 ${transcriptOpen ? 'h-[55vh]' : 'h-auto'}`}>
+      <section aria-labelledby="transcript-heading" className={`w-full md:w-96 border-t md:border-t-0 md:border-l border-slate-800 bg-slate-900/50 backdrop-blur-sm flex flex-col md:h-screen transition-all duration-300 ${transcriptOpen ? 'h-[55vh]' : 'h-auto'}`}>
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <h3 className="font-semibold text-slate-300 flex items-center gap-2">
+          <h3 id="transcript-heading" className="font-semibold text-slate-300 flex items-center gap-2">
             <svg className="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
             Live Transcript
           </h3>
@@ -422,7 +421,7 @@ function App() {
         <div className={`flex-1 overflow-hidden ${transcriptOpen ? '' : 'hidden md:block'}`}>
           <Transcript messages={messages} />
         </div>
-      </div>
+      </section>
 
       {/* User Profile Modal */}
       <UserProfileModal
