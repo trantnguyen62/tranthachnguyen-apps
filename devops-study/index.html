@@ -363,7 +363,7 @@
                                 </div>
                             </div>
                             <div class="quiz-question" id="quizQuestion"></div>
-                            <div class="quiz-options" id="quizOptions" role="group" aria-labelledby="quizQuestion">
+                            <div class="quiz-options" id="quizOptions" role="radiogroup" aria-labelledby="quizQuestion">
                                 <!-- Options will be populated by JS -->
                             </div>
                             <div class="quiz-feedback hidden" id="quizFeedback" role="status" aria-live="polite" aria-atomic="true">
@@ -381,7 +381,7 @@
                     <!-- Codebase View -->
                     <div class="codebase-view hidden" id="codebaseView" role="tabpanel" aria-labelledby="tab-codebase" tabindex="-1">
                         <div class="codebase-container">
-                            <h3 class="codebase-title">📝 Code Examples & Templates</h3>
+                            <h3 class="codebase-title"><span aria-hidden="true">📝</span> Code Examples &amp; Templates</h3>
                             <p class="codebase-subtitle">Practical code snippets and configuration files</p>
                             <div class="codebase-list" id="codebaseList">
                                 <!-- Codebase items will be populated by JS -->
@@ -394,9 +394,9 @@
                         <div class="match-container">
                             <div class="match-header">
                                 <div class="match-stats">
-                                    <span class="match-timer">⏱️ <span id="matchTimer">0:00</span></span>
-                                    <span class="match-pairs">🎯 <span id="matchedPairs">0</span>/<span id="totalPairs">6</span> Matched</span>
-                                    <span class="match-attempts">🔄 <span id="matchAttempts">0</span> Attempts</span>
+                                    <span class="match-timer"><span aria-hidden="true">⏱️</span> <span id="matchTimer">0:00</span></span>
+                                    <span class="match-pairs"><span aria-hidden="true">🎯</span> <span id="matchedPairs">0</span>/<span id="totalPairs">6</span> Matched</span>
+                                    <span class="match-attempts"><span aria-hidden="true">🔄</span> <span id="matchAttempts">0</span> Attempts</span>
                                 </div>
                                 <button class="match-restart-btn" id="matchRestartBtn"><span aria-hidden="true">🔄</span> New Game</button>
                             </div>
@@ -417,7 +417,7 @@
                             <div class="sr-only" id="matchAnnouncer" aria-live="polite" aria-atomic="true"></div>
                             <div class="match-complete hidden" id="matchComplete">
                                 <div class="match-complete-content">
-                                    <span class="match-complete-icon">🎉</span>
+                                    <span class="match-complete-icon" aria-hidden="true">🎉</span>
                                     <h3>All Matched!</h3>
                                     <p>Time: <span id="matchFinalTime">0:00</span></p>
                                     <p>Attempts: <span id="matchFinalAttempts">0</span></p>
@@ -430,7 +430,7 @@
                     <!-- Commands View -->
                     <div class="commands-view hidden" id="commandsView" role="tabpanel" aria-labelledby="tab-commands" tabindex="-1">
                         <div class="commands-container">
-                            <h3 class="commands-title">📋 Command Cheat Sheet</h3>
+                            <h3 class="commands-title"><span aria-hidden="true">📋</span> Command Cheat Sheet</h3>
                             <p class="commands-subtitle">Essential commands for quick reference</p>
                             <div class="commands-list" id="commandsList">
                                 <!-- Commands will be populated by JS -->
@@ -441,7 +441,7 @@
                     <!-- Quiz Results -->
                     <div class="quiz-results hidden" id="quizResults">
                         <div class="results-content">
-                            <div class="results-icon" id="resultsIcon">🎉</div>
+                            <div class="results-icon" id="resultsIcon" aria-hidden="true">🎉</div>
                             <h3 class="results-title" id="resultsTitle">Quiz Complete!</h3>
                             <div class="results-score">
                                 <span class="score-value" id="finalScore">0</span>
