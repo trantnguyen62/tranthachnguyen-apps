@@ -3695,6 +3695,9 @@ const debouncedSaveProgress = debounce(saveProgress, 500);
 // Fast topic lookup map (O(1) vs O(n) find)
 const topicMap = new Map(devopsData.topics.map(t => [t.id, t]));
 
+// Precomputed total flashcard count (constant, never changes at runtime)
+const totalFlashcardsCount = devopsData.topics.reduce((sum, t) => sum + t.flashcards.length, 0);
+
 // Pre-built lowercase search index to avoid repeated .toLowerCase() on every keystroke
 const searchIndex = devopsData.topics.map(topic => ({
     topic,
@@ -3764,17 +3767,11 @@ function saveProgress() {
 
 // Calculate overall progress
 function calculateOverallProgress() {
-    let totalCards = 0;
     let viewedCards = 0;
-
-    devopsData.topics.forEach(topic => {
-        totalCards += topic.flashcards.length;
-        if (state.progress[topic.id]) {
-            viewedCards += state.progress[topic.id].flashcardsViewed.size;
-        }
-    });
-
-    return totalCards > 0 ? Math.round((viewedCards / totalCards) * 100) : 0;
+    for (const topicId in state.progress) {
+        viewedCards += state.progress[topicId].flashcardsViewed.size;
+    }
+    return totalFlashcardsCount > 0 ? Math.round((viewedCards / totalFlashcardsCount) * 100) : 0;
 }
 
 // Calculate topic progress
@@ -3790,15 +3787,13 @@ function calculateTopicProgress(topicId) {
 
 // Update header stats
 function updateHeaderStats() {
-    const totalProgress = calculateOverallProgress();
-    let totalCardsStudied = 0;
-
-    Object.values(state.progress).forEach(p => {
-        totalCardsStudied += p.flashcardsViewed.size;
-    });
-
+    let viewedCards = 0;
+    for (const topicId in state.progress) {
+        viewedCards += state.progress[topicId].flashcardsViewed.size;
+    }
+    const totalProgress = totalFlashcardsCount > 0 ? Math.round((viewedCards / totalFlashcardsCount) * 100) : 0;
     dom.totalProgress.textContent = totalProgress + '%';
-    dom.cardsStudied.textContent = totalCardsStudied;
+    dom.cardsStudied.textContent = viewedCards;
 }
 
 // Render sidebar topics
@@ -3888,7 +3883,7 @@ function renderTopicGrid() {
 function selectTopic(topic) {
     // Update sidebar active state without rebuilding the whole list
     if (state.currentTopic) {
-        const prev = document.querySelector(`.topic-item[data-id="${state.currentTopic.id}"]`);
+        const prev = sidebarItemMap.get(state.currentTopic.id);
         if (prev) prev.classList.remove('active');
     }
 
@@ -3898,7 +3893,7 @@ function selectTopic(topic) {
     state.quizScore = 0;
     state.isCardFlipped = false;
 
-    const next = document.querySelector(`.topic-item[data-id="${topic.id}"]`);
+    const next = sidebarItemMap.get(topic.id);
     if (next) next.classList.add('active');
 
     // Update UI
@@ -3916,7 +3911,7 @@ function selectTopic(topic) {
 // Go back to welcome screen
 function goBack() {
     if (state.currentTopic) {
-        const item = document.querySelector(`.topic-item[data-id="${state.currentTopic.id}"]`);
+        const item = sidebarItemMap.get(state.currentTopic.id);
         if (item) item.classList.remove('active');
     }
     state.currentTopic = null;
@@ -3982,7 +3977,7 @@ function renderCodebase() {
     if (!state.currentTopic) return;
 
     const codebase = state.currentTopic.codebase || [];
-    const codebaseList = document.getElementById('codebaseList');
+    const codebaseList = dom.codebaseList;
     codebaseList.innerHTML = '';
 
     if (codebase.length === 0) {
@@ -4042,7 +4037,7 @@ function renderCommands() {
     if (!state.currentTopic) return;
 
     const commands = state.currentTopic.commands || [];
-    const commandsList = document.getElementById('commandsList');
+    const commandsList = dom.commandsList;
     commandsList.innerHTML = '';
 
     if (commands.length === 0) {
@@ -4289,8 +4284,7 @@ function updateMatchTimer() {
     const elapsed = Math.floor((Date.now() - matchState.startTime) / 1000);
     const minutes = Math.floor(elapsed / 60);
     const seconds = elapsed % 60;
-    document.getElementById('matchTimer').textContent = 
-        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    dom.matchTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function endMatchGame() {
@@ -4627,6 +4621,9 @@ function init() {
         codebaseView: document.getElementById('codebaseView'),
         topicGrid: document.getElementById('topicGrid'),
         searchResultInfo: document.getElementById('searchResultInfo'),
+        commandsList: document.getElementById('commandsList'),
+        codebaseList: document.getElementById('codebaseList'),
+        matchTimer: document.getElementById('matchTimer'),
     };
 
     loadProgress();
