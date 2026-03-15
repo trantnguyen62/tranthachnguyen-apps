@@ -194,7 +194,7 @@ body {
     background: rgba(59, 130, 246, 0.2);
     border-color: #60a5fa;
     color: #60a5fa;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), inset 0 0 12px rgba(59, 130, 246, 0.1);
 }
 
 .topic-btn.selected::after {
@@ -284,8 +284,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 20px 25px;
+    padding: 20px 25px 40px;
     pointer-events: none;
+    background: linear-gradient(180deg, rgba(12, 18, 34, 0.65) 0%, transparent 100%);
 }
 
 .hud-left,
@@ -615,7 +616,7 @@ body {
     margin-top: 0.75rem;
     text-align: center;
     font-size: 0.78rem;
-    color: #4a6080;
+    color: #7b8eaa;
     letter-spacing: 0.03em;
 }
 
@@ -699,6 +700,16 @@ body {
     font-size: 1.6rem;
     color: #60a5fa;
     text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+}
+
+.stat-box:nth-child(2) .stat-value {
+    color: #4ade80;
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+.stat-box:nth-child(3) .stat-value {
+    color: #fbbf24;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
 }
 
 .stat-label {
