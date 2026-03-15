@@ -464,6 +464,25 @@ function init() {
     game.elFeedback      = document.getElementById('answerFeedback');
     game.elQuestionModal = document.getElementById('questionModal');
     game.elQuestionPanel = document.querySelector('.question-panel');
+    game.elAnswerGrid = document.getElementById('answerGrid');
+
+    // Pre-create 4 answer buttons once and reuse them across questions to avoid
+    // DOM reconstruction (innerHTML reset + element creation) on every question shown.
+    game.elAnswerBtns = Array.from({ length: 4 }, (_, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'answer-btn';
+        const keySpan = document.createElement('span');
+        keySpan.className = 'answer-key';
+        keySpan.setAttribute('aria-hidden', 'true');
+        keySpan.textContent = i + 1;
+        const textSpan = document.createElement('span');
+        textSpan.className = 'answer-text';
+        btn.appendChild(keySpan);
+        btn.appendChild(textSpan);
+        game.elAnswerGrid.appendChild(btn);
+        return btn;
+    });
 
     loadProgress();
     renderTopicButtons();
@@ -649,7 +668,7 @@ function setupEventListeners() {
 
         // Focus trap inside question modal
         if (game.questionActive && e.key === 'Tab') {
-            const answerBtns = [...document.querySelectorAll('#answerGrid .answer-btn:not([disabled])')];
+            const answerBtns = game.currentQuestion.btns.filter(btn => !btn.classList.contains('disabled'));
             if (answerBtns.length === 0) return;
             const currentIdx = answerBtns.indexOf(document.activeElement);
             if (e.shiftKey) {
@@ -1143,30 +1162,18 @@ function showQuestion() {
     document.getElementById('questionText').textContent = question.q;
     document.getElementById('questionTimer').textContent = CONFIG.QUESTION_TIME;
 
-    const answerGrid = document.getElementById('answerGrid');
-    const fragment = document.createDocumentFragment();
-
+    // Reuse pre-created buttons: reset state and update content in place,
+    // avoiding the innerHTML reset + DOM reconstruction that causes reflow.
+    const btns = game.elAnswerBtns;
     answers.forEach((answer, i) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
+        const btn = btns[i];
         btn.className = 'answer-btn';
-        const keySpan = document.createElement('span');
-        keySpan.className = 'answer-key';
-        keySpan.setAttribute('aria-hidden', 'true');
-        keySpan.textContent = i + 1;
-        const textSpan = document.createElement('span');
-        textSpan.className = 'answer-text';
-        textSpan.textContent = answer.text;
-        btn.appendChild(keySpan);
-        btn.appendChild(textSpan);
+        btn.removeAttribute('aria-disabled');
+        btn.querySelector('.answer-text').textContent = answer.text;
         btn.setAttribute('aria-label', `Option ${i + 1}: ${answer.text}`);
         btn.onclick = () => selectAnswer(i);
-        fragment.appendChild(btn);
     });
-
-    answerGrid.innerHTML = '';
-    answerGrid.appendChild(fragment);
-    game.currentQuestion.btns = Array.from(answerGrid.querySelectorAll('.answer-btn'));
+    game.currentQuestion.btns = btns;
 
     game.elQuestionModal.classList.remove('hidden');
     startQuestionTimer();

@@ -365,6 +365,7 @@ body {
     animation: slideUp 0.35s ease;
     max-width: 85%;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    will-change: transform, opacity;
 }
 
 .tip-banner.hidden {
@@ -440,6 +441,7 @@ body {
         0 0 50px rgba(59, 130, 246, 0.25),
         0 20px 60px rgba(0, 0, 0, 0.5);
     animation: modalIn 0.22s ease-out;
+    will-change: transform, opacity;
 }
 
 @keyframes modalIn {
