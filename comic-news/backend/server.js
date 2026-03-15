@@ -423,7 +423,7 @@ I am 34 now. My teacher is retired. I still think about this sometimes. I assume
     genre: "Slice of Life",
     publishedDate: "2025-02-10",
     coverImage: "/images/youre-welcome-early.svg",
-    description: "The gratitude was clearly on its way. I could see it coming. I just didn't wait for it to arrive.",
+    description: "She nodded. The gratitude was right there — inevitable, clearly on its way. I said 'you're welcome' before it arrived. She paused, then delivered the thank you anyway. I said 'yeah.' I am still working on what that means.",
     rating: 4.7,
     chapters: 1,
     status: "Completed",
