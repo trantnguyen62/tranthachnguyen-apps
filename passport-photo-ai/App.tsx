@@ -292,7 +292,7 @@ export default function App() {
                   ))}
                 </div>
                 <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 16, letterSpacing: '0.03em' }}>
-                  Analyzing your photo against official ICAO biometric standards&hellip;
+                  Checking 7 official ICAO biometric requirements&hellip;
                 </p>
               </div>
             ) : status === AppStatus.ERROR ? (
@@ -445,7 +445,7 @@ export default function App() {
                     Photo ready to check!
                   </p>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 220 }}>
-                    Tap <strong style={{ color: accentPink }}>Check Photo</strong> to instantly verify it meets official biometric standards.
+                    Tap <strong style={{ color: accentPink }}>Check Photo</strong> to verify all 7 ICAO biometric requirements in seconds.
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 280 }}>
@@ -494,6 +494,9 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 12, lineHeight: 1.5 }}>
+                    Official ICAO standards — accepted in the US, UK, EU, Canada, Australia, and 100+ countries.
+                  </p>
                 </div>
               </div>
             )}
