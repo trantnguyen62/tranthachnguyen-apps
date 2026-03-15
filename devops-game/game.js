@@ -795,52 +795,63 @@ function update() {
         });
 
         // Update projectiles and check collisions
-        game.projectiles = game.projectiles.filter(p => {
+        for (let i = game.projectiles.length - 1; i >= 0; i--) {
+            const p = game.projectiles[i];
             p.y -= p.speed;
-            if (p.y < 0) return false;
+            let remove = p.y < 0;
 
-            // Check collision with each enemy
-            for (let enemy of game.enemies) {
-                const dx = p.x - enemy.x;
-                const dy = p.y - enemy.y;
-                if (Math.abs(dx) < 30 && Math.abs(dy) < 30) {
-                    enemy.health -= CONFIG.SHOOT_DAMAGE;
-                    createHitParticles(enemy.x, enemy.y);
-
-                    if (enemy.health <= 0 && !enemy.triggered) {
-                        destroyEnemyByShot(enemy);
+            if (!remove) {
+                for (let enemy of game.enemies) {
+                    const dx = p.x - enemy.x;
+                    const dy = p.y - enemy.y;
+                    if (Math.abs(dx) < 30 && Math.abs(dy) < 30) {
+                        enemy.health -= CONFIG.SHOOT_DAMAGE;
+                        createHitParticles(enemy.x, enemy.y);
+                        if (enemy.health <= 0 && !enemy.triggered) {
+                            destroyEnemyByShot(enemy);
+                        }
+                        remove = true;
+                        break;
                     }
-                    return false; // Remove projectile
                 }
             }
-            return true;
-        });
+
+            if (remove) {
+                game.projectiles[i] = game.projectiles[game.projectiles.length - 1];
+                game.projectiles.pop();
+            }
+        }
     }
 
     // Update particles
-    game.particles = game.particles.filter(p => {
+    for (let i = game.particles.length - 1; i >= 0; i--) {
+        const p = game.particles[i];
         p.x += p.vx;
         p.y += p.vy;
         p.life -= 0.02;
         p.vy += 0.1; // gravity
-        return p.life > 0;
-    });
+        if (p.life <= 0) {
+            game.particles[i] = game.particles[game.particles.length - 1];
+            game.particles.pop();
+        }
+    }
 
     // Update powerups
-    game.powerups = game.powerups.filter(p => {
+    for (let i = game.powerups.length - 1; i >= 0; i--) {
+        const p = game.powerups[i];
         p.y += 1;
 
-        // Check collision with player
         const dx = p.x - game.player.x;
         const dy = p.y - game.player.y;
+        const remove = dx * dx + dy * dy < 1600 // 40 * 40
+            ? (applyPowerup(p.type), true)
+            : p.y >= game.canvas.height;
 
-        if (dx * dx + dy * dy < 1600) { // 40 * 40
-            applyPowerup(p.type);
-            return false;
+        if (remove) {
+            game.powerups[i] = game.powerups[game.powerups.length - 1];
+            game.powerups.pop();
         }
-
-        return p.y < game.canvas.height;
-    });
+    }
 
     // Question timer
     if (game.questionActive && game.questionTimer > 0) {
@@ -899,6 +910,7 @@ function render() {
         const colorGroups = game._particleGroups;
         colorGroups.clear();
         for (const p of game.particles) {
+            if (p.life < 0.03) continue; // Skip near-invisible particles
             let group = colorGroups.get(p.color);
             if (!group) { group = []; colorGroups.set(p.color, group); }
             group.push(p);
