@@ -14,7 +14,18 @@ function Bookmarks() {
       id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/bookmarks`,
     });
     document.head.appendChild(canonical);
-    return () => { canonical.remove(); };
+
+    // Noindex: bookmarks are user-specific, not indexable content
+    document.getElementById('meta-robots-bookmarks')?.remove();
+    const robotsMeta = Object.assign(document.createElement('meta'), {
+      id: 'meta-robots-bookmarks', name: 'robots', content: 'noindex, nofollow',
+    });
+    document.head.appendChild(robotsMeta);
+
+    return () => {
+      canonical.remove();
+      document.getElementById('meta-robots-bookmarks')?.remove();
+    };
   }, []);
 
   useEffect(() => {

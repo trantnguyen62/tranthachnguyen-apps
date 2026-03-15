@@ -42,12 +42,23 @@ function Library() {
       id: 'canonical-link', rel: 'canonical', href: url,
     });
     document.head.appendChild(canonical);
+
+    // Noindex search result pages to avoid thin/duplicate content indexing
+    document.getElementById('meta-robots-library')?.remove();
+    if (searchQuery) {
+      const robotsMeta = Object.assign(document.createElement('meta'), {
+        id: 'meta-robots-library', name: 'robots', content: 'noindex, follow',
+      });
+      document.head.appendChild(robotsMeta);
+    }
+
     return () => {
       canonical.remove();
+      document.getElementById('meta-robots-library')?.remove();
       const origDesc = 'Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you\'ll actually want to read.';
       document.querySelector('meta[name="description"]')?.setAttribute('content', origDesc);
     };
-  }, [selectedGenre]);
+  }, [selectedGenre, searchQuery]);
 
   useEffect(() => {
     if (cachedGenres) {
