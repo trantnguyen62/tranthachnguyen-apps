@@ -137,7 +137,10 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           {/* Original */}
           <div className="space-y-3">
             {!isExpanded && (
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider" aria-hidden="true">Before</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5" aria-hidden="true">
+                <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" />
+                Before
+              </p>
             )}
              <div className={`relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm ${isExpanded ? 'h-[50vh] lg:h-[80vh]' : 'h-64 sm:h-80 md:h-96'}`}>
                <img
@@ -163,7 +166,8 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           {/* Processed (Image or Video) */}
           <div className="space-y-3 relative">
             {!isExpanded && (
-              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wider" aria-hidden="true">
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wider flex items-center gap-1.5" aria-hidden="true">
+                <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />
                 {isProcessing ? 'Generating…' : 'After AI Edit'}
               </p>
             )}

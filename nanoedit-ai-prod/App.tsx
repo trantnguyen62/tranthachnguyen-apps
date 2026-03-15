@@ -82,6 +82,8 @@ const App: React.FC = () => {
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [errorDismissed, setErrorDismissed] = useState(false);
   const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelControllerRef = useRef<AbortController | null>(null);
+  const userCancelledRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -122,9 +124,12 @@ const App: React.FC = () => {
 
     setStatus(AppStatus.PROCESSING);
     setErrorMsg(null);
+    userCancelledRef.current = false;
+    const abortController = new AbortController();
+    cancelControllerRef.current = abortController;
 
     try {
-      const result = await generateEditedImage(currentImage.data, currentImage.mimeType, prompt);
+      const result = await generateEditedImage(currentImage.data, currentImage.mimeType, prompt, abortController.signal);
 
       if (result) {
         const newImage: ProcessedImage = {
@@ -148,6 +153,10 @@ const App: React.FC = () => {
         throw new Error("Failed to generate image. Please try again.");
       }
     } catch (err: unknown) {
+      // If the user explicitly cancelled, swallow the error — status already reset
+      if (err instanceof Error && err.name === 'AbortError' && userCancelledRef.current) {
+        return;
+      }
       console.error(err);
       const message = err instanceof Error ? err.message : "Something went wrong. Please try a different prompt or image.";
       setErrorMsg(message);
@@ -169,6 +178,13 @@ const App: React.FC = () => {
       setErrorMsg(null);
     }
   }, [canRedo]);
+
+  const handleCancel = useCallback(() => {
+    userCancelledRef.current = true;
+    cancelControllerRef.current?.abort();
+    setStatus(AppStatus.READY_TO_EDIT);
+    setErrorMsg(null);
+  }, []);
 
   // Use refs so the keyboard listener is registered once and stays current
   const canUndoRef = useRef(canUndo);
@@ -314,7 +330,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleUndo}
                       disabled={!canUndo}
-                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="p-2 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       title="Undo (Ctrl+Z)"
                       aria-label="Undo — go back one version (Ctrl+Z)"
                     >
@@ -327,7 +343,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleRedo}
                       disabled={!canRedo}
-                      className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="p-2 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       title="Redo (Ctrl+Y)"
                       aria-label="Redo — go forward one version (Ctrl+Y)"
                     >
@@ -371,6 +387,16 @@ const App: React.FC = () => {
                       </span>
                     )}
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
+                      {status === AppStatus.PROCESSING && (
+                        <Button
+                          onClick={handleCancel}
+                          variant="outline"
+                          className="flex-1 sm:flex-initial rounded-lg"
+                          leftIcon={<X className="w-4 h-4" />}
+                        >
+                          Cancel
+                        </Button>
+                      )}
                       <Button
                         onClick={handleGenerate}
                         disabled={!prompt.trim() || status === AppStatus.PROCESSING}

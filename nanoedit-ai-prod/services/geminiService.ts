@@ -19,10 +19,16 @@ const REQUEST_TIMEOUT_MS = 120_000; // 2 minutes
 export const generateEditedImage = async (
   base64Image: string,
   mimeType: string,
-  prompt: string
+  prompt: string,
+  externalSignal?: AbortSignal
 ): Promise<string | null> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  // Forward external cancellation (e.g. user-initiated) to internal controller
+  if (externalSignal) {
+    externalSignal.addEventListener('abort', () => controller.abort(), { once: true });
+  }
 
   try {
     const response = await fetch(`${PROXY_URL}/api/gemini/edit-image`, {
