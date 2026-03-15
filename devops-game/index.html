@@ -79,6 +79,7 @@
 </head>
 
 <body>
+    <a href="#gameCanvas" class="skip-link">Skip to game</a>
     <div class="game-container">
         <!-- Global Menu Button (always on top) -->
         <button class="game-menu-btn" id="globalMenuBtn" title="Pause (P)"
@@ -229,7 +230,7 @@
                         <span class="level-label" id="levelLabel">ZONE 1</span>
                         <span class="level-name" id="levelName">Docker</span>
                     </div>
-                    <div class="wave-display">
+                    <div class="wave-display" aria-label="Current wave">
                         <span>Wave <span id="waveNumber">1</span></span>
                     </div>
                 </div>
@@ -242,7 +243,7 @@
                     <div class="question-text" id="questionText">Loading question...</div>
                     <div class="answer-grid" id="answerGrid" role="group" aria-label="Answer options"></div>
                     <div class="question-explanation hidden" id="questionExplanation" aria-live="polite"></div>
-                    <div class="question-timer">
+                    <div class="question-timer" role="timer" aria-label="Question time remaining" aria-live="off">
                         <div class="timer-fill" id="timerFill"></div>
                         <span class="timer-text" id="timerText" aria-hidden="true">15s</span>
                     </div>
@@ -288,7 +289,7 @@
             <!-- Level Complete Screen -->
             <div class="level-complete hidden" id="levelComplete" role="dialog" aria-modal="true" aria-labelledby="levelCompleteTitle">
                 <h2 class="level-complete-title" id="levelCompleteTitle">ZONE COMPLETE!</h2>
-                <div class="zone-icon" id="zoneCompleteIcon">🐳</div>
+                <div class="zone-icon" id="zoneCompleteIcon" aria-hidden="true">🐳</div>
                 <div class="zone-name" id="zoneCompleteName">Docker</div>
                 <div class="level-stats">
                     <div class="stat-item">

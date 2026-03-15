@@ -1026,6 +1026,23 @@ body {
    Screen Reader Only (visually hidden)
    ===================================================== */
 
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    padding: 0.5rem 1rem;
+    background: var(--nano-yellow);
+    color: var(--nano-black);
+    font-weight: 700;
+    z-index: 10000;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
 .sr-only {
     position: absolute;
     width: 1px;
