@@ -909,7 +909,7 @@ function render() {
     // Draw particles, batched by color to reduce fillStyle changes per frame
     if (game.particles.length > 0) {
         const colorGroups = game._particleGroups;
-        colorGroups.clear();
+        colorGroups.forEach(arr => { arr.length = 0; });
         for (const p of game.particles) {
             if (p.life < 0.03) continue; // Skip near-invisible particles
             let group = colorGroups.get(p.color);
