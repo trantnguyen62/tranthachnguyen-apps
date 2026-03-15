@@ -253,15 +253,11 @@ export const useLiveSession = (studyContext: StudyContext) => {
               const userText = currentInputTranscriptionRef.current.trim();
               const modelText = currentOutputTranscriptionRef.current.trim();
 
-              if (userText) {
+              if (userText || modelText) {
                 setMessages(prev => {
-                  const next = [...prev, { id: nextMessageId('user'), role: 'user' as const, text: userText, timestamp: new Date(), isFinal: true }];
-                  return next.length > MAX_MESSAGES ? next.slice(next.length - MAX_MESSAGES) : next;
-                });
-              }
-              if (modelText) {
-                setMessages(prev => {
-                  const next = [...prev, { id: nextMessageId('model'), role: 'model' as const, text: modelText, timestamp: new Date(), isFinal: true }];
+                  const next = [...prev];
+                  if (userText) next.push({ id: nextMessageId('user'), role: 'user' as const, text: userText, timestamp: new Date(), isFinal: true });
+                  if (modelText) next.push({ id: nextMessageId('model'), role: 'model' as const, text: modelText, timestamp: new Date(), isFinal: true });
                   return next.length > MAX_MESSAGES ? next.slice(next.length - MAX_MESSAGES) : next;
                 });
               }

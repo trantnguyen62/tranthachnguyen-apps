@@ -29,6 +29,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(600);
+  const rafRef = useRef<number>(0);
 
   const lines = useMemo(() => file?.content?.split('\n') || [], [file?.content]);
 
@@ -47,11 +48,16 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
     if (!el) return;
     const ro = new ResizeObserver(() => setViewportHeight(el.clientHeight));
     ro.observe(el);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    setScrollTop(e.currentTarget.scrollTop);
+    const top = e.currentTarget.scrollTop;
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => setScrollTop(top));
   }, []);
 
   const handleCopy = useCallback(async () => {

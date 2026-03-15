@@ -319,17 +319,20 @@ app.get('/api/search', async (req, res) => {
           continue;
         }
 
-        // Search in content
+        // Search in content — skip large files (> 512KB) to keep search fast
         try {
-          const content = await fs.promises.readFile(fullPath, 'utf-8');
-          if (content.toLowerCase().includes(query)) {
-            results.push({
-              name: entry.name,
-              path: relativePath,
-              type: 'file',
-              language: getLanguage(entry.name),
-              matchType: 'content'
-            });
+          const stat = await fs.promises.stat(fullPath);
+          if (stat.size <= 512 * 1024) {
+            const content = await fs.promises.readFile(fullPath, 'utf-8');
+            if (content.toLowerCase().includes(query)) {
+              results.push({
+                name: entry.name,
+                path: relativePath,
+                type: 'file',
+                language: getLanguage(entry.name),
+                matchType: 'content'
+              });
+            }
           }
         } catch (e) {}
       }
