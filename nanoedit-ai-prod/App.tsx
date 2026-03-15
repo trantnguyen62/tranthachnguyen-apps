@@ -205,7 +205,8 @@ const App: React.FC = () => {
     if (!currentImage) return;
     const link = document.createElement('a');
     link.href = currentImage.data;
-    link.download = `nano-edit-${Date.now()}.png`;
+    const editLabel = historyIndex > 0 ? `edit${historyIndex}-` : '';
+    link.download = `nano-edit-${editLabel}${Date.now()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -366,7 +367,7 @@ const App: React.FC = () => {
                         <span className="hidden sm:flex items-center gap-1.5">
                           <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate <span className="text-slate-300">·</span> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Shift+Enter</kbd> for newline
                         </span>
-                        <span className={`tabular-nums transition-all ${prompt.length > 0 ? 'opacity-100' : 'opacity-0'} ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-400'}`}>{prompt.length} / 2000</span>
+                        <span className={`tabular-nums transition-all ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-300'}`}>{prompt.length} / 2000</span>
                       </span>
                     )}
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
@@ -424,7 +425,7 @@ const App: React.FC = () => {
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">Generation failed — try a different prompt or image</p>
-                      <p className="text-sm opacity-90">{errorMsg}</p>
+                      <p className="text-sm">{errorMsg}</p>
                     </div>
                     <div className="flex-shrink-0 flex items-center gap-1">
                       <button
