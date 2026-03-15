@@ -118,7 +118,7 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
               {q.options.map((opt, idx) => (
                 <li
                   key={idx}
-                  className={`p-3 rounded-md flex items-start ${idx === q.correctIndex ? 'bg-green-50 border border-green-200 text-green-900' : 'text-slate-500'}`}
+                  className={`p-3 rounded-md flex items-start ${idx === q.correctIndex ? 'bg-green-50 border border-green-200 text-green-900' : 'bg-slate-50/70 text-slate-500'}`}
                 >
                   <span aria-hidden="true" className={`w-6 h-6 rounded-full border flex-shrink-0 flex items-center justify-center mr-3 text-sm ${idx === q.correctIndex ? 'border-green-600 bg-green-600 text-white' : 'border-slate-300'}`}>
                     {idx === q.correctIndex ? (

@@ -276,8 +276,8 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
             {t.score}: {score}{scorePct !== null ? ` (${scorePct}%)` : ''}
           </span>
         </div>
-        <div className="w-full bg-slate-100 rounded-full h-2 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length} aria-label={language === 'vi' ? `Câu hỏi ${currentQuestionIndex + 1} trên ${questions.length}` : `Question ${currentQuestionIndex + 1} of ${questions.length}`}>
-          <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }} />
+        <div className="w-full bg-slate-100 rounded-full h-2.5 mb-6" role="progressbar" aria-valuenow={currentQuestionIndex + 1} aria-valuemin={1} aria-valuemax={questions.length} aria-label={language === 'vi' ? `Câu hỏi ${currentQuestionIndex + 1} trên ${questions.length}` : `Question ${currentQuestionIndex + 1} of ${questions.length}`}>
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }} />
         </div>
 
         <div className="flex gap-2 items-start mb-6">

@@ -77,7 +77,7 @@ const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: stri
     >
       <div aria-hidden="true">{icon}</div>
       <span className="font-medium text-sm">{label}</span>
-      <span className={`text-xs ${isActive ? 'text-blue-100' : 'text-slate-400'}`}>{description}</span>
+      <span className={`text-xs hidden sm:block ${isActive ? 'text-blue-100' : 'text-slate-400'}`}>{description}</span>
     </button>
   );
 });
