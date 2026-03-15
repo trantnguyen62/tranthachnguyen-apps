@@ -170,10 +170,10 @@ function Reader() {
   if (!comic) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center px-4">
-        <div className="text-center">
+        <div className="text-center" role="alert">
           <Home className="w-16 h-16 text-gray-700 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-2xl font-bold text-white mb-2">Comic not found</h2>
-          <p className="text-gray-500 mb-6">This story doesn't exist or may have been removed.</p>
+          <p className="text-gray-400 mb-6">This story doesn't exist or may have been removed.</p>
           <Link to="/library" className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition-colors">
             Back to Library
           </Link>
@@ -300,7 +300,7 @@ function Reader() {
 
           {/* End of comic indicator */}
           <div className="text-center py-12 border-t border-gray-800 mt-4">
-            <p className="text-gray-500 mb-4">End of comic</p>
+            <p className="text-gray-400 mb-4">End of comic</p>
             <Link
               to={`/comic/${id}`}
               aria-label={`Back to ${comic.title} details`}

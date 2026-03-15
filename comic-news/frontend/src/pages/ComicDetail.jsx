@@ -151,7 +151,7 @@ function ComicDetail() {
   if (!comic) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="text-center">
+        <div className="text-center" role="alert">
           <BookOpen className="w-16 h-16 text-gray-700 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-2xl font-bold text-white mb-2">Comic not found</h2>
           <p className="text-gray-400 mb-6">This story doesn't exist or may have been removed.</p>
@@ -302,7 +302,7 @@ function ComicDetail() {
                   Comic Version
                 </h2>
                 {/* Seamless vertical scroll container */}
-                <div className="max-h-[70vh] overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-dark-200" aria-label="Comic panels">
+                <div className="max-h-[70vh] overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-dark-200" aria-label="Comic panels" tabIndex="0">
                   <div className="flex flex-col">
                     {comic.pages.map((page, index) => (
                       <img
@@ -316,7 +316,7 @@ function ComicDetail() {
                   </div>
                 </div>
                 {comic.pages.length > 1 && (
-                  <p className="text-gray-500 text-sm text-center mt-4">
+                  <p className="text-gray-400 text-sm text-center mt-4">
                     Scroll to read all {comic.pages.length} panels
                   </p>
                 )}
