@@ -17,11 +17,11 @@ const PROCESSING_MESSAGES = [
   'Applying your edits…',
   'Generating the result…',
   'Adding finishing touches…',
-  'Enhancing details…',
-  'Refining the output…',
+  'Fine-tuning colors and edges…',
+  'Almost there…',
   'Rendering your image…',
-  'Polishing the result…',
   'Waiting for Gemini response…',
+  'This one is taking a moment…',
 ] as const;
 
 // Static data moved outside component to prevent recreation
@@ -262,7 +262,7 @@ const App: React.FC = () => {
               Edit Any Photo Instantly — Just <span className="text-brand-600">Describe What You Want</span>
             </h2>
             <p className="text-lg text-slate-600 mb-6">
-              Upload any photo and describe your edit in plain English — NanoEdit AI handles the rest. Powered by Google Gemini. No account needed, completely free.
+              Upload any photo and describe the edit you want in plain English. NanoEdit AI uses Google Gemini to apply your changes instantly — no account or signup required.
             </p>
             <ul className="flex flex-wrap justify-center gap-2 list-none" aria-label="Features">
               {FEATURES.map((feat) => (
@@ -342,7 +342,7 @@ const App: React.FC = () => {
                       aria-label="Describe the image changes you want"
                       aria-describedby="prompt-hint"
                       onKeyDown={handleKeyDown}
-                      placeholder="E.g., 'Remove the background' or 'Make it a professional headshot'"
+                      placeholder="E.g., 'Remove the background' or 'Make it a passport photo'"
                       className="w-full p-4 pr-10 text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent rounded-lg text-base"
                       rows={3}
                       maxLength={2000}
