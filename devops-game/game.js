@@ -478,6 +478,7 @@ function init() {
         domCache.healthText    = document.getElementById('healthText');
         domCache.healthBar     = document.getElementById('healthBar');
         domCache.shieldFill    = document.getElementById('shieldFill');
+        domCache.shieldBar     = document.getElementById('shieldBar');
         domCache.scoreValue    = document.getElementById('scoreValue');
         domCache.streakValue   = document.getElementById('streakValue');
         domCache.multiplier    = document.getElementById('multiplier');
@@ -1308,7 +1309,7 @@ function destroyEnemy(enemy) {
     }
 
     // Remove enemy
-    game.enemies = game.enemies.filter(e => e !== enemy);
+    const _ei = game.enemies.indexOf(enemy); if (_ei !== -1) game.enemies.splice(_ei, 1);
     game.enemiesDefeated++;
 
     // Maybe spawn powerup
@@ -1415,7 +1416,7 @@ function destroyEnemyByShot(enemy) {
         });
     }
 
-    game.enemies = game.enemies.filter(e => e !== enemy);
+    const _ei = game.enemies.indexOf(enemy); if (_ei !== -1) game.enemies.splice(_ei, 1);
     game.enemiesDefeated++;
     game.score += CONFIG.SHOOT_SCORE;
     updateHUD();
@@ -1578,8 +1579,7 @@ function updateHUD() {
     if (game.player.shield !== h.shield) {
         h.shield = game.player.shield;
         domCache.shieldFill.style.width = `${game.player.shield}%`;
-        const shieldBar = document.getElementById('shieldBar');
-        if (shieldBar) shieldBar.setAttribute('aria-valuenow', Math.round(game.player.shield));
+        if (domCache.shieldBar) domCache.shieldBar.setAttribute('aria-valuenow', Math.round(game.player.shield));
     }
     if (game.score !== h.score) {
         h.score = game.score;

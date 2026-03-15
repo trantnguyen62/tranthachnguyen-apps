@@ -137,7 +137,7 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     background: rgba(30, 41, 59, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.13);
     contain: layout style paint;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-top-color 0.3s ease;
@@ -226,15 +226,22 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 [data-card] {
     animation: fade-in-up 0.45s ease both;
 }
+/* Push CTA row to the bottom of every card regardless of description length */
+.glass-card > p {
+    flex: 1;
+}
 .cta-row {
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
     border-radius: 0.5rem;
     margin: auto -0.5rem 0;
     padding: 0.875rem 0.5rem 0.5rem;
+    /* Subtle rest-state affordance: faint pill hint that the row is interactive */
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 .glass-card:hover .cta-row,
 .glass-card:focus-within .cta-row {
     background-color: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.12);
     text-decoration: underline;
     text-underline-offset: 3px;
 }
