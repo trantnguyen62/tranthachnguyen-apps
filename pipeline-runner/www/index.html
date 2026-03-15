@@ -13,7 +13,7 @@
     <meta name="keywords"
         content="learn devops, devops training, devops game, CI/CD tutorial, docker learning, kubernetes tutorial, aws training, terraform learning, git tutorial, devops for beginners, devops certification prep, SRE training, cloud computing game, infrastructure as code, devops quiz, devops practice, free devops course">
     <meta name="author" content="Pipeline Runner Team">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <!-- Canonical URL -->
     <link rel="canonical" href="https://tranthachnguyen.com/pipeline-runner/">
 
@@ -94,7 +94,41 @@
         ],
         "image": "https://tranthachnguyen.com/pipeline-runner/og-image.png",
         "datePublished": "2025-01-01",
-        "dateModified": "2026-03-12"
+        "dateModified": "2026-03-13"
+    }
+    </script>
+
+    <!-- Structured Data - LearningResource for Google rich results -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        "name": "Pipeline Runner - DevOps Learning Game",
+        "url": "https://tranthachnguyen.com/pipeline-runner/",
+        "description": "Interactive arcade game for learning Docker, Kubernetes, CI/CD, AWS, Terraform, Git, Linux, and Monitoring concepts through quizzes.",
+        "educationalLevel": "Beginner to Advanced",
+        "learningResourceType": "Game",
+        "teaches": [
+            "Docker containerization and image management",
+            "Kubernetes orchestration and kubectl commands",
+            "CI/CD pipeline design and automation",
+            "AWS cloud services and architecture",
+            "Terraform infrastructure as code",
+            "Git version control and branching",
+            "Linux administration and shell commands",
+            "Monitoring with Prometheus and Grafana"
+        ],
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "educationalUse": ["self-assessment", "practice"],
+        "competencyRequired": "None",
+        "datePublished": "2025-01-01",
+        "dateModified": "2026-03-13",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Pipeline Runner Team"
+        },
+        "image": "https://tranthachnguyen.com/pipeline-runner/og-image.png"
     }
     </script>
 
@@ -167,6 +201,22 @@
                     "@type": "Answer",
                     "text": "Pipeline Runner's CI/CD learning track covers pipeline stages, triggers, artifacts, caching, environment variables, and deployment strategies used in tools like GitHub Actions, GitLab CI, and Jenkins. Practice concepts interactively through quiz gameplay at no cost, making it ideal for building CI/CD knowledge for DevOps roles and certifications."
                 }
+            },
+            {
+                "@type": "Question",
+                "name": "How can I learn Terraform for free?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Pipeline Runner's Terraform track teaches infrastructure as code fundamentals including terraform init, plan, apply, destroy, state management, modules, variables, and provider configuration. It's free and designed to help you build skills for the HashiCorp Terraform Associate certification through interactive quiz gameplay."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the best free AWS training for beginners?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Pipeline Runner offers a free AWS learning track covering core services like EC2, S3, IAM, Lambda, VPC, RDS, CloudWatch, and EKS. The interactive quiz format reinforces concepts used in real-world cloud architecture and helps prepare for the AWS Solutions Architect Associate exam at no cost."
+                }
             }
         ]
     }
@@ -220,8 +270,7 @@
         <!-- Ad Banner (Top) -->
         <div class="ad-banner ad-banner-top" id="adBannerTop" aria-hidden="true">
             <div class="ad-placeholder">
-                <span class="ad-label">📢 Advertisement</span>
-                <span class="ad-demo-text">Your AdSense banner will appear here</span>
+                <span class="ad-label">Advertisement</span>
             </div>
         </div>
 
@@ -251,8 +300,8 @@
                 </div>
 
                 <div class="instructions">
-                    <p>Press <kbd>SPACE</kbd> or <kbd>CLICK</kbd> to boost</p>
-                    <p>Pass gates to learn commands • Correct answers earn lives • Climb the DevOps ranks!</p>
+                    <p>Press <kbd>SPACE</kbd>, click, or tap to boost upward</p>
+                    <p>Navigate through gates to score • Correct quiz answers earn lives • Rank up from Junior to Architect!</p>
                 </div>
             </div>
         </div>
@@ -291,26 +340,27 @@
                 </div>
                 <div class="question-text" id="questionText"></div>
                 <div class="answer-grid" id="answerGrid"></div>
+                <div class="keyboard-hint" id="keyboardHint">Press <kbd>1</kbd>–<kbd>4</kbd> or click to answer</div>
             </div>
         </div>
 
         <!-- Game Over Screen -->
         <div id="gameOverScreen" class="screen hidden" role="dialog" aria-modal="true" aria-labelledby="gameOverTitle">
             <div class="game-over-content">
-                <h2 class="game-over-title" id="gameOverTitle">Pipeline Failed!</h2>
+                <h2 class="game-over-title" id="gameOverTitle">Pipeline Terminated!</h2>
 
                 <div class="stats-grid">
                     <div class="stat-box">
                         <div class="stat-value" id="finalScore">0</div>
-                        <div class="stat-label">Distance</div>
+                        <div class="stat-label">Gates Passed</div>
                     </div>
                     <div class="stat-box">
                         <div class="stat-value" id="questionsCorrect">0</div>
-                        <div class="stat-label">Correct</div>
+                        <div class="stat-label">Correct Answers</div>
                     </div>
                     <div class="stat-box">
                         <div class="stat-value" id="bestStreak">0</div>
-                        <div class="stat-label">Best Streak</div>
+                        <div class="stat-label">Top Streak</div>
                     </div>
                 </div>
 
@@ -320,7 +370,7 @@
                 </div>
 
                 <div class="learned-fact" id="learnedFact" aria-live="polite">
-                    <span class="fact-label"><span aria-hidden="true">📚</span> You Learned:</span>
+                    <span class="fact-label"><span aria-hidden="true">📚</span> Key Takeaway:</span>
                     <span class="fact-text" id="factText"></span>
                 </div>
 
@@ -343,10 +393,9 @@
         <!-- Rewarded Ad Modal -->
         <div id="rewardedAdModal" class="rewarded-ad-modal hidden" role="dialog" aria-modal="true" aria-labelledby="rewardedAdHeading">
             <div class="rewarded-ad-content">
-                <h3 id="rewardedAdHeading" class="rewarded-ad-title" tabindex="-1"><span aria-hidden="true">📺</span> Watch Ad for Extra Life</h3>
+                <h3 id="rewardedAdHeading" class="rewarded-ad-title" tabindex="-1"><span aria-hidden="true">📺</span> Watch a short video to earn +1 life</h3>
                 <div class="rewarded-ad-video">
                     <p><span aria-hidden="true">🎬</span> Video Ad Playing...</p>
-                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">(Demo Mode - Real ads coming soon!)</p>
                 </div>
                 <div class="rewarded-ad-timer" id="rewardedAdTimer" role="timer" aria-live="polite" aria-label="Ad timer: 5 seconds remaining">5</div>
                 <button type="button" class="skip-ad-btn" id="skipAdBtn" disabled onclick="AdManager.skipAd()">

@@ -460,7 +460,10 @@ function init() {
     game.elStreak  = document.getElementById('streakCount');
     game.elTipBanner = document.getElementById('tipBanner');
     game.elTipText   = document.getElementById('tipText');
-    game.elTimer     = document.getElementById('questionTimer');
+    game.elTimer         = document.getElementById('questionTimer');
+    game.elFeedback      = document.getElementById('answerFeedback');
+    game.elQuestionModal = document.getElementById('questionModal');
+    game.elQuestionPanel = document.querySelector('.question-panel');
 
     loadProgress();
     renderTopicButtons();
@@ -762,7 +765,7 @@ function startGame() {
 
     showScreen('gameScreen');
     hideTipBanner();
-    document.getElementById('questionModal').classList.add('hidden');
+    game.elQuestionModal.classList.add('hidden');
 
     if (game.animationId) cancelAnimationFrame(game.animationId);
     if (game.obstacleInterval) clearInterval(game.obstacleInterval);
@@ -1165,7 +1168,7 @@ function showQuestion() {
     answerGrid.appendChild(fragment);
     game.currentQuestion.btns = Array.from(answerGrid.querySelectorAll('.answer-btn'));
 
-    document.getElementById('questionModal').classList.remove('hidden');
+    game.elQuestionModal.classList.remove('hidden');
     startQuestionTimer();
 
     // Move focus to the first answer button for keyboard/screen reader users
@@ -1239,8 +1242,8 @@ function checkAnswer(index) {
     if (feedbackEl) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
         feedbackEl.textContent = correct
-            ? 'Correct!'
-            : `Not quite — the correct answer was: ${correctText}`;
+            ? 'Correct! ✅'
+            : `Incorrect — the correct answer is: ${correctText}`;
     }
 
     game.questionsAnswered++;
@@ -1258,7 +1261,7 @@ function checkAnswer(index) {
         // Award a life for correct answer!
         game.lives++;
         game.elLives.textContent = game.lives;
-        showTip(`✅ Correct!${game.streak > 1 ? ` 🔥 ${game.streak} streak!` : ''} ❤️ +1 life — you have ${game.lives} now.`);
+        showTip(`✅ Correct!${game.streak > 1 ? ` 🔥 ${game.streak}-answer streak!` : ''} +1 life (${game.lives} total).`);
 
         game.lastLearnedFact = game.currentQuestion.fact || "Great job! Keep learning!";
     } else {
@@ -1294,7 +1297,7 @@ function handleTimeout() {
     const feedbackEl = document.getElementById('answerFeedback');
     if (feedbackEl) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
-        feedbackEl.textContent = `Time's up! No worries — the correct answer was: ${correctText}`;
+        feedbackEl.textContent = `⏰ Time's up! The correct answer is: ${correctText}`;
     }
 
     game.lastLearnedFact = game.currentQuestion.fact || "Time's up! Try to answer faster.";
@@ -1310,7 +1313,7 @@ function closeQuestion() {
     game.questionActive = false;
     game.paused = false;
     game.currentQuestion = null;
-    document.getElementById('questionModal').classList.add('hidden');
+    game.elQuestionModal.classList.add('hidden');
     // Restart the render loop that was suspended during the question
     if (game.running) {
         gameLoop();
@@ -1370,7 +1373,7 @@ function gameOver() {
         const randomLearned = game.learnedItems[Math.floor(Math.random() * game.learnedItems.length)];
         document.getElementById('factText').textContent = `${randomLearned.cmd}: ${randomLearned.desc}`;
     } else {
-        document.getElementById('factText').textContent = game.lastLearnedFact || "Answer questions during the run to unlock DevOps insights!";
+        document.getElementById('factText').textContent = game.lastLearnedFact || "Answer quiz questions during gameplay to learn DevOps commands and concepts!";
     }
 
     // Store the timeout so it can be cancelled if user continues with extra life
@@ -1387,7 +1390,7 @@ function useLife() {
     game.elLives.textContent = game.lives;
 
     game.respawnInvincible = true;
-    showTip(`❤️ Used 1 life! ${game.lives} left — answer questions to earn more.`);
+    showTip(`❤️ Used 1 life! ${game.lives} remaining — get correct answers to earn more.`);
 
     // Reset player position to safe spot
     game.player.y = game.height / 2;
@@ -1637,7 +1640,7 @@ const AdManager = {
         gameLoop();
 
         // Show "Tap to Continue" tip that stays until tap
-        showTip('👆 Tap to resume — 3s of invincibility incoming!');
+        showTip('Tap or press Space to resume — 3s of invincibility incoming!');
 
         // Set up one-time tap handler to resume gameplay
         const resumeHandler = (e) => {

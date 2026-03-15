@@ -460,7 +460,10 @@ function init() {
     game.elStreak  = document.getElementById('streakCount');
     game.elTipBanner = document.getElementById('tipBanner');
     game.elTipText   = document.getElementById('tipText');
-    game.elTimer     = document.getElementById('questionTimer');
+    game.elTimer         = document.getElementById('questionTimer');
+    game.elFeedback      = document.getElementById('answerFeedback');
+    game.elQuestionModal = document.getElementById('questionModal');
+    game.elQuestionPanel = document.querySelector('.question-panel');
 
     loadProgress();
     renderTopicButtons();
@@ -476,7 +479,8 @@ function init() {
         _resizeTimer = setTimeout(() => { _resizeTimer = null; resizeCanvas(); }, 150);
     });
 
-    // Suspend the rAF loop when the tab is hidden to save CPU
+    // Suspend the rAF loop and obstacle spawning when the tab is hidden to save CPU
+    // and prevent obstacle pile-up (spawned obstacles freeze in place while physics is paused)
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             if (game.animationId) {
@@ -484,9 +488,28 @@ function init() {
                 game.animationId = null;
                 game._loopSuspended = true;
             }
+            if (game.obstacleInterval) {
+                clearInterval(game.obstacleInterval);
+                game.obstacleInterval = null;
+                game._obstacleSuspended = true;
+            }
         } else if (game._loopSuspended) {
             game._loopSuspended = false;
             if (game.running && !game.questionActive) gameLoop();
+            if (game._obstacleSuspended) {
+                game._obstacleSuspended = false;
+                if (game.running && !game.paused) {
+                    game.obstacleInterval = setInterval(spawnObstacle, CONFIG.OBSTACLE_SPAWN_RATE);
+                }
+            }
+        }
+    });
+
+    // Clean up ad timer on page exit to avoid dangling intervals
+    window.addEventListener('pagehide', () => {
+        if (AdManager.rewardedAdTimer) {
+            clearInterval(AdManager.rewardedAdTimer);
+            AdManager.rewardedAdTimer = null;
         }
     });
 }
@@ -1219,8 +1242,8 @@ function checkAnswer(index) {
     if (feedbackEl) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
         feedbackEl.textContent = correct
-            ? 'Correct!'
-            : `Incorrect. The correct answer was: ${correctText}`;
+            ? 'Correct! ✅'
+            : `Incorrect — the correct answer is: ${correctText}`;
     }
 
     game.questionsAnswered++;
@@ -1238,7 +1261,7 @@ function checkAnswer(index) {
         // Award a life for correct answer!
         game.lives++;
         game.elLives.textContent = game.lives;
-        showTip(`✅ Correct!${game.streak > 1 ? ` 🔥 ${game.streak} streak!` : ''} ❤️ +1 life — you have ${game.lives} now.`);
+        showTip(`✅ Correct!${game.streak > 1 ? ` 🔥 ${game.streak}-answer streak!` : ''} +1 life (${game.lives} total).`);
 
         game.lastLearnedFact = game.currentQuestion.fact || "Great job! Keep learning!";
     } else {
@@ -1263,8 +1286,8 @@ function handleTimeout() {
         panel.classList.add('modal-shake');
     }
 
-    const btns = document.querySelectorAll('.answer-btn');
-    const correctBtn = game.currentQuestion && btns[game.currentQuestion.correctIndex];
+    const btns = game.currentQuestion && game.currentQuestion.btns;
+    const correctBtn = btns && btns[game.currentQuestion.correctIndex];
     if (correctBtn) {
         correctBtn.classList.add('correct');
         correctBtn.setAttribute('aria-label',
@@ -1274,7 +1297,7 @@ function handleTimeout() {
     const feedbackEl = document.getElementById('answerFeedback');
     if (feedbackEl) {
         const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
-        feedbackEl.textContent = `Time's up! The correct answer was: ${correctText}`;
+        feedbackEl.textContent = `⏰ Time's up! The correct answer is: ${correctText}`;
     }
 
     game.lastLearnedFact = game.currentQuestion.fact || "Time's up! Try to answer faster.";
@@ -1350,7 +1373,7 @@ function gameOver() {
         const randomLearned = game.learnedItems[Math.floor(Math.random() * game.learnedItems.length)];
         document.getElementById('factText').textContent = `${randomLearned.cmd}: ${randomLearned.desc}`;
     } else {
-        document.getElementById('factText').textContent = game.lastLearnedFact || "Keep playing to build your DevOps knowledge!";
+        document.getElementById('factText').textContent = game.lastLearnedFact || "Answer quiz questions during gameplay to learn DevOps commands and concepts!";
     }
 
     // Store the timeout so it can be cancelled if user continues with extra life
@@ -1367,7 +1390,7 @@ function useLife() {
     game.elLives.textContent = game.lives;
 
     game.respawnInvincible = true;
-    showTip(`❤️ Used 1 life! ${game.lives} left — answer questions to earn more.`);
+    showTip(`❤️ Used 1 life! ${game.lives} remaining — get correct answers to earn more.`);
 
     // Reset player position to safe spot
     game.player.y = game.height / 2;
@@ -1617,7 +1640,7 @@ const AdManager = {
         gameLoop();
 
         // Show "Tap to Continue" tip that stays until tap
-        showTip('👆 Tap to resume — 3s of invincibility incoming!');
+        showTip('Tap or press Space to resume — 3s of invincibility incoming!');
 
         // Set up one-time tap handler to resume gameplay
         const resumeHandler = (e) => {
