@@ -504,7 +504,7 @@ I now wait for other people to laugh first. This is not cowardice. It is calibra
 // NOTE: These are process-scoped — data is lost on server restart and is shared
 // across all users. Limits (500 bookmarks, 1000 progress entries) are enforced
 // in the write endpoints to prevent unbounded memory growth.
-let bookmarks = [];
+let bookmarks = new Set();
 let readingProgress = {};
 
 // Precomputed static data
@@ -540,6 +540,7 @@ const comicsETag = `"${_dataHash}"`;
 const genresETag = `"${_dataHash}-genres"`;
 const featuredETag = `"${_dataHash}-featured"`;
 const comicETags = new Map(comics.map(c => [c.id, `"${_dataHash}-${c.id}"`]));
+const comicsMap = new Map(comics.map(c => [c.id, c]));
 
 const _rawBaseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
 if (!/^https?:\/\/[a-zA-Z0-9.-]+(:\d+)?$/.test(_rawBaseUrl)) {
@@ -634,7 +635,7 @@ app.get('/api/comics', readRateLimit, (req, res) => {
 app.get('/api/comics/:id', readRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
-  const comic = comics.find(c => c.id === id);
+  const comic = comicsMap.get(id);
   if (!comic) return res.status(404).json({ error: 'Comic not found' });
   const etag = comicETags.get(id);
   res.set('Cache-Control', 'public, max-age=3600');
@@ -655,7 +656,7 @@ app.get('/api/genres', readRateLimit, (req, res) => {
 app.get('/api/bookmarks', readRateLimit, (req, res) => {
   res.set('Cache-Control', 'no-store');
   const bookmarkedComics = comics
-    .filter(c => bookmarks.includes(c.id))
+    .filter(c => bookmarks.has(c.id))
     .map(({ pages, ...comic }) => comic);
   res.json(bookmarkedComics);
 });
@@ -664,16 +665,16 @@ app.get('/api/bookmarks/check/:id', readRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
   res.set('Cache-Control', 'no-store');
-  res.json({ isBookmarked: bookmarks.includes(id) });
+  res.json({ isBookmarked: bookmarks.has(id) });
 });
 
 app.post('/api/bookmarks/:id', writeRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
-  if (!comics.find(c => c.id === id)) return res.status(404).json({ error: 'Comic not found' });
-  if (!bookmarks.includes(id)) {
-    if (bookmarks.length >= 500) return res.status(429).json({ error: 'Bookmark limit reached' });
-    bookmarks.push(id);
+  if (!comicsMap.has(id)) return res.status(404).json({ error: 'Comic not found' });
+  if (!bookmarks.has(id)) {
+    if (bookmarks.size >= 500) return res.status(429).json({ error: 'Bookmark limit reached' });
+    bookmarks.add(id);
   }
   res.json({ success: true });
 });
@@ -681,8 +682,7 @@ app.post('/api/bookmarks/:id', writeRateLimit, (req, res) => {
 app.delete('/api/bookmarks/:id', writeRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
-  const idx = bookmarks.indexOf(id);
-  if (idx !== -1) bookmarks.splice(idx, 1);
+  bookmarks.delete(id);
   res.json({ success: true });
 });
 
@@ -697,7 +697,7 @@ app.get('/api/progress/:id', readRateLimit, (req, res) => {
 app.post('/api/progress/:id', writeRateLimit, (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
-  if (!comics.find(c => c.id === id)) return res.status(404).json({ error: 'Comic not found' });
+  if (!comicsMap.has(id)) return res.status(404).json({ error: 'Comic not found' });
   const page = parseInt(req.body.page, 10);
   if (isNaN(page) || page < 1 || page > 10000) return res.status(400).json({ error: 'Invalid page' });
   if (Object.keys(readingProgress).length >= 1000 && !(id in readingProgress)) {
@@ -732,7 +732,7 @@ app.get('/sitemap.xml', (req, res) => {
 // SSR meta injection for comic detail pages (improves crawler visibility)
 app.get('/comic/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const comic = comics.find(c => c.id === id);
+  const comic = comicsMap.get(id);
   if (!comic || !indexHtmlTemplate) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.sendFile(join(__dirname, 'dist', 'index.html'), (err) => {

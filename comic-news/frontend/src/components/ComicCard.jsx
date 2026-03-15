@@ -34,8 +34,9 @@ function ComicCard({ comic, index = 0 }) {
               alt={comic.title}
               onLoad={() => setImgLoaded(true)}
               onError={() => { setImgError(true); setImgLoaded(true); }}
-              loading="lazy"
-              decoding="async"
+              loading={index < 4 ? 'eager' : 'lazy'}
+              decoding={index === 0 ? 'sync' : 'async'}
+              fetchPriority={index === 0 ? 'high' : index < 4 ? 'auto' : 'low'}
               className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
           )}
