@@ -19,6 +19,7 @@ const PASSING_SCORE = 80;
 
 interface QuizModeProps {
   language: Language;
+  onSwitchToStudy?: () => void;
 }
 
 // Static translations moved outside component
@@ -38,6 +39,7 @@ const TRANSLATIONS = {
     retake: "Retake Quiz",
     correct: "correct",
     incorrect: "incorrect",
+    reviewStudy: "Review Study List",
   },
   vi: {
     questionLabel: "Câu hỏi",
@@ -54,10 +56,11 @@ const TRANSLATIONS = {
     retake: "Làm Lại",
     correct: "đúng",
     incorrect: "sai",
+    reviewStudy: "Xem Lại Tài Liệu",
   }
 } as const;
 
-export const QuizMode = memo<QuizModeProps>(({ language }) => {
+export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -232,12 +235,22 @@ export const QuizMode = memo<QuizModeProps>(({ language }) => {
             <span>100%</span>
           </div>
 
-          <button
-            onClick={restartQuiz}
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
-          >
-            {t.retake}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {!passed && onSwitchToStudy && (
+              <button
+                onClick={onSwitchToStudy}
+                className="px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors"
+              >
+                {t.reviewStudy}
+              </button>
+            )}
+            <button
+              onClick={restartQuiz}
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+            >
+              {t.retake}
+            </button>
+          </div>
         </div>
       </div>
     );

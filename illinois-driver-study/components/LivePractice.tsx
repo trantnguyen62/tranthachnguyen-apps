@@ -410,7 +410,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
           </div>
         </div>
 
-        <div aria-live="polite" aria-atomic="true" className="absolute -bottom-8 left-0 right-0 text-center font-medium text-slate-500 animate-pulse text-sm">
+        <div aria-live="polite" aria-atomic="true" className={`absolute -bottom-8 left-0 right-0 text-center font-medium text-slate-500 text-sm ${status === 'connecting' ? 'animate-pulse' : ''}`}>
           {status === 'connecting' ? t.status_connecting :
            status === 'speaking' ? t.status_speaking :
            status === 'connected' ? t.status_connected :

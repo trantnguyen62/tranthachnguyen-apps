@@ -24,8 +24,11 @@ const TRANSLATIONS = {
     appTitle: "Illinois Driver Study",
     shortTitle: "IL Driver",
     quizMode: "Quiz Mode",
+    quizDesc: "Test your knowledge",
     studyList: "Study List",
+    studyDesc: "Browse all Q&As",
     livePractice: "Live Practice",
+    liveDesc: "AI voice instructor",
     footerText: "Illinois Driver Study Helper.",
     footerSub: "Content based on official study materials."
   },
@@ -33,8 +36,11 @@ const TRANSLATIONS = {
     appTitle: "Ôn Thi Bằng Lái Xe Illinois",
     shortTitle: "IL Driver VN",
     quizMode: "Trắc Nghiệm",
+    quizDesc: "Kiểm tra kiến thức",
     studyList: "Ôn Tập",
+    studyDesc: "Xem tất cả câu hỏi",
     livePractice: "Luyện Tập Trực Tiếp",
+    liveDesc: "Giáo viên AI",
     footerText: "Hỗ Trợ Ôn Thi Bằng Lái Xe Illinois.",
     footerSub: "Nội dung dựa trên tài liệu học tập chính thức."
   }
@@ -54,23 +60,27 @@ const LoadingFallback: React.FC<{ language: Language }> = ({ language }) => (
 );
 
 // Memoized NavButton component
-const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: string; currentMode: AppMode; onClick: (mode: AppMode) => void }>(({
-  targetMode, icon, label, currentMode, onClick
-}) => (
-  <button
-    type="button"
-    onClick={() => onClick(targetMode)}
-    aria-current={currentMode === targetMode ? 'page' : undefined}
-    className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 p-3 sm:px-5 sm:py-2.5 rounded-xl transition-all duration-200 w-full sm:w-auto flex-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 outline-none ${
-      currentMode === targetMode
-        ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-300 ring-offset-1'
-        : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
-    }`}
-  >
-    <div aria-hidden="true">{icon}</div>
-    <span className="font-medium text-sm">{label}</span>
-  </button>
-));
+const NavButton = memo<{ targetMode: AppMode; icon: React.ReactNode; label: string; description: string; currentMode: AppMode; onClick: (mode: AppMode) => void }>(({
+  targetMode, icon, label, description, currentMode, onClick
+}) => {
+  const isActive = currentMode === targetMode;
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(targetMode)}
+      aria-current={isActive ? 'page' : undefined}
+      className={`flex flex-col items-center justify-center gap-0.5 p-3 sm:px-5 sm:py-2.5 rounded-xl transition-all duration-200 w-full sm:w-auto flex-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 outline-none ${
+        isActive
+          ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-300 ring-offset-1'
+          : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+      }`}
+    >
+      <div aria-hidden="true">{icon}</div>
+      <span className="font-medium text-sm">{label}</span>
+      <span className={`text-xs ${isActive ? 'text-blue-100' : 'text-slate-400'}`}>{description}</span>
+    </button>
+  );
+});
 NavButton.displayName = 'NavButton';
 
 /**
@@ -157,6 +167,7 @@ const App: React.FC = () => {
             currentMode={mode}
             onClick={handleModeChange}
             label={t.quizMode}
+            description={t.quizDesc}
             icon={ICON_QUIZ}
           />
           <NavButton
@@ -164,6 +175,7 @@ const App: React.FC = () => {
             currentMode={mode}
             onClick={handleModeChange}
             label={t.studyList}
+            description={t.studyDesc}
             icon={ICON_STUDY}
           />
           <NavButton
@@ -171,6 +183,7 @@ const App: React.FC = () => {
             currentMode={mode}
             onClick={handleModeChange}
             label={t.livePractice}
+            description={t.liveDesc}
             icon={ICON_LIVE}
           />
         </nav>
@@ -178,7 +191,7 @@ const App: React.FC = () => {
         <div className="flex-grow animate-fade-in">
           {mode === AppMode.QUIZ && (
             <Suspense fallback={<LoadingFallback language={language} />}>
-              <QuizMode language={language} />
+              <QuizMode language={language} onSwitchToStudy={() => handleModeChange(AppMode.STUDY)} />
             </Suspense>
           )}
           {mode === AppMode.STUDY && (
