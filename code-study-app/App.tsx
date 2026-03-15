@@ -143,7 +143,10 @@ function App() {
       console.error('Failed to load file:', err);
       setFileLoadError(file.name);
     } finally {
-      setIsLoadingFile(false);
+      // Only clear loading state if this is still the active fetch
+      if (fileFetchAbortRef.current === abortCtrl) {
+        setIsLoadingFile(false);
+      }
     }
   }, [selectedProject]);
 
