@@ -154,7 +154,7 @@ function Home() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {loading
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-            : featured.map((comic) => <ComicCard key={comic.id} comic={comic} />)
+            : featured.map((comic, i) => <ComicCard key={comic.id} comic={comic} index={i} />)
           }
         </div>
       </section>
@@ -173,7 +173,7 @@ function Home() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {loading
             ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-            : comics.map((comic) => <ComicCard key={comic.id} comic={comic} />)
+            : comics.map((comic, i) => <ComicCard key={comic.id} comic={comic} index={i} />)
           }
         </div>
       </section>

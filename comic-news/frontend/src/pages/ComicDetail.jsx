@@ -276,7 +276,7 @@ function ComicDetail() {
               >
                 {isBookmarked ? (
                   <>
-                    <BookmarkCheck className="w-5 h-5" aria-hidden="true" />
+                    <BookmarkCheck className="w-5 h-5 bookmark-pop" aria-hidden="true" />
                     Bookmarked
                   </>
                 ) : (

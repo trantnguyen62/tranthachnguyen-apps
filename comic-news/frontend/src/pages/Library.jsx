@@ -197,8 +197,8 @@ function Library() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {comics.map((comic) => (
-            <ComicCard key={comic.id} comic={comic} />
+          {comics.map((comic, i) => (
+            <ComicCard key={comic.id} comic={comic} index={i} />
           ))}
         </div>
       )}

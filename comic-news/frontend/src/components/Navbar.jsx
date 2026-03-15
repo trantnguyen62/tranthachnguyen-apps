@@ -66,7 +66,7 @@ function Navbar() {
 
           <div className="flex items-center gap-2">
             {showSearch ? (
-              <form onSubmit={handleSearch} role="search" className="relative flex items-center gap-1">
+              <form onSubmit={handleSearch} role="search" className="search-form relative flex items-center gap-1">
                 <input
                   type="text"
                   placeholder="Search stories..."
