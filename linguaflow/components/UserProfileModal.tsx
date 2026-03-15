@@ -148,8 +148,8 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
             <div className="space-y-4">
               <div className="bg-slate-700/50 rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl font-bold text-white">
-                    {existingProfile.name.charAt(0).toUpperCase()}
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl font-bold text-white" aria-label={`Avatar for ${existingProfile.name}`}>
+                    <span aria-hidden="true">{existingProfile.name.charAt(0).toUpperCase()}</span>
                   </div>
                   <div>
                     <h3 className="font-semibold text-white text-lg">{existingProfile.name}</h3>
@@ -185,18 +185,18 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
                 {existingProfile.wordsLearned.length > 0 && (
                   <div className="pt-2">
                     <p className="text-xs text-slate-400 mb-2">Từ đã học gần đây:</p>
-                    <div className="flex flex-wrap gap-1">
+                    <ul className="flex flex-wrap gap-1 list-none p-0 m-0" aria-label="Recently learned words">
                       {existingProfile.wordsLearned.slice(-8).map((word, i) => (
-                        <span key={i} className="px-2 py-1 bg-slate-800 rounded text-xs text-slate-300">
+                        <li key={i} className="px-2 py-1 bg-slate-800 rounded text-xs text-slate-300">
                           {word}
-                        </span>
+                        </li>
                       ))}
                       {existingProfile.wordsLearned.length > 8 && (
-                        <span className="px-2 py-1 bg-slate-800 rounded text-xs text-slate-500 italic">
+                        <li className="px-2 py-1 bg-slate-800 rounded text-xs text-slate-400 italic">
                           +{existingProfile.wordsLearned.length - 8} more
-                        </span>
+                        </li>
                       )}
-                    </div>
+                    </ul>
                   </div>
                 )}
               </div>

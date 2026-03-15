@@ -399,7 +399,7 @@ function App() {
           </h3>
           <div className="flex items-center gap-2">
             {messages.length > 0 && (
-              <span className="text-xs text-slate-500 px-2 py-1 rounded-full bg-slate-800">
+              <span className="text-xs text-slate-400 px-2 py-1 rounded-full bg-slate-800">
                 {messages.length} {messages.length === 1 ? 'message' : 'messages'}
               </span>
             )}
