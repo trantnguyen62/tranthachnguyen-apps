@@ -313,18 +313,18 @@ const QUESTIONS = {
 
 // Topic configuration
 const TOPICS = [
-    { id: 'docker', name: 'Docker', icon: '🐳', color: '#0db7ed', desc: 'Containers, images, volumes & networking' },
-    { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', color: '#326ce5', desc: 'Pods, deployments, services & scaling' },
-    { id: 'cicd', name: 'CI/CD', icon: '🔄', color: '#f97316', desc: 'Pipelines, GitOps & deployment strategies' },
-    { id: 'aws', name: 'AWS', icon: '☁️', color: '#ff9900', desc: 'EC2, S3, Lambda, IAM & core services' },
-    { id: 'terraform', name: 'Terraform', icon: '🏗️', color: '#7b42bc', desc: 'IaC, providers, state & modules' },
-    { id: 'git', name: 'Git', icon: '🌿', color: '#f05032', desc: 'Branching, merging, workflows & history' },
-    { id: 'linux', name: 'Linux', icon: '🐧', color: '#fcc624', desc: 'Commands, permissions, processes & scripting' },
-    { id: 'monitoring', name: 'Monitoring', icon: '📊', color: '#00c853', desc: 'Prometheus, Grafana, tracing & SLOs' },
-    { id: 'ansible', name: 'Ansible', icon: '🔧', color: '#ee0000', desc: 'Playbooks, roles, inventory & idempotency' },
-    { id: 'azure', name: 'Azure', icon: '🔷', color: '#0078d4', desc: 'AKS, Functions, DevOps & resource management' },
-    { id: 'devsecops', name: 'DevSecOps', icon: '🔒', color: '#dc2626', desc: 'SAST, DAST, scanning & zero trust' },
-    { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2', desc: 'DNS, load balancing, TLS, proxies & service mesh' }
+    { id: 'docker', name: 'Docker', icon: '🐳', color: '#0db7ed', desc: 'Build, run & manage containers from basics to Compose' },
+    { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', color: '#326ce5', desc: 'Orchestrate containers at scale with K8s objects & patterns' },
+    { id: 'cicd', name: 'CI/CD', icon: '🔄', color: '#f97316', desc: 'Automate builds, tests & deployments with modern pipelines' },
+    { id: 'aws', name: 'AWS', icon: '☁️', color: '#ff9900', desc: 'Navigate cloud services from EC2 and S3 to Lambda & IAM' },
+    { id: 'terraform', name: 'Terraform', icon: '🏗️', color: '#7b42bc', desc: 'Define & provision infrastructure as code with HCL' },
+    { id: 'git', name: 'Git', icon: '🌿', color: '#f05032', desc: 'Master version control from commits to complex rebases' },
+    { id: 'linux', name: 'Linux', icon: '🐧', color: '#fcc624', desc: 'Navigate the command line, manage systems & write scripts' },
+    { id: 'monitoring', name: 'Monitoring', icon: '📊', color: '#00c853', desc: 'Observe systems with metrics, traces, logs & alerting' },
+    { id: 'ansible', name: 'Ansible', icon: '🔧', color: '#ee0000', desc: 'Automate configuration & deployments with idempotent playbooks' },
+    { id: 'azure', name: 'Azure', icon: '🔷', color: '#0078d4', desc: 'Cloud engineering on Azure from VMs to AKS & Functions' },
+    { id: 'devsecops', name: 'DevSecOps', icon: '🔒', color: '#dc2626', desc: 'Shift security left with scanning, hardening & zero trust' },
+    { id: 'networking', name: 'Networking', icon: '🌐', color: '#0891b2', desc: 'Master protocols, traffic routing, TLS & service mesh' }
 ];
 
 // Cached sprite references (populated after asset loading)
