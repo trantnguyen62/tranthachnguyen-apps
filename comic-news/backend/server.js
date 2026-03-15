@@ -89,6 +89,7 @@ const comics = [
     title: "Evanston Cold Weather Alert",
     author: "National Weather Service",
     genre: "News",
+    publishedDate: "2025-01-15",
     coverImage: "/images/evanston-cold-weather.png",
     description: "Saturday at noon: 10 degrees. Overnight: zero. Wind chill of minus 8. The National Weather Service would like a word about your weekend plans.",
     rating: 4.7,
@@ -118,6 +119,7 @@ Conditions are expected to be worse to the south of the immediate Chicago area â
     title: "Started a Business Relationship with a Great Guy",
     author: "Anonymous",
     genre: "Non-Fiction",
+    publishedDate: "2025-02-01",
     coverImage: "/images/Started a business relationship with a great guy . Met his wife who I had sex with in my 20s/panel_1.png",
     description: "A trusted business friend turns complicated when his wife turns out to be someone from a distant past. A story about unexpected reconnections and moral choices.",
     rating: 4.6,
@@ -165,6 +167,7 @@ About a week later she creeped me on social media. Then email. Inferring things.
     title: "I Accidentally Said 'Love You' to a Cashier",
     author: "Anonymous",
     genre: "Slice of Life",
+    publishedDate: "2024-12-10",
     coverImage: "/images/love-you-cashier.png",
     description: "An awkward moment at the checkout that spiraled into the most embarrassing exit of my life. Full volume. Clear as a bell. The cashier handled it with more grace than deserved.",
     rating: 4.8,
@@ -205,6 +208,7 @@ I now do all my grocery shopping online.`,
     title: "I Said 'You Too' When the Waiter Said 'Enjoy Your Meal'",
     author: "Anonymous",
     genre: "Slice of Life",
+    publishedDate: "2024-12-15",
     coverImage: "/images/you-too-waiter.svg",
     description: "The two words left my mouth before any part of my brain could intervene. The waiter accepted it with extraordinary dignity. Three years later, he still works there.",
     rating: 4.9,
@@ -247,6 +251,7 @@ I still tip 25%. It feels like the right thing to do.`,
     title: "I Waved Back at Someone Who Wasn't Waving at Me",
     author: "Anonymous",
     genre: "Slice of Life",
+    publishedDate: "2025-01-05",
     coverImage: "/images/wave-back.svg",
     description: "Full commitment. Meaningful eye contact. A warm smile. They were waving at the person standing three feet behind me. The half-second between confidence and comprehension was the best I have ever felt.",
     rating: 4.7,
@@ -287,6 +292,7 @@ It was the best I have ever felt.`,
     title: "My Autocorrect Changed 'Meeting' to 'Mating' at Work",
     author: "Anonymous",
     genre: "Slice of Life",
+    publishedDate: "2025-01-20",
     coverImage: "/images/autocorrect-mating.svg",
     description: "I typed quickly. I hit send. My manager replied in forty seconds. My colleague said he'd bring snacks. On the conference table that Thursday: a small bowl of mixed nuts.",
     rating: 4.8,
@@ -333,6 +339,7 @@ I now proofread every email three times. Sometimes four. I read them aloud. I ha
     title: "I Held the Door for Someone Way Too Far Away",
     author: "Anonymous",
     genre: "Slice of Life",
+    publishedDate: "2025-01-25",
     coverImage: "/images/held-door.svg",
     description: "I had committed. There was no graceful exit. I held that door for approximately twenty-seven seconds. It felt like three to five business days. I have since developed a precise system. I run drills.",
     rating: 4.6,
@@ -375,6 +382,7 @@ I run drills.`,
     title: "I Called My Teacher 'Mom' in Front of the Whole Class",
     author: "Anonymous",
     genre: "Slice of Life",
+    publishedDate: "2024-11-20",
     coverImage: "/images/called-teacher-mom.svg",
     description: "Third period. Quiz handed back. Full confidence. Zero hesitation. Thirty-two witnesses. She said 'you're welcome' because she was a professional. I am 34 now. I still think about this.",
     rating: 4.8,
@@ -413,6 +421,7 @@ I am 34 now. My teacher is retired. I still think about this sometimes. I assume
     title: "I Replied 'You're Welcome' Before Anyone Said Thank You",
     author: "Anonymous",
     genre: "Slice of Life",
+    publishedDate: "2025-02-10",
     coverImage: "/images/youre-welcome-early.svg",
     description: "The gratitude was clearly on its way. I could see it coming. I just didn't wait for it to arrive.",
     rating: 4.7,
@@ -453,6 +462,7 @@ I now wait. I wait for the thank you. I do not rush it. Some things need to arri
     title: "I Laughed at the Wrong Part of Someone's Story",
     author: "Anonymous",
     genre: "Slice of Life",
+    publishedDate: "2025-01-30",
     coverImage: "/images/laughed-wrong-part.svg",
     description: "I had misread the tone. I thought the worst was already behind them. I was wrong â€” the worst was the part I laughed at. She stopped talking. I nodded with great seriousness for the remainder of the evening.",
     rating: 4.6,
@@ -742,12 +752,13 @@ app.get('/comic/:id', (req, res) => {
     description: comic.description,
     author: { '@type': 'Person', name: comic.author },
     publisher: { '@type': 'Organization', name: 'Comic News', url: baseUrl, logo: { '@type': 'ImageObject', url: `${baseUrl}/favicon.svg` } },
-    image: imgUrl,
+    image: { '@type': 'ImageObject', url: imgUrl },
     genre: comic.genre,
     inLanguage: 'en-US',
     url: canonicalUrl,
-    datePublished: today,
+    datePublished: comic.publishedDate,
     dateModified: today,
+    ...(comic.hasTextVersion && comic.textStory ? { wordCount: comic.textStory.trim().split(/\s+/).length } : {}),
     ...(comic.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: comic.rating, bestRating: 5, worstRating: 1, ratingCount: Math.round(comic.rating * comic.chapters * 15) } } : {}),
   };
 
@@ -848,6 +859,23 @@ app.get('/library', (req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
   res.type('html').send(html);
 });
+
+// SSR noindex injection for reader and bookmarks pages (prevents duplicate/thin content indexing)
+function serveNoindex(res) {
+  if (!indexHtmlTemplate) {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    return res.sendFile(join(__dirname, 'dist', 'index.html'), (err) => {
+      if (err && !res.headersSent) res.status(500).end();
+    });
+  }
+  const html = indexHtmlTemplate
+    .replace(/(<meta name="robots" content=")[^"]*(")/,  '$1noindex, follow$2');
+  res.set('Cache-Control', 'no-store');
+  res.type('html').send(html);
+}
+
+app.get('/read/:id', (req, res) => serveNoindex(res));
+app.get('/bookmarks', (req, res) => serveNoindex(res));
 
 // SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res) => {
