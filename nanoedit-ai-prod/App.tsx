@@ -36,7 +36,7 @@ const PRESET_PROMPTS = [
 
 const PASSPORT_PROMPT = "Convert this into a professional passport photo: solid white background, center the subject, crop to head and shoulders, ensure even lighting, and make it look professional.";
 
-const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement", "Always Free · No Account Needed"];
+const FEATURES = ["Background Removal", "Portrait Retouching", "Artistic Filters", "Passport Photos", "Color Enhancement", "Always Free", "No Account Needed"];
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -262,7 +262,7 @@ const App: React.FC = () => {
               Edit Any Photo Instantly — Just <span className="text-brand-600">Describe What You Want</span>
             </h2>
             <p className="text-lg text-slate-600 mb-6">
-              Upload any photo and describe the edit you want in plain English. NanoEdit AI uses Google Gemini to apply your changes instantly — no account or signup required.
+              Upload any photo and describe the edit you want in plain English. NanoEdit AI uses Google Gemini to apply your changes — no account, no signup, and your photos are never stored.
             </p>
             <ul className="flex flex-wrap justify-center gap-2 list-none" aria-label="Features">
               {FEATURES.map((feat) => (
@@ -343,7 +343,7 @@ const App: React.FC = () => {
                       aria-label="Describe the image changes you want"
                       aria-describedby="prompt-hint"
                       onKeyDown={handleKeyDown}
-                      placeholder="E.g., 'Remove the background' or 'Make it a passport photo'"
+                      placeholder="E.g., 'Remove the background', 'Make it look vintage', or 'Smooth skin'"
                       className="w-full p-4 pr-10 text-slate-700 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent rounded-lg text-base"
                       rows={3}
                       maxLength={2000}
@@ -423,7 +423,7 @@ const App: React.FC = () => {
                   <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">Unable to generate — try again</p>
+                      <p className="font-medium text-sm">Generation failed — try a different prompt or image</p>
                       <p className="text-sm opacity-90">{errorMsg}</p>
                     </div>
                     <div className="flex-shrink-0 flex items-center gap-1">
@@ -492,6 +492,9 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 text-center space-y-3">
           <p className="text-slate-500 text-sm max-w-xl mx-auto">
             NanoEdit AI is a free AI-powered image editor. Remove backgrounds, retouch portraits, create passport photos, and apply artistic filters — all with simple text prompts.
+          </p>
+          <p className="text-slate-400 text-xs">
+            Your photos are processed by Google Gemini and are never stored or retained.
           </p>
           <p className="text-slate-400 text-xs">
             &copy; {CURRENT_YEAR} NanoEdit AI &middot; Powered by Google Gemini &middot; Free online photo editor
