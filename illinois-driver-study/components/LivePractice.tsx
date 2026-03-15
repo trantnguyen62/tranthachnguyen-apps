@@ -272,8 +272,11 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
              if (message.toolCall) {
                 const responses = message.toolCall.functionCalls.map(fc => {
                   if (fc.name === 'displayQuestion') {
-                    const id = fc.args['id'] as number;
-                    const q = questionsMap.get(id);
+                    const rawId = fc.args['id'];
+                    const id = typeof rawId === 'number' && Number.isInteger(rawId) && rawId >= 1 && rawId <= allQuestions.length
+                      ? rawId
+                      : NaN;
+                    const q = Number.isNaN(id) ? undefined : questionsMap.get(id);
                     if (q) {
                       setCurrentQuestion(q);
                       return {
@@ -358,7 +361,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       setStatus('idle');
       setIsActive(false);
       const isPermissionError = err instanceof Error && err.name === 'NotAllowedError';
-      setSessionError(isPermissionError ? t.mic_permission : (err instanceof Error ? err.message : String(err)));
+      setSessionError(isPermissionError ? t.mic_permission : (language === 'vi' ? 'Không thể kết nối. Vui lòng thử lại.' : 'Connection failed. Please try again.'));
     }
   };
 

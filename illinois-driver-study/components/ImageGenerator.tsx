@@ -85,6 +85,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
               rows={3}
               placeholder={t.promptPlaceholder}
               value={prompt}
+              maxLength={500}
               onChange={(e) => setPrompt(e.target.value)}
             />
           </div>
