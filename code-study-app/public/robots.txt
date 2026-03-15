@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tranthachnguyen.com/sitemap.xml
+Sitemap: https://codestudy.tranthachnguyen.com/sitemap.xml

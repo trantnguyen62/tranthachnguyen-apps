@@ -75,6 +75,17 @@ function App() {
     if (error) setDismissedError(null);
   }, [error]);
 
+  // Update document title based on selected project/file
+  useEffect(() => {
+    if (selectedFile && selectedProject) {
+      document.title = `${selectedFile.name} — ${selectedProject.name} | Code Study`;
+    } else if (selectedProject) {
+      document.title = `${selectedProject.name} | Code Study`;
+    } else {
+      document.title = 'Code Study - Learn Your Codebase with AI';
+    }
+  }, [selectedProject, selectedFile]);
+
   // Load projects on mount
   useEffect(() => {
     fetch(`${API_URL}/api/projects`)
