@@ -63,7 +63,10 @@ already used by other cards (`blue`, `emerald`, `purple`, `rose`, `orange`,
 `yellow`, `sky`, `cyan`).
 
 Increment the `animation-delay` by `0.03s` relative to the previous card so
-the entrance animation staggers correctly.
+the entrance animation staggers correctly. The current 8 cards use delays
+`0s`–`0.21s`, so the next card should use `0.24s`.
+
+After adding the card, update the `dateModified` value in the `<script type="application/ld+json">` block in `index.html` to today's date (ISO 8601 format, e.g. `2026-03-15`).
 
 ```html
 <!-- App Name -->
@@ -114,8 +117,12 @@ Update `sitemap.xml` with the new app's URL if it lives on the same domain.
 - **X-Content-Type-Options: nosniff** — prevents MIME-type sniffing
 - **X-Frame-Options: DENY** — blocks the page from being embedded in iframes
 - **Referrer-Policy: strict-origin-when-cross-origin** — limits referrer leakage
-- **Permissions-Policy** — disables camera, microphone, geolocation, payment, and USB APIs
-- **Cache-Control** — 1-hour cache for HTML, 30-day cache for CSS assets
+- **Permissions-Policy** — disables camera, microphone, geolocation, payment, USB, and ad-targeting APIs
+- **Strict-Transport-Security** — enforces HTTPS for 1 year across all subdomains (HSTS preload eligible)
+- **Cross-Origin-Opener-Policy: same-origin** — isolates the browsing context to prevent cross-origin window attacks
+- **Cross-Origin-Resource-Policy: same-origin** — prevents other origins from loading this site's resources
+- **X-Permitted-Cross-Domain-Policies: none** — blocks Adobe Flash/PDF cross-domain policy files
+- **Cache-Control** — 1-hour cache for HTML, 30-day cache for CSS, 1-year immutable cache for fonts
 
 ## 🌐 Live Demo
 
