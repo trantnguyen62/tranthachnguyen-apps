@@ -25,10 +25,12 @@ export function createBlob(data: Float32Array): Blob {
 
 // Base64-encodes a byte array for transmission over JSON.
 export function encode(bytes: Uint8Array): string {
+  // Use apply in chunks to avoid stack overflow on large buffers while
+  // still avoiding O(n²) string concatenation from per-byte appending.
+  const CHUNK = 8192;
   let binary = '';
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
   }
   return btoa(binary);
 }
@@ -58,10 +60,11 @@ export async function decodeAudioData(
   const frameCount = dataInt16.length / numChannels;
   const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
 
+  const scale = 1 / 32768.0;
   for (let channel = 0; channel < numChannels; channel++) {
     const channelData = buffer.getChannelData(channel);
     for (let i = 0; i < frameCount; i++) {
-      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+      channelData[i] = dataInt16[i * numChannels + channel] * scale;
     }
   }
   return buffer;

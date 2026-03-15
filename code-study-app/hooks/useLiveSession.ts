@@ -146,25 +146,27 @@ export const useLiveSession = (studyContext: StudyContext) => {
 
       // Build system instruction with current code context
       const ctx = studyContextRef.current;
-      let systemInstruction = SYSTEM_INSTRUCTION;
+      const parts: string[] = [SYSTEM_INSTRUCTION];
       if (ctx.currentFile) {
-        systemInstruction += `\n\nCURRENT FILE: ${ctx.currentFile.path}\nLANGUAGE: ${ctx.currentFile.language || 'unknown'}`;
+        parts.push(`\n\nCURRENT FILE: ${ctx.currentFile.path}\nLANGUAGE: ${ctx.currentFile.language || 'unknown'}`);
         if (ctx.currentFile.content) {
-          const content = ctx.currentFile.content.length > MAX_FILE_CHARS
-            ? ctx.currentFile.content.slice(0, MAX_FILE_CHARS) + '\n... [truncated]'
-            : ctx.currentFile.content;
-          systemInstruction += `\n\nFILE CONTENT:\n\`\`\`${ctx.currentFile.language || ''}\n${content}\n\`\`\``;
+          const raw = ctx.currentFile.content;
+          const content = raw.length > MAX_FILE_CHARS
+            ? raw.slice(0, MAX_FILE_CHARS) + '\n... [truncated]'
+            : raw;
+          parts.push(`\n\nFILE CONTENT:\n\`\`\`${ctx.currentFile.language || ''}\n${content}\n\`\`\``);
         }
       }
       if (ctx.currentProject) {
-        systemInstruction += `\n\nCURRENT PROJECT: ${ctx.currentProject.name}`;
-        if (ctx.currentProject.description) {
-          systemInstruction += ` - ${ctx.currentProject.description}`;
-        }
+        const projectDesc = ctx.currentProject.description
+          ? ` - ${ctx.currentProject.description}`
+          : '';
+        parts.push(`\n\nCURRENT PROJECT: ${ctx.currentProject.name}${projectDesc}`);
       }
       if (ctx.selectedCode) {
-        systemInstruction += `\n\nSELECTED CODE:\n\`\`\`\n${ctx.selectedCode}\n\`\`\``;
+        parts.push(`\n\nSELECTED CODE:\n\`\`\`\n${ctx.selectedCode}\n\`\`\``);
       }
+      const systemInstruction = parts.join('');
 
       const config = {
         model: MODEL_NAME,
