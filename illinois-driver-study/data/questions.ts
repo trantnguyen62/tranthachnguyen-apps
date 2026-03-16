@@ -231,7 +231,7 @@ export const questionsEn: Question[] = [
     text: "The '2-Second Rule' works like this: when the vehicle ahead of you passes a fixed object like a tree, etc., if you begin counting, 'one thousand one, one thousand two' then if you reach the same tree before you have finished saying 'one thousand two,' you are following too closely.",
     options: ["True", "False"],
     correctIndex: 0,
-    explanation: "The counting technique described here correctly identifies following-too-closely behavior. However, the current Illinois Rules of the Road recommends a minimum of 3 seconds of following distance under normal conditions — not 2. If you reach the fixed object before finishing your count, you are too close. Always increase this gap further in bad weather, heavy traffic, or low visibility."
+    explanation: "True — if you reach the fixed object before finishing 'one thousand two,' you are following too closely. Keep in mind that Illinois Rules of the Road recommends a minimum of 3 seconds under normal conditions, so even arriving at the object at exactly 2 seconds is still too close. Increase this gap further in bad weather, heavy traffic, or low visibility."
   },
   {
     id: 23,
@@ -315,7 +315,7 @@ export const questionsEn: Question[] = [
   },
   {
     id: 31,
-    text: "Unless posted otherwise, it is permissible for drivers on a one-way street to turn left on a red light into other one-way street that moves traffic to the left.",
+    text: "Unless posted otherwise, it is permissible for drivers on a one-way street to turn left on a red light into another one-way street that moves traffic to the left.",
     options: ["True", "False"],
     correctIndex: 0,
     explanation: "In Illinois, turning left on red from a one-way street onto another one-way street (where traffic flows to the left) is legal unless a sign prohibits it—similar to a right turn on red."
@@ -845,7 +845,7 @@ export const questionsVi: Question[] = [
     text: "Quy tắc '2 Giây' hoạt động như sau: khi xe phía trước bạn vượt qua một vật cố định như cái cây, nếu bạn bắt đầu đếm 'một ngàn một, một ngàn hai' và bạn đến cái cây đó trước khi đếm xong, bạn đang đi quá gần.",
     options: ["Đúng", "Sai"],
     correctIndex: 0,
-    explanation: "Kỹ thuật đếm được mô tả đây giúp xác định khi nào bạn đang đi quá gần. Tuy nhiên, Quy tắc Giao thông Illinois hiện tại khuyến nghị tối thiểu 3 giây khoảng cách an toàn trong điều kiện bình thường — không phải 2 giây. Nếu bạn đến vật cố định trước khi đếm xong, bạn đang đi quá gần. Hãy tăng khoảng cách hơn nữa trong điều kiện thời tiết xấu, giao thông đông hoặc tầm nhìn hạn chế."
+    explanation: "Đúng — nếu bạn đến vật cố định trước khi đếm xong 'một ngàn hai', bạn đang đi quá gần. Lưu ý rằng Quy tắc Giao thông Illinois khuyến nghị tối thiểu 3 giây trong điều kiện bình thường, vì vậy ngay cả khi bạn đến đúng lúc 2 giây thì vẫn còn quá gần. Hãy tăng khoảng cách thêm trong điều kiện thời tiết xấu, giao thông đông hoặc tầm nhìn hạn chế."
   },
   {
     id: 23,
