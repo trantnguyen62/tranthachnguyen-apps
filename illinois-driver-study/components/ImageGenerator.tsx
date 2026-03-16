@@ -50,14 +50,15 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
   const t = TRANSLATIONS[language];
 
   const handleGenerate = async () => {
-    if (!prompt) return;
+    const trimmedPrompt = prompt.trim();
+    if (!trimmedPrompt || trimmedPrompt.length < 3) return;
     setLoading(true);
     setError(null);
     setImageSrc(null);
 
     try {
       // Prepend context if Vietnamese to ensure better understanding, or rely on model
-      const result = await generateStudyImage(prompt, size);
+      const result = await generateStudyImage(trimmedPrompt, size);
       setImageSrc(result);
     } catch (err) {
       setError(t.error);
@@ -111,10 +112,10 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
 
           <button
             onClick={handleGenerate}
-            disabled={loading || !prompt}
+            disabled={loading || prompt.trim().length < 3}
             className={`w-full py-3 rounded-lg font-bold text-white shadow-md transition-all ${
-              loading || !prompt 
-                ? 'bg-slate-300 cursor-not-allowed' 
+              loading || prompt.trim().length < 3
+                ? 'bg-slate-300 cursor-not-allowed'
                 : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg transform hover:-translate-y-0.5'
             }`}
           >
