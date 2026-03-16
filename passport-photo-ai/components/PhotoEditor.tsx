@@ -283,6 +283,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
             <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: -8 }}>
               <button
                 onClick={() => { setBrightness(105); setContrast(108); }}
+                aria-label="Reset brightness and contrast to defaults"
                 title="Reset brightness and contrast to defaults"
                 style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: "'Space Grotesk', sans-serif", textDecoration: 'underline', transition: 'color 0.15s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.7)'; }}

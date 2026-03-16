@@ -114,7 +114,7 @@ export default function App() {
         </Suspense>
       )}
 
-      <div style={{ position: 'relative', zIndex: 1, padding: '40px 24px', maxWidth: 1200, margin: '0 auto' }}>
+      <div inert={showEditor ? true : undefined} style={{ position: 'relative', zIndex: 1, padding: '40px 24px', maxWidth: 1200, margin: '0 auto' }}>
         {/* Header */}
         <header style={{ textAlign: 'center', marginBottom: 60 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
@@ -375,8 +375,9 @@ export default function App() {
                       <span style={{ width: 16, height: 2, background: accentGold, borderRadius: 1 }} />
                       Issues Found
                     </h3>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {result.issues.map((issue: string, idx: number) => (
-                      <div key={idx} className="result-item" style={{
+                      <li key={idx} className="result-item" style={{
                         padding: '12px 16px',
                         background: 'rgba(255,255,255,0.03)',
                         borderRadius: 10,
@@ -387,10 +388,11 @@ export default function App() {
                         animation: `fadeSlideIn 0.4s ease both`,
                         animationDelay: `${idx * 0.07}s`
                       }}>
-                        <span style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: `${accentGold}22`, border: `1px solid ${accentGold}55`, color: accentGold, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>{idx + 1}</span>
+                        <span aria-hidden="true" style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: `${accentGold}22`, border: `1px solid ${accentGold}55`, color: accentGold, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>{idx + 1}</span>
                         {issue}
-                      </div>
+                      </li>
                     ))}
+                    </ul>
                   </div>
                 )}
 
@@ -405,8 +407,9 @@ export default function App() {
                       <span style={{ width: 16, height: 2, background: accentPurple, borderRadius: 1 }} />
                       How to Fix
                     </h3>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                     {result.suggestions.map((tip: string, idx: number) => (
-                      <div key={idx} className="result-item" style={{
+                      <li key={idx} className="result-item" style={{
                         padding: '12px 16px',
                         background: 'rgba(255,255,255,0.03)',
                         borderRadius: 10,
@@ -417,10 +420,11 @@ export default function App() {
                         animation: `fadeSlideIn 0.4s ease both`,
                         animationDelay: `${idx * 0.07}s`
                       }}>
-                        <span style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: `${accentPurple}22`, border: `1px solid ${accentPurple}55`, color: accentPurple, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>{idx + 1}</span>
+                        <span aria-hidden="true" style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: `${accentPurple}22`, border: `1px solid ${accentPurple}55`, color: accentPurple, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>{idx + 1}</span>
                         {tip}
-                      </div>
+                      </li>
                     ))}
+                    </ul>
                   </div>
                 )}
               </div>
