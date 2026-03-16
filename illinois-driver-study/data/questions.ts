@@ -231,7 +231,7 @@ export const questionsEn: Question[] = [
     text: "The '2-Second Rule' works like this: when the vehicle ahead of you passes a fixed object like a tree, etc., if you begin counting, 'one thousand one, one thousand two' then if you reach the same tree before you have finished saying 'one thousand two,' you are following too closely.",
     options: ["True", "False"],
     correctIndex: 0,
-    explanation: "True — if you reach the fixed object before finishing 'one thousand two,' you are following too closely. Keep in mind that Illinois Rules of the Road recommends a minimum of 3 seconds under normal conditions, so even arriving at the object at exactly 2 seconds is still too close. Increase this gap further in bad weather, heavy traffic, or low visibility."
+    explanation: "True — the 2-second rule correctly describes the method for checking following distance. However, Illinois Rules of the Road recommends a minimum of 3 seconds under normal conditions for an added safety margin. Increase this gap further in bad weather, heavy traffic, or low visibility."
   },
   {
     id: 23,
@@ -625,6 +625,17 @@ export const questionsEn: Question[] = [
     ],
     correctIndex: 1,
     explanation: "Illinois law prohibits U-turns where the driver's view is obstructed within 500 feet in either direction, in business districts (unless permitted by signal), and wherever signs prohibit them. U-turns must only be made when they can be done safely without interfering with other traffic."
+  },
+  {
+    id: 59,
+    text: "Unless posted otherwise, the maximum speed limit on a highway outside of an urban area in Illinois is:",
+    options: [
+      "45 mph",
+      "55 mph",
+      "65 mph"
+    ],
+    correctIndex: 1,
+    explanation: "Illinois law sets the default speed limit at 55 mph on highways outside of urban areas when no other limit is posted. Within urban areas, the default limit is 30 mph. Always obey posted speed limit signs, which may differ from these defaults based on road conditions and local ordinances."
   }
 ];
 
@@ -847,7 +858,7 @@ export const questionsVi: Question[] = [
     text: "Quy tắc '2 Giây' hoạt động như sau: khi xe phía trước bạn vượt qua một vật cố định như cái cây, nếu bạn bắt đầu đếm 'một ngàn một, một ngàn hai' và bạn đến cái cây đó trước khi đếm xong, bạn đang đi quá gần.",
     options: ["Đúng", "Sai"],
     correctIndex: 0,
-    explanation: "Đúng — nếu bạn đến vật cố định trước khi đếm xong 'một ngàn hai', bạn đang đi quá gần. Lưu ý rằng Quy tắc Giao thông Illinois khuyến nghị tối thiểu 3 giây trong điều kiện bình thường, vì vậy ngay cả khi bạn đến đúng lúc 2 giây thì vẫn còn quá gần. Hãy tăng khoảng cách thêm trong điều kiện thời tiết xấu, giao thông đông hoặc tầm nhìn hạn chế."
+    explanation: "Đúng — quy tắc 2 giây mô tả đúng cách kiểm tra khoảng cách an toàn. Tuy nhiên, Quy tắc Giao thông Illinois khuyến nghị tối thiểu 3 giây trong điều kiện bình thường để có biên độ an toàn cao hơn. Hãy tăng khoảng cách thêm trong điều kiện thời tiết xấu, giao thông đông hoặc tầm nhìn hạn chế."
   },
   {
     id: 23,
@@ -1241,6 +1252,17 @@ export const questionsVi: Question[] = [
     ],
     correctIndex: 1,
     explanation: "Pháp luật Illinois cấm quay đầu xe khi tầm nhìn của tài xế bị che khuất trong vòng 500 feet theo cả hai hướng, trong khu thương mại (trừ khi được phép bởi tín hiệu), và bất cứ nơi nào có biển cấm. Quay đầu xe chỉ được thực hiện khi có thể làm an toàn mà không cản trở giao thông khác."
+  },
+  {
+    id: 59,
+    text: "Trừ khi có biển báo khác, tốc độ tối đa trên đường cao tốc ngoài khu vực đô thị ở Illinois là:",
+    options: [
+      "45 dặm/giờ",
+      "55 dặm/giờ",
+      "65 dặm/giờ"
+    ],
+    correctIndex: 1,
+    explanation: "Luật Illinois quy định tốc độ mặc định là 55 dặm/giờ trên đường cao tốc ngoài khu vực đô thị khi không có biển báo khác. Trong khu vực đô thị, tốc độ mặc định là 30 dặm/giờ. Luôn tuân thủ biển báo tốc độ được đăng, vì chúng có thể khác với các giá trị mặc định này tùy theo điều kiện đường và quy định địa phương."
   }
 ];
 
