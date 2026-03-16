@@ -16,10 +16,10 @@ Browse and read daily news stories transformed into comics. Track your reading p
 ### Development
 
 ```bash
-# Start backend on port 5188 (vite proxy expects this port in dev)
+# Start backend on port 5188 (Vite dev server proxies /api to this port)
 cd backend
 npm install
-PORT=5188 npm start
+ALLOWED_ORIGIN=http://localhost:5187 PORT=5188 npm start
 
 # Start frontend dev server (port 5187)
 cd frontend
@@ -27,7 +27,7 @@ npm install
 npm run dev
 ```
 
-> In development, set `ALLOWED_ORIGIN=http://localhost:5187` to allow the Vite dev server to reach the API.
+> The Vite dev proxy forwards `/api` requests from `localhost:5187` to the backend on `localhost:5188`, so both ports must be free. In production (Docker), a single process serves everything on one port.
 
 ### Docker
 
@@ -39,7 +39,10 @@ cd frontend && npm install && npm run build && cd ..
 
 # Build and run Docker image
 docker build -t comic-news .
-docker run -p 5187:5187 comic-news
+docker run -p 5187:5187 \
+  -e BASE_URL=https://example.com \
+  -e ALLOWED_ORIGIN=https://example.com \
+  comic-news
 ```
 
 ## Project Structure
@@ -65,7 +68,7 @@ comic-news/
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/comics` | List comics. Query params: `genre`, `search`, `sort` (`rating`\|`title`) |
+| GET | `/api/comics` | List comics. Query params: `genre` (exact match), `search` (matches title/author/description), `sort` (`rating`\|`title`) |
 | GET | `/api/comics/:id` | Get single comic with `pages` (images) and `panels` (text descriptions) |
 | GET | `/api/genres` | List available genres |
 | GET | `/api/featured` | Top-rated comics (up to 4) |
@@ -90,6 +93,7 @@ A comic object returned by `/api/comics/:id`:
   "title": "Story Title",
   "author": "Author Name",
   "genre": "Slice of Life",
+  "publishedDate": "2025-01-15",
   "coverImage": "/images/cover.png",
   "description": "Short description shown on cards and detail pages.",
   "rating": 4.8,
