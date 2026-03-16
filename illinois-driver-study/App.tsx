@@ -107,8 +107,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const titles: Record<AppMode, string> = {
-      [AppMode.QUIZ]: 'Illinois DMV Practice Quiz - Free IL Written Test | Illinois Driver Study',
-      [AppMode.STUDY]: 'Study IL Traffic Laws & Road Signs - Illinois Driver Study',
+      [AppMode.QUIZ]: `Illinois DMV Practice Quiz ${CURRENT_YEAR} - Free IL Written Test | Illinois Driver Study`,
+      [AppMode.STUDY]: `Study IL Traffic Laws & Road Signs ${CURRENT_YEAR} - Illinois Driver Study`,
       [AppMode.LIVE_PRACTICE]: 'AI-Powered Illinois Driving Practice - Illinois Driver Study',
     };
     const descriptions: Record<AppMode, string> = {
