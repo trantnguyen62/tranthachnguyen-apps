@@ -25,6 +25,15 @@ if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D
 const TWO_PI = Math.PI * 2;
 const DEG_TO_RAD = Math.PI / 180;
 
+// Fisher-Yates shuffle (in-place). Returns the array for convenience.
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+}
+
 // Game Configuration
 const CONFIG = {
     GRAVITY: 0.35,          // Downward acceleration applied each frame (px/frame²)
@@ -554,6 +563,7 @@ function saveProgress() {
         localStorage.setItem('pipeline-runner-learned', game.totalLearned);
     } catch (e) {
         // localStorage unavailable (e.g. private browsing quota exceeded)
+        console.warn('Progress could not be saved:', e);
     }
 }
 
@@ -642,13 +652,9 @@ function initStars() {
 // Cycles through all items without repetition using a pre-shuffled queue.
 function getNextLearnableContent() {
     const content = LEARNABLE_CONTENT[game.selectedTopic];
+    if (!content || content.length === 0) return null;
     if (game.contentQueue.length === 0) {
-        const indices = Array.from({ length: content.length }, (_, i) => i);
-        for (let i = indices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
-        }
-        game.contentQueue = indices;
+        game.contentQueue = shuffleArray(Array.from({ length: content.length }, (_, i) => i));
     }
     return content[game.contentQueue.pop()];
 }
@@ -1134,20 +1140,11 @@ function showQuestion() {
     const questions = QUESTIONS[game.selectedTopic];
     if (!questions || questions.length === 0) return;
     if (game.questionQueue.length === 0) {
-        const indices = Array.from({ length: questions.length }, (_, i) => i);
-        for (let i = indices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
-        }
-        game.questionQueue = indices;
+        game.questionQueue = shuffleArray(Array.from({ length: questions.length }, (_, i) => i));
     }
     const question = questions[game.questionQueue.pop()];
 
-    const answers = question.a.map((text, originalIndex) => ({ text, originalIndex }));
-    for (let i = answers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [answers[i], answers[j]] = [answers[j], answers[i]];
-    }
+    const answers = shuffleArray(question.a.map((text, originalIndex) => ({ text, originalIndex })));
 
     const correctShuffledIndex = answers.findIndex(a => a.originalIndex === question.c);
 
