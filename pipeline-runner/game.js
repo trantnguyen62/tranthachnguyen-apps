@@ -548,10 +548,15 @@ function init() {
 }
 
 function loadProgress() {
-    const rawBest = parseInt(localStorage.getItem('pipeline-runner-best') || '0', 10);
-    const rawLearned = parseInt(localStorage.getItem('pipeline-runner-learned') || '0', 10);
-    game.bestScore = (isNaN(rawBest) || rawBest < 0) ? 0 : Math.min(rawBest, 1e7);
-    game.totalLearned = (isNaN(rawLearned) || rawLearned < 0) ? 0 : Math.min(rawLearned, 1e7);
+    try {
+        const rawBest = parseInt(localStorage.getItem('pipeline-runner-best') || '0', 10);
+        const rawLearned = parseInt(localStorage.getItem('pipeline-runner-learned') || '0', 10);
+        game.bestScore = (isNaN(rawBest) || rawBest < 0) ? 0 : Math.min(rawBest, 1e7);
+        game.totalLearned = (isNaN(rawLearned) || rawLearned < 0) ? 0 : Math.min(rawLearned, 1e7);
+    } catch (e) {
+        // localStorage unavailable (e.g. private browsing or storage blocked)
+        console.warn('Progress could not be loaded:', e);
+    }
     const elBest = document.getElementById('bestScore');
     const elLearned = document.getElementById('totalLearned');
     if (elBest) elBest.textContent = game.bestScore;
@@ -1239,7 +1244,7 @@ function markAnswerResult(btns, q, wrongIndex) {
         correctBtn.setAttribute('aria-label',
             `Correct answer: ${q.shuffledAnswers[q.correctIndex]}`);
     }
-    if (wrongIndex != null && wrongIndex !== q.correctIndex) {
+    if (wrongIndex !== null && wrongIndex !== undefined && wrongIndex !== q.correctIndex) {
         const wrongBtn = btns[wrongIndex];
         if (wrongBtn) {
             wrongBtn.classList.add('incorrect');
@@ -1464,6 +1469,7 @@ function stopGameLoops() {
 
 // Adjusts a hex color's brightness. Positive percent lightens, negative darkens.
 function adjustColor(hex, percent) {
+    if (typeof hex !== 'string' || !/^#[0-9A-Fa-f]{6}$/.test(hex)) return hex;
     const num = parseInt(hex.replace('#', ''), 16);
     const amt = Math.round(2.55 * percent);
     const R = Math.min(255, Math.max(0, (num >> 16) + amt));
@@ -1620,6 +1626,7 @@ const AdManager = {
 
         clearInterval(this.rewardedAdTimer);
         const modal = document.getElementById('rewardedAdModal');
+        if (!modal) return;
         modal.classList.add('hidden');
 
         // Mark ad as watched and grant reward
