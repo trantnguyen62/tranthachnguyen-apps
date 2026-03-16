@@ -50,7 +50,7 @@ landing-page/
 | Illinois Driver Study | Interactive Illinois driver's license study guide |
 | NanoEdit AI | AI-assisted photo editor |
 | Passport Photo AI | AI photo cropping for passport requirements |
-| Comic News | Comic browser and reader |
+| Comic News | AI-generated comic strip versions of today's top news headlines |
 | DevOps Mastery | DevOps flashcards and quizzes |
 | DevOps Defender | DevOps learning game |
 | Resume & Portfolio | Professional resume and portfolio |
@@ -64,7 +64,7 @@ already used by other cards (`blue`, `emerald`, `purple`, `rose`, `orange`,
 
 Increment the `animation-delay` by `0.03s` relative to the previous card so
 the entrance animation staggers correctly. The current 8 cards use delays
-`0s`–`0.21s`, so the next card should use `0.24s`.
+`0.03s`–`0.24s`, so the next card should use `0.27s`.
 
 After adding the card, update the `dateModified` value in the `<script type="application/ld+json">` block in `index.html` to today's date (ISO 8601 format, e.g. `2026-03-15`).
 
@@ -79,15 +79,15 @@ After adding the card, update the `dateModified` value in the `<script type="app
             focus-visible:outline-{color}-400 focus-visible:outline-offset-2
             group cursor-pointer block">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-2xl font-bold group-hover:text-{color}-400 transition-colors">
-        <span aria-hidden="true" class="mr-2">🔧</span>App Name
+      <h3 class="text-2xl font-bold group-hover:text-{color}-400 transition-colors flex items-center gap-3">
+        <span aria-hidden="true" class="app-icon icon-{color}">🔧</span>App Name
       </h3>
       <span aria-hidden="true" class="px-3 py-1 bg-{color}-500/20 text-{color}-300 text-xs font-medium rounded-full">Category</span>
     </div>
     <p class="text-slate-300 mb-4 leading-relaxed group-hover:text-slate-200 transition-colors">
       Short description of what the app does.
     </p>
-    <div class="cta-row flex items-center text-{color}-400 font-semibold mt-4 border-t border-white/10">
+    <div class="cta-row flex items-center text-{color}-400 font-semibold">
       Launch App <span class="ml-2 group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true">↗</span>
     </div>
   </a>
@@ -123,6 +123,23 @@ Update `sitemap.xml` with the new app's URL if it lives on the same domain.
 - **Cross-Origin-Resource-Policy: same-origin** — prevents other origins from loading this site's resources
 - **X-Permitted-Cross-Domain-Policies: none** — blocks Adobe Flash/PDF cross-domain policy files
 - **Cache-Control** — 1-hour cache for HTML, 30-day cache for CSS, 1-year immutable cache for fonts
+
+## ♿ Accessibility
+
+- **Skip link** — keyboard users can skip directly to `#main-content` via a visually-hidden link at the top of the page
+- **ARIA labels** — all interactive cards include `aria-label` with destination and "(opens in new tab)" notice; decorative elements use `aria-hidden="true"`
+- **Semantic landmarks** — `<main>`, `<nav>`, `<header>`, `<footer>` with matching `aria-labelledby` / `aria-label` attributes
+- **Reduced motion** — `@media (prefers-reduced-motion: reduce)` in `styles.css` disables all CSS animations for users who opt out
+- **Focus styles** — `focus-visible` outlines on all interactive elements with a 2px ring and per-card accent colour
+
+## 🔍 SEO
+
+- **Schema.org structured data** — `<script type="application/ld+json">` in `index.html` contains a `@graph` with `WebSite`, `Person`, `ItemList`, and `SoftwareApplication` entries for each app
+- **Open Graph & Twitter Card** — full metadata for rich link previews on social platforms, referencing `og-image.png` (1200×630)
+- **Canonical & hreflang** — `<link rel="canonical">` and `hreflang="en"` / `hreflang="x-default"` tags prevent duplicate-content issues
+- **sitemap.xml** — lists the root URL; update `<lastmod>` and add sub-URLs here when new apps go live on the same domain
+- **robots.txt** — allows all crawlers and references the sitemap location
+- **dateModified** — update the `dateModified` field in the JSON-LD block whenever content changes; this signals freshness to search engines
 
 ## 🌐 Live Demo
 
