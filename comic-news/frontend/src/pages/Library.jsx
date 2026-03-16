@@ -153,7 +153,7 @@ function Library() {
         <div className="flex flex-col md:flex-row md:items-center gap-4">
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-gray-400" aria-hidden="true" />
-            <span className="text-gray-400 text-sm">Category:</span>
+            <span className="text-gray-400 text-sm">Genre:</span>
           </div>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by genre">
             {genres.map((genre) => (
@@ -181,7 +181,7 @@ function Library() {
               className="bg-dark-200 text-gray-300 px-4 py-2 rounded-lg border border-white/10 focus:outline-none focus:border-red-500"
             >
               <option value="rating">Top Rated</option>
-              <option value="title">Alphabetical</option>
+              <option value="title">A–Z</option>
             </select>
           </div>
         </div>

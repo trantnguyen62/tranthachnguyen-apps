@@ -238,7 +238,7 @@ function ComicDetail() {
             {/* Progress */}
             {progress > 1 && (
               <div className="mt-6 p-4 glass-effect rounded-xl">
-                <p className="text-sm text-gray-400">Continue reading from page {progress}</p>
+                <p className="text-sm text-gray-400">Continue from panel {progress} of {comic.pages.length}</p>
                 <div
                   className="mt-2 h-2 bg-dark-200 rounded-full overflow-hidden"
                   role="progressbar"

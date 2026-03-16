@@ -118,7 +118,7 @@ function Home() {
               <span className="text-white">Turned Into Comics</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-              News events, awkward moments, and stories you recognize — brought to life one panel at a time.
+              Awkward moments, social slip-ups, and stories you've lived yourself — brought to life one panel at a time.
             </p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link
@@ -199,8 +199,8 @@ function Home() {
             <div className="w-14 h-14 bg-yellow-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Monitor className="w-7 h-7 text-yellow-500" aria-hidden="true" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Two Ways to Read</h3>
-            <p className="text-gray-400">Read panel-by-panel in comic mode or switch to the full text version — every story supports both.</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Comic & Text Versions</h3>
+            <p className="text-gray-400">Scroll through comic panels or read the full written story — every comic ships with both formats side by side.</p>
           </div>
         </div>
       </section>
