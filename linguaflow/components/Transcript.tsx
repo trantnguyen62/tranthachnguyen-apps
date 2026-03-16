@@ -31,7 +31,7 @@ const CopyButton = memo<{ text: string }>(({ text }) => {
     <button
       onClick={handleCopy}
       aria-label={copied ? 'Copied!' : 'Copy message'}
-      className="opacity-30 group-hover:opacity-100 transition-opacity duration-150 w-6 h-6 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-slate-700 focus:opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-500"
+      className="opacity-50 group-hover:opacity-100 transition-opacity duration-150 w-6 h-6 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-slate-700 focus:opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-500"
     >
       {copied ? (
         <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -66,7 +66,7 @@ const Transcript = memo<Props>(({ messages }) => {
           <p className="text-sm font-medium text-slate-400">No messages yet</p>
           <p className="text-xs text-slate-500 leading-relaxed">Start a conversation and your dialogue<br />will appear here in real time.</p>
         </div>
-        <p className="text-xs text-slate-600 leading-relaxed max-w-[200px]">
+        <p className="text-xs text-slate-500 leading-relaxed max-w-[200px]">
           Tip: mistakes are how you improve — your tutor catches and corrects every one.
         </p>
       </div>
@@ -85,7 +85,7 @@ const Transcript = memo<Props>(({ messages }) => {
             px-4 py-2.5 rounded-2xl text-sm leading-relaxed
             ${msg.role === 'user'
               ? 'bg-blue-600 text-white rounded-br-sm'
-              : 'bg-slate-700/80 text-slate-200 rounded-bl-sm'}
+              : 'bg-slate-700 text-slate-100 rounded-bl-sm'}
           `}>
             {msg.text}
           </div>

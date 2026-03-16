@@ -264,7 +264,7 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
                   placeholder="Ví dụ: Minh, Lan, Hùng..."
                   aria-describedby={error ? 'name-error' : undefined}
                   aria-invalid={!!error}
-                  className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-slate-700 border rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${error ? 'border-red-500 focus:ring-red-500' : 'border-slate-600 focus:ring-blue-500'}`}
                   autoFocus
                 />
                 {error && (

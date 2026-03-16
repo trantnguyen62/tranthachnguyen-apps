@@ -230,7 +230,7 @@ function App() {
                 </span>
               ) : (
                 <span aria-hidden="true" className="flex items-center gap-1.5">
-                  <span className="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
+                  <span className="inline-flex rounded-full h-2 w-2 bg-slate-500"></span>
                   <span className="text-slate-400">Ready</span>
                 </span>
               )}
