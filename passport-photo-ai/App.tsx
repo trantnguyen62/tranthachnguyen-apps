@@ -145,7 +145,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Avoid rejection — free AI checks your passport, visa, or ID photo against official ICAO biometric standards used in 100+ countries. Results in seconds, no sign-up required.<br/>
+            Get your photo approved the first time — free AI checks your passport, visa, or ID photo against official ICAO biometric standards for 100+ countries. Results in seconds, no sign-up required.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
 
@@ -519,7 +519,7 @@ export default function App() {
             Made with <span aria-hidden="true" style={{ color: accentPink }}>♥</span><span style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', borderWidth: 0 }}>love</span> by PassportLens · {CURRENT_YEAR}
           </p>
           <p style={{ marginTop: 8, fontSize: 12 }}>
-            100% private — photos are analyzed instantly and never stored, logged, or shared. Background removal runs entirely in your browser.
+            100% private — photos are analyzed instantly and never saved to disk, logged, or shared with third parties. Background removal runs entirely in your browser.
           </p>
           <p style={{ marginTop: 6, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
             Powered by Google Gemini 2.0 Flash AI. Results are guidance only — verify with your country's official requirements before submitting.
