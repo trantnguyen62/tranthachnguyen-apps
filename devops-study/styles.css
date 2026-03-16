@@ -1119,6 +1119,18 @@ body {
     padding: var(--space-md);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
+    animation: slide-in-up 0.2s ease;
+}
+
+@keyframes slide-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .quiz-feedback.correct {
@@ -1656,6 +1668,12 @@ body {
     color: white;
 }
 
+.command-copy-btn.copied {
+    background: var(--color-success);
+    color: white;
+    transform: scale(1.05);
+}
+
 /* =====================================================
    Codebase Styles
    ===================================================== */
@@ -1792,6 +1810,12 @@ body {
 .codebase-copy-btn:hover {
     background: var(--accent-primary);
     color: white;
+}
+
+.codebase-copy-btn.copied {
+    background: var(--color-success);
+    color: white;
+    transform: scale(1.05);
 }
 
 /* Syntax highlighting */

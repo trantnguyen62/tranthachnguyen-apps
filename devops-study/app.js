@@ -4033,8 +4033,10 @@ function copyCodebase(btn, index) {
         navigator.clipboard.writeText(codebase[index].code).then(() => {
             const originalText = btn.textContent;
             btn.textContent = '✓ Copied!';
+            btn.classList.add('copied');
             setTimeout(() => {
                 btn.textContent = originalText;
+                btn.classList.remove('copied');
             }, 1500);
         }).catch(() => {
             btn.textContent = '✗ Failed';
@@ -4083,8 +4085,10 @@ function copyCommand(event, command) {
     const originalText = btn.textContent;
     navigator.clipboard.writeText(command).then(() => {
         btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
         setTimeout(() => {
             btn.textContent = originalText;
+            btn.classList.remove('copied');
         }, 1500);
     }).catch(() => {
         btn.textContent = '✗ Failed';
