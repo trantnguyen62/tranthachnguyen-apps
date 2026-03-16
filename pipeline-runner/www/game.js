@@ -25,6 +25,15 @@ if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D
 const TWO_PI = Math.PI * 2;
 const DEG_TO_RAD = Math.PI / 180;
 
+// Fisher-Yates shuffle (in-place). Returns the array for convenience.
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+}
+
 // Game Configuration
 const CONFIG = {
     GRAVITY: 0.35,          // Downward acceleration applied each frame (px/frame²)
@@ -224,6 +233,11 @@ const LEARNABLE_CONTENT = {
 };
 
 // DevOps Questions Database
+// Each entry follows the schema:
+//   q    {string}   Question text
+//   a    {string[]} Four answer choices (indices 0–3)
+//   c    {number}   Index into `a` of the correct answer (always 0 before shuffling)
+//   fact {string}   Fun fact shown after the question is answered
 const QUESTIONS = {
     docker: [
         { q: "What command creates a new container from an image?", a: ["docker run", "docker start", "docker create", "docker build"], c: 0, fact: "docker run combines 'create' and 'start' in one command!" },
@@ -464,6 +478,25 @@ function init() {
     game.elFeedback      = document.getElementById('answerFeedback');
     game.elQuestionModal = document.getElementById('questionModal');
     game.elQuestionPanel = document.querySelector('.question-panel');
+    game.elAnswerGrid = document.getElementById('answerGrid');
+
+    // Pre-create 4 answer buttons once and reuse them across questions to avoid
+    // DOM reconstruction (innerHTML reset + element creation) on every question shown.
+    game.elAnswerBtns = Array.from({ length: 4 }, (_, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'answer-btn';
+        const keySpan = document.createElement('span');
+        keySpan.className = 'answer-key';
+        keySpan.setAttribute('aria-hidden', 'true');
+        keySpan.textContent = i + 1;
+        const textSpan = document.createElement('span');
+        textSpan.className = 'answer-text';
+        btn.appendChild(keySpan);
+        btn.appendChild(textSpan);
+        game.elAnswerGrid.appendChild(btn);
+        return btn;
+    });
 
     loadProgress();
     renderTopicButtons();
@@ -535,6 +568,7 @@ function saveProgress() {
         localStorage.setItem('pipeline-runner-learned', game.totalLearned);
     } catch (e) {
         // localStorage unavailable (e.g. private browsing quota exceeded)
+        console.warn('Progress could not be saved:', e);
     }
 }
 
@@ -623,13 +657,9 @@ function initStars() {
 // Cycles through all items without repetition using a pre-shuffled queue.
 function getNextLearnableContent() {
     const content = LEARNABLE_CONTENT[game.selectedTopic];
+    if (!content || content.length === 0) return null;
     if (game.contentQueue.length === 0) {
-        const indices = Array.from({ length: content.length }, (_, i) => i);
-        for (let i = indices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
-        }
-        game.contentQueue = indices;
+        game.contentQueue = shuffleArray(Array.from({ length: content.length }, (_, i) => i));
     }
     return content[game.contentQueue.pop()];
 }
@@ -649,7 +679,7 @@ function setupEventListeners() {
 
         // Focus trap inside question modal
         if (game.questionActive && e.key === 'Tab') {
-            const answerBtns = [...document.querySelectorAll('#answerGrid .answer-btn:not([disabled])')];
+            const answerBtns = game.currentQuestion.btns.filter(btn => !btn.classList.contains('disabled'));
             if (answerBtns.length === 0) return;
             const currentIdx = answerBtns.indexOf(document.activeElement);
             if (e.shiftKey) {
@@ -725,6 +755,7 @@ function showStartScreen() {
     showScreen('startScreen');
 }
 
+// Resets all game state and begins a new run for the currently selected topic.
 function startGame() {
     game.running = true;
     game.paused = false;
@@ -765,11 +796,9 @@ function startGame() {
 
     showScreen('gameScreen');
     hideTipBanner();
-    document.getElementById('questionModal').classList.add('hidden');
+    game.elQuestionModal.classList.add('hidden');
 
-    if (game.animationId) cancelAnimationFrame(game.animationId);
-    if (game.obstacleInterval) clearInterval(game.obstacleInterval);
-
+    stopGameLoops();
     game.obstacleInterval = setInterval(spawnObstacle, CONFIG.OBSTACLE_SPAWN_RATE);
     setTimeout(spawnObstacle, 800);
 
@@ -794,6 +823,8 @@ function gameLoop() {
     game.animationId = requestAnimationFrame(gameLoop);
 }
 
+// Advances physics and game objects by one frame.
+// Called every frame by gameLoop() when the game is not paused.
 function update() {
     game.player.velocity += CONFIG.GRAVITY;
     if (game.player.velocity > CONFIG.TERMINAL_VELOCITY) game.player.velocity = CONFIG.TERMINAL_VELOCITY;
@@ -831,8 +862,7 @@ function update() {
         }
 
         if (obs.x <= -CONFIG.OBSTACLE_WIDTH * 2) {
-            obstacles[i] = obstacles[obstacles.length - 1];
-            obstacles.pop();
+            obstacles.splice(i, 1);
         }
     }
 
@@ -882,6 +912,8 @@ function showLearnedContent(content) {
     showTip(`${content.cmd}: ${content.desc}`);
 }
 
+// Draws the current frame to the canvas: background, stars, pipeline lines,
+// particles, obstacles, floating text labels, and the player sprite.
 function render() {
     const ctx = game.ctx;
 
@@ -921,15 +953,54 @@ function render() {
 
     const obstacles = game.obstacles;
     if (obstacles.length > 0) {
-        // Set shared obstacle state once per frame
+        // Pre-extract shared values to avoid repeated property lookups per obstacle
+        const { topic, obstacleCanvas } = game.topicCache;
+        const gateWidth = CONFIG.OBSTACLE_WIDTH;
+        const gapSize = CONFIG.OBSTACLE_GAP;
+        const capW = gateWidth + 16;
+        const halfGate = gateWidth / 2;
+        const gameWidth = game.width;
+        const gameHeight = game.height;
+
+        // Set shared state once per frame (ctx.font set per-pass below, not per-obstacle)
         ctx.lineWidth = 2;
+        ctx.strokeStyle = topic.color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+
+        // Pass 1: columns, caps, and command text ('bold 11px monospace')
+        ctx.font = 'bold 11px monospace';
         for (let i = 0; i < obstacles.length; i++) {
             const obs = obstacles[i];
-            if (obs.x > game.width) break; // sorted ascending; rest are off-screen right
-            if (obs.x + CONFIG.OBSTACLE_WIDTH < 0) continue; // off-screen left
-            drawObstacle(ctx, obs);
+            if (obs.x > gameWidth) break;
+            if (obs.x + gateWidth < 0) continue;
+            const ox = obs.x;
+            const gapY = obs.gapY;
+            const bottomY = gapY + gapSize;
+            // top column
+            if (gapY > 0) ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, gapY, ox, 0, gateWidth, gapY);
+            // top cap + command text
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(ox - 8, gapY - 35, capW, 35);
+            ctx.strokeRect(ox - 8, gapY - 35, capW, 35);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(obs.content.cmd, ox + halfGate, gapY - 17);
+            // bottom column
+            const bottomH = gameHeight - bottomY;
+            if (bottomH > 0) ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, bottomH, ox, bottomY, gateWidth, bottomH);
+            // bottom cap (icon drawn in pass 2)
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(ox - 8, bottomY, capW, 35);
+            ctx.strokeRect(ox - 8, bottomY, capW, 35);
+        }
+
+        // Pass 2: topic icons ('18px Arial') — font set once for all obstacles
+        ctx.font = '18px Arial';
+        for (let i = 0; i < obstacles.length; i++) {
+            const obs = obstacles[i];
+            if (obs.x > gameWidth) break;
+            if (obs.x + gateWidth < 0) continue;
+            ctx.fillText(topic.icon, obs.x + halfGate, obs.gapY + gapSize + 18);
         }
     }
 
@@ -979,42 +1050,6 @@ function drawPipelineBackground(ctx) {
     ctx.drawImage(game.pipelineCanvas, 0, 0, game.width, game.height);
 }
 
-function drawObstacle(ctx, obs) {
-    const { topic, obstacleCanvas } = game.topicCache;
-    const gateWidth = CONFIG.OBSTACLE_WIDTH;
-    const gateColor = topic.color;
-
-    // Top gate - blit from prerendered obstacle canvas
-    if (obs.gapY > 0) {
-        ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, obs.gapY, obs.x, 0, gateWidth, obs.gapY);
-    }
-
-    // Top gate cap with command
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(obs.x - 8, obs.gapY - 35, gateWidth + 16, 35);
-    ctx.strokeStyle = gateColor;
-    ctx.strokeRect(obs.x - 8, obs.gapY - 35, gateWidth + 16, 35);
-
-    // Command text on top gate
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 11px monospace';
-    ctx.fillText(obs.content.cmd, obs.x + gateWidth / 2, obs.gapY - 17);
-
-    // Bottom gate - blit from prerendered obstacle canvas
-    const bottomY = obs.gapY + CONFIG.OBSTACLE_GAP;
-    const bottomH = game.height - bottomY;
-    if (bottomH > 0) {
-        ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, bottomH, obs.x, bottomY, gateWidth, bottomH);
-    }
-
-    // Bottom gate cap with topic icon
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(obs.x - 8, bottomY, gateWidth + 16, 35);
-    ctx.strokeStyle = gateColor;
-    ctx.strokeRect(obs.x - 8, bottomY, gateWidth + 16, 35);
-    ctx.font = '18px Arial';
-    ctx.fillText(topic.icon, obs.x + gateWidth / 2, bottomY + 18);
-}
 
 function drawPlayer(ctx) {
     const p = game.player;
@@ -1044,6 +1079,7 @@ function drawPlayer(ctx) {
     ctx.restore();
 }
 
+// Applies an instant upward velocity impulse (tap/Space). Also spawns trail particles.
 function boost() {
     game.player.velocity = CONFIG.BOOST_FORCE;
     createBoostParticles();
@@ -1064,6 +1100,8 @@ function createBoostParticles() {
     }
 }
 
+// Spawns a new gate obstacle just off the right edge of the screen.
+// The vertical gap position is randomised with a 120 px margin from each edge.
 function spawnObstacle() {
     if (!game.running || game.questionActive) return;
 
@@ -1112,28 +1150,24 @@ function checkCollision() {
 }
 
 // Question System
+
+// Picks the next question from a pre-shuffled queue, shuffles its answers,
+// and displays the question modal. Pauses the game loop until the player answers
+// or the timer expires.
 function showQuestion() {
     const questions = QUESTIONS[game.selectedTopic];
     if (!questions || questions.length === 0) return;
     if (game.questionQueue.length === 0) {
-        const indices = Array.from({ length: questions.length }, (_, i) => i);
-        for (let i = indices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
-        }
-        game.questionQueue = indices;
+        game.questionQueue = shuffleArray(Array.from({ length: questions.length }, (_, i) => i));
     }
     const question = questions[game.questionQueue.pop()];
 
-    const answers = question.a.map((text, originalIndex) => ({ text, originalIndex }));
-    for (let i = answers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [answers[i], answers[j]] = [answers[j], answers[i]];
-    }
+    // Shuffle answer indices to avoid wrapper objects; store plain strings in shuffledAnswers.
+    const indices = shuffleArray([0, 1, 2, 3].slice(0, question.a.length));
+    const correctShuffledIndex = indices.indexOf(question.c);
+    const shuffledAnswers = indices.map(i => question.a[i]);
 
-    const correctShuffledIndex = answers.findIndex(a => a.originalIndex === question.c);
-
-    game.currentQuestion = { ...question, correctIndex: correctShuffledIndex, shuffledAnswers: answers };
+    game.currentQuestion = { ...question, correctIndex: correctShuffledIndex, shuffledAnswers };
     game.questionActive = true;
     game.questionTimer = CONFIG.QUESTION_TIME;
     game.paused = true;
@@ -1143,36 +1177,24 @@ function showQuestion() {
     document.getElementById('questionText').textContent = question.q;
     document.getElementById('questionTimer').textContent = CONFIG.QUESTION_TIME;
 
-    const answerGrid = document.getElementById('answerGrid');
-    const fragment = document.createDocumentFragment();
-
-    answers.forEach((answer, i) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
+    // Reuse pre-created buttons: reset state and update content in place,
+    // avoiding the innerHTML reset + DOM reconstruction that causes reflow.
+    const btns = game.elAnswerBtns;
+    shuffledAnswers.forEach((text, i) => {
+        const btn = btns[i];
         btn.className = 'answer-btn';
-        const keySpan = document.createElement('span');
-        keySpan.className = 'answer-key';
-        keySpan.setAttribute('aria-hidden', 'true');
-        keySpan.textContent = i + 1;
-        const textSpan = document.createElement('span');
-        textSpan.className = 'answer-text';
-        textSpan.textContent = answer.text;
-        btn.appendChild(keySpan);
-        btn.appendChild(textSpan);
-        btn.setAttribute('aria-label', `Option ${i + 1}: ${answer.text}`);
+        btn.removeAttribute('aria-disabled');
+        btn.querySelector('.answer-text').textContent = text;
+        btn.setAttribute('aria-label', `Option ${i + 1}: ${text}`);
         btn.onclick = () => selectAnswer(i);
-        fragment.appendChild(btn);
     });
+    game.currentQuestion.btns = btns;
 
-    answerGrid.innerHTML = '';
-    answerGrid.appendChild(fragment);
-    game.currentQuestion.btns = Array.from(answerGrid.querySelectorAll('.answer-btn'));
-
-    document.getElementById('questionModal').classList.remove('hidden');
+    game.elQuestionModal.classList.remove('hidden');
     startQuestionTimer();
 
     // Move focus to the first answer button for keyboard/screen reader users
-    const firstAnswer = document.querySelector('#answerGrid .answer-btn');
+    const firstAnswer = game.currentQuestion && game.currentQuestion.btns && game.currentQuestion.btns[0];
     if (firstAnswer) firstAnswer.focus();
 }
 
@@ -1188,13 +1210,14 @@ function startQuestionTimer() {
         }
 
         game.questionTimer--;
-        game.elTimer.textContent = game.questionTimer;
-        game.elTimer.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
+        const displayTime = Math.max(0, game.questionTimer);
+        game.elTimer.textContent = displayTime;
+        game.elTimer.setAttribute('aria-label', `${displayTime} seconds remaining`);
         game.elTimer.classList.toggle('timer-urgent', game.questionTimer <= 5);
 
         // Announce only at key thresholds to avoid flooding screen readers
         if (game.questionTimer === 5 || game.questionTimer === 3) {
-            const feedbackEl = document.getElementById('answerFeedback');
+            const feedbackEl = game.elFeedback;
             if (feedbackEl) feedbackEl.textContent = `${game.questionTimer} seconds remaining`;
         }
 
@@ -1204,6 +1227,26 @@ function startQuestionTimer() {
             handleTimeout();
         }
     }, 1000);
+}
+
+// Marks the correct button green and, if wrongIndex is given, the wrong button red.
+// Shared by checkAnswer and handleTimeout to avoid duplicated DOM update logic.
+function markAnswerResult(btns, q, wrongIndex) {
+    if (!btns) return;
+    const correctBtn = btns[q.correctIndex];
+    if (correctBtn) {
+        correctBtn.classList.add('correct');
+        correctBtn.setAttribute('aria-label',
+            `Correct answer: ${q.shuffledAnswers[q.correctIndex]}`);
+    }
+    if (wrongIndex != null && wrongIndex !== q.correctIndex) {
+        const wrongBtn = btns[wrongIndex];
+        if (wrongBtn) {
+            wrongBtn.classList.add('incorrect');
+            wrongBtn.setAttribute('aria-label',
+                `Wrong answer: ${q.shuffledAnswers[wrongIndex]}`);
+        }
+    }
 }
 
 // Handles answer selection: disables all buttons and highlights the chosen one,
@@ -1223,24 +1266,19 @@ function selectAnswer(index) {
     setTimeout(() => checkAnswer(index), 300);
 }
 
+// Evaluates the selected answer index. Correct: +5 score, +1 life, streak++.
+// Wrong or timeout: streak resets. Schedules closeQuestion after 1.2 s.
 function checkAnswer(index) {
     const answerCount = game.currentQuestion.shuffledAnswers.length;
     if (index < 0 || index >= answerCount) return;
     const correct = index === game.currentQuestion.correctIndex;
     const btns = game.currentQuestion.btns;
 
-    btns[game.currentQuestion.correctIndex].classList.add('correct');
-    btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
-        `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
-    if (!correct) {
-        btns[index].classList.add('incorrect');
-        btns[index].setAttribute('aria-label',
-            `Wrong answer: ${game.currentQuestion.shuffledAnswers[index].text}`);
-    }
+    markAnswerResult(btns, game.currentQuestion, correct ? null : index);
 
-    const feedbackEl = document.getElementById('answerFeedback');
+    const feedbackEl = game.elFeedback;
     if (feedbackEl) {
-        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
+        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex];
         feedbackEl.textContent = correct
             ? 'Correct! ✅'
             : `Incorrect — the correct answer is: ${correctText}`;
@@ -1261,7 +1299,7 @@ function checkAnswer(index) {
         // Award a life for correct answer!
         game.lives++;
         game.elLives.textContent = game.lives;
-        showTip(`✅ Correct!${game.streak > 1 ? ` 🔥 ${game.streak}-answer streak!` : ''} +1 life (${game.lives} total).`);
+        showTip(`✅ Correct! ${game.streak > 1 ? `🔥 ${game.streak}-answer streak! ` : ''}+1 life (${game.lives} total).`);
 
         game.lastLearnedFact = game.currentQuestion.fact || "Great job! Keep learning!";
     } else {
@@ -1279,7 +1317,7 @@ function handleTimeout() {
     game.elStreak.textContent = '0';
 
     // Shake the panel to signal time's up
-    const panel = document.querySelector('.question-panel');
+    const panel = game.elQuestionPanel;
     if (panel) {
         panel.classList.remove('modal-shake');
         void panel.offsetWidth;
@@ -1287,17 +1325,12 @@ function handleTimeout() {
     }
 
     const btns = game.currentQuestion && game.currentQuestion.btns;
-    const correctBtn = btns && btns[game.currentQuestion.correctIndex];
-    if (correctBtn) {
-        correctBtn.classList.add('correct');
-        correctBtn.setAttribute('aria-label',
-            `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
-    }
+    markAnswerResult(btns, game.currentQuestion, null);
 
-    const feedbackEl = document.getElementById('answerFeedback');
+    const feedbackEl = game.elFeedback;
     if (feedbackEl) {
-        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
-        feedbackEl.textContent = `⏰ Time's up! The correct answer is: ${correctText}`;
+        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex];
+        feedbackEl.textContent = `⏰ Time's up! Correct answer: ${correctText}.`;
     }
 
     game.lastLearnedFact = game.currentQuestion.fact || "Time's up! Try to answer faster.";
@@ -1313,7 +1346,7 @@ function closeQuestion() {
     game.questionActive = false;
     game.paused = false;
     game.currentQuestion = null;
-    document.getElementById('questionModal').classList.add('hidden');
+    game.elQuestionModal.classList.add('hidden');
     // Restart the render loop that was suspended during the question
     if (game.running) {
         gameLoop();
@@ -1352,17 +1385,24 @@ function hideTipBanner() {
 }
 
 // Game Over
+
+// Ends the run: stops loops, saves progress, computes rank, and shows the
+// game-over screen after a 500 ms delay (cancelled if the player uses an extra life).
 function gameOver() {
     game.running = false;
 
-    if (game.animationId) cancelAnimationFrame(game.animationId);
-    if (game.obstacleInterval) clearInterval(game.obstacleInterval);
-
+    stopGameLoops();
     saveProgress();
 
-    document.getElementById('finalScore').textContent = game.score;
-    document.getElementById('questionsCorrect').textContent = `${game.correctAnswers}/${game.questionsAnswered}`;
-    document.getElementById('bestStreak').textContent = game.bestStreak;
+    const elFinalScore = document.getElementById('finalScore');
+    const elQuestionsCorrect = document.getElementById('questionsCorrect');
+    const elBestStreak = document.getElementById('bestStreak');
+    elFinalScore.textContent = game.score;
+    elFinalScore.setAttribute('aria-label', `Gates Passed: ${game.score}`);
+    elQuestionsCorrect.textContent = `${game.correctAnswers}/${game.questionsAnswered}`;
+    elQuestionsCorrect.setAttribute('aria-label', `Correct Answers: ${game.correctAnswers} of ${game.questionsAnswered}`);
+    elBestStreak.textContent = game.bestStreak;
+    elBestStreak.setAttribute('aria-label', `Top Streak: ${game.bestStreak}`);
 
     const rank = [...RANKS].reverse().find(r => game.score >= r.minScore) || RANKS[0];
     document.getElementById('rankIcon').textContent = rank.icon;
@@ -1373,7 +1413,7 @@ function gameOver() {
         const randomLearned = game.learnedItems[Math.floor(Math.random() * game.learnedItems.length)];
         document.getElementById('factText').textContent = `${randomLearned.cmd}: ${randomLearned.desc}`;
     } else {
-        document.getElementById('factText').textContent = game.lastLearnedFact || "Answer quiz questions during gameplay to learn DevOps commands and concepts!";
+        document.getElementById('factText').textContent = game.lastLearnedFact || "Keep playing to unlock DevOps knowledge — each quiz answer teaches a real command or concept.";
     }
 
     // Store the timeout so it can be cancelled if user continues with extra life
@@ -1390,7 +1430,7 @@ function useLife() {
     game.elLives.textContent = game.lives;
 
     game.respawnInvincible = true;
-    showTip(`❤️ Used 1 life! ${game.lives} remaining — get correct answers to earn more.`);
+    showTip(`❤️ Life lost! ${game.lives} remaining — answer quiz questions correctly to earn more.`);
 
     // Reset player position to safe spot
     game.player.y = game.height / 2;
@@ -1408,24 +1448,32 @@ function useLife() {
     }, 1500);
 }
 
+// Stops the rAF loop and obstacle spawn interval. Safe to call when either is already stopped.
+function stopGameLoops() {
+    if (game.animationId) {
+        cancelAnimationFrame(game.animationId);
+        game.animationId = null;
+    }
+    if (game.obstacleInterval) {
+        clearInterval(game.obstacleInterval);
+        game.obstacleInterval = null;
+    }
+}
+
 // Utility functions
-function lightenColor(hex, percent) {
+
+// Adjusts a hex color's brightness. Positive percent lightens, negative darkens.
+function adjustColor(hex, percent) {
     const num = parseInt(hex.replace('#', ''), 16);
     const amt = Math.round(2.55 * percent);
-    const R = Math.min(255, (num >> 16) + amt);
-    const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
-    const B = Math.min(255, (num & 0x0000FF) + amt);
+    const R = Math.min(255, Math.max(0, (num >> 16) + amt));
+    const G = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amt));
+    const B = Math.min(255, Math.max(0, (num & 0x0000FF) + amt));
     return `rgb(${R}, ${G}, ${B})`;
 }
 
-function darkenColor(hex, percent) {
-    const num = parseInt(hex.replace('#', ''), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = Math.max(0, (num >> 16) - amt);
-    const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
-    const B = Math.max(0, (num & 0x0000FF) - amt);
-    return `rgb(${R}, ${G}, ${B})`;
-}
+function lightenColor(hex, percent) { return adjustColor(hex, percent); }
+function darkenColor(hex, percent)  { return adjustColor(hex, -percent); }
 
 // Rebuilds the topic-specific offscreen canvases for the player sprite and
 // obstacle columns. Call this whenever the selected topic or canvas size changes.
@@ -1539,8 +1587,10 @@ const AdManager = {
         modal.classList.remove('hidden');
         this.remainingTime = 5;
         timerDisplay.textContent = this.remainingTime;
+        timerDisplay.setAttribute('aria-label', `Ad timer: ${this.remainingTime} seconds remaining`);
         skipBtn.disabled = true;
         skipBtn.textContent = `Skip in ${this.remainingTime}s`;
+        skipBtn.setAttribute('aria-label', `Skip ad, available in ${this.remainingTime} seconds`);
 
         // Move focus into modal for keyboard/screen reader users
         const heading = document.getElementById('rewardedAdHeading');
@@ -1550,12 +1600,15 @@ const AdManager = {
         this.rewardedAdTimer = setInterval(() => {
             this.remainingTime--;
             timerDisplay.textContent = this.remainingTime;
+            timerDisplay.setAttribute('aria-label', `Ad timer: ${this.remainingTime} seconds remaining`);
             skipBtn.textContent = `Skip in ${this.remainingTime}s`;
+            skipBtn.setAttribute('aria-label', `Skip ad, available in ${this.remainingTime} seconds`);
 
             if (this.remainingTime <= 0) {
                 clearInterval(this.rewardedAdTimer);
                 skipBtn.disabled = false;
                 skipBtn.textContent = '✓ Claim Reward';
+                skipBtn.removeAttribute('aria-label');
                 skipBtn.focus();
             }
         }, 1000);
@@ -1581,9 +1634,11 @@ const AdManager = {
 
         // Disable the watch ad button
         const watchAdBtn = document.getElementById('watchAdBtn');
-        watchAdBtn.classList.add('disabled');
-        watchAdBtn.textContent = '✓ Reward Claimed';
-        watchAdBtn.onclick = null;
+        if (watchAdBtn) {
+            watchAdBtn.classList.add('disabled');
+            watchAdBtn.textContent = '✓ Reward Claimed';
+            watchAdBtn.onclick = null;
+        }
 
         // Continue the game
         this.continueGame();
@@ -1607,14 +1662,7 @@ const AdManager = {
         }
 
         // Cancel any existing animation/intervals first
-        if (game.animationId) {
-            cancelAnimationFrame(game.animationId);
-            game.animationId = null;
-        }
-        if (game.obstacleInterval) {
-            clearInterval(game.obstacleInterval);
-            game.obstacleInterval = null;
-        }
+        stopGameLoops();
 
         // Set game state - USE PAUSED STATE until player taps
         game.running = true;
@@ -1640,7 +1688,7 @@ const AdManager = {
         gameLoop();
 
         // Show "Tap to Continue" tip that stays until tap
-        showTip('Tap or press Space to resume — 3s of invincibility incoming!');
+        showTip('Tap or press Space to resume — 3 seconds of invincibility ahead!');
 
         // Set up one-time tap handler to resume gameplay
         const resumeHandler = (e) => {
@@ -1657,7 +1705,7 @@ const AdManager = {
             game.respawnInvincibleTimeout = setTimeout(() => {
                 game.respawnInvincible = false;
                 game.respawnInvincibleTimeout = null;
-                showTip('⚠️ Invincibility ended — eyes on the pipeline!');
+                showTip('⚠️ Invincibility ended — stay alert!');
             }, 3000);
 
             // Unpause the game

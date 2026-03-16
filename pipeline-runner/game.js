@@ -953,15 +953,54 @@ function render() {
 
     const obstacles = game.obstacles;
     if (obstacles.length > 0) {
-        // Set shared obstacle state once per frame
+        // Pre-extract shared values to avoid repeated property lookups per obstacle
+        const { topic, obstacleCanvas } = game.topicCache;
+        const gateWidth = CONFIG.OBSTACLE_WIDTH;
+        const gapSize = CONFIG.OBSTACLE_GAP;
+        const capW = gateWidth + 16;
+        const halfGate = gateWidth / 2;
+        const gameWidth = game.width;
+        const gameHeight = game.height;
+
+        // Set shared state once per frame (ctx.font set per-pass below, not per-obstacle)
         ctx.lineWidth = 2;
+        ctx.strokeStyle = topic.color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+
+        // Pass 1: columns, caps, and command text ('bold 11px monospace')
+        ctx.font = 'bold 11px monospace';
         for (let i = 0; i < obstacles.length; i++) {
             const obs = obstacles[i];
-            if (obs.x > game.width) break; // sorted ascending; rest are off-screen right
-            if (obs.x + CONFIG.OBSTACLE_WIDTH < 0) continue; // off-screen left
-            drawObstacle(ctx, obs);
+            if (obs.x > gameWidth) break;
+            if (obs.x + gateWidth < 0) continue;
+            const ox = obs.x;
+            const gapY = obs.gapY;
+            const bottomY = gapY + gapSize;
+            // top column
+            if (gapY > 0) ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, gapY, ox, 0, gateWidth, gapY);
+            // top cap + command text
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(ox - 8, gapY - 35, capW, 35);
+            ctx.strokeRect(ox - 8, gapY - 35, capW, 35);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(obs.content.cmd, ox + halfGate, gapY - 17);
+            // bottom column
+            const bottomH = gameHeight - bottomY;
+            if (bottomH > 0) ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, bottomH, ox, bottomY, gateWidth, bottomH);
+            // bottom cap (icon drawn in pass 2)
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(ox - 8, bottomY, capW, 35);
+            ctx.strokeRect(ox - 8, bottomY, capW, 35);
+        }
+
+        // Pass 2: topic icons ('18px Arial') — font set once for all obstacles
+        ctx.font = '18px Arial';
+        for (let i = 0; i < obstacles.length; i++) {
+            const obs = obstacles[i];
+            if (obs.x > gameWidth) break;
+            if (obs.x + gateWidth < 0) continue;
+            ctx.fillText(topic.icon, obs.x + halfGate, obs.gapY + gapSize + 18);
         }
     }
 
@@ -1011,41 +1050,6 @@ function drawPipelineBackground(ctx) {
     ctx.drawImage(game.pipelineCanvas, 0, 0, game.width, game.height);
 }
 
-function drawObstacle(ctx, obs) {
-    const { topic, obstacleCanvas } = game.topicCache;
-    const gateWidth = CONFIG.OBSTACLE_WIDTH;
-    const gateColor = topic.color;
-
-    // Top gate - blit from prerendered obstacle canvas
-    if (obs.gapY > 0) {
-        ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, obs.gapY, obs.x, 0, gateWidth, obs.gapY);
-    }
-
-    // Top gate cap with command
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(obs.x - 8, obs.gapY - 35, gateWidth + 16, 35);
-    ctx.strokeStyle = gateColor;
-    ctx.strokeRect(obs.x - 8, obs.gapY - 35, gateWidth + 16, 35);
-
-    // Command text on top gate
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 11px monospace';
-    ctx.fillText(obs.content.cmd, obs.x + gateWidth / 2, obs.gapY - 17);
-
-    // Bottom gate - blit from prerendered obstacle canvas
-    const bottomY = obs.gapY + CONFIG.OBSTACLE_GAP;
-    const bottomH = game.height - bottomY;
-    if (bottomH > 0) {
-        ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, bottomH, obs.x, bottomY, gateWidth, bottomH);
-    }
-
-    // Bottom gate cap with topic icon (strokeStyle still set to gateColor from top gate)
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(obs.x - 8, bottomY, gateWidth + 16, 35);
-    ctx.strokeRect(obs.x - 8, bottomY, gateWidth + 16, 35);
-    ctx.font = '18px Arial';
-    ctx.fillText(topic.icon, obs.x + gateWidth / 2, bottomY + 18);
-}
 
 function drawPlayer(ctx) {
     const p = game.player;
