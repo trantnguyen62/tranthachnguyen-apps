@@ -166,6 +166,7 @@ app.get('/api/users/search', async (req, res) => {
 
     if (user) {
       logger.info('User found', { name: user.name, id: user.id });
+      res.setHeader('Cache-Control', 'private, max-age=10');
       res.json({ user });
     } else {
       res.json({ user: null });
@@ -187,6 +188,7 @@ app.get('/api/users/:id', async (req, res) => {
     const user = data.users[id];
 
     if (user) {
+      res.setHeader('Cache-Control', 'private, max-age=10');
       res.json({ user });
     } else {
       res.status(404).json({ error: 'User not found' });

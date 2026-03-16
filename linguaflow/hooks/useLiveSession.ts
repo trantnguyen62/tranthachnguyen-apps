@@ -40,10 +40,14 @@ import { MODEL_NAME, TOPIC_NAMES } from '../constants';
  */
 export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: UserProfile | null) => {
   const [connectionState, setConnectionState] = useState<ConnectionState>(ConnectionState.DISCONNECTED);
+
+  // Keep ref in sync so connect() guard doesn't need connectionState as a dep
+  useEffect(() => { connectionStateRef.current = connectionState; }, [connectionState]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   // Refs for audio context and session management
+  const connectionStateRef = useRef<ConnectionState>(ConnectionState.DISCONNECTED);
   const audioContextsRef = useRef<{ input: AudioContext | null; output: AudioContext | null }>({ input: null, output: null });
   const sessionPromiseRef = useRef<Promise<any> | null>(null);
   const messageCounterRef = useRef(0);
@@ -114,7 +118,7 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
   }, []);
 
   const connect = useCallback(async () => {
-    if (connectionState === ConnectionState.CONNECTED || connectionState === ConnectionState.CONNECTING) return;
+    if (connectionStateRef.current === ConnectionState.CONNECTED || connectionStateRef.current === ConnectionState.CONNECTING) return;
 
     setConnectionState(ConnectionState.CONNECTING);
     setError(null);
@@ -389,7 +393,7 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
       setConnectionState(ConnectionState.ERROR);
       disconnect();
     }
-  }, [activeLanguage, userProfile, connectionState, disconnect]);
+  }, [activeLanguage, userProfile, disconnect]);
 
   useEffect(() => {
     // Cleanup on unmount

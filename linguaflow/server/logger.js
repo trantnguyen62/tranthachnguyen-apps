@@ -17,8 +17,11 @@ const LOG_LEVELS = {
 
 class Logger {
     constructor() {
-        this.logs = [];
         this.maxLogs = 1000; // Keep last 1000 logs in memory
+        // Ring buffer: O(1) writes, no shifting
+        this._buf = new Array(this.maxLogs);
+        this._head = 0; // next write index
+        this._size = 0; // number of stored entries
     }
 
     /**
@@ -49,11 +52,20 @@ class Logger {
                 console.log(prefix, message, metadata);
         }
 
-        // Store in memory (circular buffer)
-        this.logs.push(logEntry);
-        if (this.logs.length > this.maxLogs) {
-            this.logs.shift();
+        // Store in ring buffer — O(1), no array shifting
+        this._buf[this._head] = logEntry;
+        this._head = (this._head + 1) % this.maxLogs;
+        if (this._size < this.maxLogs) this._size++;
+    }
+
+    /** Iterates entries oldest-first, newest-last. */
+    _iterate() {
+        const entries = [];
+        const start = this._size < this.maxLogs ? 0 : this._head;
+        for (let i = 0; i < this._size; i++) {
+            entries.push(this._buf[(start + i) % this.maxLogs]);
         }
+        return entries;
     }
 
     info(message, metadata) {
@@ -74,14 +86,13 @@ class Logger {
 
     /** Returns the most recent `limit` SECURITY-level log entries. */
     getSecurityLogs(limit = 100) {
-        return this.logs
-            .filter(log => log.level === LOG_LEVELS.SECURITY)
-            .slice(-limit);
+        const all = this._iterate().filter(log => log.level === LOG_LEVELS.SECURITY);
+        return all.slice(-limit);
     }
 
     /** Returns the most recent `limit` log entries across all levels. */
     getRecentLogs(limit = 100) {
-        return this.logs.slice(-limit);
+        return this._iterate().slice(-limit);
     }
 }
 
