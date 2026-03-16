@@ -1031,10 +1031,9 @@ function drawObstacle(ctx, obs) {
         ctx.drawImage(obstacleCanvas, 0, 0, gateWidth, bottomH, obs.x, bottomY, gateWidth, bottomH);
     }
 
-    // Bottom gate cap with topic icon
+    // Bottom gate cap with topic icon (strokeStyle still set to gateColor from top gate)
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(obs.x - 8, bottomY, gateWidth + 16, 35);
-    ctx.strokeStyle = gateColor;
     ctx.strokeRect(obs.x - 8, bottomY, gateWidth + 16, 35);
     ctx.font = '18px Arial';
     ctx.fillText(topic.icon, obs.x + gateWidth / 2, bottomY + 18);
@@ -1144,11 +1143,12 @@ function showQuestion() {
     }
     const question = questions[game.questionQueue.pop()];
 
-    const answers = shuffleArray(question.a.map((text, originalIndex) => ({ text, originalIndex })));
+    // Shuffle answer indices to avoid wrapper objects; store plain strings in shuffledAnswers.
+    const indices = shuffleArray([0, 1, 2, 3].slice(0, question.a.length));
+    const correctShuffledIndex = indices.indexOf(question.c);
+    const shuffledAnswers = indices.map(i => question.a[i]);
 
-    const correctShuffledIndex = answers.findIndex(a => a.originalIndex === question.c);
-
-    game.currentQuestion = { ...question, correctIndex: correctShuffledIndex, shuffledAnswers: answers };
+    game.currentQuestion = { ...question, correctIndex: correctShuffledIndex, shuffledAnswers };
     game.questionActive = true;
     game.questionTimer = CONFIG.QUESTION_TIME;
     game.paused = true;
@@ -1161,12 +1161,12 @@ function showQuestion() {
     // Reuse pre-created buttons: reset state and update content in place,
     // avoiding the innerHTML reset + DOM reconstruction that causes reflow.
     const btns = game.elAnswerBtns;
-    answers.forEach((answer, i) => {
+    shuffledAnswers.forEach((text, i) => {
         const btn = btns[i];
         btn.className = 'answer-btn';
         btn.removeAttribute('aria-disabled');
-        btn.querySelector('.answer-text').textContent = answer.text;
-        btn.setAttribute('aria-label', `Option ${i + 1}: ${answer.text}`);
+        btn.querySelector('.answer-text').textContent = text;
+        btn.setAttribute('aria-label', `Option ${i + 1}: ${text}`);
         btn.onclick = () => selectAnswer(i);
     });
     game.currentQuestion.btns = btns;
@@ -1217,14 +1217,14 @@ function markAnswerResult(btns, q, wrongIndex) {
     if (correctBtn) {
         correctBtn.classList.add('correct');
         correctBtn.setAttribute('aria-label',
-            `Correct answer: ${q.shuffledAnswers[q.correctIndex].text}`);
+            `Correct answer: ${q.shuffledAnswers[q.correctIndex]}`);
     }
     if (wrongIndex != null && wrongIndex !== q.correctIndex) {
         const wrongBtn = btns[wrongIndex];
         if (wrongBtn) {
             wrongBtn.classList.add('incorrect');
             wrongBtn.setAttribute('aria-label',
-                `Wrong answer: ${q.shuffledAnswers[wrongIndex].text}`);
+                `Wrong answer: ${q.shuffledAnswers[wrongIndex]}`);
         }
     }
 }
@@ -1256,7 +1256,7 @@ function checkAnswer(index) {
 
     const feedbackEl = game.elFeedback;
     if (feedbackEl) {
-        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
+        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex];
         feedbackEl.textContent = correct
             ? 'Correct! ✅'
             : `Incorrect — the correct answer is: ${correctText}`;
@@ -1307,7 +1307,7 @@ function handleTimeout() {
 
     const feedbackEl = game.elFeedback;
     if (feedbackEl) {
-        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text;
+        const correctText = game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex];
         feedbackEl.textContent = `⏰ Time's up! Correct answer: ${correctText}.`;
     }
 
