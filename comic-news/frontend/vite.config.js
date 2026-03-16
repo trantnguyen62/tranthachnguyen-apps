@@ -16,6 +16,7 @@ export default defineConfig({
   },
   build: {
     target: 'es2020',
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
         // Split vendor and icon libraries into separate chunks so browsers

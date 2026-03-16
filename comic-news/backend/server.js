@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5187;
 
 const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://comic-news.tranthachnguyen.com';
 app.set('trust proxy', 1);
-app.use(compression({ level: 9 }));
+app.use(compression({ level: 6 }));
 app.use(cors({ origin: allowedOrigin, optionsSuccessStatus: 200 }));
 app.use(express.json({ limit: '10kb' }));
 
@@ -883,6 +883,10 @@ app.get('*', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Comic News running on http://localhost:${PORT}`);
 });
+// Keep TCP connections alive long enough to cover parallel API requests on page load.
+// headersTimeout must exceed keepAliveTimeout to avoid race conditions.
+server.keepAliveTimeout = 65_000;
+server.headersTimeout = 66_000;
