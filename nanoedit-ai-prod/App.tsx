@@ -276,8 +276,10 @@ const App: React.FC = () => {
             <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white shadow-sm" aria-hidden="true">
               <Sparkles className="w-5 h-5" />
             </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-brand-700 to-brand-500 bg-clip-text text-transparent">
-              NanoEdit AI
+            <h1 className="text-xl font-bold">
+              <a href="/" aria-label="NanoEdit AI — Home" className="bg-gradient-to-r from-brand-700 to-brand-500 bg-clip-text text-transparent hover:opacity-90 transition-opacity">
+                NanoEdit AI
+              </a>
             </h1>
           </div>
           <div className="flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
