@@ -1339,6 +1339,8 @@ function checkAnswer(index) {
 }
 
 function handleTimeout() {
+    if (!game.currentQuestion || game.currentQuestion.answered) return;
+    game.currentQuestion.answered = true;
     game.questionsAnswered++;
     game.streak = 0;
     game.elStreak.textContent = '0';
@@ -1720,14 +1722,16 @@ const AdManager = {
         // Show "Tap to Continue" tip that stays until tap
         showTip('Tap or press Space to resume — 3 seconds of invincibility ahead!');
 
-        // Set up one-time tap handler to resume gameplay
+        // Set up one-time handler to resume gameplay (click, touch, or Space key)
         const resumeHandler = (e) => {
             if (!game.running || !game.paused) return;
+            if (e.type === 'keydown' && e.code !== 'Space') return;
 
             // Remove listeners immediately to prevent double-fire on touch devices
             // (touchstart and click both fire on a single tap)
             game.canvas.removeEventListener('click', resumeHandler);
             game.canvas.removeEventListener('touchstart', resumeHandler);
+            document.removeEventListener('keydown', resumeHandler);
 
             // Enable invincibility for 3 seconds (longer to give player time)
             game.respawnInvincible = true;
@@ -1757,6 +1761,7 @@ const AdManager = {
 
         game.canvas.addEventListener('click', resumeHandler);
         game.canvas.addEventListener('touchstart', resumeHandler);
+        document.addEventListener('keydown', resumeHandler);
     },
 
     // Reset for new game
