@@ -523,6 +523,11 @@ function init() {
     });
 }
 
+/**
+ * Post a message to the ARIA live region so screen readers announce it.
+ * Clears the element first so repeated identical messages still trigger re-announcement.
+ * @param {string} message - Human-readable text to announce.
+ */
 function announce(message) {
     if (!domCache.ariaAnnouncer) return;
     // Clear first so repeated messages re-trigger screen readers
@@ -532,11 +537,19 @@ function announce(message) {
     });
 }
 
+/**
+ * Read the persisted high score from localStorage and update the menu display.
+ * Falls back to 0 if no value has been stored yet.
+ */
 function loadHighScore() {
     game.highScore = parseInt(localStorage.getItem('devops-defender-highscore') || '0', 10) || 0;
     if (domCache.menuHighScore) domCache.menuHighScore.textContent = game.highScore;
 }
 
+/**
+ * Persist the current score if it beats the stored high score.
+ * @returns {boolean} True if a new high score was recorded.
+ */
 function saveHighScore() {
     if (game.score > game.highScore) {
         game.highScore = game.score;
@@ -546,6 +559,13 @@ function saveHighScore() {
     return false;
 }
 
+/**
+ * Wire up all DOM event listeners for the game.
+ * Uses programmatic addEventListener instead of inline onclick attributes
+ * to satisfy the Content Security Policy (no unsafe-inline scripts).
+ * Also handles keyboard input (movement, shooting, pause, answer selection),
+ * window resize debouncing, and auto-pause on tab visibility change.
+ */
 function setupEventListeners() {
     // Button handlers (replaces inline onclick attributes for CSP compliance)
     document.getElementById('globalMenuBtn').addEventListener('click', togglePause);
@@ -606,6 +626,10 @@ function setupEventListeners() {
     });
 }
 
+/**
+ * Resize the canvas to fill the viewport and recompute background draw dimensions.
+ * Called on init and debounced on every window resize event.
+ */
 function resizeCanvas() {
     game.canvas.width = window.innerWidth;
     game.canvas.height = window.innerHeight;
@@ -619,6 +643,11 @@ function resizeCanvas() {
     }
 }
 
+/**
+ * Populate the topic-selection screen with a card for each entry in TOPICS.
+ * Each card is keyboard-accessible (role="button", tabindex="0") and launches
+ * practice mode for the corresponding topic when activated.
+ */
 function renderTopicGrid() {
     const grid = document.getElementById('topicGrid');
     grid.replaceChildren();
@@ -654,6 +683,10 @@ function renderTopicGrid() {
 }
 
 // Screen management
+/**
+ * Hide every screen element and show only the one with the given id.
+ * @param {string} screenId - The id of the screen element to reveal.
+ */
 function showScreen(screenId) {
     domCache.screens.forEach(s => s.classList.add('hidden'));
     document.getElementById(screenId).classList.remove('hidden');
@@ -720,6 +753,10 @@ function startGame(mode, topicId = null) {
     setTimeout(() => spawnWave(), 1000);
 }
 
+/**
+ * Dismiss all in-game overlays (pause menu, game over, level complete, question panel).
+ * Called at the start of each game session to reset overlay state.
+ */
 function hideAllOverlays() {
     domCache.pauseMenu.classList.add('hidden');
     domCache.gameOver.classList.add('hidden');
@@ -743,6 +780,15 @@ function gameLoop() {
     game.animationId = requestAnimationFrame(gameLoop);
 }
 
+/**
+ * Advance the game simulation by one frame.
+ * Handles: star parallax scrolling, player movement (Arrow/WASD),
+ * enemy movement and proximity-based question triggers,
+ * projectile movement and hit detection (AABB collision),
+ * particle physics (gravity + fade), powerup collection,
+ * question timer countdown, and screen-shake decay.
+ * Movement is frozen while a question is active.
+ */
 function update() {
     // Update stars (parallax background)
     game.stars.forEach(star => {
@@ -872,6 +918,13 @@ function update() {
     }
 }
 
+/**
+ * Draw the current frame to the canvas.
+ * Render order (back to front): clear → background image → stars →
+ * particles → powerups → enemies → enemy icons → projectiles → player.
+ * A random translation is applied before drawing if game.shake > 0,
+ * then restored with ctx.restore() after all elements are drawn.
+ */
 function render() {
     const ctx = game.ctx;
 
@@ -973,6 +1026,12 @@ function render() {
     ctx.restore(); // Restore after shake
 }
 
+/**
+ * Draw the player ship at its current position.
+ * Uses the preloaded sprite when available; falls back to a code-drawn
+ * triangle ship with engine glow if the image failed to load.
+ * Shield strength is visualised as a semi-transparent arc overlay.
+ */
 function drawPlayer() {
     const ctx = game.ctx;
     const p = game.player;
@@ -1049,6 +1108,12 @@ function drawPlayer() {
     ctx.restore();
 }
 
+/**
+ * Draw a single enemy ship at its current position.
+ * Uses the preloaded sprite (rotated 180° so it faces downward) when available;
+ * falls back to a code-drawn inverted triangle with the topic's accent colour.
+ * @param {object} enemy - Enemy state object from game.enemies.
+ */
 function drawEnemy(enemy) {
     const ctx = game.ctx;
 
@@ -1173,6 +1238,12 @@ function selectAnswer(index) {
     setTimeout(() => checkAnswer(index), 300);
 }
 
+/**
+ * Evaluate the player's answer selection and route to the correct/wrong handler.
+ * Highlights the correct button (and the wrong one if applicable), increments
+ * the answered counter, shows the explanation text, and schedules closeQuestion().
+ * @param {number} index - Shuffled answer index that was selected.
+ */
 function checkAnswer(index) {
     const correct = index === game.currentQuestion.correctIndex;
     const btns = domCache.answerBtns;
@@ -1242,6 +1313,9 @@ function handleCorrectAnswer() {
     // playSound('correct');
 }
 
+/**
+ * Reset streak/multiplier and apply damage when the player picks the wrong answer.
+ */
 function handleWrongAnswer() {
     game.streak = 0;
     game.multiplier = 1;
@@ -1252,6 +1326,10 @@ function handleWrongAnswer() {
     updateHUD();
 }
 
+/**
+ * Handle question timer expiry: reset streak/multiplier, apply timeout damage,
+ * reveal the correct answer, show the explanation, and schedule closeQuestion().
+ */
 function handleTimeout() {
     game.questionsAnswered++;
     game.streak = 0;
@@ -1280,6 +1358,10 @@ function handleTimeout() {
     updateHUD();
 }
 
+/**
+ * Hide the question panel and clear active-question state so the game loop
+ * resumes normal movement and shooting.
+ */
 function closeQuestion() {
     game.questionActive = false;
     game.currentQuestion = null;
@@ -1299,6 +1381,12 @@ function pushParticle(p) {
     if (game.particles.length < CONFIG.MAX_PARTICLES) game.particles.push(p);
 }
 
+/**
+ * Remove an enemy after a question interaction (correct or wrong answer / timeout).
+ * Spawns an explosion particle burst, optionally drops a powerup (20% chance),
+ * and triggers completeWave() if no enemies remain.
+ * @param {object} enemy - The enemy object to remove.
+ */
 function destroyEnemy(enemy) {
     // Create explosion particles
     for (let i = 0; i < 20; i++) {
@@ -1328,6 +1416,12 @@ function destroyEnemy(enemy) {
     }
 }
 
+/**
+ * Reduce player health by amount, with shield absorbing damage first.
+ * Triggers a screen-shake, a CSS damage-flash overlay, and red hit particles.
+ * Calls gameOver() when health reaches zero.
+ * @param {number} amount - Raw damage points before shield mitigation.
+ */
 function takeDamage(amount) {
     // Shield absorbs damage first
     if (game.player.shield > 0) {
@@ -1366,6 +1460,12 @@ function takeDamage(amount) {
     }
 }
 
+/**
+ * Drop a random powerup token at the given position.
+ * Type is either 'health' or 'shield', chosen with equal probability.
+ * @param {number} x - Horizontal spawn position in canvas pixels.
+ * @param {number} y - Vertical spawn position in canvas pixels.
+ */
 function spawnPowerup(x, y) {
     game.powerups.push({
         x,
@@ -1375,6 +1475,10 @@ function spawnPowerup(x, y) {
 }
 
 // Shooting mechanics
+/**
+ * Fire a projectile from the player's current position, subject to FIRE_RATE cooldown.
+ * Spawns three cyan muzzle-flash particles for visual feedback.
+ */
 function shoot() {
     const now = Date.now();
     if (now - game.lastFireTime < CONFIG.FIRE_RATE) return;
@@ -1400,6 +1504,11 @@ function shoot() {
     }
 }
 
+/**
+ * Emit a small burst of yellow particles at the given position to indicate a projectile hit.
+ * @param {number} x - Horizontal position in canvas pixels.
+ * @param {number} y - Vertical position in canvas pixels.
+ */
 function createHitParticles(x, y) {
     for (let i = 0; i < 5; i++) {
         pushParticle({
@@ -1413,6 +1522,12 @@ function createHitParticles(x, y) {
     }
 }
 
+/**
+ * Destroy an enemy killed by a projectile (before it triggered a question).
+ * Awards SHOOT_SCORE points, spawns a cyan explosion, optionally drops a powerup
+ * (15% chance), and triggers completeWave() if the wave is now cleared.
+ * @param {object} enemy - The enemy hit by the projectile.
+ */
 function destroyEnemyByShot(enemy) {
     // Explosion particles
     for (let i = 0; i < 15; i++) {
@@ -1443,6 +1558,13 @@ function destroyEnemyByShot(enemy) {
     }
 }
 
+/**
+ * Apply the effect of a collected powerup token to the player.
+ * 'health' restores up to 25 HP (capped at maxHealth).
+ * 'shield' adds up to 50 shield points (capped at 100).
+ * Announces the effect via ARIA and emits sparkle particles.
+ * @param {'health'|'shield'} type - The powerup type to apply.
+ */
 function applyPowerup(type) {
     if (type === 'health') {
         game.player.health = Math.min(game.player.maxHealth, game.player.health + 25);
@@ -1468,6 +1590,11 @@ function applyPowerup(type) {
     updateHUD();
 }
 
+/**
+ * Emit a small burst of gold particles near the player to signal points earned.
+ * The points value is not currently rendered as text; the HUD score updates separately.
+ * @param {number} points - Points awarded (currently unused visually, reserved for future text overlay).
+ */
 function createScoreParticle(points) {
     // This would create floating score text - simplified here
     for (let i = 0; i < 5; i++) {
@@ -1515,6 +1642,13 @@ function spawnWave() {
     }
 }
 
+/**
+ * Handle the end of the current wave.
+ * In adventure mode, advances to zone-complete when all waves are done.
+ * In endless mode, rotates to the next topic and continues indefinitely.
+ * In other modes (speedquiz/practice), increments the wave counter and
+ * spawns the next wave after a 2 s delay.
+ */
 function completeWave() {
     game.currentWave++;
 
@@ -1542,6 +1676,10 @@ function completeWave() {
     }
 }
 
+/**
+ * Show the level-complete overlay with the current zone's stats (score, accuracy).
+ * Focus is moved to the first button in the overlay for keyboard accessibility.
+ */
 function completeZone() {
     const topic = TOPICS[game.currentZone];
 
@@ -1559,6 +1697,10 @@ function completeZone() {
     announce(`Zone complete: ${topic.name}!`);
 }
 
+/**
+ * Advance to the next zone in adventure mode.
+ * Triggers victory (gameOver(true)) when all zones have been completed.
+ */
 function nextZone() {
     game.currentZone++;
 
@@ -1626,6 +1768,11 @@ function updateHUD() {
     }
 }
 
+/**
+ * Sync the question-timer progress bar and text to the current questionTimer value.
+ * Uses a last-width cache to avoid redundant DOM writes each frame.
+ * Switches the bar to danger styling and announces a warning when under 30% time remains.
+ */
 function updateTimerDisplay() {
     const maxTime = game.mode === 'speedquiz' ? CONFIG.SPEEDQUIZ_QUESTION_TIME : CONFIG.QUESTION_TIME;
     const pct = game.questionTimer / maxTime;
@@ -1646,6 +1793,12 @@ function updateTimerDisplay() {
 }
 
 // Game state management
+/**
+ * Toggle the paused state and show/hide the pause menu accordingly.
+ * While paused, the question panel is hidden to prevent reading without time pressure;
+ * it is restored when the game resumes. Focus is moved to the first pause-menu button
+ * for keyboard accessibility.
+ */
 function togglePause() {
     game.paused = !game.paused;
     domCache.pauseMenu.classList.toggle('hidden', !game.paused);
@@ -1664,18 +1817,29 @@ function togglePause() {
     }
 }
 
+/**
+ * Resume a paused game and return focus to the global menu button.
+ */
 function resumeGame() {
     game.paused = false;
     domCache.pauseMenu.classList.add('hidden');
     domCache.globalMenuBtn.focus();
 }
 
+/**
+ * Restart the current game mode from scratch.
+ * For practice mode, re-uses the same topic that was being played.
+ */
 function restartGame() {
     hideAllOverlays();
     const zoneIndex = Math.min(game.currentZone, TOPICS.length - 1);
     startGame(game.mode, game.mode === 'practice' ? TOPICS[zoneIndex].id : null);
 }
 
+/**
+ * Stop the game loop, hide all overlays, and return to the main menu.
+ * Also refreshes the displayed high score so the player sees any new record.
+ */
 function quitToMenu() {
     game.running = false;
     if (game.animationId) {
@@ -1687,6 +1851,12 @@ function quitToMenu() {
     loadHighScore();
 }
 
+/**
+ * End the game session, persist a new high score if earned, and show the game-over overlay.
+ * Displays final stats (score, accuracy, best streak) and changes the title colour
+ * to green for victory or red for defeat.
+ * @param {boolean} [victory=false] - True when the player completes all zones in adventure mode.
+ */
 function gameOver(victory = false) {
     game.running = false;
 
