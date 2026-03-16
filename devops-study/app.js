@@ -3976,6 +3976,10 @@ function updateTabs() {
 function renderCodebase() {
     if (!state.currentTopic) return;
 
+    // Skip re-render if already rendered for this topic
+    if (dom.codebaseList._renderedTopicId === state.currentTopic.id) return;
+    dom.codebaseList._renderedTopicId = state.currentTopic.id;
+
     const codebase = state.currentTopic.codebase || [];
     const codebaseList = dom.codebaseList;
     codebaseList.innerHTML = '';
@@ -4035,6 +4039,10 @@ function copyCodebase(btn, index) {
 // Render commands cheat sheet
 function renderCommands() {
     if (!state.currentTopic) return;
+
+    // Skip re-render if already rendered for this topic
+    if (dom.commandsList._renderedTopicId === state.currentTopic.id) return;
+    dom.commandsList._renderedTopicId = state.currentTopic.id;
 
     const commands = state.currentTopic.commands || [];
     const commandsList = dom.commandsList;
@@ -4391,6 +4399,7 @@ function renderQuizQuestion() {
     dom.quizOptions.innerHTML = '';
 
     const letters = ['A', 'B', 'C', 'D'];
+    const optionsFragment = document.createDocumentFragment();
     question.options.forEach((option, index) => {
         const btn = document.createElement('button');
         btn.className = 'quiz-option';
@@ -4402,8 +4411,9 @@ function renderQuizQuestion() {
             <span>${escapeHtml(option)}</span>
         `;
         btn.addEventListener('click', () => selectAnswer(index));
-        dom.quizOptions.appendChild(btn);
+        optionsFragment.appendChild(btn);
     });
+    dom.quizOptions.appendChild(optionsFragment);
 
     // Update progress bar
     const progress = ((state.currentQuestionIndex + 1) / questions.length) * 100;
@@ -4479,7 +4489,7 @@ function showQuizResults() {
     dom.maxScore.textContent = totalQuestions;
     dom.resultsPercentage.textContent = percentage + '%';
 
-    const resultsContent = dom.quizResults.querySelector('.results-content');
+    const resultsContent = dom.resultsContent;
     resultsContent.className = 'results-content';
 
     if (percentage >= 80) {
@@ -4624,6 +4634,7 @@ function init() {
         commandsList: document.getElementById('commandsList'),
         codebaseList: document.getElementById('codebaseList'),
         matchTimer: document.getElementById('matchTimer'),
+        resultsContent: document.querySelector('#quizResults .results-content'),
     };
 
     loadProgress();
