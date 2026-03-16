@@ -180,10 +180,16 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 /* Sky→indigo→purple gradient clipped to text for the main heading */
 .gradient-text {
     color: #818cf8; /* indigo-400 fallback if gradient-clip is unsupported */
-    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 52%, #c084fc 100%);
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #c084fc 80%, #38bdf8 100%);
+    background-size: 200% 100%;
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: gradient-shift 7s ease-in-out infinite;
+}
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50%       { background-position: 100% 50%; }
 }
 @media (forced-colors: active) {
     .gradient-text {
@@ -238,9 +244,6 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     padding: 0.875rem 0.5rem 0.5rem;
     /* Subtle rest-state affordance: faint pill hint that the row is interactive */
     border: 1px solid rgba(255, 255, 255, 0.06);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-color: currentColor;
     opacity: 0.75;
 }
 .glass-card:hover .cta-row,
@@ -311,4 +314,5 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     .blob { will-change: auto; }
     [data-card] { animation: none; }
     .pulse-dot::after { animation: none; }
+    .gradient-text { animation: none; background-position: 0% 50%; }
 }
