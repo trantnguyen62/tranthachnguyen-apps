@@ -64,13 +64,7 @@ function createPcmData(data: Float32Array): Int16Array {
  * Used to convert base64-encoded PCM audio chunks received from the Gemini Live API.
  */
 function decodeBase64(base64: string): Uint8Array {
-  const binaryString = atob(base64);
-  const length = binaryString.length;
-  const bytes = new Uint8Array(length);
-  for (let i = 0; i < length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
+  return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
 }
 
 /**

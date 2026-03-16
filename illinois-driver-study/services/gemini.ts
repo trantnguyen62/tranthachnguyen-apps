@@ -68,12 +68,7 @@ export const generateSpeech = async (text: string): Promise<ArrayBuffer> => {
   if (!base64Audio) throw new Error("No audio generated");
 
   // Decode base64 to ArrayBuffer
-  const binaryString = atob(base64Audio);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
+  const bytes = Uint8Array.from(atob(base64Audio), c => c.charCodeAt(0));
   if (ttsCache.size >= TTS_CACHE_MAX) {
     const firstKey = ttsCache.keys().next().value;
     if (firstKey !== undefined) ttsCache.delete(firstKey);
