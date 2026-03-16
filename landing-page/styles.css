@@ -179,6 +179,7 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 
 /* Sky→indigo→purple gradient clipped to text for the main heading */
 .gradient-text {
+    color: #818cf8; /* indigo-400 fallback if gradient-clip is unsupported */
     background: linear-gradient(135deg, #38bdf8 0%, #818cf8 52%, #c084fc 100%);
     background-clip: text;
     -webkit-background-clip: text;
@@ -239,13 +240,14 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     border: 1px solid rgba(255, 255, 255, 0.06);
     text-decoration: underline;
     text-underline-offset: 3px;
-    text-decoration-color: rgba(255, 255, 255, 0.3);
+    text-decoration-color: currentColor;
+    opacity: 0.75;
 }
 .glass-card:hover .cta-row,
 .glass-card:focus-within .cta-row {
+    opacity: 1;
     background-color: rgba(255, 255, 255, 0.09);
     border-color: rgba(255, 255, 255, 0.12);
-    text-decoration-color: currentColor;
 }
 .pulse-dot {
     position: relative;
@@ -285,15 +287,15 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 .icon-cyan    { background: rgba(6,182,212,0.18); }
 /* Footer name link */
 .footer-link {
-    color: inherit;
+    color: #cbd5e1; /* slate-300: visually distinct from surrounding slate-400 text (WCAG 1.4.1) */
     text-decoration: underline;
     text-underline-offset: 2px;
-    text-decoration-color: rgba(255,255,255,0.2);
+    text-decoration-color: rgba(203,213,225,0.5);
     transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
-.footer-link:hover {
-    color: #cbd5e1;
-    text-decoration-color: rgba(255,255,255,0.5);
+.footer-link:hover, .footer-link:focus-visible {
+    color: #e2e8f0; /* slate-200 */
+    text-decoration-color: #e2e8f0;
 }
 /*
  * Accessibility — honour the OS-level "reduce motion" preference.
