@@ -67,7 +67,7 @@ const Transcript = memo<Props>(({ messages }) => {
           <p className="text-xs text-slate-500 leading-relaxed">Start a conversation and your dialogue<br />will appear here in real time.</p>
         </div>
         <p className="text-xs text-slate-600 leading-relaxed max-w-[200px]">
-          Tip: speak slowly and clearly — your tutor will correct pronunciation as you go.
+          Tip: mistakes are how you improve — your tutor catches and corrects every one.
         </p>
       </div>
     );

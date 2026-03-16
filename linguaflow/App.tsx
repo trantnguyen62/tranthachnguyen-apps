@@ -199,7 +199,7 @@ function App() {
               <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
                 LinguaFlow
               </h1>
-              <p className="text-xs text-slate-400">Speak naturally. Get instant pronunciation feedback.</p>
+              <p className="text-xs text-slate-400">Speak freely. Get real-time pronunciation coaching.</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

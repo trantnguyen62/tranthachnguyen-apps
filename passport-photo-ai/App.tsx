@@ -157,7 +157,7 @@ export default function App() {
               { step: 3, label: 'Fix', color: accentPurple, done: false, active: !!result },
             ] as const).map(({ step, label, color, done, active }, i) => (
               <React.Fragment key={step}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: active || done ? 1 : 0.38, transition: 'opacity 0.4s ease' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: active || done ? 1 : 0.38, transition: 'opacity 0.4s ease' }} {...(active ? { 'aria-current': 'step' } : {})}>
                   <div style={{
                     width: 26, height: 26, borderRadius: '50%',
                     background: done ? color : active ? `${color}28` : 'rgba(255,255,255,0.05)',
@@ -279,7 +279,7 @@ export default function App() {
             
             <div aria-live="polite" aria-atomic="true">
             {status === AppStatus.CHECKING ? (
-              <div style={{ height: 350, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16, padding: '0 4px' }} aria-label="Checking photo compliance…">
+              <div role="status" style={{ height: 350, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 16, padding: '0 4px' }} aria-label="Checking photo compliance…">
                 <div style={{ height: 72, borderRadius: 16, background: 'rgba(255,255,255,0.05)', animation: 'pulse 1.5s ease-in-out infinite' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {[1, 0.75, 0.55].map((w, i) => (

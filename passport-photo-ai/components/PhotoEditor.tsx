@@ -250,8 +250,8 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
         )}
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, marginBottom: 24, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.05)', alignItems: 'flex-start' }}>
-          <div style={{ flexShrink: 0 }}>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Background</p>
+          <fieldset style={{ flexShrink: 0, border: 'none', padding: 0, margin: 0 }}>
+            <legend style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase', padding: 0 }}>Background</legend>
             <div style={{ display: 'flex', gap: 8 }}>
               {BG_COLORS.map((c) => (
                 <button
@@ -265,7 +265,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
                 />
               ))}
             </div>
-          </div>
+          </fieldset>
           <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,0.06)', borderRadius: 1, flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
