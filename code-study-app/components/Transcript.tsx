@@ -2,6 +2,47 @@ import { useEffect, useRef, useState, memo, useCallback } from 'react';
 import { ChatMessage } from '../types';
 import { User, Bot, Copy, Check, ChevronDown } from 'lucide-react';
 
+const MessageItem = memo<{ message: ChatMessage }>(({ message }) => (
+  <div
+    className={`flex gap-3 group ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+  >
+    {message.role === 'model' && (
+      <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+        <Bot className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+      </div>
+    )}
+    <div className={`max-w-[80%] flex flex-col gap-1 ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
+      <div
+        className={`flex items-start gap-1 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+      >
+        <div className={`rounded-2xl px-4 py-2.5 ${
+          message.role === 'user'
+            ? 'bg-blue-600/25 text-blue-100 border border-blue-500/20'
+            : 'bg-slate-700/60 text-slate-200 border border-slate-600/30'
+        }`}>
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+          {message.role === 'model' && !message.isFinal && (
+            <span className="inline-flex items-center gap-0.5 mt-1" aria-label="AI is responding">
+              <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '0ms' }} aria-hidden="true" />
+              <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '150ms' }} aria-hidden="true" />
+              <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '300ms' }} aria-hidden="true" />
+            </span>
+          )}
+        </div>
+        {message.isFinal && <CopyButton text={message.text} />}
+      </div>
+      <time dateTime={message.timestamp.toISOString()} className="text-xs text-slate-500 px-1">{formatTime(message.timestamp)}</time>
+    </div>
+    {message.role === 'user' && (
+      <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
+        <User className="w-4 h-4 text-blue-400" aria-hidden="true" />
+      </div>
+    )}
+  </div>
+));
+
+MessageItem.displayName = 'MessageItem';
+
 function formatTime(date: Date): string {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
@@ -130,43 +171,7 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
       className="flex-1 overflow-y-auto space-y-4 pr-2"
     >
       {messages.map((message) => (
-        <div
-          key={message.id}
-          className={`flex gap-3 group ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-        >
-          {message.role === 'model' && (
-            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
-              <Bot className="w-4 h-4 text-emerald-400" aria-hidden="true" />
-            </div>
-          )}
-          <div className={`max-w-[80%] flex flex-col gap-1 ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
-            <div
-              className={`flex items-start gap-1 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-            >
-              <div className={`rounded-2xl px-4 py-2.5 ${
-                message.role === 'user'
-                  ? 'bg-blue-600/25 text-blue-100 border border-blue-500/20'
-                  : 'bg-slate-700/60 text-slate-200 border border-slate-600/30'
-              }`}>
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                {message.role === 'model' && !message.isFinal && (
-                  <span className="inline-flex items-center gap-0.5 mt-1" aria-label="AI is responding">
-                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '0ms' }} aria-hidden="true" />
-                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '150ms' }} aria-hidden="true" />
-                    <span className="w-1 h-1 rounded-full bg-emerald-400/70 animate-bounce" style={{ animationDelay: '300ms' }} aria-hidden="true" />
-                  </span>
-                )}
-              </div>
-              {message.isFinal && <CopyButton text={message.text} />}
-            </div>
-            <time dateTime={message.timestamp.toISOString()} className="text-xs text-slate-500 px-1">{formatTime(message.timestamp)}</time>
-          </div>
-          {message.role === 'user' && (
-            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0" aria-hidden="true">
-              <User className="w-4 h-4 text-blue-400" aria-hidden="true" />
-            </div>
-          )}
-        </div>
+        <MessageItem key={message.id} message={message} />
       ))}
     </div>
     </div>

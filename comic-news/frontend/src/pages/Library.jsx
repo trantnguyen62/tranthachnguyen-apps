@@ -155,13 +155,13 @@ function Library() {
             <Filter className="w-5 h-5 text-gray-400" aria-hidden="true" />
             <span className="text-gray-400 text-sm">Genre:</span>
           </div>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by genre">
+          <div className="flex gap-2 overflow-x-auto pb-1 flex-nowrap md:flex-wrap md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" role="group" aria-label="Filter by genre">
             {genres.map((genre) => (
               <button
                 key={genre}
                 onClick={() => setSelectedGenre(genre)}
                 aria-pressed={selectedGenre === genre}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   selectedGenre === genre
                     ? 'bg-red-500 text-white shadow-sm shadow-red-500/30'
                     : 'bg-dark-200/60 text-gray-200 border border-white/10 hover:bg-dark-100 hover:text-white'

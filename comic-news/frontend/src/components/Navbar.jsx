@@ -1,12 +1,19 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BookOpen, Home, Library, Bookmark, Search, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const isActive = (path) => location.pathname === path;
 
@@ -20,7 +27,7 @@ function Navbar() {
   };
 
   return (
-    <nav aria-label="Main navigation" className="fixed top-0 left-0 right-0 z-50 glass-effect">
+    <nav aria-label="Main navigation" className={`fixed top-0 left-0 right-0 z-50 glass-effect transition-shadow duration-200 ${scrolled ? 'shadow-lg shadow-black/40' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2" aria-label="ComicNews home">

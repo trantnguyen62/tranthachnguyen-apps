@@ -181,21 +181,24 @@ function Home() {
       {/* Features Section */}
       <section aria-label="App features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="glass-effect rounded-2xl p-6 text-center">
+          <div className="glass-effect rounded-2xl p-6 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-red-500 to-red-400" aria-hidden="true" />
             <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-7 h-7 text-red-500" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Curated Stories</h3>
             <p className="text-gray-400">Hand-picked news events and real-life moments — from weather alerts to social disasters — turned into comics worth reading.</p>
           </div>
-          <div className="glass-effect rounded-2xl p-6 text-center">
+          <div className="glass-effect rounded-2xl p-6 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-500 to-orange-400" aria-hidden="true" />
             <div className="w-14 h-14 bg-orange-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Bookmark className="w-7 h-7 text-orange-500" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Your Reading List</h3>
             <p className="text-gray-400">Bookmark the stories that get you. Your reading progress is saved automatically so you can pick up right where you left off.</p>
           </div>
-          <div className="glass-effect rounded-2xl p-6 text-center">
+          <div className="glass-effect rounded-2xl p-6 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-yellow-500 to-yellow-400" aria-hidden="true" />
             <div className="w-14 h-14 bg-yellow-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Monitor className="w-7 h-7 text-yellow-500" aria-hidden="true" />
             </div>
