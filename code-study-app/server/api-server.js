@@ -87,54 +87,49 @@ function getLanguage(filename) {
   return LANG_MAP[ext] || 'text';
 }
 
-// Recursively build file tree
-function buildFileTree(dirPath, basePath = '') {
-  const items = [];
-  
+// Recursively build file tree (async to avoid blocking the event loop)
+async function buildFileTree(dirPath, basePath = '') {
+  let entries;
   try {
-    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-    
-    for (const entry of entries) {
-      const fullPath = path.join(dirPath, entry.name);
-      const relativePath = path.join(basePath, entry.name);
-      
-      if (entry.isDirectory()) {
-        if (IGNORED_DIRS.includes(entry.name)) continue;
-        
-        const children = buildFileTree(fullPath, relativePath);
-        if (children.length > 0) {
-          items.push({
-            name: entry.name,
-            path: relativePath,
-            type: 'directory',
-            children
-          });
-        }
-      } else {
-        if (IGNORED_FILES.includes(entry.name)) continue;
-        
-        const ext = path.extname(entry.name).toLowerCase();
-        if (!CODE_EXTENSIONS.includes(ext)) continue;
-        
-        items.push({
-          name: entry.name,
-          path: relativePath,
-          type: 'file',
-          language: getLanguage(entry.name)
-        });
-      }
-    }
+    entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
   } catch (err) {
     console.error(`Error reading directory ${dirPath}:`, err.message);
+    return [];
   }
-  
+
+  const files = [];
+  const subdirPromises = [];
+
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry.name);
+    const relativePath = path.join(basePath, entry.name);
+
+    if (entry.isDirectory()) {
+      if (IGNORED_DIRS.includes(entry.name)) continue;
+      subdirPromises.push(
+        buildFileTree(fullPath, relativePath).then(children => {
+          if (children.length > 0) {
+            files.push({ name: entry.name, path: relativePath, type: 'directory', children });
+          }
+        })
+      );
+    } else {
+      if (IGNORED_FILES.includes(entry.name)) continue;
+      const ext = path.extname(entry.name).toLowerCase();
+      if (!CODE_EXTENSIONS.includes(ext)) continue;
+      files.push({ name: entry.name, path: relativePath, type: 'file', language: getLanguage(entry.name) });
+    }
+  }
+
+  await Promise.all(subdirPromises);
+
   // Sort: directories first, then files, alphabetically
-  items.sort((a, b) => {
+  files.sort((a, b) => {
     if (a.type !== b.type) return a.type === 'directory' ? -1 : 1;
     return a.name.localeCompare(b.name);
   });
-  
-  return items;
+
+  return files;
 }
 
 // Simple in-memory cache for file trees and projects list
@@ -196,10 +191,12 @@ app.get('/api/projects', (req, res) => {
 });
 
 // Get file tree for a project
-app.get('/api/projects/:project/tree', (req, res) => {
+app.get('/api/projects/:project/tree', async (req, res) => {
   const projectPath = path.join(CODEBASE_PATH, req.params.project);
 
-  if (!fs.existsSync(projectPath)) {
+  try {
+    await fs.promises.access(projectPath);
+  } catch {
     return res.status(404).json({ error: 'Project not found' });
   }
 
@@ -209,10 +206,15 @@ app.get('/api/projects/:project/tree', (req, res) => {
     return res.json(cached.tree);
   }
 
-  const tree = buildFileTree(projectPath);
-  treeCache.set(req.params.project, { tree, ts: Date.now() });
-  res.set('Cache-Control', `public, max-age=${Math.floor(TREE_CACHE_TTL / 1000)}`);
-  res.json(tree);
+  try {
+    const tree = await buildFileTree(projectPath);
+    treeCache.set(req.params.project, { tree, ts: Date.now() });
+    res.set('Cache-Control', `public, max-age=${Math.floor(TREE_CACHE_TTL / 1000)}`);
+    res.json(tree);
+  } catch (err) {
+    console.error('Error building file tree:', err.message);
+    res.status(500).json({ error: 'Failed to build file tree' });
+  }
 });
 
 // Get file content
