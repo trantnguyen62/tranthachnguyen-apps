@@ -177,9 +177,9 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 .card-sky::before     { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(14,165,233,0.13) 0%, transparent 100%); }
 .card-cyan::before    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(6,182,212,0.13) 0%, transparent 100%); }
 
-/* Blue→purple gradient clipped to text for the main heading */
+/* Sky→indigo→purple gradient clipped to text for the main heading */
 .gradient-text {
-    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 52%, #c084fc 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -263,6 +263,37 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 }
 .glass-card:active {
     transform: scale(0.99);
+}
+/* App icon containers — colored background chip for each card's emoji */
+.app-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.625rem;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+}
+.icon-blue    { background: rgba(59,130,246,0.18); }
+.icon-emerald { background: rgba(16,185,129,0.18); }
+.icon-purple  { background: rgba(168,85,247,0.18); }
+.icon-rose    { background: rgba(244,63,94,0.18); }
+.icon-orange  { background: rgba(249,115,22,0.18); }
+.icon-yellow  { background: rgba(234,179,8,0.18); }
+.icon-sky     { background: rgba(14,165,233,0.18); }
+.icon-cyan    { background: rgba(6,182,212,0.18); }
+/* Footer name link */
+.footer-link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-color: rgba(255,255,255,0.2);
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.footer-link:hover {
+    color: #cbd5e1;
+    text-decoration-color: rgba(255,255,255,0.5);
 }
 /*
  * Accessibility — honour the OS-level "reduce motion" preference.

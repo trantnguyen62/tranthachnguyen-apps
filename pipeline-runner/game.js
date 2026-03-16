@@ -792,9 +792,7 @@ function startGame() {
     hideTipBanner();
     game.elQuestionModal.classList.add('hidden');
 
-    if (game.animationId) cancelAnimationFrame(game.animationId);
-    if (game.obstacleInterval) clearInterval(game.obstacleInterval);
-
+    stopGameLoops();
     game.obstacleInterval = setInterval(spawnObstacle, CONFIG.OBSTACLE_SPAWN_RATE);
     setTimeout(spawnObstacle, 800);
 
@@ -1191,8 +1189,9 @@ function startQuestionTimer() {
         }
 
         game.questionTimer--;
-        game.elTimer.textContent = game.questionTimer;
-        game.elTimer.setAttribute('aria-label', `${game.questionTimer} seconds remaining`);
+        const displayTime = Math.max(0, game.questionTimer);
+        game.elTimer.textContent = displayTime;
+        game.elTimer.setAttribute('aria-label', `${displayTime} seconds remaining`);
         game.elTimer.classList.toggle('timer-urgent', game.questionTimer <= 5);
 
         // Announce only at key thresholds to avoid flooding screen readers
@@ -1366,9 +1365,7 @@ function hideTipBanner() {
 function gameOver() {
     game.running = false;
 
-    if (game.animationId) cancelAnimationFrame(game.animationId);
-    if (game.obstacleInterval) clearInterval(game.obstacleInterval);
-
+    stopGameLoops();
     saveProgress();
 
     document.getElementById('finalScore').textContent = game.score;
@@ -1419,24 +1416,32 @@ function useLife() {
     }, 1500);
 }
 
+// Stops the rAF loop and obstacle spawn interval. Safe to call when either is already stopped.
+function stopGameLoops() {
+    if (game.animationId) {
+        cancelAnimationFrame(game.animationId);
+        game.animationId = null;
+    }
+    if (game.obstacleInterval) {
+        clearInterval(game.obstacleInterval);
+        game.obstacleInterval = null;
+    }
+}
+
 // Utility functions
-function lightenColor(hex, percent) {
+
+// Adjusts a hex color's brightness. Positive percent lightens, negative darkens.
+function adjustColor(hex, percent) {
     const num = parseInt(hex.replace('#', ''), 16);
     const amt = Math.round(2.55 * percent);
-    const R = Math.min(255, (num >> 16) + amt);
-    const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
-    const B = Math.min(255, (num & 0x0000FF) + amt);
+    const R = Math.min(255, Math.max(0, (num >> 16) + amt));
+    const G = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amt));
+    const B = Math.min(255, Math.max(0, (num & 0x0000FF) + amt));
     return `rgb(${R}, ${G}, ${B})`;
 }
 
-function darkenColor(hex, percent) {
-    const num = parseInt(hex.replace('#', ''), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = Math.max(0, (num >> 16) - amt);
-    const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
-    const B = Math.max(0, (num & 0x0000FF) - amt);
-    return `rgb(${R}, ${G}, ${B})`;
-}
+function lightenColor(hex, percent) { return adjustColor(hex, percent); }
+function darkenColor(hex, percent)  { return adjustColor(hex, -percent); }
 
 // Rebuilds the topic-specific offscreen canvases for the player sprite and
 // obstacle columns. Call this whenever the selected topic or canvas size changes.
@@ -1620,14 +1625,7 @@ const AdManager = {
         }
 
         // Cancel any existing animation/intervals first
-        if (game.animationId) {
-            cancelAnimationFrame(game.animationId);
-            game.animationId = null;
-        }
-        if (game.obstacleInterval) {
-            clearInterval(game.obstacleInterval);
-            game.obstacleInterval = null;
-        }
+        stopGameLoops();
 
         // Set game state - USE PAUSED STATE until player taps
         game.running = true;
