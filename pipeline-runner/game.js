@@ -1209,6 +1209,26 @@ function startQuestionTimer() {
     }, 1000);
 }
 
+// Marks the correct button green and, if wrongIndex is given, the wrong button red.
+// Shared by checkAnswer and handleTimeout to avoid duplicated DOM update logic.
+function markAnswerResult(btns, q, wrongIndex) {
+    if (!btns) return;
+    const correctBtn = btns[q.correctIndex];
+    if (correctBtn) {
+        correctBtn.classList.add('correct');
+        correctBtn.setAttribute('aria-label',
+            `Correct answer: ${q.shuffledAnswers[q.correctIndex].text}`);
+    }
+    if (wrongIndex != null && wrongIndex !== q.correctIndex) {
+        const wrongBtn = btns[wrongIndex];
+        if (wrongBtn) {
+            wrongBtn.classList.add('incorrect');
+            wrongBtn.setAttribute('aria-label',
+                `Wrong answer: ${q.shuffledAnswers[wrongIndex].text}`);
+        }
+    }
+}
+
 // Handles answer selection: disables all buttons and highlights the chosen one,
 // then defers the correctness check by 300ms to let the selection animation play.
 function selectAnswer(index) {
@@ -1232,14 +1252,7 @@ function checkAnswer(index) {
     const correct = index === game.currentQuestion.correctIndex;
     const btns = game.currentQuestion.btns;
 
-    btns[game.currentQuestion.correctIndex].classList.add('correct');
-    btns[game.currentQuestion.correctIndex].setAttribute('aria-label',
-        `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
-    if (!correct) {
-        btns[index].classList.add('incorrect');
-        btns[index].setAttribute('aria-label',
-            `Wrong answer: ${game.currentQuestion.shuffledAnswers[index].text}`);
-    }
+    markAnswerResult(btns, game.currentQuestion, correct ? null : index);
 
     const feedbackEl = game.elFeedback;
     if (feedbackEl) {
@@ -1290,12 +1303,7 @@ function handleTimeout() {
     }
 
     const btns = game.currentQuestion && game.currentQuestion.btns;
-    const correctBtn = btns && btns[game.currentQuestion.correctIndex];
-    if (correctBtn) {
-        correctBtn.classList.add('correct');
-        correctBtn.setAttribute('aria-label',
-            `Correct answer: ${game.currentQuestion.shuffledAnswers[game.currentQuestion.correctIndex].text}`);
-    }
+    markAnswerResult(btns, game.currentQuestion, null);
 
     const feedbackEl = game.elFeedback;
     if (feedbackEl) {
