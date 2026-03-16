@@ -3708,6 +3708,10 @@ const searchIndex = devopsData.topics.map(topic => ({
     }))
 }));
 
+// Constants
+const MATCH_GAME_CARD_COUNT = 6;
+const MATCH_DEFINITION_TRUNCATE_LENGTH = 100;
+
 // Application State
 let state = {
     currentTopic: null,
@@ -4139,13 +4143,13 @@ function initMatchGame() {
     // Get 6 random flashcards for the game
     const allCards = state.currentTopic.flashcards;
     const shuffledCards = shuffleArray(allCards);
-    const gameCards = shuffledCards.slice(0, Math.min(6, allCards.length));
-    
+    const gameCards = shuffledCards.slice(0, Math.min(MATCH_GAME_CARD_COUNT, allCards.length));
+
     matchState.pairs = gameCards.map((card, index) => ({
         id: index,
         term: card.term,
-        definition: card.definition.length > 100 
-            ? card.definition.substring(0, 100) + '...' 
+        definition: card.definition.length > MATCH_DEFINITION_TRUNCATE_LENGTH
+            ? card.definition.substring(0, MATCH_DEFINITION_TRUNCATE_LENGTH) + '...'
             : card.definition,
         matched: false
     }));
@@ -4334,6 +4338,7 @@ function renderFlashcard() {
 
     const cards = state.currentTopic.flashcards;
     const card = cards[state.currentCardIndex];
+    if (!card) return;
 
     dom.flashcardTerm.textContent = card.term;
     dom.flashcardDefinition.textContent = card.definition;
@@ -4560,19 +4565,17 @@ function studyCards() {
 }
 
 // Search functionality
-let _lastSearchQuery = null;
-let _lastSearchResults = null;
-let _searchActive = false;
+const searchCache = { query: null, results: null, active: false };
 function handleSearch(event) {
     const query = event.target.value.toLowerCase().trim();
 
     if (!query) {
-        if (_searchActive) {
+        if (searchCache.active) {
             dom.searchResultInfo.hidden = true;
             dom.searchResultInfo.textContent = '';
-            _searchActive = false;
-            _lastSearchQuery = null;
-            _lastSearchResults = null;
+            searchCache.active = false;
+            searchCache.query = null;
+            searchCache.results = null;
             renderTopicGrid();
         }
         return;
@@ -4580,8 +4583,8 @@ function handleSearch(event) {
 
     // Search using pre-built lowercase index; memoize to skip reprocessing identical queries
     let results;
-    if (query === _lastSearchQuery) {
-        results = _lastSearchResults;
+    if (query === searchCache.query) {
+        results = searchCache.results;
     } else {
         results = [];
         searchIndex.forEach(({ topic, nameLower, cards }) => {
@@ -4597,12 +4600,12 @@ function handleSearch(event) {
                 });
             }
         });
-        _lastSearchQuery = query;
-        _lastSearchResults = results;
+        searchCache.query = query;
+        searchCache.results = results;
     }
 
     // Re-render topic grid with filtered results
-    _searchActive = true;
+    searchCache.active = true;
     dom.topicGrid.innerHTML = '';
 
     if (results.length === 0) {
