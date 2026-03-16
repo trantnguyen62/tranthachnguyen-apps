@@ -392,11 +392,22 @@ body {
     font-weight: 900;
 }
 
+/* Shield Label */
+.shield-label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--nano-cyan);
+    margin-top: 6px;
+    margin-bottom: 3px;
+    text-shadow: 0 0 6px var(--nano-cyan-glow);
+}
+
 /* Shield Bar */
 .shield-bar {
     width: 200px;
     height: 10px;
-    margin-top: 5px;
+    margin-top: 0;
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid var(--nano-cyan);
     transform: skewX(-20deg);
@@ -646,6 +657,7 @@ body {
     border-color: var(--nano-yellow);
     color: #fff;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+    transform: scale(1.01);
 }
 
 .answer-btn:active:not(.disabled) {
@@ -1023,6 +1035,31 @@ body {
 }
 
 /* =====================================================
+   Damage Flash Overlay
+   ===================================================== */
+
+.damage-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 0, 60, 0.4) 100%);
+    opacity: 0;
+    z-index: 50;
+}
+
+@keyframes damageFlashAnim {
+    0%   { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.damage-flash.active {
+    animation: damageFlashAnim 0.45s ease-out forwards;
+}
+
+/* =====================================================
    Screen Reader Only (visually hidden)
    ===================================================== */
 
@@ -1078,6 +1115,10 @@ body {
     }
 
     .new-high-score {
+        animation: none;
+    }
+
+    .damage-flash.active {
         animation: none;
     }
 

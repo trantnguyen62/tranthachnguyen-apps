@@ -490,6 +490,7 @@ function init() {
         domCache.waveNumber    = document.getElementById('waveNumber');
         domCache.timerFill     = document.getElementById('timerFill');
         domCache.timerText     = document.getElementById('timerText');
+        domCache.damageFlash   = document.getElementById('damageFlash');
         domCache.questionPanel = document.getElementById('questionPanel');
         domCache.questionTopic = document.getElementById('questionTopic');
         domCache.questionText  = document.getElementById('questionText');
@@ -1337,6 +1338,12 @@ function takeDamage(amount) {
 
     game.player.health = Math.max(0, game.player.health - amount);
 
+    if (amount > 0 && domCache.damageFlash) {
+        domCache.damageFlash.classList.remove('active');
+        void domCache.damageFlash.offsetWidth; // force reflow to restart animation
+        domCache.damageFlash.classList.add('active');
+    }
+
     game.shake = 20; // Canvas shake magnitude (handled by render loop translate)
 
     // Create damage particles
@@ -1527,7 +1534,9 @@ function completeWave() {
         }
     } else {
         // Next wave
-        domCache.waveNumber.textContent = game.currentWave;
+        domCache.waveNumber.textContent = game.mode === 'adventure'
+            ? `${game.currentWave}/${CONFIG.WAVES_PER_ZONE}`
+            : game.currentWave;
         announce(`Wave ${game.currentWave}`);
         setTimeout(() => spawnWave(), 2000);
     }
@@ -1611,7 +1620,9 @@ function updateHUD() {
     }
     if (game.currentWave !== h.wave) {
         h.wave = game.currentWave;
-        domCache.waveNumber.textContent = game.currentWave;
+        domCache.waveNumber.textContent = game.mode === 'adventure'
+            ? `${game.currentWave}/${CONFIG.WAVES_PER_ZONE}`
+            : game.currentWave;
     }
 }
 

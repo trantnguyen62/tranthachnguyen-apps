@@ -201,6 +201,7 @@
         <!-- Game Screen -->
         <div id="gameScreen" class="screen hidden">
             <canvas id="gameCanvas" role="img" aria-label="Game arena: move your ship with arrow keys or WASD, select answers with keys 1–4, pause with P"></canvas>
+            <div class="damage-flash" id="damageFlash" aria-hidden="true"></div>
 
             <!-- HUD -->
             <div class="hud">
@@ -210,6 +211,7 @@
                         <div class="health-fill" id="healthFill"></div>
                         <span class="health-text" id="healthText" aria-hidden="true">100</span>
                     </div>
+                    <span class="shield-label" aria-hidden="true">SH</span>
                     <div class="shield-bar" aria-label="Shield" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="shieldBar">
                         <div class="shield-fill" id="shieldFill"></div>
                     </div>
