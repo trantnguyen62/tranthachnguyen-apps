@@ -145,7 +145,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Don't get rejected at the counter. Free AI instantly verifies your photo meets official ICAO biometric standards — accepted for passports, visas, and ID cards in 100+ countries.<br/>
+            Avoid rejection — free AI checks your passport, visa, or ID photo against official ICAO biometric standards used in 100+ countries. Results in seconds, no sign-up required.<br/>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
 
@@ -350,7 +350,7 @@ export default function App() {
                         color: result.compliant ? '#10B981' : accentPink,
                         marginBottom: 4
                       }}>
-                        {result.compliant ? 'Photo Passes — Ready to Submit' : 'Issues Found — Here\'s How to Fix'}
+                        {result.compliant ? 'Compliant — Ready to Submit Your Application' : 'Issues Found — See How to Fix Below'}
                       </h3>
                       <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
                         {result.summary || (result.compliant ? 'Your photo meets ICAO biometric standards.' : 'One or more issues were found. See details below.')}

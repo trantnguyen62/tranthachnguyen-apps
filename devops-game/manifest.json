@@ -1,0 +1,31 @@
+{
+  "name": "DevOps Defender",
+  "short_name": "DevOps Defender",
+  "description": "Master Docker, Kubernetes, CI/CD, and more by battling enemy ships in this 2D space shooter quiz game.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/assets/player_ship.png",
+      "sizes": "160x160",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/background.png",
+      "sizes": "900x900",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["games", "education"],
+  "screenshots": [
+    {
+      "src": "/assets/background.png",
+      "sizes": "900x900",
+      "type": "image/png",
+      "label": "DevOps Defender gameplay"
+    }
+  ]
+}
