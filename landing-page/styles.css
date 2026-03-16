@@ -124,6 +124,8 @@
 
 /* Use Inter with a broad system-font fallback chain */
 body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; color-scheme: dark; }
+/* Suppress focus ring on programmatic skip-link target — not a user-interactive element */
+main:focus { outline: none; }
 
 /*
  * .glass-card — frosted-glass card base
