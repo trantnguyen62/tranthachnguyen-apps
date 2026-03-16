@@ -446,10 +446,10 @@ export default function App() {
                 }}>🔍</div>
                 <div>
                   <p style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.92)', marginBottom: 8, fontFamily: "'Syne', sans-serif" }}>
-                    Photo ready to check!
+                    Ready for Compliance Check
                   </p>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 220 }}>
-                    Tap <strong style={{ color: accentPink }}>Check Photo</strong> to verify all 7 ICAO biometric requirements in seconds.
+                    Tap <strong style={{ color: accentPink }}>Check Photo</strong> to verify all 7 official ICAO biometric requirements in seconds.
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 280 }}>
@@ -480,7 +480,7 @@ export default function App() {
                 </p>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.8)', marginBottom: 10, fontWeight: 600 }}>
-                    What our AI checks
+                    7 requirements our AI verifies
                   </p>
                   <ul style={{ listStyle: 'none', fontSize: 12, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>
                     {[
@@ -522,7 +522,7 @@ export default function App() {
             100% private — photos are analyzed instantly and never stored, logged, or shared. Background removal runs entirely in your browser.
           </p>
           <p style={{ marginTop: 6, fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-            Compliance checks powered by Google Gemini AI. Results are for guidance only, not an official guarantee.
+            Powered by Google Gemini 2.0 Flash AI. Results are guidance only — verify with your country's official requirements before submitting.
           </p>
         </footer>
       </div>
