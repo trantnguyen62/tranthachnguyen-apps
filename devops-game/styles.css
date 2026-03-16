@@ -634,22 +634,23 @@ body {
 }
 
 .answer-btn {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: var(--text-primary);
     padding: 1rem;
     font-family: 'Inter', sans-serif;
     font-size: 1rem;
     font-weight: 500;
     line-height: 1.4;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: left;
     position: relative;
     display: flex;
     align-items: center;
     gap: 1rem;
     min-height: 64px;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
 }
 
 .answer-btn:hover:not(.disabled) {
@@ -722,15 +723,20 @@ body {
     animation: shake 0.4s ease;
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 .question-explanation {
     font-size: 0.78rem;
     color: var(--nano-cyan);
     background: rgba(0, 243, 255, 0.06);
     border-left: 3px solid var(--nano-cyan);
     border-radius: 0 4px 4px 0;
-    padding: 0.45rem 0.7rem;
-    margin-top: 0.5rem;
-    line-height: 1.4;
+    padding: 0.6rem 0.8rem;
+    margin-top: 0.75rem;
+    line-height: 1.5;
     animation: fadeIn 0.3s ease;
 }
 
@@ -830,13 +836,17 @@ body {
     border-left: 3px solid var(--topic-color, rgba(255, 255, 255, 0.2));
     padding: 1.5rem;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
 
 .topic-card:hover {
-    border-color: var(--nano-yellow);
-    transform: translateY(-5px);
-    box-shadow: 0 0 20px var(--nano-yellow-glow);
+    border-color: rgba(255, 215, 0, 0.45);
+    border-left-color: var(--topic-color, var(--nano-yellow));
+    border-left-width: 4px;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px var(--nano-yellow-glow);
+    background: rgba(15, 15, 22, 0.95);
 }
 
 .topic-card:focus-visible {
@@ -871,18 +881,26 @@ body {
 }
 
 .back-btn {
-    background: transparent;
-    border: 1px solid var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.35);
     color: var(--text-secondary);
     padding: 0.75rem 1.5rem;
     font-family: 'Orbitron', sans-serif;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
 }
 
 .back-btn:hover {
     border-color: var(--nano-yellow);
     color: var(--nano-yellow);
+    background: rgba(255, 215, 0, 0.06);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+}
+
+.back-btn:active {
+    transform: scale(0.97);
+    transition-duration: 0.05s;
 }
 
 .back-btn:focus-visible {
@@ -970,6 +988,16 @@ body {
 .game-over-buttons .menu-btn {
     justify-content: center;
     margin-bottom: 0.5rem;
+}
+
+.pause-menu h2 {
+    font-size: 2.5rem;
+    color: var(--nano-yellow);
+    text-shadow: 0 0 20px var(--nano-yellow-glow);
+    letter-spacing: 0.2em;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.25);
 }
 
 /* Stats panels (game over & level complete) */
