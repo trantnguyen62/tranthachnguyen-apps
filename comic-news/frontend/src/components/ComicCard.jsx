@@ -17,7 +17,7 @@ function ComicCard({ comic, index = 0 }) {
   const [imgError, setImgError] = useState(false);
 
   return (
-    <Link to={`/comic/${comic.id}`} title={comic.title} style={{ animationDelay: `${Math.min(index, 9) * 45}ms` }} className="comic-card group block cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#11111b]">
+    <Link to={`/comic/${comic.id}`} title={comic.title} aria-label={`${comic.title} — ${comic.genre} by ${comic.author}`} style={{ animationDelay: `${Math.min(index, 9) * 45}ms` }} className="comic-card group block cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#11111b]">
       <div className="relative overflow-hidden rounded-xl bg-dark-200 border border-white/5 hover:border-red-500/30">
         <div className="aspect-[2/3] overflow-hidden relative">
           {!imgLoaded && !imgError && (

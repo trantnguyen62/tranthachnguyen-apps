@@ -185,11 +185,11 @@ function ComicDetail() {
 
         <div className="flex flex-col md:flex-row gap-8">
           {/* Cover Image */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex justify-center md:block">
             <img
               src={comic.coverImage}
               alt={comic.title}
-              className="w-64 h-96 object-cover rounded-xl shadow-2xl border border-white/10"
+              className="w-48 h-72 md:w-64 md:h-96 object-cover rounded-xl shadow-2xl border border-white/10"
             />
           </div>
 
