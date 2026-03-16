@@ -84,12 +84,21 @@ const App: React.FC = () => {
   const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cancelControllerRef = useRef<AbortController | null>(null);
   const userCancelledRef = useRef(false);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
       if (downloadTimerRef.current !== null) clearTimeout(downloadTimerRef.current);
     };
   }, []);
+
+  // Scroll to the result panel when an edit completes — mainly helps mobile users
+  // where the comparison view is below the fold.
+  useEffect(() => {
+    if (status === AppStatus.COMPLETED && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [status]);
 
   // Derived state
   const currentImage = history[historyIndex] ?? null;
@@ -383,7 +392,9 @@ const App: React.FC = () => {
                         <span className="hidden sm:flex items-center gap-1.5">
                           <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate <span className="text-slate-300">·</span> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Shift+Enter</kbd> for newline
                         </span>
-                        <span className={`tabular-nums transition-all ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-300'}`}>{prompt.length} / 2000</span>
+                        {prompt.length > 0 && (
+                          <span className={`tabular-nums transition-all ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-300'}`}>{prompt.length} / 2000</span>
+                        )}
                       </span>
                     )}
                     <div className="flex gap-2 ml-auto w-full sm:w-auto">
@@ -479,7 +490,7 @@ const App: React.FC = () => {
 
           {/* Right Column: Results (Only visible if we have a result beyond original) */}
           {historyIndex > 0 && currentImage && originalImage && (
-            <div className="lg:col-span-8 animate-fadeIn">
+            <div ref={resultRef} className="lg:col-span-8 animate-fadeIn">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 h-full">
                 <div className="flex items-center gap-2 mb-4 text-slate-500 text-sm" aria-label={`Edit ${historyIndex} of ${history.length - 1}`}>
                   <History className="w-4 h-4" aria-hidden="true" />
