@@ -70,7 +70,7 @@ const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promi
  *
  * State machine: `idle` → (click Auto-Fix) → `processing` → `done`.
  * In the `done` state the user can tweak background colour, brightness, and
- * contrast; every change re-renders the canvas preview via a 150 ms debounce.
+ * contrast; every change re-renders the canvas preview via a 400 ms debounce.
  * Background removal runs entirely in the browser via `@imgly/background-removal`.
  */
 export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {

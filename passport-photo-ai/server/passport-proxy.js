@@ -6,7 +6,7 @@
  *  - Proxy image analysis requests to Google Gemini 2.0 Flash, enforcing:
  *      • Input validation (MIME type, size limit)
  *      • Rate limiting (10 requests / IP / minute)
- *      • Result caching (SHA-256 keyed, 30-minute TTL, max 200 entries)
+ *      • Result caching (SHA-256 keyed, 60-minute TTL, max 1000 entries)
  *  - Apply security headers (HSTS, CSP, X-Frame-Options, etc.).
  *
  * Endpoints:

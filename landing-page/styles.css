@@ -138,6 +138,7 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.13);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     contain: layout style paint;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-top-color 0.3s ease;
@@ -168,14 +169,14 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     border-radius: 1rem;
 }
 .glass-card:hover::before, .glass-card:focus-within::before { opacity: 1; }
-.card-blue::before    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59,130,246,0.13) 0%, transparent 100%); }
-.card-emerald::before { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(16,185,129,0.13) 0%, transparent 100%); }
-.card-purple::before  { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(168,85,247,0.13) 0%, transparent 100%); }
-.card-rose::before    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(244,63,94,0.13) 0%, transparent 100%); }
-.card-orange::before  { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(249,115,22,0.13) 0%, transparent 100%); }
-.card-yellow::before  { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(234,179,8,0.13) 0%, transparent 100%); }
-.card-sky::before     { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(14,165,233,0.13) 0%, transparent 100%); }
-.card-cyan::before    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(6,182,212,0.13) 0%, transparent 100%); }
+.card-blue::before    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59,130,246,0.16) 0%, transparent 100%); }
+.card-emerald::before { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(16,185,129,0.16) 0%, transparent 100%); }
+.card-purple::before  { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(168,85,247,0.16) 0%, transparent 100%); }
+.card-rose::before    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(244,63,94,0.16) 0%, transparent 100%); }
+.card-orange::before  { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(249,115,22,0.16) 0%, transparent 100%); }
+.card-yellow::before  { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(234,179,8,0.16) 0%, transparent 100%); }
+.card-sky::before     { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(14,165,233,0.16) 0%, transparent 100%); }
+.card-cyan::before    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(6,182,212,0.16) 0%, transparent 100%); }
 
 /* Sky→indigo→purple gradient clipped to text for the main heading */
 .gradient-text {
@@ -243,7 +244,7 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     margin: auto -0.5rem 0;
     padding: 0.875rem 0.5rem 0.5rem;
     /* Subtle rest-state affordance: faint pill hint that the row is interactive */
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .glass-card:hover .cta-row,
 .glass-card:focus-within .cta-row {
@@ -266,7 +267,7 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     75%, 100% { transform: scale(2.2); opacity: 0; }
 }
 .glass-card:active {
-    transform: scale(0.99);
+    transform: scale(0.975);
 }
 /* App icon containers — colored background chip for each card's emoji */
 .app-icon {
@@ -279,14 +280,14 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     font-size: 1.125rem;
     flex-shrink: 0;
 }
-.icon-blue    { background: rgba(59,130,246,0.18); }
-.icon-emerald { background: rgba(16,185,129,0.18); }
-.icon-purple  { background: rgba(168,85,247,0.18); }
-.icon-rose    { background: rgba(244,63,94,0.18); }
-.icon-orange  { background: rgba(249,115,22,0.18); }
-.icon-yellow  { background: rgba(234,179,8,0.18); }
-.icon-sky     { background: rgba(14,165,233,0.18); }
-.icon-cyan    { background: rgba(6,182,212,0.18); }
+.icon-blue    { background: rgba(59,130,246,0.22); }
+.icon-emerald { background: rgba(16,185,129,0.22); }
+.icon-purple  { background: rgba(168,85,247,0.22); }
+.icon-rose    { background: rgba(244,63,94,0.22); }
+.icon-orange  { background: rgba(249,115,22,0.22); }
+.icon-yellow  { background: rgba(234,179,8,0.22); }
+.icon-sky     { background: rgba(14,165,233,0.22); }
+.icon-cyan    { background: rgba(6,182,212,0.22); }
 /* Footer name link */
 .footer-link {
     color: #cbd5e1; /* slate-300: visually distinct from surrounding slate-400 text (WCAG 1.4.1) */
