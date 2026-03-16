@@ -589,6 +589,7 @@ export const questionsEn: Question[] = [
       "Maintain your speed because you have the right-of-way."
     ],
     correctIndex: 1,
+    image: "/images/yield.svg",
     explanation: "A yield sign means slow down and be prepared to stop if necessary. You must give the right-of-way to any vehicles or pedestrians in the intersection or approaching on the cross road. Unlike a stop sign, a full stop is not required if the way is clearly open."
   },
   {
@@ -600,6 +601,7 @@ export const questionsEn: Question[] = [
       "30 mph"
     ],
     correctIndex: 0,
+    image: "/images/school_zone.svg",
     explanation: "Illinois law sets a maximum speed limit of 20 mph in school zones during school hours and at times posted on the school zone signs (typically before and after school on school days). The reduced limit applies regardless of whether you can see children — slow down whenever school zone signs are active. Fines for speeding in school zones are substantially higher than standard violations and may be enforced by automated speed cameras."
   },
   {
@@ -1203,6 +1205,7 @@ export const questionsVi: Question[] = [
       "Giữ nguyên tốc độ vì bạn có quyền ưu tiên."
     ],
     correctIndex: 1,
+    image: "/images/yield.svg",
     explanation: "Biển nhường đường có nghĩa là giảm tốc và sẵn sàng dừng lại nếu cần thiết. Bạn phải nhường quyền ưu tiên cho bất kỳ phương tiện hoặc người đi bộ nào đang ở trong giao lộ hoặc đang đến từ đường ngang. Khác với biển dừng, bạn không cần dừng hoàn toàn nếu đường thông thoáng."
   },
   {
@@ -1214,6 +1217,7 @@ export const questionsVi: Question[] = [
       "30 mph"
     ],
     correctIndex: 0,
+    image: "/images/school_zone.svg",
     explanation: "Pháp luật Illinois quy định tốc độ tối đa 20 mph trong khu vực trường học trong giờ học và vào các thời điểm ghi trên biển báo khu vực trường học (thường trước và sau giờ học trong các ngày đi học). Giới hạn tốc độ áp dụng dù bạn có nhìn thấy trẻ em hay không — hãy giảm tốc khi biển khu vực trường học đang có hiệu lực. Tiền phạt vi phạm tốc độ trong khu trường học cao hơn đáng kể so với mức thông thường và có thể được thực thi bằng camera tốc độ tự động."
   },
   {

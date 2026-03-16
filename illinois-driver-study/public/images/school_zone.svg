@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110" width="100" height="110">
+  <!-- Pentagon school zone sign: yellow-green background -->
+  <polygon points="50,5 95,35 95,105 5,105 5,35" fill="#ADFF2F" stroke="#000" stroke-width="3"/>
+  <text x="50" y="58" text-anchor="middle" font-size="15" font-weight="bold" font-family="Arial, sans-serif" fill="#000">SCHOOL</text>
+  <text x="50" y="78" text-anchor="middle" font-size="13" font-weight="bold" font-family="Arial, sans-serif" fill="#000">ZONE</text>
+  <text x="50" y="98" text-anchor="middle" font-size="12" font-family="Arial, sans-serif" fill="#000">20 MPH</text>
+</svg>
