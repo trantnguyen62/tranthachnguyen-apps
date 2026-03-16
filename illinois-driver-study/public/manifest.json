@@ -1,0 +1,34 @@
+{
+  "name": "Illinois Driver Study",
+  "short_name": "IL Driver Study",
+  "description": "Free Illinois driver's license practice test with 58 questions, quiz mode, and AI-powered live practice.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "lang": "en",
+  "orientation": "portrait-primary",
+  "categories": ["education", "utilities"],
+  "icons": [
+    {
+      "src": "/images/stop.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Practice Quiz",
+      "short_name": "Quiz",
+      "description": "Start an Illinois DMV practice quiz",
+      "url": "/#quiz"
+    },
+    {
+      "name": "Study Mode",
+      "short_name": "Study",
+      "description": "Browse all Illinois traffic law questions",
+      "url": "/#study"
+    }
+  ]
+}
