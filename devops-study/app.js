@@ -4178,6 +4178,7 @@ function renderMatchItems() {
             item.setAttribute('aria-disabled', 'true');
             item.setAttribute('aria-label', `Term: ${pair.term}, matched`);
         }
+        matchState.pairs[pair.id].termEl = item;
         termsContainer.appendChild(item);
     });
 
@@ -4196,6 +4197,7 @@ function renderMatchItems() {
             item.setAttribute('aria-disabled', 'true');
             item.setAttribute('aria-label', `Definition: ${pair.definition}, matched`);
         }
+        matchState.pairs[pair.id].defEl = item;
         defsContainer.appendChild(item);
     });
 
@@ -4245,8 +4247,8 @@ function selectMatchItem(element, id, type) {
             matchState.matchedPairs++;
             document.getElementById('matchedPairs').textContent = matchState.matchedPairs;
 
-            // Mark both items as matched
-            document.querySelectorAll(`.match-item[data-id="${id}"]`).forEach(el => {
+            // Mark both items as matched using cached element refs
+            [matchState.pairs[id].termEl, matchState.pairs[id].defEl].forEach(el => {
                 el.classList.remove('selected');
                 el.classList.add('matched');
                 el.removeAttribute('aria-pressed');
@@ -4545,33 +4547,49 @@ function studyCards() {
 }
 
 // Search functionality
+let _lastSearchQuery = null;
+let _lastSearchResults = null;
+let _searchActive = false;
 function handleSearch(event) {
     const query = event.target.value.toLowerCase().trim();
 
     if (!query) {
-        dom.searchResultInfo.hidden = true;
-        dom.searchResultInfo.textContent = '';
-        renderTopicGrid();
+        if (_searchActive) {
+            dom.searchResultInfo.hidden = true;
+            dom.searchResultInfo.textContent = '';
+            _searchActive = false;
+            _lastSearchQuery = null;
+            _lastSearchResults = null;
+            renderTopicGrid();
+        }
         return;
     }
 
-    // Search using pre-built lowercase index to avoid repeated .toLowerCase() calls
-    const results = [];
-    searchIndex.forEach(({ topic, nameLower, cards }) => {
-        const topicMatch = nameLower.includes(query);
-        const matchCount = cards.filter(c =>
-            c.termLower.includes(query) || c.defLower.includes(query)
-        ).length;
+    // Search using pre-built lowercase index; memoize to skip reprocessing identical queries
+    let results;
+    if (query === _lastSearchQuery) {
+        results = _lastSearchResults;
+    } else {
+        results = [];
+        searchIndex.forEach(({ topic, nameLower, cards }) => {
+            const topicMatch = nameLower.includes(query);
+            const matchCount = cards.filter(c =>
+                c.termLower.includes(query) || c.defLower.includes(query)
+            ).length;
 
-        if (topicMatch || matchCount > 0) {
-            results.push({
-                topic,
-                matchCount: matchCount + (topicMatch ? 1 : 0)
-            });
-        }
-    });
+            if (topicMatch || matchCount > 0) {
+                results.push({
+                    topic,
+                    matchCount: matchCount + (topicMatch ? 1 : 0)
+                });
+            }
+        });
+        _lastSearchQuery = query;
+        _lastSearchResults = results;
+    }
 
     // Re-render topic grid with filtered results
+    _searchActive = true;
     dom.topicGrid.innerHTML = '';
 
     if (results.length === 0) {
