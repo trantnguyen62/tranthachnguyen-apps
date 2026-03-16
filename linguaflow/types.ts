@@ -47,6 +47,8 @@ export interface LanguageConfig {
   code: string;
   name: string;
   flag: string;
+  /** Short one-line description shown in the language picker. */
+  tagline?: string;
   /** Gemini voice name used when speaking in this language. */
   voiceName: string;
   /** Base system instruction sent to Gemini at session start. */
