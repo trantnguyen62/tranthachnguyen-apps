@@ -29,7 +29,7 @@
     text-align: center;
     padding: 5px 8px;
     font-size: 0.6rem;
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.72);
     pointer-events: none;
     z-index: 1;
     line-height: 1.4;
@@ -144,7 +144,7 @@ body {
 
 .tagline {
     font-size: 1.15rem;
-    color: #a1b4cf;
+    color: #b8cce0;
     margin-bottom: 2rem;
     font-weight: 400;
 }
@@ -179,7 +179,7 @@ body {
     border-radius: 10px;
     padding: 0.65rem 1rem;
     font-size: 0.9rem;
-    color: #a1b4cf;
+    color: #b8cce0;
     cursor: pointer;
     transition: all 0.25s ease;
     font-weight: 500;
@@ -240,7 +240,7 @@ body {
 .high-score-display {
     margin-top: 1.5rem;
     font-size: 0.95rem;
-    color: #7b8eaa;
+    color: #9cafc5;
     background: rgba(26, 39, 68, 0.7);
     border: 1px solid rgba(96, 165, 250, 0.2);
     border-radius: 10px;
@@ -256,7 +256,7 @@ body {
 .instructions {
     margin-top: 2rem;
     font-size: 1rem;
-    color: #7b8eaa;
+    color: #9cafc5;
     line-height: 2;
 }
 

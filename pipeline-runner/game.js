@@ -1635,6 +1635,7 @@ const AdManager = {
             if (this.remainingTime <= 0) {
                 clearInterval(this.rewardedAdTimer);
                 skipBtn.disabled = false;
+                skipBtn.removeAttribute('aria-disabled');
                 skipBtn.textContent = '✓ Claim Reward';
                 skipBtn.removeAttribute('aria-label');
                 skipBtn.focus();
