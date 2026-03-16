@@ -1368,9 +1368,15 @@ function gameOver() {
     stopGameLoops();
     saveProgress();
 
-    document.getElementById('finalScore').textContent = game.score;
-    document.getElementById('questionsCorrect').textContent = `${game.correctAnswers}/${game.questionsAnswered}`;
-    document.getElementById('bestStreak').textContent = game.bestStreak;
+    const elFinalScore = document.getElementById('finalScore');
+    const elQuestionsCorrect = document.getElementById('questionsCorrect');
+    const elBestStreak = document.getElementById('bestStreak');
+    elFinalScore.textContent = game.score;
+    elFinalScore.setAttribute('aria-label', `Gates Passed: ${game.score}`);
+    elQuestionsCorrect.textContent = `${game.correctAnswers}/${game.questionsAnswered}`;
+    elQuestionsCorrect.setAttribute('aria-label', `Correct Answers: ${game.correctAnswers} of ${game.questionsAnswered}`);
+    elBestStreak.textContent = game.bestStreak;
+    elBestStreak.setAttribute('aria-label', `Top Streak: ${game.bestStreak}`);
 
     const rank = [...RANKS].reverse().find(r => game.score >= r.minScore) || RANKS[0];
     document.getElementById('rankIcon').textContent = rank.icon;
@@ -1555,8 +1561,10 @@ const AdManager = {
         modal.classList.remove('hidden');
         this.remainingTime = 5;
         timerDisplay.textContent = this.remainingTime;
+        timerDisplay.setAttribute('aria-label', `Ad timer: ${this.remainingTime} seconds remaining`);
         skipBtn.disabled = true;
         skipBtn.textContent = `Skip in ${this.remainingTime}s`;
+        skipBtn.setAttribute('aria-label', `Skip ad, available in ${this.remainingTime} seconds`);
 
         // Move focus into modal for keyboard/screen reader users
         const heading = document.getElementById('rewardedAdHeading');
@@ -1566,12 +1574,15 @@ const AdManager = {
         this.rewardedAdTimer = setInterval(() => {
             this.remainingTime--;
             timerDisplay.textContent = this.remainingTime;
+            timerDisplay.setAttribute('aria-label', `Ad timer: ${this.remainingTime} seconds remaining`);
             skipBtn.textContent = `Skip in ${this.remainingTime}s`;
+            skipBtn.setAttribute('aria-label', `Skip ad, available in ${this.remainingTime} seconds`);
 
             if (this.remainingTime <= 0) {
                 clearInterval(this.rewardedAdTimer);
                 skipBtn.disabled = false;
                 skipBtn.textContent = '✓ Claim Reward';
+                skipBtn.removeAttribute('aria-label');
                 skipBtn.focus();
             }
         }, 1000);
