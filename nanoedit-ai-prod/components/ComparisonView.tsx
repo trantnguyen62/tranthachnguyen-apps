@@ -180,6 +180,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                     src={processedImage}
                     controls
                     autoPlay
+                    muted
                     loop
                     aria-label="AI-processed result video"
                     className="w-full h-full object-contain bg-black"
