@@ -435,7 +435,8 @@ body {
 }
 
 .topic-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-primary);
 }
 
 .topic-item:hover::before {
@@ -671,8 +672,8 @@ body {
 }
 
 .topic-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.15);
     box-shadow: var(--shadow-lg);
 }
 
@@ -763,6 +764,13 @@ body {
 .back-btn:hover {
     background: rgba(255, 255, 255, 0.08);
     color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.back-btn:hover span[aria-hidden] {
+    transform: translateX(-3px);
+    display: inline-block;
+    transition: transform var(--transition-fast);
 }
 
 .study-title {
@@ -810,8 +818,9 @@ body {
     flex-shrink: 0;
 }
 
-.tab-btn:hover {
+.tab-btn:hover:not(.active) {
     color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .tab-btn.active {
@@ -942,8 +951,9 @@ body {
 }
 
 .control-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(139, 92, 246, 0.12);
     border-color: var(--accent-primary);
+    color: var(--text-primary);
 }
 
 .control-btn:disabled {
@@ -1057,9 +1067,14 @@ body {
 }
 
 .quiz-option:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(139, 92, 246, 0.08);
     border-color: var(--accent-primary);
     transform: translateX(4px);
+}
+
+.quiz-option:hover:not(:disabled) .option-letter {
+    background: var(--accent-primary);
+    color: white;
 }
 
 .quiz-option.correct {
@@ -1067,9 +1082,19 @@ body {
     border-color: var(--color-success);
 }
 
+.quiz-option.correct .option-letter {
+    background: var(--color-success);
+    color: white;
+}
+
 .quiz-option.incorrect {
     background: rgba(239, 68, 68, 0.2);
     border-color: var(--color-error);
+}
+
+.quiz-option.incorrect .option-letter {
+    background: var(--color-error);
+    color: white;
 }
 
 .quiz-option:disabled {
@@ -1321,6 +1346,19 @@ body {
 .topic-card {
     animation: card-enter 0.25s ease both;
 }
+
+.topic-card:nth-child(1)  { animation-delay: 0.02s; }
+.topic-card:nth-child(2)  { animation-delay: 0.04s; }
+.topic-card:nth-child(3)  { animation-delay: 0.06s; }
+.topic-card:nth-child(4)  { animation-delay: 0.08s; }
+.topic-card:nth-child(5)  { animation-delay: 0.10s; }
+.topic-card:nth-child(6)  { animation-delay: 0.12s; }
+.topic-card:nth-child(7)  { animation-delay: 0.14s; }
+.topic-card:nth-child(8)  { animation-delay: 0.16s; }
+.topic-card:nth-child(9)  { animation-delay: 0.18s; }
+.topic-card:nth-child(10) { animation-delay: 0.20s; }
+.topic-card:nth-child(11) { animation-delay: 0.22s; }
+.topic-card:nth-child(12) { animation-delay: 0.24s; }
 
 /* =====================================================
    Color-coded Quiz Results
