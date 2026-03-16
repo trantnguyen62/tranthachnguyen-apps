@@ -3761,7 +3761,11 @@ function saveProgress() {
             quizAttempts: p.quizAttempts
         };
     }
-    localStorage.setItem('devops-mastery-progress', JSON.stringify(serializable));
+    try {
+        localStorage.setItem('devops-mastery-progress', JSON.stringify(serializable));
+    } catch (e) {
+        console.warn('Could not save progress to localStorage:', e);
+    }
     updateHeaderStats();
 }
 
@@ -4032,6 +4036,9 @@ function copyCodebase(btn, index) {
             setTimeout(() => {
                 btn.textContent = originalText;
             }, 1500);
+        }).catch(() => {
+            btn.textContent = '✗ Failed';
+            setTimeout(() => { btn.textContent = btn.textContent === '✗ Failed' ? '📋 Copy' : btn.textContent; }, 1500);
         });
     }
 }
@@ -4072,14 +4079,16 @@ function renderCommands() {
 
 // Copy command to clipboard
 function copyCommand(event, command) {
+    const btn = event.target;
+    const originalText = btn.textContent;
     navigator.clipboard.writeText(command).then(() => {
-        // Show brief feedback
-        const btn = event.target;
-        const originalText = btn.textContent;
         btn.textContent = '✓ Copied!';
         setTimeout(() => {
             btn.textContent = originalText;
         }, 1500);
+    }).catch(() => {
+        btn.textContent = '✗ Failed';
+        setTimeout(() => { btn.textContent = originalText; }, 1500);
     });
 }
 
@@ -4330,7 +4339,7 @@ function renderFlashcard() {
     // Update progress bar
     const progress = ((state.currentCardIndex + 1) / cards.length) * 100;
     dom.flashcardProgress.style.width = progress + '%';
-    dom.flashcardProgress.parentElement.setAttribute('aria-valuenow', Math.round(progress));
+    if (dom.flashcardProgress.parentElement) dom.flashcardProgress.parentElement.setAttribute('aria-valuenow', Math.round(progress));
 
     // Reset flip state
     dom.flashcard.classList.remove('flipped');
@@ -4420,7 +4429,7 @@ function renderQuizQuestion() {
     // Update progress bar
     const progress = ((state.currentQuestionIndex + 1) / questions.length) * 100;
     dom.quizProgress.style.width = progress + '%';
-    dom.quizProgress.parentElement.setAttribute('aria-valuenow', Math.round(progress));
+    if (dom.quizProgress.parentElement) dom.quizProgress.parentElement.setAttribute('aria-valuenow', Math.round(progress));
 
     // Hide feedback and next button
     dom.quizFeedback.classList.add('hidden');
