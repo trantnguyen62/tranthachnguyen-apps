@@ -124,7 +124,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
     if (step === 'done' && removedBgRef.current) {
       const id = setTimeout(() => {
         createPassport(removedBgRef.current!, bgColor, brightness, contrast).then(setResult);
-      }, 250);
+      }, 400);
       return () => clearTimeout(id);
     }
   }, [bgColor, brightness, contrast, step]);
