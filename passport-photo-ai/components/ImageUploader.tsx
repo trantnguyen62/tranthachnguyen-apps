@@ -164,7 +164,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           }}
           onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-        >×</button>
+        ><span aria-hidden="true">×</span></button>
       </div>
     );
   }
@@ -174,6 +174,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     return (
       <div style={{ borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', background: '#0D0D0D' }}>
         <div style={{ position: 'relative' }}>
+          <p className="sr-only">Position your face within the oval guide shown on screen, then press Capture.</p>
           <video
             ref={videoRef}
             autoPlay

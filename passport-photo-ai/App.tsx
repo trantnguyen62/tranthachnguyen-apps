@@ -174,7 +174,7 @@ export default function App() {
                     {label}
                   </span>
                 </div>
-                {i < 2 && <div style={{ width: 18, height: 1.5, background: 'rgba(255,255,255,0.1)', borderRadius: 1 }} />}
+                {i < 2 && <div aria-hidden="true" style={{ width: 18, height: 1.5, background: 'rgba(255,255,255,0.1)', borderRadius: 1 }} />}
               </React.Fragment>
             ))}
           </div>
@@ -221,7 +221,7 @@ export default function App() {
                   padding: '16px 12px', borderRadius: 14,
                   border: image ? `1px solid ${accentPurple}44` : '1px solid transparent',
                   background: image ? `linear-gradient(135deg, ${accentPurple}33, ${accentPurple}11)` : 'rgba(255,255,255,0.03)',
-                  color: image ? accentPurple : 'rgba(255,255,255,0.2)',
+                  color: image ? accentPurple : 'rgba(255,255,255,0.45)',
                   fontWeight: 600, cursor: image ? 'pointer' : 'not-allowed',
                   transition: 'all 0.3s ease',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -240,7 +240,7 @@ export default function App() {
                   padding: '16px 12px', borderRadius: 14,
                   border: 'none',
                   background: image ? `linear-gradient(135deg, ${accentPink}, ${accentGold})` : 'rgba(255,255,255,0.03)',
-                  color: image ? '#fff' : 'rgba(255,255,255,0.2)',
+                  color: image ? '#fff' : 'rgba(255,255,255,0.45)',
                   fontWeight: 600, cursor: image ? 'pointer' : 'not-allowed',
                   transition: 'all 0.3s ease',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
