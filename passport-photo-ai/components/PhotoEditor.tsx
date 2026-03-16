@@ -32,7 +32,7 @@ const BG_COLOR_NAMES: Record<string, string> = {
  * @param bg     - CSS fill colour for the passport background (e.g. `"#FFFFFF"`).
  * @param b      - Brightness percentage applied via `ctx.filter` (90–120).
  * @param c      - Contrast percentage applied via `ctx.filter` (90–120).
- * @returns JPEG data URL at quality 0.95 suitable for download or re-use.
+ * @returns JPEG data URL at quality 0.90 suitable for download or re-use.
  */
 const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promi
 
       ctx.filter = `brightness(${b}%) contrast(${c}%)`;
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 600, 750);
-      resolve(canvas.toDataURL('image/jpeg', 0.95));
+      resolve(canvas.toDataURL('image/jpeg', 0.90));
     };
     img.src = imgUrl;
   });
@@ -124,7 +124,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
     if (step === 'done' && removedBgRef.current) {
       const id = setTimeout(() => {
         createPassport(removedBgRef.current!, bgColor, brightness, contrast).then(setResult);
-      }, 150);
+      }, 250);
       return () => clearTimeout(id);
     }
   }, [bgColor, brightness, contrast, step]);
