@@ -237,13 +237,15 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     padding: 0.875rem 0.5rem 0.5rem;
     /* Subtle rest-state affordance: faint pill hint that the row is interactive */
     border: 1px solid rgba(255, 255, 255, 0.06);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(255, 255, 255, 0.3);
 }
 .glass-card:hover .cta-row,
 .glass-card:focus-within .cta-row {
     background-color: rgba(255, 255, 255, 0.09);
     border-color: rgba(255, 255, 255, 0.12);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    text-decoration-color: currentColor;
 }
 .pulse-dot {
     position: relative;
