@@ -349,7 +349,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleUndo}
                       disabled={!canUndo}
-                      className="p-2 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="p-2.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       title="Undo (Ctrl+Z)"
                       aria-label="Undo — go back one version (Ctrl+Z)"
                     >
@@ -362,7 +362,7 @@ const App: React.FC = () => {
                     <button
                       onClick={handleRedo}
                       disabled={!canRedo}
-                      className="p-2 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="p-2.5 rounded-md hover:bg-slate-100 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       title="Redo (Ctrl+Y)"
                       aria-label="Redo — go forward one version (Ctrl+Y)"
                     >
@@ -371,7 +371,12 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-white p-1 rounded-xl shadow-sm border border-slate-200 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent transition-all">
+                <div className="relative bg-white p-1 rounded-xl shadow-sm border border-slate-200 focus-within:ring-2 focus-within:ring-brand-500 focus-within:border-transparent transition-all overflow-hidden">
+                  {status === AppStatus.PROCESSING && (
+                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-brand-100" aria-hidden="true">
+                      <div className="h-full bg-brand-500 animate-progress-bar" />
+                    </div>
+                  )}
                   <div className="relative">
                     <textarea
                       value={prompt}
@@ -402,6 +407,7 @@ const App: React.FC = () => {
                         <span className="hidden sm:flex items-center gap-1.5">
                           <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate <span className="text-slate-300">·</span> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Shift+Enter</kbd> for newline
                         </span>
+                        <span className="sm:hidden">Tap Generate to apply</span>
                         {prompt.length > 0 && (
                           <span className={`tabular-nums transition-all ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-300'}`}>{prompt.length} / 2000</span>
                         )}

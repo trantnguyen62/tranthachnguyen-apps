@@ -194,11 +194,13 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                )}
 
                {isProcessing && (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" role="status" aria-live="polite" aria-atomic="true">
-                   <Loader2 className="w-8 h-8 text-brand-600 animate-spin" aria-hidden="true" />
-                   <span className="text-xs font-medium text-slate-600 bg-white/80 px-3 py-1 rounded-full backdrop-blur-sm">
-                     Generating your edit…
-                   </span>
+                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3" role="status" aria-live="polite" aria-atomic="true">
+                   <div className="flex flex-col items-center gap-2 bg-white/90 backdrop-blur-sm px-5 py-3 rounded-xl shadow-sm">
+                     <Loader2 className="w-6 h-6 text-brand-600 animate-spin" aria-hidden="true" />
+                     <span className="text-xs font-medium text-slate-600">
+                       Generating your edit…
+                     </span>
+                   </div>
                  </div>
                )}
 

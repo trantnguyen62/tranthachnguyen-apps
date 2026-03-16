@@ -14,9 +14,24 @@
   animation: fadeIn 0.4s ease-out forwards;
 }
 
+@keyframes progress-indeterminate {
+  0% { transform: translateX(-100%); width: 45%; }
+  50% { width: 65%; }
+  100% { transform: translateX(260%); width: 45%; }
+}
+
+.animate-progress-bar {
+  animation: progress-indeterminate 1.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fadeIn {
     animation: none;
+  }
+  .animate-progress-bar {
+    animation: none;
+    width: 100%;
+    transform: none;
   }
   * {
     animation-duration: 0.01ms !important;
