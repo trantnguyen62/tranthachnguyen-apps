@@ -47,6 +47,7 @@ function App() {
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [isLoadingTree, setIsLoadingTree] = useState(false);
   const [fileLoadError, setFileLoadError] = useState<string | null>(null);
+  const [treeLoadError, setTreeLoadError] = useState<string | null>(null);
   const [dismissedError, setDismissedError] = useState<string | null>(null);
 
   // File cache (LRU, capped at 50 entries) and in-flight request controllers
@@ -97,15 +98,18 @@ function App() {
   // Load file tree when project changes
   useEffect(() => {
     fileCache.current.clear();
+    setFileTree([]);
+    setTreeLoadError(null);
     if (selectedProject) {
       setIsLoadingTree(true);
       fetch(`${API_URL}/api/projects/${encodeURIComponent(selectedProject.path)}/tree`)
         .then(res => { if (!res.ok) throw new Error(`Server returned ${res.status}`); return res.json(); })
         .then(data => setFileTree(data))
-        .catch(err => console.error('Failed to load file tree:', err))
+        .catch(err => {
+          console.error('Failed to load file tree:', err);
+          setTreeLoadError('Failed to load file tree. Check that the API server is running.');
+        })
         .finally(() => setIsLoadingTree(false));
-    } else {
-      setFileTree([]);
     }
     setSelectedFile(null);
   }, [selectedProject]);
@@ -314,6 +318,11 @@ function App() {
                   <div className="flex items-center justify-center gap-2 py-8 text-slate-400 text-sm" role="status" aria-label="Loading file tree">
                     <Loader2 className="w-4 h-4 animate-spin text-emerald-400" aria-hidden="true" />
                     Loading files...
+                  </div>
+                ) : treeLoadError ? (
+                  <div className="flex flex-col items-center gap-2 py-8 px-4 text-center" role="alert">
+                    <AlertCircle className="w-6 h-6 text-red-400/70" aria-hidden="true" />
+                    <p className="text-sm text-red-300">{treeLoadError}</p>
                   </div>
                 ) : (
                   <FileTree

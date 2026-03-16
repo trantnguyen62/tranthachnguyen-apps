@@ -162,6 +162,31 @@ Progress is persisted in the browser's `localStorage` under two keys:
 
 To reset progress, run `localStorage.clear()` in the browser console.
 
+## 📝 Adding Questions & Learning Content
+
+### Questions (`QUESTIONS` in `game.js`)
+
+Each entry uses this schema:
+
+```js
+{ q: "Question text",
+  a: ["correct answer", "wrong 1", "wrong 2", "wrong 3"],
+  c: 0,       // index into `a` of the correct answer (0 = first element)
+  fact: "Fun fact shown after answering" }
+```
+
+Answers are shuffled at runtime, so order in the source only matters for determining which index `c` points to.
+
+### Learnable Content (`LEARNABLE_CONTENT` in `game.js`)
+
+Each entry uses this schema:
+
+```js
+{ cmd: 'command or concept', desc: 'one-line description' }
+```
+
+Content is shown on obstacle gates and in the tip banner as the player passes through. Items are cycled in random order without repeating within a session.
+
 ## 🗒️ Development Notes
 
 - **Build script scope:** `npm run build` copies `*.html`, `*.css`, and `*.js` to `www/`. Image assets (e.g. `og-image.png`) must be copied to `www/` manually or added to the build script.

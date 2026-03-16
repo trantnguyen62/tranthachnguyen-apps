@@ -181,8 +181,6 @@ export const useLiveSession = (studyContext: StudyContext) => {
         },
       };
 
-      console.log("Initiating connection to proxy...");
-      
       const sessionPromise = ai.live.connect({
         ...config,
         callbacks: {
@@ -305,7 +303,6 @@ export const useLiveSession = (studyContext: StudyContext) => {
             // 4. Barge-in / interrupt: user spoke over the model. Stop all queued audio
             //    immediately and reset the playback timeline to the present.
             if (message.serverContent?.interrupted) {
-              console.log("Interrupted!");
               sourcesRef.current.forEach(src => {
                 try { src.stop(); } catch (e) { console.warn('Error stopping audio source:', e); }
               });

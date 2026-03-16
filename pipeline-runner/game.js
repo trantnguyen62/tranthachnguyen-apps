@@ -233,6 +233,11 @@ const LEARNABLE_CONTENT = {
 };
 
 // DevOps Questions Database
+// Each entry follows the schema:
+//   q    {string}   Question text
+//   a    {string[]} Four answer choices (indices 0–3)
+//   c    {number}   Index into `a` of the correct answer (always 0 before shuffling)
+//   fact {string}   Fun fact shown after the question is answered
 const QUESTIONS = {
     docker: [
         { q: "What command creates a new container from an image?", a: ["docker run", "docker start", "docker create", "docker build"], c: 0, fact: "docker run combines 'create' and 'start' in one command!" },
@@ -750,6 +755,7 @@ function showStartScreen() {
     showScreen('startScreen');
 }
 
+// Resets all game state and begins a new run for the currently selected topic.
 function startGame() {
     game.running = true;
     game.paused = false;
@@ -817,6 +823,8 @@ function gameLoop() {
     game.animationId = requestAnimationFrame(gameLoop);
 }
 
+// Advances physics and game objects by one frame.
+// Called every frame by gameLoop() when the game is not paused.
 function update() {
     game.player.velocity += CONFIG.GRAVITY;
     if (game.player.velocity > CONFIG.TERMINAL_VELOCITY) game.player.velocity = CONFIG.TERMINAL_VELOCITY;
@@ -904,6 +912,8 @@ function showLearnedContent(content) {
     showTip(`${content.cmd}: ${content.desc}`);
 }
 
+// Draws the current frame to the canvas: background, stars, pipeline lines,
+// particles, obstacles, floating text labels, and the player sprite.
 function render() {
     const ctx = game.ctx;
 
@@ -1065,6 +1075,7 @@ function drawPlayer(ctx) {
     ctx.restore();
 }
 
+// Applies an instant upward velocity impulse (tap/Space). Also spawns trail particles.
 function boost() {
     game.player.velocity = CONFIG.BOOST_FORCE;
     createBoostParticles();
@@ -1085,6 +1096,8 @@ function createBoostParticles() {
     }
 }
 
+// Spawns a new gate obstacle just off the right edge of the screen.
+// The vertical gap position is randomised with a 120 px margin from each edge.
 function spawnObstacle() {
     if (!game.running || game.questionActive) return;
 
@@ -1133,6 +1146,10 @@ function checkCollision() {
 }
 
 // Question System
+
+// Picks the next question from a pre-shuffled queue, shuffles its answers,
+// and displays the question modal. Pauses the game loop until the player answers
+// or the timer expires.
 function showQuestion() {
     const questions = QUESTIONS[game.selectedTopic];
     if (!questions || questions.length === 0) return;
@@ -1245,6 +1262,8 @@ function selectAnswer(index) {
     setTimeout(() => checkAnswer(index), 300);
 }
 
+// Evaluates the selected answer index. Correct: +5 score, +1 life, streak++.
+// Wrong or timeout: streak resets. Schedules closeQuestion after 1.2 s.
 function checkAnswer(index) {
     const answerCount = game.currentQuestion.shuffledAnswers.length;
     if (index < 0 || index >= answerCount) return;
@@ -1362,6 +1381,9 @@ function hideTipBanner() {
 }
 
 // Game Over
+
+// Ends the run: stops loops, saves progress, computes rank, and shows the
+// game-over screen after a 500 ms delay (cancelled if the player uses an extra life).
 function gameOver() {
     game.running = false;
 

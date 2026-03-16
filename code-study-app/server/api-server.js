@@ -137,6 +137,14 @@ function buildFileTree(dirPath, basePath = '') {
   return items;
 }
 
+// Simple in-memory cache for file trees and projects list
+const treeCache = new Map();
+const TREE_CACHE_TTL = 300_000;
+let projectsCache = null;
+let projectsCacheTs = 0;
+const PROJECTS_CACHE_TTL = 60_000;
+const SEARCH_RESULTS_LIMIT = 50;
+
 // Get list of projects
 app.get('/api/projects', (req, res) => {
   if (projectsCache && Date.now() - projectsCacheTs < PROJECTS_CACHE_TTL) {
@@ -186,14 +194,6 @@ app.get('/api/projects', (req, res) => {
   res.set('Cache-Control', `public, max-age=${Math.floor(PROJECTS_CACHE_TTL / 1000)}`);
   res.json(projects);
 });
-
-// Simple in-memory cache for file trees and projects list
-const treeCache = new Map();
-const TREE_CACHE_TTL = 300_000;
-let projectsCache = null;
-let projectsCacheTs = 0;
-const PROJECTS_CACHE_TTL = 60_000;
-const SEARCH_RESULTS_LIMIT = 50;
 
 // Get file tree for a project
 app.get('/api/projects/:project/tree', (req, res) => {
