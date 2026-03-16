@@ -244,7 +244,6 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
     padding: 0.875rem 0.5rem 0.5rem;
     /* Subtle rest-state affordance: faint pill hint that the row is interactive */
     border: 1px solid rgba(255, 255, 255, 0.06);
-    opacity: 0.75;
 }
 .glass-card:hover .cta-row,
 .glass-card:focus-within .cta-row {
@@ -299,6 +298,11 @@ body { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-
 .footer-link:hover, .footer-link:focus-visible {
     color: #e2e8f0; /* slate-200 */
     text-decoration-color: #e2e8f0;
+}
+.footer-link:focus-visible {
+    outline: 2px solid #e2e8f0;
+    outline-offset: 2px;
+    border-radius: 2px;
 }
 /*
  * Accessibility — honour the OS-level "reduce motion" preference.
