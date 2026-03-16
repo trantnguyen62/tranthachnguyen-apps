@@ -85,6 +85,7 @@ const App: React.FC = () => {
   const cancelControllerRef = useRef<AbortController | null>(null);
   const userCancelledRef = useRef(false);
   const resultRef = useRef<HTMLDivElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
@@ -99,6 +100,13 @@ const App: React.FC = () => {
       resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }, [status]);
+
+  // Move focus to the error message when it appears so screen reader users are notified.
+  useEffect(() => {
+    if (errorMsg && !errorDismissed && errorRef.current) {
+      errorRef.current.focus();
+    }
+  }, [errorMsg, errorDismissed]);
 
   // Derived state
   const currentImage = history[historyIndex] ?? null;
@@ -312,7 +320,7 @@ const App: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-5 h-5 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" aria-hidden="true">1</span>
-                  <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Upload Image</h2>
+                  <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Upload Image</h3>
                 </div>
                 {history.length > 0 && (
                   <span className="text-xs text-slate-500">Original Source</span>
@@ -331,7 +339,7 @@ const App: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="w-5 h-5 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" aria-hidden="true">2</span>
-                    <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Describe Changes</h2>
+                    <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Describe Changes</h3>
                   </div>
 
                   {/* History Controls */}
@@ -345,7 +353,7 @@ const App: React.FC = () => {
                     >
                       <RotateCcw className="w-4 h-4" aria-hidden="true" />
                     </button>
-                    <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full select-none mx-0.5" aria-label={`Version ${historyIndex + 1} of ${history.length}`} title={historyIndex === 0 ? 'Original upload' : `AI edit ${historyIndex} of ${history.length - 1}`}>
+                    <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full select-none mx-0.5" aria-label={`Version ${historyIndex + 1} of ${history.length}`} aria-live="polite" aria-atomic="true" title={historyIndex === 0 ? 'Original upload' : `AI edit ${historyIndex} of ${history.length - 1}`}>
                       {historyIndex === 0 ? 'Original' : `Edit ${historyIndex}`}
                       {history.length > 1 && <span className="text-slate-400 ml-1 font-normal">/ {history.length - 1}</span>}
                     </span>
@@ -458,7 +466,7 @@ const App: React.FC = () => {
 
                 {/* Error Message */}
                 {errorMsg && !errorDismissed && (
-                  <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn">
+                  <div ref={errorRef} tabIndex={-1} role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 text-red-700 animate-fadeIn focus:outline-none">
                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">Generation failed — try a different prompt or image</p>

@@ -207,7 +207,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
             </button>
           </div>
         )}
-        <div className="absolute bottom-2 left-2 px-3 py-1 bg-black/50 backdrop-blur-md rounded-full text-xs text-white font-medium">
+        <div className="absolute bottom-2 left-2 px-3 py-1 bg-black/50 backdrop-blur-md rounded-full text-xs text-white font-medium" aria-hidden="true">
           Original Image
         </div>
       </div>
