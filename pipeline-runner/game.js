@@ -697,6 +697,28 @@ function setupEventListeners() {
             e.preventDefault();
         }
 
+        // Focus trap inside rewarded ad modal
+        if (e.key === 'Tab') {
+            const adModal = document.getElementById('rewardedAdModal');
+            if (adModal && !adModal.classList.contains('hidden')) {
+                const focusable = Array.from(adModal.querySelectorAll('[tabindex="-1"][id="rewardedAdHeading"], button:not([disabled])')).filter(el => adModal.contains(el));
+                const heading = document.getElementById('rewardedAdHeading');
+                const skipBtn = document.getElementById('skipAdBtn');
+                const trappable = [heading, skipBtn].filter(el => el && !el.disabled);
+                if (trappable.length > 0) {
+                    const first = trappable[0];
+                    const last = trappable[trappable.length - 1];
+                    if (e.shiftKey && document.activeElement === first) {
+                        last.focus();
+                        e.preventDefault();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        first.focus();
+                        e.preventDefault();
+                    }
+                }
+            }
+        }
+
         // Escape on game over screen goes to menu
         if (e.key === 'Escape') {
             const gameOverScreen = document.getElementById('gameOverScreen');
