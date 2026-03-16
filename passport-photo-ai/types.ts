@@ -25,7 +25,3 @@ export enum AppStatus {
   COMPLETED = 'completed',
   ERROR = 'error',
 }
-
-
-
-

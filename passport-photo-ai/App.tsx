@@ -376,7 +376,7 @@ export default function App() {
                       Issues Found
                     </h3>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {result.issues.map((issue: string, idx: number) => (
+                    {result.issues.map((issue, idx) => (
                       <li key={idx} className="result-item" style={{
                         padding: '12px 16px',
                         background: 'rgba(255,255,255,0.03)',
@@ -408,7 +408,7 @@ export default function App() {
                       How to Fix
                     </h3>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {result.suggestions.map((tip: string, idx: number) => (
+                    {result.suggestions.map((tip, idx) => (
                       <li key={idx} className="result-item" style={{
                         padding: '12px 16px',
                         background: 'rgba(255,255,255,0.03)',
