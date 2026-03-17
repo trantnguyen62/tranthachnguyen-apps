@@ -1002,10 +1002,7 @@ function render() {
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ffffff';
         game.enemies.forEach(enemy => {
-            ctx.save();
-            ctx.translate(enemy.x, enemy.y);
-            ctx.fillText(enemy.icon, 0, 50);
-            ctx.restore();
+            ctx.fillText(enemy.icon, enemy.x, enemy.y + 50);
         });
     }
 

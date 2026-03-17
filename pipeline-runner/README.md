@@ -15,6 +15,7 @@ An endless runner game that teaches DevOps concepts through gameplay. Navigate t
 - [Ranks & Progression](#-ranks--progression)
 - [Game Configuration](#️-game-configuration)
 - [Local Storage](#-local-storage)
+- [Troubleshooting](#-troubleshooting)
 - [Development Notes](#️-development-notes)
 
 ## 🎯 Features
@@ -148,8 +149,11 @@ Key constants in `game.js` (`CONFIG` object) that control gameplay feel:
 | `OBSTACLE_SPEED` | `3` | Horizontal scroll speed (px/frame) |
 | `OBSTACLE_GAP` | `180` | Vertical gap between obstacles (px) |
 | `OBSTACLE_SPAWN_RATE` | `2200` | Milliseconds between obstacle spawns |
+| `PLAYER_SIZE` | `50` | Player sprite bounding box (px) |
+| `OBSTACLE_WIDTH` | `100` | Width of each obstacle column (px) |
 | `QUESTION_INTERVAL` | `5` | Gates passed before a quiz question triggers |
 | `QUESTION_TIME` | `12` | Seconds to answer each quiz question |
+| `TERMINAL_VELOCITY` | `12` | Maximum downward speed to prevent tunneling (px/frame) |
 
 ## 💾 Local Storage
 
@@ -186,6 +190,24 @@ Each entry uses this schema:
 ```
 
 Content is shown on obstacle gates and in the tip banner as the player passes through. Items are cycled in random order without repeating within a session.
+
+## 🔧 Troubleshooting
+
+**Game runs slowly or stutters**
+- Make sure hardware acceleration is enabled in your browser.
+- Close other CPU-intensive tabs; the game loop runs at ~60 fps via `requestAnimationFrame`.
+
+**Quiz questions or tip banners stop appearing**
+- This can happen if `localStorage` data becomes corrupted. Run `localStorage.clear()` in the browser console and reload.
+
+**`npm start` shows an old version of the game**
+- The dev server serves from `www/` (built assets). Run `npm run build` after making changes to source files.
+
+**Favicon errors in the console**
+- `favicon-32x32.png`, `favicon-16x16.png`, and `apple-touch-icon.png` are referenced in `index.html` but not included. Generate them at [realfavicongenerator.net](https://realfavicongenerator.net) and place them in the project root.
+
+**iOS build fails after pulling changes**
+- Re-run `npm run build && npm run ios:sync` to sync the latest web assets into the Xcode project before opening Xcode.
 
 ## 🗒️ Development Notes
 
