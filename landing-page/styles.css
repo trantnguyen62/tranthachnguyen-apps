@@ -130,10 +130,11 @@ main:focus { outline: none; }
 /*
  * .glass-card — frosted-glass card base
  * Semi-transparent slate background + backdrop-blur creates the glassmorphism
- * effect. `contain: layout style paint` limits browser reflow scope for
- * better paint performance. Hover/focus transitions are handled here once
- * rather than per-card so each .card-{color} modifier only needs to override
- * box-shadow colour.
+ * effect. `contain: layout style paint` limits browser reflow scope for better
+ * paint performance. `will-change: transform` promotes each card to its own GPU
+ * compositing layer, keeping hover scale transitions smooth without triggering
+ * full-page repaints. Hover/focus transitions are handled here once rather than
+ * per-card so each .card-{color} modifier only needs to override box-shadow colour.
  */
 .glass-card {
     background: rgba(30, 41, 59, 0.7);

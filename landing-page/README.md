@@ -32,11 +32,12 @@ docker run -p 8080:80 landing-page
 
 ```
 landing-page/
-├── index.html      # Main HTML file with all content
-├── styles.css      # Additional custom styles
-├── fonts/          # Self-hosted Inter font files (woff2, multiple unicode ranges)
+├── index.html      # Main HTML file with all content and JSON-LD structured data
+├── styles.css      # All styles: hand-inlined Tailwind utilities + custom CSS (no build step)
+├── og-image.png    # Open Graph preview image (1200×630) for social link previews
+├── fonts/          # Self-hosted Inter font (7 woff2 files, one per unicode range)
 ├── Dockerfile      # Docker configuration
-├── serve.json      # Security headers and cache rules for `npx serve`
+├── serve.json      # Security headers and 3-tier cache rules for `npx serve`
 ├── robots.txt      # Crawler instructions for SEO
 ├── sitemap.xml     # Sitemap for search engines
 └── README.md       # This file
