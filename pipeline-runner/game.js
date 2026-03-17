@@ -1803,6 +1803,9 @@ showStartScreen = function () {
 };
 
 // Initialize - show banner on load
-document.addEventListener('DOMContentLoaded', () => {
+// Guard against fast loads where DOMContentLoaded has already fired before this script runs
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => AdManager.showBanner());
+} else {
     AdManager.showBanner();
-});
+}
