@@ -7,7 +7,7 @@
     <meta name="description" content="Don't get rejected at the counter. Free AI passport photo checker instantly verifies background, lighting, face position, and glasses — for passports, visas, and ID cards in 100+ countries." />
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="author" content="PassportLens" />
-    <meta name="keywords" content="passport photo checker, AI passport photo, passport photo requirements, passport photo editor, biometric photo, passport photo compliance, visa photo checker, id photo validator, avoid passport rejection, passport photo online, free passport photo tool, passport photo size, 2x2 passport photo, passport photo background, check passport photo, passport photo app" />
+    <meta name="keywords" content="passport photo checker, AI passport photo, passport photo requirements, passport photo editor, biometric photo, passport photo compliance, visa photo checker, id photo validator, avoid passport rejection, passport photo online, free passport photo tool, passport photo size, 2x2 passport photo, passport photo background, check passport photo, passport photo app, ICAO standards checker, instant passport photo check, online passport photo tool, photo id requirements, passport photo validator" />
     <link rel="canonical" href="https://passportphoto.tranthachnguyen.com/" />
     <link rel="alternate" hreflang="en" href="https://passportphoto.tranthachnguyen.com/" />
     <link rel="alternate" hreflang="x-default" href="https://passportphoto.tranthachnguyen.com/" />
@@ -38,6 +38,9 @@
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PassportLens" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
@@ -241,10 +244,20 @@
           "description": "Free AI passport photo checker and editor for passports, visas, and ID cards in 100+ countries.",
           "inLanguage": "en",
           "publisher": { "@id": "https://passportphoto.tranthachnguyen.com/#organization" },
-          "potentialAction": {
-            "@type": "UseAction",
-            "target": "https://passportphoto.tranthachnguyen.com/"
-          }
+          "potentialAction": [
+            {
+              "@type": "UseAction",
+              "target": "https://passportphoto.tranthachnguyen.com/"
+            },
+            {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://passportphoto.tranthachnguyen.com/?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          ]
         },
         {
           "@type": "Organization",
@@ -279,6 +292,18 @@
             "@type": "ReadAction",
             "target": "https://passportphoto.tranthachnguyen.com/"
           }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://passportphoto.tranthachnguyen.com/#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "PassportLens — AI Passport Photo Checker",
+              "item": "https://passportphoto.tranthachnguyen.com/"
+            }
+          ]
         }
       ]
     }
