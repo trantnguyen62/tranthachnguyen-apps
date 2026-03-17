@@ -30,6 +30,7 @@ declare global {
 }
 
 const MAX_FILE_CHARS = 12000;
+const MAX_SELECTED_CODE_CHARS = 4000;
 const MAX_MESSAGES = 200;
 
 let messageCounter = 0;
@@ -164,7 +165,11 @@ export const useLiveSession = (studyContext: StudyContext) => {
         parts.push(`\n\nCURRENT PROJECT: ${ctx.currentProject.name}${projectDesc}`);
       }
       if (ctx.selectedCode) {
-        parts.push(`\n\nSELECTED CODE:\n\`\`\`\n${ctx.selectedCode}\n\`\`\``);
+        const rawCode = ctx.selectedCode;
+        const code = rawCode.length > MAX_SELECTED_CODE_CHARS
+          ? rawCode.slice(0, MAX_SELECTED_CODE_CHARS) + '\n... [truncated]'
+          : rawCode;
+        parts.push(`\n\nSELECTED CODE:\n\`\`\`\n${code}\n\`\`\``);
       }
       const systemInstruction = parts.join('');
 

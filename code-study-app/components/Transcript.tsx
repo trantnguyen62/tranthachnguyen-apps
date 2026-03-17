@@ -88,6 +88,7 @@ interface TranscriptProps {
 
 const Transcript = memo<TranscriptProps>(({ messages }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRafRef = useRef<number | null>(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   const isNearBottom = useCallback(() => {
@@ -103,8 +104,18 @@ const Transcript = memo<TranscriptProps>(({ messages }) => {
   }, []);
 
   const handleScroll = useCallback(() => {
-    setShowScrollBtn(!isNearBottom());
+    if (scrollRafRef.current !== null) return;
+    scrollRafRef.current = requestAnimationFrame(() => {
+      scrollRafRef.current = null;
+      setShowScrollBtn(!isNearBottom());
+    });
   }, [isNearBottom]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollRafRef.current !== null) cancelAnimationFrame(scrollRafRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (isNearBottom()) {
