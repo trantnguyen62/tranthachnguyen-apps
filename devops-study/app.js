@@ -4583,6 +4583,7 @@ function handleSearch(event) {
     // Search using pre-built lowercase index; memoize to skip reprocessing identical queries
     let results;
     if (query === searchCache.query) {
+        if (searchCache.active) return; // DOM already shows these results
         results = searchCache.results;
     } else {
         results = [];

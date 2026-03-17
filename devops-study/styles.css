@@ -135,6 +135,8 @@ body {
     filter: blur(40px);
     animation: float 20s infinite ease-in-out;
     will-change: transform;
+    contain: strict;
+    pointer-events: none;
 }
 
 .bg-orb-1 {
