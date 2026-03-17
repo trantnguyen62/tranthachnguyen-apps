@@ -651,28 +651,29 @@ for (const genre of genreList) {
 
 // Precomputed lowercase strings for search
 const comicsWithLower = comics.map(c => ({
-  ...c, _titleLower: c.title.toLowerCase(), _authorLower: c.author.toLowerCase(),
+  ...c, titleLower: c.title.toLowerCase(), authorLower: c.author.toLowerCase(),
 }));
 
 // ETags for static endpoints (computed once at startup)
-const _dataHash = crypto.createHash('sha1').update(JSON.stringify(comics)).digest('hex').slice(0, 16);
-const comicsETag = `"${_dataHash}"`;
-const genresETag = `"${_dataHash}-genres"`;
-const featuredETag = `"${_dataHash}-featured"`;
-const comicETags = new Map(comics.map(c => [c.id, `"${_dataHash}-${c.id}"`]));
+const dataHash = crypto.createHash('sha1').update(JSON.stringify(comics)).digest('hex').slice(0, 16);
+const comicsETag = `"${dataHash}"`;
+const genresETag = `"${dataHash}-genres"`;
+const featuredETag = `"${dataHash}-featured"`;
+const comicETags = new Map(comics.map(c => [c.id, `"${dataHash}-${c.id}"`]));
 // SSR ETags incorporate today's date since SSR HTML includes dateModified
-const ssrDataTag = `${_dataHash}-${new Date().toISOString().split('T')[0]}`;
+const ssrDataTag = `${dataHash}-${new Date().toISOString().split('T')[0]}`;
 const comicSsrETags = new Map(comics.map(c => [c.id, `"ssr-${ssrDataTag}-${c.id}"`]));
 const librarySsrETag = `"ssr-${ssrDataTag}-lib"`;
 const comicsMap = new Map(comics.map(c => [c.id, c]));
 
-const _rawBaseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
-if (!/^https?:\/\/[a-zA-Z0-9.-]+(:\d+)?$/.test(_rawBaseUrl)) {
-  console.error(`Invalid BASE_URL: "${_rawBaseUrl}". Must be https://hostname or http://hostname[:port].`);
+const baseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
+if (!/^https?:\/\/[a-zA-Z0-9.-]+(:\d+)?$/.test(baseUrl)) {
+  console.error(`Invalid BASE_URL: "${baseUrl}". Must be https://hostname or http://hostname[:port].`);
   process.exit(1);
 }
-const baseUrl = _rawBaseUrl;
 const today = new Date().toISOString().split('T')[0];
+// Scales rating × chapters to produce a plausible aggregateRating ratingCount for schema.org
+const RATING_COUNT_FACTOR = 15;
 
 function escapeHtml(str) {
   return String(str)
@@ -721,7 +722,7 @@ if (indexHtmlTemplate) {
       datePublished: comic.publishedDate,
       dateModified: today,
       ...(comic.hasTextVersion && comic.textStory ? { wordCount: comic.textStory.trim().split(/\s+/).length } : {}),
-      ...(comic.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: comic.rating, bestRating: 5, worstRating: 1, ratingCount: Math.round(comic.rating * comic.chapters * 15) } } : {}),
+      ...(comic.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: comic.rating, bestRating: 5, worstRating: 1, ratingCount: Math.round(comic.rating * comic.chapters * RATING_COUNT_FACTOR) } } : {}),
     };
     const breadcrumbLd = {
       '@context': 'https://schema.org',
@@ -855,7 +856,7 @@ app.get('/api/comics', readRateLimit, (req, res) => {
   const searchLower = search ? String(search).slice(0, 100).toLowerCase() : null;
   let result = comicsWithLower.filter(comic =>
     (genre && genre !== 'All' ? comic.genre === genre : true) &&
-    (searchLower ? comic._titleLower.includes(searchLower) || comic._authorLower.includes(searchLower) : true)
+    (searchLower ? comic.titleLower.includes(searchLower) || comic.authorLower.includes(searchLower) : true)
   );
 
   if (sort === 'rating') {
@@ -865,7 +866,7 @@ app.get('/api/comics', readRateLimit, (req, res) => {
   }
 
   // Return without pages or internal fields
-  res.json(result.map(({ pages, _titleLower, _authorLower, ...comic }) => comic));
+  res.json(result.map(({ pages, titleLower, authorLower, ...comic }) => comic));
 });
 
 // Get single comic with pages

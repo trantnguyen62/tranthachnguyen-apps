@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { Star, BookOpen, User, Tag, Bookmark, BookmarkCheck, Play, ArrowLeft, FileText, Image } from 'lucide-react';
 import { setMeta } from '../utils/meta';
 
+// Scales rating × chapters to produce a plausible aggregateRating ratingCount for schema.org
+const RATING_COUNT_FACTOR = 15;
+
 function ComicDetail() {
   const { id } = useParams();
   const [comic, setComic] = useState(null);
@@ -89,7 +92,7 @@ function ComicDetail() {
             ratingValue: comicData.rating,
             bestRating: 5,
             worstRating: 1,
-            ratingCount: Math.round(comicData.rating * (comicData.chapters || 1) * 15),
+            ratingCount: Math.round(comicData.rating * (comicData.chapters || 1) * RATING_COUNT_FACTOR),
           } : undefined,
         });
         document.head.appendChild(ld);
