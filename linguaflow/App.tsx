@@ -205,7 +205,7 @@ function App() {
           <div className="flex items-center gap-3">
             {userProfile && (
               <div role="img" className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0" aria-label={`User: ${userProfile.name}`} title={userProfile.name}>
-                {userProfile.name.charAt(0).toUpperCase()}
+                <span aria-hidden="true">{userProfile.name.charAt(0).toUpperCase()}</span>
               </div>
             )}
             <div className="flex items-center gap-2 text-xs">
@@ -404,6 +404,8 @@ function App() {
             )}
             <button
               onClick={() => setTranscriptOpen(o => !o)}
+              aria-expanded={transcriptOpen}
+              aria-controls="transcript-content"
               aria-label={transcriptOpen ? 'Collapse transcript' : `Expand transcript${unreadCount > 0 ? `, ${unreadCount} new message${unreadCount > 1 ? 's' : ''}` : ''}`}
               className="md:hidden relative w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
             >
@@ -418,7 +420,7 @@ function App() {
             </button>
           </div>
         </div>
-        <div className={`flex-1 overflow-hidden ${transcriptOpen ? '' : 'hidden md:block'}`}>
+        <div id="transcript-content" className={`flex-1 overflow-hidden ${transcriptOpen ? '' : 'hidden md:block'}`}>
           <Transcript messages={messages} />
         </div>
       </section>

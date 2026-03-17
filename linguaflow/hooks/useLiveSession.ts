@@ -113,6 +113,8 @@ export const useLiveSession = (activeLanguage: LanguageConfig, userProfile?: Use
     }
 
     inputVolumeRef.current = 0;
+    currentInputTranscriptionRef.current = '';
+    currentOutputTranscriptionRef.current = '';
     setConnectionState(ConnectionState.DISCONNECTED);
     nextStartTimeRef.current = 0;
   }, []);
@@ -274,25 +276,13 @@ Hãy chào ${safeName} và ${userProfile.totalSessions > 0 ? 'tiếp tục bài 
               const userText = currentInputTranscriptionRef.current.trim();
               const modelText = currentOutputTranscriptionRef.current.trim();
 
-              if (userText) {
-                const id = `${++messageCounterRef.current}-user`;
-                setMessages(prev => [...prev.slice(-99), {
-                  id,
-                  role: 'user',
-                  text: userText,
-                  timestamp: new Date(),
-                  isFinal: true
-                }]);
-              }
-              if (modelText) {
-                const id = `${++messageCounterRef.current}-model`;
-                setMessages(prev => [...prev.slice(-99), {
-                  id,
-                  role: 'model',
-                  text: modelText,
-                  timestamp: new Date(),
-                  isFinal: true
-                }]);
+              if (userText || modelText) {
+                setMessages(prev => {
+                  const next = [...prev];
+                  if (userText) next.push({ id: `${++messageCounterRef.current}-user`, role: 'user', text: userText, timestamp: new Date(), isFinal: true });
+                  if (modelText) next.push({ id: `${++messageCounterRef.current}-model`, role: 'model', text: modelText, timestamp: new Date(), isFinal: true });
+                  return next.slice(-100);
+                });
               }
 
               currentInputTranscriptionRef.current = '';

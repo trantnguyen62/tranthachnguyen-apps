@@ -159,7 +159,7 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
           <h2 id="profile-modal-title" className="text-xl font-bold text-white">
-            {existingProfile ? '👋 Chào mừng trở lại!' : '🎓 Chào bạn!'}
+            {existingProfile ? <><span aria-hidden="true">👋 </span>Chào mừng trở lại!</> : <><span aria-hidden="true">🎓 </span>Chào bạn!</>}
           </h2>
           <p className="text-blue-100 text-sm mt-1">
             {existingProfile 
@@ -179,8 +179,8 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
             <div className="space-y-4">
               <div className="bg-slate-700/50 rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl font-bold text-white" aria-label={`Avatar for ${existingProfile.name}`}>
-                    <span aria-hidden="true">{existingProfile.name.charAt(0).toUpperCase()}</span>
+                  <div aria-hidden="true" className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl font-bold text-white">
+                    {existingProfile.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
                     <h3 className="font-semibold text-white text-lg">{existingProfile.name}</h3>
@@ -273,7 +273,7 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
               </div>
 
               <p className="text-xs text-slate-400">
-                💡 Tên của bạn sẽ được lưu để giáo viên cá nhân hóa bài học và theo dõi tiến độ.
+                <span aria-hidden="true">💡 </span>Tên của bạn sẽ được lưu để giáo viên cá nhân hóa bài học và theo dõi tiến độ.
               </p>
 
               <div className="flex gap-3">
