@@ -491,7 +491,11 @@ function init() {
         domCache.healthBar     = document.getElementById('healthBar');
         domCache.shieldFill    = document.getElementById('shieldFill');
         domCache.shieldBar     = document.getElementById('shieldBar');
+        domCache.shieldText    = document.getElementById('shieldText');
         domCache.scoreValue    = document.getElementById('scoreValue');
+        domCache.scoreValue.addEventListener('animationend', () => {
+            domCache.scoreValue.classList.remove('updated');
+        });
         domCache.streakValue   = document.getElementById('streakValue');
         domCache.multiplier    = document.getElementById('multiplier');
         domCache.multiplier.addEventListener('animationend', () => {
@@ -1606,12 +1610,22 @@ function applyPowerup(type) {
 }
 
 /**
- * Emit a small burst of gold particles near the player to signal points earned.
- * The points value is not currently rendered as text; the HUD score updates separately.
- * @param {number} points - Points awarded (currently unused visually, reserved for future text overlay).
+ * Emit a burst of gold particles and a floating DOM score text near the score HUD.
+ * @param {number} points - Points awarded.
  */
 function createScoreParticle(points) {
-    // This would create floating score text - simplified here
+    // Floating DOM score popup
+    const gameScreen = document.getElementById('gameScreen');
+    if (gameScreen) {
+        const el = document.createElement('div');
+        el.className = 'float-score';
+        el.textContent = `+${points}`;
+        el.setAttribute('aria-hidden', 'true');
+        gameScreen.appendChild(el);
+        el.addEventListener('animationend', () => el.remove(), { once: true });
+    }
+
+    // Canvas particle burst
     for (let i = 0; i < 5; i++) {
         pushParticle({
             x: game.player.x + (Math.random() - 0.5) * 50,
@@ -1750,10 +1764,14 @@ function updateHUD() {
         h.shield = game.player.shield;
         domCache.shieldFill.style.width = `${game.player.shield}%`;
         if (domCache.shieldBar) domCache.shieldBar.setAttribute('aria-valuenow', Math.round(game.player.shield));
+        if (domCache.shieldText) domCache.shieldText.textContent = Math.round(game.player.shield);
     }
     if (game.score !== h.score) {
         h.score = game.score;
         domCache.scoreValue.textContent = game.score;
+        domCache.scoreValue.classList.remove('updated');
+        void domCache.scoreValue.offsetWidth;
+        domCache.scoreValue.classList.add('updated');
     }
     if (game.streak !== h.streak) {
         h.streak = game.streak;
