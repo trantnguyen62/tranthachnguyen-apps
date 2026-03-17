@@ -657,6 +657,10 @@ const comicsETag = `"${_dataHash}"`;
 const genresETag = `"${_dataHash}-genres"`;
 const featuredETag = `"${_dataHash}-featured"`;
 const comicETags = new Map(comics.map(c => [c.id, `"${_dataHash}-${c.id}"`]));
+// SSR ETags incorporate today's date since SSR HTML includes dateModified
+const ssrDataTag = `${_dataHash}-${new Date().toISOString().split('T')[0]}`;
+const comicSsrETags = new Map(comics.map(c => [c.id, `"ssr-${ssrDataTag}-${c.id}"`]));
+const librarySsrETag = `"ssr-${ssrDataTag}-lib"`;
 const comicsMap = new Map(comics.map(c => [c.id, c]));
 
 const _rawBaseUrl = process.env.BASE_URL || 'https://comic-news.tranthachnguyen.com';
@@ -970,7 +974,10 @@ app.get('/comic/:id', (req, res) => {
       if (err && !res.headersSent) res.status(500).end();
     });
   }
+  const etag = comicSsrETags.get(id);
   res.set('Cache-Control', 'public, max-age=3600');
+  res.set('ETag', etag);
+  if (req.headers['if-none-match'] === etag) return res.status(304).end();
   res.type('html').send(html);
 });
 
@@ -984,6 +991,8 @@ app.get('/library', (req, res) => {
     });
   }
   res.set('Cache-Control', 'public, max-age=3600');
+  res.set('ETag', librarySsrETag);
+  if (req.headers['if-none-match'] === librarySsrETag) return res.status(304).end();
   res.type('html').send(librarySsrHtml);
 });
 

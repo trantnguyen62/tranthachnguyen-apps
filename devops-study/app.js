@@ -3733,9 +3733,8 @@ function loadProgress() {
             const parsed = JSON.parse(saved);
             // Convert flashcardsViewed arrays to Sets for O(1) lookup
             for (const topicId in parsed) {
-                if (Array.isArray(parsed[topicId].flashcardsViewed)) {
-                    parsed[topicId].flashcardsViewed = new Set(parsed[topicId].flashcardsViewed);
-                }
+                const fv = parsed[topicId].flashcardsViewed;
+                parsed[topicId].flashcardsViewed = Array.isArray(fv) ? new Set(fv) : new Set();
             }
             state.progress = parsed;
         } catch (e) {
@@ -3760,7 +3759,7 @@ function saveProgress() {
     for (const topicId in state.progress) {
         const p = state.progress[topicId];
         serializable[topicId] = {
-            flashcardsViewed: [...p.flashcardsViewed],
+            flashcardsViewed: p.flashcardsViewed instanceof Set ? [...p.flashcardsViewed] : [],
             quizBestScore: p.quizBestScore,
             quizAttempts: p.quizAttempts
         };
