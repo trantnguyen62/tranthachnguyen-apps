@@ -315,7 +315,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
 
           <button
             onClick={(e) => { e.stopPropagation(); startCamera(); }}
-            className="flex items-center gap-2 px-5 py-2.5 border border-slate-300 bg-white text-slate-700 rounded-lg hover:bg-slate-50 hover:border-slate-400 transition-colors shadow-sm font-medium text-sm"
+            className="flex items-center gap-2 px-5 py-2.5 border border-brand-200 bg-brand-50 text-brand-700 rounded-lg hover:bg-brand-100 hover:border-brand-300 transition-colors shadow-sm font-medium text-sm"
             aria-label="Take a photo using your camera"
           >
             <Camera className="w-4 h-4" aria-hidden="true" />

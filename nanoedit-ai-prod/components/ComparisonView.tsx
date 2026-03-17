@@ -114,11 +114,11 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                <button
                 ref={expandButtonRef}
                 onClick={() => setIsExpanded(true)}
-                className="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
-                title="Fullscreen"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors text-xs font-medium"
                 aria-label="View fullscreen"
               >
-                <Maximize2 className="w-5 h-5" aria-hidden="true" />
+                <Maximize2 className="w-4 h-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Fullscreen</span>
               </button>
               <button
                 onClick={onDownload}

@@ -461,7 +461,7 @@ const App: React.FC = () => {
                           onClick={() => handlePresetClick(text)}
                           aria-pressed={isActive}
                           title={text}
-                          className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border rounded-full transition-colors ${isActive ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200'}`}
+                          className={`flex items-center gap-1.5 text-xs px-3 py-2 border rounded-full transition-colors active:scale-95 ${isActive ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-brand-50 hover:text-brand-700 hover:border-brand-200'}`}
                         >
                           <Icon className="w-3 h-3" aria-hidden="true" />
                           {label}
