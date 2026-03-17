@@ -495,6 +495,125 @@ I now wait for other people to laugh first. This is not cowardice. It is calibra
       { id: 5, title: "Sorry, I Thought—", description: "A sentence with no good ending. Left unfinished. Wisely." },
       { id: 6, title: "Very Serious Nodding", description: "For the remainder of the evening. I had earned this. I nodded through all of it." }
     ]
+  },
+  {
+    id: 11,
+    title: "I Forgot Someone's Name Mid-Introduction",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    publishedDate: "2025-03-05",
+    coverImage: "/images/forgot-name-intro.svg",
+    description: "I knew both of their names. I had known them for years. One introduction, and his name was simply gone. I gestured at him vaguely and said 'from the third floor.' His name came back at 2:47 in the morning.",
+    rating: 4.8,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I forgot someone's name in the middle of introducing them.
+
+It was a work happy hour. I had been standing with my manager when a colleague walked over. My manager didn't know my colleague. This was fine. I knew both of their names. I had known them for years.
+
+"Have you met—" I said.
+
+And then it was gone. His name. My colleague's name. A name I had said approximately four hundred times. The name of a person I had eaten lunch with. Gone.
+
+I kept talking. I don't know why.
+
+"Have you met my — have you met, uh — this is my colleague from the—" I gestured at him vaguely, "—from the third floor."
+
+They introduced themselves to each other. They shook hands. My colleague looked at me. I looked at the wall behind him.
+
+His name came back to me at 2:47 in the morning. I know this because I woke up and said it out loud to no one.
+
+I have since adopted a policy of introducing people as "someone I think you should meet" and then leaving.`,
+    pages: [
+      { id: 1, image: "/images/forgot-name-intro.svg", caption: "Two people I know well. One sentence. Complete failure of memory." }
+    ],
+    panels: [
+      { id: 1, title: "The Setup", description: "Two people I know. One introduction to make. Routine. Simple. Nothing to worry about." },
+      { id: 2, title: "Have You Met—", description: "A sentence started with full confidence and no known ending." },
+      { id: 3, title: "The Gap", description: "His name. Gone. Four hundred lunches. Three years. Nothing." },
+      { id: 4, title: "The Gesture", description: "A vague wave toward a man I knew well. \"From the third floor.\"" },
+      { id: 5, title: "The Handshake", description: "They introduced themselves to each other. I watched as if observing strangers." },
+      { id: 6, title: "2:47 AM", description: "His name returned while I was asleep. I said it out loud. To no one." }
+    ]
+  },
+  {
+    id: 12,
+    title: "I Confidently Walked Into the Wrong Meeting",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    publishedDate: "2025-03-10",
+    coverImage: "/images/wrong-meeting.svg",
+    description: "Conference Room B. 10am. I said 'morning, everyone' with real conviction. There were six people I had never seen before. Mid-presentation. I assessed the room for a full second before saying 'wrong room' and backing out through a door that wouldn't close.",
+    rating: 4.7,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I walked confidently into the wrong meeting.
+
+It was a Monday. I had a 10am. I walked to Conference Room B, opened the door, and said "morning, everyone" with the energy of someone who belongs.
+
+There were six people I did not know. They were already mid-presentation.
+
+I stood in the doorway for a moment, assessing the room. The presenter paused. Six people looked at me.
+
+"Wrong room," I said.
+
+I backed out. The door didn't close fully. I had to push it again. It still didn't close. On the third push it clicked shut.
+
+I found my meeting in Conference Room C. I was four minutes late. I said the traffic was bad. It was an internal meeting. There was no traffic.
+
+I have since begun reading calendar invites all the way to the end, including the room assignment.`,
+    pages: [
+      { id: 1, image: "/images/wrong-meeting.svg", caption: "Conference Room B. Six strangers. One presenter who did not expect an interruption." }
+    ],
+    panels: [
+      { id: 1, title: "Monday, 10 AM", description: "Calendar says Conference Room B. Confidence is at an all-time high." },
+      { id: 2, title: "Morning, Everyone!", description: "Said with full conviction. Wrong room. Six strangers mid-presentation." },
+      { id: 3, title: "The Assessment", description: "A full second of standing in a doorway processing new information." },
+      { id: 4, title: "Wrong Room", description: "Two words. Clean. Backed out. The door had other plans." },
+      { id: 5, title: "The Door", description: "Three attempts. Every attempt witnessed by six people through the glass." },
+      { id: 6, title: "Conference Room C", description: "Four minutes late. \"Traffic was bad.\" Internal meeting. No traffic." }
+    ]
+  },
+  {
+    id: 13,
+    title: "I Waved at My Own Reflection in a Store Window",
+    author: "Anonymous",
+    genre: "Slice of Life",
+    publishedDate: "2025-03-15",
+    coverImage: "/images/waved-at-reflection.svg",
+    description: "Someone across the street was waving. I waved back. Full smile. Meaningful eye contact. It was a large plate glass window. The waving figure was me. I kept walking at the same pace. I went into the nearest store and bought a notebook I did not need.",
+    rating: 4.9,
+    chapters: 1,
+    status: "Completed",
+    hasTextVersion: true,
+    textStory: `I waved at my own reflection in a store window.
+
+It was a Saturday afternoon. I was walking through downtown. Someone ahead of me — across the street, maybe thirty feet — seemed to wave in my direction.
+
+I waved back. Warm smile. Full eye contact.
+
+Then I got closer.
+
+It was a large plate glass window. The waving figure was me. I had seen my own reflection at a distance, misidentified it as a separate person, and enthusiastically waved hello to myself.
+
+I had made eye contact with myself.
+
+I kept walking at the same pace. I did not break stride. I did not change my expression. I went into the nearest store and bought a notebook I did not need.
+
+I thought about this for the rest of the weekend. Not with embarrassment — with a kind of scientific interest. How far away were you, I thought, when you stopped recognizing yourself?`,
+    pages: [
+      { id: 1, image: "/images/waved-at-reflection.svg", caption: "A wave across the street. A warm smile. A large plate glass window." }
+    ],
+    panels: [
+      { id: 1, title: "A Saturday Walk", description: "Downtown. Afternoon. Good mood. Everything going normally." },
+      { id: 2, title: "Someone Waving", description: "Across the street. Toward me. Deliberate. Unmistakably directed at me." },
+      { id: 3, title: "I Waved Back", description: "Full commitment. Warm smile. Meaningful eye contact. Very friendly." },
+      { id: 4, title: "The Window", description: "A large plate glass. A reflection. The waving figure was me." },
+      { id: 5, title: "Eye Contact With Myself", description: "I held it briefly. I do not recommend this." },
+      { id: 6, title: "The Notebook", description: "Bought one I didn't need. Kept walking. Some moments need a cover story." }
+    ]
   }
 ];
 
