@@ -1558,7 +1558,11 @@ echo "Deployed \$ECR_REPO:\$IMAGE_TAG to \$SERVICE_NAME"`
                 { term: 'sensitive Variable', definition: 'A variable or output marked sensitive = true so its value is redacted from plan and apply output, preventing secrets from appearing in logs.' },
                 { term: 'Provisioner', definition: 'An escape hatch that runs scripts on a resource (local-exec or remote-exec) after creation. Discouraged in favor of configuration management tools like Ansible.' },
                 { term: '-replace Flag', definition: 'Passed to terraform apply or plan to force replacement of a specific resource (e.g., -replace=aws_instance.web), replacing the deprecated terraform taint command.' },
-                { term: 'templatefile()', definition: 'A Terraform built-in function that renders a template file with provided variables, commonly used to generate cloud-init user data or config file contents.' }
+                { term: 'templatefile()', definition: 'A Terraform built-in function that renders a template file with provided variables, commonly used to generate cloud-init user data or config file contents.' },
+                { term: 'precondition / postcondition', definition: 'Validation blocks inside a resource or data source lifecycle. precondition checks inputs before the resource is created; postcondition checks outputs after. Both raise errors with a custom message on failure.' },
+                { term: 'check Block', definition: 'A Terraform 1.5+ block for continuous, non-blocking validation of infrastructure state (e.g., HTTP health checks). Unlike precondition, a failing check produces a warning rather than halting the run.' },
+                { term: 'terraform test', definition: 'A native testing command introduced in Terraform 1.6. Runs .tftest.hcl files that provision real infrastructure, assert on outputs and resource attributes, then tear it all down — replacing third-party tools like Terratest for unit and integration testing.' },
+                { term: 'import Block', definition: 'A Terraform 1.5+ declarative alternative to the terraform import CLI command. Defined in .tf files, it lets you plan and review state imports in a PR before applying, supports for_each for bulk imports, and is idempotent.' }
             ],
             quiz: [
                 {
@@ -1620,6 +1624,21 @@ echo "Deployed \$ECR_REPO:\$IMAGE_TAG to \$SERVICE_NAME"`
                     question: 'What is the modern replacement for terraform taint?',
                     options: ['terraform refresh', 'terraform apply -replace=<resource>', 'terraform state rm', 'terraform plan -destroy'],
                     correct: 1
+                },
+                {
+                    question: 'What is the difference between a precondition and a check block in Terraform?',
+                    options: ['No difference; they are aliases', 'precondition runs before plan; check runs after apply', 'precondition aborts the run on failure; check emits a warning and continues', 'check blocks only work in modules'],
+                    correct: 2
+                },
+                {
+                    question: 'What does the terraform test command (1.6+) do?',
+                    options: ['Validates HCL syntax only', 'Provisions real infrastructure, runs assertions, then destroys it', 'Runs only against mock providers', 'Lints Terraform code for best practices'],
+                    correct: 1
+                },
+                {
+                    question: 'What advantage does a declarative import block have over the terraform import CLI command?',
+                    options: ['It is faster', 'It supports only AWS resources', 'It cannot be used with for_each', 'The import can be reviewed in a plan before being applied and supports for_each for bulk imports'],
+                    correct: 3
                 }
             ],
             codebase: [
@@ -2541,7 +2560,9 @@ echo "Server setup complete!"`
                 { term: 'Pushgateway', definition: 'A Prometheus component that allows short-lived jobs (batch jobs, cron jobs) to push metrics to a gateway, which Prometheus then scrapes. Used when the pull model is not feasible.' },
                 { term: 'Blackbox Exporter', definition: 'A Prometheus exporter for probing external endpoints over HTTP, HTTPS, DNS, TCP, and ICMP. Used to measure availability and latency from the outside.' },
                 { term: 'kube-state-metrics', definition: 'A service that listens to the Kubernetes API and exposes metrics about the state of objects (deployments, pods, nodes). Distinct from metrics-server which provides resource usage.' },
-                { term: 'VictoriaMetrics', definition: 'A fast, cost-effective time-series database compatible with Prometheus. Known for better compression and performance at high cardinality workloads. Can be used as a long-term Prometheus remote storage.' }
+                { term: 'VictoriaMetrics', definition: 'A fast, cost-effective time-series database compatible with Prometheus. Known for better compression and performance at high cardinality workloads. Can be used as a long-term Prometheus remote storage.' },
+                { term: 'Recording Rules', definition: 'Prometheus rules that precompute expensive or frequently-used PromQL expressions and save the result as a new time-series. They speed up dashboards and alerts by avoiding repeated full-range-vector scans at query time.' },
+                { term: 'ServiceMonitor', definition: 'A Prometheus Operator custom resource that declaratively defines how a set of Kubernetes services should be scraped. It replaces manual scrape_config entries and lets you manage monitoring targets as Kubernetes objects alongside the application.' }
             ],
             commands: [
                 { command: 'prometheus --config.file=prometheus.yml', description: 'Start Prometheus with config' },
@@ -2584,7 +2605,9 @@ echo "Server setup complete!"`
                 { question: 'What is high cardinality a problem for in Prometheus?', options: ['Alert routing', 'Log formatting', 'Dashboard rendering', 'Time-series database performance'], correct: 3, explanation: 'Cardinality is the number of unique label combinations in a metric. Labels with many possible values (user IDs, request IDs) create millions of time-series, overwhelming Prometheus\'s in-memory TSDB, consuming RAM, and degrading query performance.' },
                 { question: 'What are the Four Golden Signals from the Google SRE book?', options: ['CPU, Memory, Disk, Network', 'Rate, Errors, Duration, Load', 'Latency, Traffic, Errors, Saturation', 'Uptime, Throughput, Lag, Cost'], correct: 2, explanation: 'The Four Golden Signals are: Latency (how long requests take), Traffic (demand on the system), Errors (rate of failed requests), and Saturation (how full the service is). Monitoring all four provides a comprehensive view of user-impacting issues.' },
                 { question: 'What happens when an error budget is exhausted?', options: ['The service is shut down', 'SLOs are automatically relaxed', 'Alerts are silenced', 'New feature work pauses until reliability improves'], correct: 3, explanation: 'An error budget is the allowed amount of unreliability derived from an SLO. If you have a 99.9% SLO, your monthly error budget is ~43 minutes of downtime. When the budget is spent, SRE practice dictates pausing feature work to focus on reliability.' },
-                { question: 'What is Thanos primarily used for?', options: ['Long-term Prometheus metrics storage and global querying', 'Replacing Prometheus', 'Log aggregation', 'Distributed tracing'], correct: 0, explanation: 'Thanos extends Prometheus with long-term object storage (S3, GCS), global query across multiple Prometheus instances, and high availability via replication. It adds Sidecar, Store Gateway, Querier, and Compactor components to the Prometheus deployment.' }
+                { question: 'What is Thanos primarily used for?', options: ['Long-term Prometheus metrics storage and global querying', 'Replacing Prometheus', 'Log aggregation', 'Distributed tracing'], correct: 0, explanation: 'Thanos extends Prometheus with long-term object storage (S3, GCS), global query across multiple Prometheus instances, and high availability via replication. It adds Sidecar, Store Gateway, Querier, and Compactor components to the Prometheus deployment.' },
+                { question: 'What is the main benefit of Prometheus Recording Rules?', options: ['They send alerts faster', 'They precompute expensive queries as new time-series, speeding up dashboards and alerts', 'They replace alerting rules', 'They compress raw metrics on disk'], correct: 1, explanation: 'Recording rules evaluate a PromQL expression on a schedule and store the result as a new metric. This is critical for complex aggregations over many series (e.g., per-cluster CPU averages) that would be slow to recompute on every dashboard refresh or alert evaluation.' },
+                { question: 'What does a ServiceMonitor resource do in the Prometheus Operator?', options: ['Monitors Kubernetes node health', 'Defines scrape configuration for Kubernetes services as a declarative CRD', 'Replaces Alertmanager for routing alerts', 'Stores metrics in object storage'], correct: 1, explanation: 'The Prometheus Operator uses ServiceMonitor CRDs to auto-configure Prometheus scrape targets. Instead of editing prometheus.yml, teams deploy a ServiceMonitor alongside their app. The Operator watches these resources and regenerates the Prometheus configuration automatically.' }
             ],
             codebase: [
                 {
