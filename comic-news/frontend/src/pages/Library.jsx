@@ -26,7 +26,7 @@ function Library() {
     const title = 'Story Library - Comic News';
     const description = selectedGenre !== 'All'
       ? `Browse ${selectedGenre} comics on Comic News. Discover news stories and real-life moments transformed into visual comics.`
-      : 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
+      : 'Browse all stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
     const url = `${window.location.origin}/library`;
 
     document.title = title;
@@ -57,7 +57,7 @@ function Library() {
     return () => {
       canonical.remove();
       document.getElementById('meta-robots-library')?.remove();
-      const origDesc = 'Experience the news like never before. Comic News transforms trending stories and daily news into engaging visual comics you\'ll actually want to read.';
+      const origDesc = 'Real stories turned into comics. Comic News transforms awkward moments, real-life slip-ups, and everyday events into visual comics you\'ll actually want to read.';
       document.querySelector('meta[name="description"]')?.setAttribute('content', origDesc);
     };
   }, [selectedGenre, searchQuery]);
@@ -110,7 +110,7 @@ function Library() {
           url: `${window.location.origin}/library`,
           description: selectedGenre !== 'All'
             ? `Browse ${selectedGenre} comics on Comic News.`
-            : 'Browse all news stories transformed into comics.',
+            : 'Browse all stories transformed into comics.',
           hasPart: data.slice(0, 20).map(comic => ({
             '@type': 'Article',
             name: comic.title,
