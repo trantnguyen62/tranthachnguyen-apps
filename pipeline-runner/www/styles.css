@@ -28,8 +28,8 @@
     right: 0;
     text-align: center;
     padding: 5px 8px;
-    font-size: 0.6rem;
-    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.87);
     pointer-events: none;
     z-index: 1;
     line-height: 1.4;
@@ -665,7 +665,7 @@ body {
     margin-top: 0.75rem;
     text-align: center;
     font-size: 0.85rem;
-    color: #7b8eaa;
+    color: #a3b9cc;
     letter-spacing: 0.03em;
 }
 
@@ -774,7 +774,7 @@ body {
 
 .stat-label {
     font-size: 0.75rem;
-    color: #7b8eaa;
+    color: #a3b9cc;
     margin-top: 0.4rem;
     font-weight: 500;
 }
@@ -917,8 +917,7 @@ body {
 
 .ad-demo-text {
     font-size: 0.75rem;
-    color: #7b8eaa;
-    opacity: 0.7;
+    color: #a3b9cc;
 }
 
 /* Watch Ad Button */
