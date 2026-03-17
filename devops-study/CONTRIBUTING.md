@@ -46,9 +46,11 @@ code here`
 ### Guidelines
 
 - **Flashcards**: Keep definitions under 2 sentences. Aim for 20–100 cards per topic. The `term` should be a noun or short phrase; the `definition` should answer "what is it and why does it matter".
+  - Topic progress is scored as 50% flashcards seen + 50% quiz best score, so a topic needs both cards *and* quiz questions to show meaningful progress.
 - **Quiz questions**: Each question needs exactly 4 options (`options` array length must be 4) and one correct answer (`correct` is a 0-based index). Always include an `explanation`. Avoid "all of the above" / "none of the above" options.
 - **Commands**: Include only commands a practitioner would actually run. Omit obvious flags. The `desc` should describe the effect, not just restate the command name.
 - **Code examples**: Prefer real-world, minimal examples over toy snippets. Include comments inside the code block where the intent is not obvious.
+- **Match game**: The game randomly selects 6 flashcard pairs per round. Any topic with fewer than 6 flashcards will not be playable in match mode — ensure new topics have at least 6 cards.
 
 ## Adding a New Topic
 

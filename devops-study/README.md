@@ -57,15 +57,18 @@ docker run -p 8080:80 devops-study
 
 ```
 devops-study/
-├── index.html          # Main HTML file
+├── index.html          # Main HTML file (SEO meta tags + JSON-LD structured data)
 ├── privacy.html        # Privacy policy page
 ├── app.js              # Application logic and study data
-├── app.min.js          # Minified version (generated)
+├── app.min.js          # Minified version (generated — do not edit)
 ├── styles.css          # Styling
-├── styles.min.css      # Minified version (generated)
-├── serve.json          # Static server config with security headers
-├── Dockerfile          # Docker configuration
-└── package.json        # Dev dependencies (terser, clean-css-cli)
+├── styles.min.css      # Minified version (generated — do not edit)
+├── serve.json          # Static server config: security headers + 1-year cache for .min.* files
+├── Dockerfile          # Container config (Alpine-based, runs as non-root)
+├── package.json        # Dev dependencies (terser, clean-css-cli)
+├── og-image.svg        # Open Graph / social sharing preview image
+├── robots.txt          # Search engine crawl directives
+└── sitemap.xml         # XML sitemap for search indexing
 ```
 
 ## 🛠️ Development
