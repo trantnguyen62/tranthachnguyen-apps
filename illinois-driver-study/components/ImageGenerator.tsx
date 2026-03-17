@@ -142,7 +142,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
 
           {imageSrc && (
             <div className="mt-8 rounded-lg overflow-hidden shadow-xl border border-slate-200">
-              <img src={imageSrc} alt={imageAlt} className="w-full h-auto" />
+              <img src={imageSrc} alt={imageAlt} loading="lazy" className="w-full h-auto" />
             </div>
           )}
         </div>
