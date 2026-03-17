@@ -205,7 +205,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
           <h2 className="text-2xl font-bold text-slate-800 mb-1">{t.quizComplete}</h2>
           <p className={`text-lg font-semibold mb-6 ${passed ? 'text-green-600' : 'text-amber-600'}`}>{passed ? t.passing : t.needsWork}</p>
 
-          <div className="flex justify-center gap-8 mb-6">
+          <div className="flex justify-center gap-4 sm:gap-8 mb-6">
             <div className="text-center" aria-label={`${score} ${t.correct} out of ${questions.length}`}>
               <div aria-hidden="true" className="text-4xl font-bold text-green-600">{score}<span className="text-xl text-slate-400">/{questions.length}</span></div>
               <div className="text-sm text-slate-500 mt-1">{t.correct}</div>
@@ -371,6 +371,11 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
         {!showResult && (
           <p id="kb-hint" className="mt-3 text-xs text-slate-400 text-right select-none">
             {language === 'vi' ? 'Nhấn A–D để chọn' : 'Press A–D to select'}
+          </p>
+        )}
+        {showResult && (
+          <p className="mt-3 text-xs text-slate-400 text-right select-none">
+            {language === 'vi' ? 'Nhấn Enter → để tiếp tục' : 'Press Enter → to continue'}
           </p>
         )}
         {showResult && (
