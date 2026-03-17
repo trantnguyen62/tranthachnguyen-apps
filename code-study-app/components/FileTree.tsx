@@ -50,7 +50,7 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
           onClick={handleToggle}
           className="flex items-center gap-1 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm transition-colors"
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
-          aria-label={`${node.name} folder, ${isExpanded ? 'expanded' : 'collapsed'}`}
+          aria-label={`${node.name} folder, level ${depth + 1}, ${isExpanded ? 'expanded' : 'collapsed'}`}
         >
           {isExpanded ? (
             <ChevronDown className="w-4 h-4 text-slate-500" aria-hidden="true" />
@@ -89,7 +89,7 @@ const TreeNode = memo<TreeNodeProps>(({ node, depth, onFileSelect, selectedPath 
       onClick={handleSelect}
       role="treeitem"
       aria-selected={isSelected}
-      aria-label={`${node.name}${isSelected ? ', selected' : ''}`}
+      aria-label={`${node.name}, level ${depth + 1}${isSelected ? ', selected' : ''}`}
       className={`flex items-center gap-2 w-full px-2 py-1 hover:bg-slate-700/50 rounded text-left text-sm transition-colors ${
         isSelected ? 'bg-emerald-500/10 border-l-2 border-emerald-500' : 'border-l-2 border-transparent'
       }`}

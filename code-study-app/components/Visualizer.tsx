@@ -59,7 +59,7 @@ const Visualizer = memo<VisualizerProps>(({ volume, isConnected }) => {
       {isConnected && (
         <div className="flex items-center gap-4 text-xs">
           <span className="flex items-center gap-1.5 text-emerald-400/70">
-            <span className="w-2 h-2 rounded-full bg-emerald-400/60" aria-hidden="true" />
+            <span className="w-2 h-2 rounded bg-emerald-400/60" aria-hidden="true" />
             AI
           </span>
           <span className="flex items-center gap-1.5 text-blue-400/70">

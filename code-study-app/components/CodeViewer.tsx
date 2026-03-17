@@ -138,6 +138,9 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
           ) : (
             <Copy className="w-4 h-4 text-slate-400" aria-hidden="true" />
           )}
+          <span className="sr-only" role="status" aria-live="assertive">
+            {copied ? 'Copied to clipboard' : ''}
+          </span>
         </button>
       </div>
 
