@@ -438,6 +438,7 @@ let game = {
 
     // Session state
     lastLearnedFact: '',     // Fact shown on game-over when learnedItems is empty
+    frame: 0,                 // Incremented each gameLoop tick; used for time-based effects
     respawnInvincible: false, // True during the brief grace period after losing a life
     // respawnInvincibleTimeout: <set by useLife/AdManager.continueGame>
     // gameOverTimeout: <setTimeout handle set in gameOver(); cancelled on extra-life continue>
@@ -479,6 +480,9 @@ function init() {
     game.elQuestionModal = document.getElementById('questionModal');
     game.elQuestionPanel = document.querySelector('.question-panel');
     game.elAnswerGrid = document.getElementById('answerGrid');
+    game.elAdModal       = document.getElementById('rewardedAdModal');
+    game.elAdHeading     = document.getElementById('rewardedAdHeading');
+    game.elAdSkipBtn     = document.getElementById('skipAdBtn');
 
     // Pre-create 4 answer buttons once and reuse them across questions to avoid
     // DOM reconstruction (innerHTML reset + element creation) on every question shown.
@@ -699,11 +703,10 @@ function setupEventListeners() {
 
         // Focus trap inside rewarded ad modal
         if (e.key === 'Tab') {
-            const adModal = document.getElementById('rewardedAdModal');
+            const adModal = game.elAdModal;
             if (adModal && !adModal.classList.contains('hidden')) {
-                const focusable = Array.from(adModal.querySelectorAll('[tabindex="-1"][id="rewardedAdHeading"], button:not([disabled])')).filter(el => adModal.contains(el));
-                const heading = document.getElementById('rewardedAdHeading');
-                const skipBtn = document.getElementById('skipAdBtn');
+                const heading = game.elAdHeading;
+                const skipBtn = game.elAdSkipBtn;
                 const trappable = [heading, skipBtn].filter(el => el && !el.disabled);
                 if (trappable.length > 0) {
                     const first = trappable[0];
@@ -842,6 +845,8 @@ function gameLoop() {
         return;
     }
 
+    game.frame++;
+
     if (!game.paused) {
         update();
     }
@@ -857,6 +862,7 @@ function update() {
     if (game.player.velocity > CONFIG.TERMINAL_VELOCITY) game.player.velocity = CONFIG.TERMINAL_VELOCITY;
     game.player.y += game.player.velocity;
     game.player.rotation = Math.min(Math.max(game.player.velocity * 2.5, -20), 60);
+    game.player.flameOffset = Math.random() * 15; // Pre-computed for render; avoids RNG in draw path
 
     const stars = game.stars;
     for (let i = 0; i < stars.length; i++) {
@@ -1086,9 +1092,9 @@ function drawPlayer(ctx) {
     ctx.translate(p.x, p.y);
     ctx.rotate(p.rotation * DEG_TO_RAD);
 
-    // Flash player during respawn invincibility (every 150ms)
+    // Flash player during respawn invincibility (~every 9 frames at 60fps ≈ 150ms)
     if (game.respawnInvincible) {
-        ctx.globalAlpha = Math.floor(Date.now() / 150) % 2 === 0 ? 0.35 : 1;
+        ctx.globalAlpha = Math.floor(game.frame / 9) % 2 === 0 ? 0.35 : 1;
     }
 
     ctx.drawImage(playerCanvas, -playerOX, -playerOY);
@@ -1097,7 +1103,7 @@ function drawPlayer(ctx) {
         ctx.fillStyle = 'rgba(255, 200, 100, 0.8)';
         ctx.beginPath();
         ctx.moveTo(-25, -5);
-        ctx.lineTo(-40 - Math.random() * 15, 0);
+        ctx.lineTo(-40 - (game.player.flameOffset || 0), 0);
         ctx.lineTo(-25, 5);
         ctx.closePath();
         ctx.fill();
