@@ -3,7 +3,7 @@ import { Question, Language } from '../types';
 /**
  * Official Illinois DMV written knowledge test questions.
  *
- * Two parallel arrays (`questionsEn` / `questionsVi`) hold the same 58 questions
+ * Two parallel arrays (`questionsEn` / `questionsVi`) hold the same 59 questions
  * in English and Vietnamese respectively. IDs must match across both arrays —
  * the Live Practice instructor looks up questions by `id` to display them in the UI.
  *

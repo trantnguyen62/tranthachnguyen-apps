@@ -112,7 +112,7 @@ const App: React.FC = () => {
       [AppMode.LIVE_PRACTICE]: 'AI-Powered Illinois Driving Practice - Illinois Driver Study',
     };
     const descriptions: Record<AppMode, string> = {
-      [AppMode.QUIZ]: 'Take a free Illinois DMV practice quiz with instant feedback. 58 practice questions covering traffic laws, road signs, and safe driving rules for the IL written knowledge test.',
+      [AppMode.QUIZ]: 'Take a free Illinois DMV practice quiz with instant feedback. 59 practice questions covering traffic laws, road signs, and safe driving rules for the IL written knowledge test.',
       [AppMode.STUDY]: 'Study all Illinois driver\'s license test topics: traffic laws, road signs, right-of-way rules, speed limits, and Illinois-specific regulations. Free study list with explanations.',
       [AppMode.LIVE_PRACTICE]: 'Practice for the Illinois DMV written test with an AI-powered instructor. Ask questions, get explanations, and learn Illinois traffic laws through interactive voice conversation.',
     };

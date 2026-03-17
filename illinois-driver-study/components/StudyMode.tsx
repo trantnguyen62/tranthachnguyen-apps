@@ -1,5 +1,5 @@
 /**
- * StudyMode — read-only reference list of all 58 questions with answers shown.
+ * StudyMode — read-only reference list of all 59 questions with answers shown.
  *
  * Provides a debounced (200 ms) text search that filters by question text or
  * any answer option, so users can quickly look up specific rules without

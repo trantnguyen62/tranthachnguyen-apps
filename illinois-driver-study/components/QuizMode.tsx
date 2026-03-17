@@ -1,5 +1,5 @@
 /**
- * QuizMode — timed, scored quiz over all 58 official Illinois DMV questions.
+ * QuizMode — timed, scored quiz over all 59 official Illinois DMV questions.
  *
  * Flow: question → user selects option → instant right/wrong feedback + explanation
  *       → next question → … → results screen with pass/fail at 80% threshold.
