@@ -92,7 +92,7 @@ setInterval(() => { const now = Date.now(); _rateMap.forEach((v, k) => { if (now
 // Serve static files from dist
 const distPath = join(__dirname, '../dist');
 app.use(express.static(distPath, {
-  maxAge: '7d',
+  maxAge: '1y',
   immutable: true,
   setHeaders(res, filePath) {
     // HTML must not be cached aggressively (SPA entry point changes on deploy)
