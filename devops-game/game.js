@@ -311,7 +311,15 @@ const QUESTIONS = {
     ]
 };
 
-// Topic configuration
+/**
+ * Ordered list of topic zones used in Adventure mode and the Practice selector.
+ * Each entry has the shape:
+ *   id    {string} - Key into QUESTIONS and used as the zone identifier
+ *   name  {string} - Display name shown in the HUD and topic cards
+ *   icon  {string} - Emoji used on enemy ships and the topic card
+ *   color {string} - Hex accent colour for enemy glow and card theming
+ *   desc  {string} - One-line description shown on the topic selection card
+ */
 const TOPICS = [
     { id: 'docker', name: 'Docker', icon: '🐳', color: '#0db7ed', desc: 'Build, run & manage containers from basics to Compose' },
     { id: 'kubernetes', name: 'Kubernetes', icon: '☸️', color: '#326ce5', desc: 'Orchestrate containers at scale with K8s objects & patterns' },
@@ -342,7 +350,11 @@ const ASSETS = {
     loaded: {}
 };
 
-// ... (AssetLoader remains same) ...
+/**
+ * Loads all image assets defined in ASSETS.images in parallel.
+ * Calls the provided callback once every asset has either loaded or errored,
+ * so the game always starts regardless of individual asset failures.
+ */
 const AssetLoader = {
     total: 0,
     loaded: 0,
