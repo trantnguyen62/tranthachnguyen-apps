@@ -5,13 +5,14 @@ FROM node:20-alpine
 WORKDIR /app
 # Create a non-root user so the container process cannot write to the host
 # filesystem or escalate privileges if the process is ever compromised.
-RUN npm install -g serve && \
+RUN npm install -g serve@14.2.6 && \
     addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --chown=appuser:appgroup index.html ./
 COPY --chown=appuser:appgroup styles.css ./
 COPY --chown=appuser:appgroup robots.txt ./
 COPY --chown=appuser:appgroup sitemap.xml ./
 COPY --chown=appuser:appgroup serve.json ./
+COPY --chown=appuser:appgroup og-image.png ./
 COPY --chown=appuser:appgroup fonts/ ./fonts/
 USER appuser
 EXPOSE 80
