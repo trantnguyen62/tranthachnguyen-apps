@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="description"
         content="DevOps Defender - Master Docker, Kubernetes, CI/CD, AWS, and more by battling enemy ships. An interactive space shooter quiz game with 240+ DevOps questions across 12 topic zones.">
     <meta name="keywords" content="DevOps game, learn DevOps, Docker quiz, Kubernetes game, CI/CD quiz, DevOps training, space shooter, educational game, DevOps certification practice, Terraform quiz, AWS quiz, Linux quiz, free DevOps quiz">
@@ -279,7 +279,7 @@
             <!-- HUD -->
             <div class="hud">
                 <div class="hud-left">
-                    <span class="health-label">HP</span>
+                    <span class="health-label" aria-hidden="true">HP</span>
                     <div class="health-bar" id="healthBar" role="meter" aria-label="Health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
                         <div class="health-fill" id="healthFill"></div>
                         <span class="health-text" id="healthText" aria-hidden="true">100</span>
@@ -305,7 +305,7 @@
                         <span class="level-label" id="levelLabel">ZONE 1</span>
                         <span class="level-name" id="levelName">Docker</span>
                     </div>
-                    <div class="wave-display" aria-label="Current wave">
+                    <div class="wave-display">
                         <span>Wave <span id="waveNumber">1</span></span>
                     </div>
                 </div>
@@ -354,7 +354,7 @@
                         <span class="stat-value" id="bestStreak">0</span>
                     </div>
                 </div>
-                <div class="new-high-score hidden" id="newHighScore">🏆 NEW HIGH SCORE! 🏆</div>
+                <div class="new-high-score hidden" id="newHighScore"><span aria-hidden="true">🏆</span> NEW HIGH SCORE! <span aria-hidden="true">🏆</span></div>
                 <div class="game-over-buttons">
                     <button class="menu-btn primary" id="btnPlayAgain">Play Again</button>
                     <button class="menu-btn" id="btnMainMenu">Main Menu</button>

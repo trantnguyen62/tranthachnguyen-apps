@@ -514,6 +514,7 @@ function init() {
         for (let i = 0; i < 4; i++) {
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
+            btn.setAttribute('aria-describedby', 'questionText');
             const keySpan = document.createElement('span');
             keySpan.className = 'answer-key';
             keySpan.setAttribute('aria-hidden', 'true');
