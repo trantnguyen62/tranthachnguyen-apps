@@ -139,6 +139,7 @@ let projectsCache = null;
 let projectsCacheTs = 0;
 const PROJECTS_CACHE_TTL = 60_000;
 const SEARCH_RESULTS_LIMIT = 50;
+const SEARCH_CONTENT_CONCURRENCY = 20;
 
 // Get list of projects
 app.get('/api/projects', (req, res) => {
@@ -335,25 +336,29 @@ app.get('/api/search', async (req, res) => {
       }
     }
 
-    // Search file contents in parallel within this directory
-    await Promise.all(contentChecks.map(async ({ name, fullPath, relativePath }) => {
-      if (results.length >= SEARCH_RESULTS_LIMIT) return;
-      try {
-        const stat = await fs.promises.stat(fullPath);
-        if (stat.size <= 512 * 1024) {
-          const content = await fs.promises.readFile(fullPath, 'utf-8');
-          if (content.toLowerCase().includes(query) && results.length < SEARCH_RESULTS_LIMIT) {
-            results.push({
-              name,
-              path: relativePath,
-              type: 'file',
-              language: getLanguage(name),
-              matchType: 'content'
-            });
+    // Search file contents in bounded batches to avoid overwhelming the filesystem
+    for (let i = 0; i < contentChecks.length; i += SEARCH_CONTENT_CONCURRENCY) {
+      if (results.length >= SEARCH_RESULTS_LIMIT) break;
+      const batch = contentChecks.slice(i, i + SEARCH_CONTENT_CONCURRENCY);
+      await Promise.all(batch.map(async ({ name, fullPath, relativePath }) => {
+        if (results.length >= SEARCH_RESULTS_LIMIT) return;
+        try {
+          const stat = await fs.promises.stat(fullPath);
+          if (stat.size <= 512 * 1024) {
+            const content = await fs.promises.readFile(fullPath, 'utf-8');
+            if (content.toLowerCase().includes(query) && results.length < SEARCH_RESULTS_LIMIT) {
+              results.push({
+                name,
+                path: relativePath,
+                type: 'file',
+                language: getLanguage(name),
+                matchType: 'content'
+              });
+            }
           }
-        }
-      } catch (e) {}
-    }));
+        } catch (e) {}
+      }));
+    }
 
     // Traverse subdirectories in parallel rather than sequentially
     if (subdirSearches.length > 0) {
