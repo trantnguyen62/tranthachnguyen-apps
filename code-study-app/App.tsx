@@ -76,15 +76,23 @@ function App() {
     if (error) setDismissedError(null);
   }, [error]);
 
-  // Update document title based on selected project/file
+  // Update document title and meta description based on selected project/file
   useEffect(() => {
+    let title: string;
+    let description: string;
     if (selectedFile && selectedProject) {
-      document.title = `${selectedFile.name} — ${selectedProject.name} | Code Study`;
+      title = `${selectedFile.name} — ${selectedProject.name} | Code Study`;
+      description = `Explore ${selectedFile.name} in ${selectedProject.name} with an AI tutor. Ask questions via voice, navigate code, and understand your codebase interactively.`;
     } else if (selectedProject) {
-      document.title = `${selectedProject.name} | Code Study`;
+      title = `${selectedProject.name} | Code Study`;
+      description = `Browse and learn the ${selectedProject.name} codebase with an AI tutor. Navigate files, search code, and ask questions via voice with Code Study.`;
     } else {
-      document.title = 'Code Study - Learn Your Codebase with AI';
+      title = 'Code Study - Learn Your Codebase with AI';
+      description = 'Code Study is an AI-powered tool that helps developers explore, understand, and learn any codebase through interactive voice sessions and intelligent code navigation.';
     }
+    document.title = title;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', description);
   }, [selectedProject, selectedFile]);
 
   // Load projects on mount
