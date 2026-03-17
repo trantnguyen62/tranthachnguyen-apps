@@ -623,7 +623,7 @@ body {
 .keyboard-hint {
     margin-top: 0.75rem;
     text-align: center;
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     color: #7b8eaa;
     letter-spacing: 0.03em;
 }
@@ -634,7 +634,7 @@ body {
     border-radius: 4px;
     padding: 0.1em 0.4em;
     font-family: 'Orbitron', monospace;
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     color: #60a5fa;
 }
 
@@ -682,6 +682,12 @@ body {
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-bottom: 1.5rem;
+}
+
+@media (max-width: 360px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .stat-box {
@@ -1034,6 +1040,18 @@ body {
     }
 
     .tip-banner {
+        animation: none;
+    }
+
+    .score-display.score-bump {
+        animation: none;
+    }
+
+    .rank-icon {
+        animation: none;
+    }
+
+    .game-over-content {
         animation: none;
     }
 

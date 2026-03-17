@@ -1445,6 +1445,11 @@ function gameOver() {
         document.getElementById('factText').textContent = game.lastLearnedFact || "Keep playing to unlock DevOps knowledge — each quiz answer teaches a real command or concept.";
     }
 
+    // Announce game-over summary to screen readers
+    if (game.elFeedback) {
+        game.elFeedback.textContent = `Game over! Gates passed: ${game.score}. Correct answers: ${game.correctAnswers} of ${game.questionsAnswered}. Rank: ${rank.title}.`;
+    }
+
     // Store the timeout so it can be cancelled if user continues with extra life
     game.gameOverTimeout = setTimeout(() => {
         showScreen('gameOverScreen');
