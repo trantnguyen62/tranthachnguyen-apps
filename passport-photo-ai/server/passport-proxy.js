@@ -250,6 +250,7 @@ app.post('/api/passport/analyze', apiRateLimit, async (req, res) => {
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash',
+      config: { maxOutputTokens: 256 },
       contents: {
         parts: [
           { inlineData: { data: clean, mimeType } },

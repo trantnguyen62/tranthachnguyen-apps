@@ -45,6 +45,9 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
       const dataUrl = reader.result;
 
       const img = new Image();
+      img.onerror = () => {
+        setCameraError('The selected file could not be read as an image. Please try a different file.');
+      };
       img.onload = () => {
         let w = img.width, h = img.height;
         if (w > h) { h = Math.round(h * Math.min(MAX_IMAGE_DIMENSION, w) / w); w = Math.min(MAX_IMAGE_DIMENSION, w); }

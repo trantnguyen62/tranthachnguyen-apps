@@ -43,7 +43,8 @@ const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promi
       const canvas = document.createElement('canvas');
       canvas.width = 600;
       canvas.height = 750;
-      const ctx = canvas.getContext('2d')!;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('Canvas 2D context unavailable')); return; }
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, 600, 750);
 
