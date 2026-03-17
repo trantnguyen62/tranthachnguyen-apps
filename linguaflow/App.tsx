@@ -258,7 +258,7 @@ function App() {
              </h2>
              <p className="text-slate-400 text-sm max-w-md mx-auto">
                {isConnected
-                 ? `Your AI tutor is listening. Speak naturally — you'll get real-time pronunciation guidance and corrections.`
+                 ? `Your AI tutor is listening. Speak naturally — corrections come right away, so just focus on talking.`
                  : isConnecting
                  ? 'Setting up your session. This usually takes a few seconds.'
                  : 'Choose a language below, then press Start Conversation. Your AI tutor will speak with you, guide your pronunciation, and help you improve.'}

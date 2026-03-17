@@ -237,7 +237,7 @@ const UserProfileModal = memo<Props>(({ isOpen, onClose, onProfileReady, apiUrl 
                   onClick={handleNewUser}
                   className="flex-1 px-4 py-3 bg-slate-700 text-slate-300 rounded-xl hover:bg-slate-600 transition-colors text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
                 >
-                  Tôi là người khác
+                  Không phải tôi
                 </button>
                 <button
                   onClick={handleContinue}
