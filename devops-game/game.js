@@ -496,6 +496,24 @@ function init() {
         domCache.questionText  = document.getElementById('questionText');
         domCache.answerGrid    = document.getElementById('answerGrid');
         domCache.questionExplanation = document.getElementById('questionExplanation');
+
+        // Pre-create 4 answer buttons once; reuse them every question
+        domCache.answerBtns = [];
+        for (let i = 0; i < 4; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'answer-btn';
+            const keySpan = document.createElement('span');
+            keySpan.className = 'answer-key';
+            keySpan.setAttribute('aria-hidden', 'true');
+            keySpan.textContent = i + 1;
+            const textSpan = document.createElement('span');
+            textSpan.className = 'answer-text';
+            btn.appendChild(keySpan);
+            btn.appendChild(textSpan);
+            btn.onclick = () => selectAnswer(i);
+            domCache.answerGrid.appendChild(btn);
+            domCache.answerBtns.push(btn);
+        }
         domCache.pauseMenu     = document.getElementById('pauseMenu');
         domCache.gameOver      = document.getElementById('gameOver');
         domCache.levelComplete = document.getElementById('levelComplete');
@@ -1187,25 +1205,12 @@ function showQuestion(enemy) {
     domCache.questionTopic.textContent = topic.name;
     domCache.questionText.textContent = question.q;
 
-    domCache.answerGrid.replaceChildren();
-    domCache.answerBtns = [];
-
     answers.forEach((answer, i) => {
-        const btn = document.createElement('button');
+        const btn = domCache.answerBtns[i];
         btn.className = 'answer-btn';
+        btn.disabled = false;
         btn.setAttribute('aria-label', `${i + 1}: ${answer.text}`);
-        const keySpan = document.createElement('span');
-        keySpan.className = 'answer-key';
-        keySpan.setAttribute('aria-hidden', 'true');
-        keySpan.textContent = i + 1;
-        const textSpan = document.createElement('span');
-        textSpan.className = 'answer-text';
-        textSpan.textContent = answer.text;
-        btn.appendChild(keySpan);
-        btn.appendChild(textSpan);
-        btn.onclick = () => selectAnswer(i);
-        domCache.answerGrid.appendChild(btn);
-        domCache.answerBtns.push(btn);
+        btn.lastChild.textContent = answer.text;
     });
 
     // Move focus to first answer so keyboard users can immediately select
