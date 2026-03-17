@@ -134,11 +134,24 @@ function setCache(key, result) {
   _checkCache.set(key, { result, expires: Date.now() + CACHE_TTL });
 }
 
-/** Extracts and parses the first JSON object from an AI model response text. Returns `{}` on failure. */
+/**
+ * Extracts and parses the first complete JSON object from an AI model response text.
+ * Uses balanced brace tracking to correctly handle multiple JSON objects or extra
+ * surrounding text (e.g. markdown code fences). Returns `{}` on failure.
+ */
 function parseAIJson(text) {
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) return {};
-  try { return JSON.parse(match[0]); } catch { return {}; }
+  // Strip markdown code fences that Gemini sometimes wraps around JSON
+  const src = text.replace(/```(?:json)?/g, '').trim();
+  const start = src.indexOf('{');
+  if (start === -1) return {};
+  let depth = 0;
+  for (let i = start; i < src.length; i++) {
+    if (src[i] === '{') depth++;
+    else if (src[i] === '}' && --depth === 0) {
+      try { return JSON.parse(src.slice(start, i + 1)); } catch { return {}; }
+    }
+  }
+  return {};
 }
 
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
