@@ -174,7 +174,7 @@ export default function App() {
                     {label}
                   </span>
                 </div>
-                {i < 2 && <div aria-hidden="true" style={{ width: 18, height: 1.5, background: 'rgba(255,255,255,0.1)', borderRadius: 1 }} />}
+                {i < 2 && <div aria-hidden="true" style={{ width: 18, height: 1.5, background: done ? color : 'rgba(255,255,255,0.1)', borderRadius: 1, transition: 'background 0.4s ease' }} />}
               </React.Fragment>
             ))}
           </div>
@@ -275,6 +275,28 @@ export default function App() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <span aria-hidden="true" style={{ fontSize: 20 }}>📋</span>
               <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 600 }}>Compliance Check</h2>
+              {result && result.issues?.length > 0 && (
+                <span aria-label={`${result.issues.length} issue${result.issues.length > 1 ? 's' : ''} found`} style={{
+                  marginLeft: 'auto', fontSize: 11,
+                  background: `${accentPink}22`,
+                  border: `1px solid ${accentPink}44`,
+                  color: accentPink,
+                  padding: '3px 9px', borderRadius: 20, fontWeight: 700
+                }}>
+                  {result.issues.length} issue{result.issues.length > 1 ? 's' : ''}
+                </span>
+              )}
+              {result && result.compliant && (
+                <span style={{
+                  marginLeft: 'auto', fontSize: 11,
+                  background: 'rgba(16,185,129,0.15)',
+                  border: '1px solid rgba(16,185,129,0.35)',
+                  color: '#10B981',
+                  padding: '3px 9px', borderRadius: 20, fontWeight: 700
+                }}>
+                  Passed
+                </span>
+              )}
             </div>
             
             <div aria-live="polite" aria-atomic="true">
@@ -426,6 +448,30 @@ export default function App() {
                     ))}
                     </ul>
                   </div>
+                )}
+
+                {/* Fix Background nudge for non-compliant results */}
+                {!result.compliant && (
+                  <button
+                    onClick={handleOpenEditor}
+                    style={{
+                      marginTop: 16, width: '100%',
+                      padding: '13px 16px', borderRadius: 12,
+                      border: `1px solid ${accentPurple}44`,
+                      background: `linear-gradient(135deg, ${accentPurple}22, ${accentPurple}0a)`,
+                      color: accentPurple, fontWeight: 600, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontSize: 13, transition: 'all 0.2s ease',
+                      animation: 'fadeSlideIn 0.5s ease both',
+                    }}
+                    onMouseEnter={e => { const el = e.currentTarget; el.style.background = `linear-gradient(135deg, ${accentPurple}44, ${accentPurple}18)`; el.style.borderColor = `${accentPurple}88`; }}
+                    onMouseLeave={e => { const el = e.currentTarget; el.style.background = `linear-gradient(135deg, ${accentPurple}22, ${accentPurple}0a)`; el.style.borderColor = `${accentPurple}44`; }}
+                  >
+                    <span aria-hidden="true">✨</span>
+                    Fix Background with AI
+                    <span aria-hidden="true" style={{ marginLeft: 2, opacity: 0.7 }}>→</span>
+                  </button>
                 )}
               </div>
             ) : image ? (
