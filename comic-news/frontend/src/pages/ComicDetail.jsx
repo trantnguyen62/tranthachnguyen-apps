@@ -238,9 +238,12 @@ function ComicDetail() {
             {/* Progress */}
             {progress > 1 && (
               <div className="mt-6 p-4 glass-effect rounded-xl">
-                <p className="text-sm text-gray-400">Continue from panel {progress} of {comic.pages.length}</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-gray-400">Continue from panel {progress} of {comic.pages.length}</p>
+                  <span className="text-sm font-medium text-red-400">{Math.round((progress / comic.pages.length) * 100)}%</span>
+                </div>
                 <div
-                  className="mt-2 h-2 bg-dark-200 rounded-full overflow-hidden"
+                  className="h-2 bg-dark-200 rounded-full overflow-hidden"
                   role="progressbar"
                   aria-label="Reading progress"
                   aria-valuenow={Math.round((progress / comic.pages.length) * 100)}

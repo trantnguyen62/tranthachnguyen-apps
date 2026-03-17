@@ -42,6 +42,11 @@ function ComicCard({ comic, index = 0 }) {
           )}
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" aria-hidden="true">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="px-3 py-1.5 bg-red-500/90 text-white text-xs font-semibold rounded-full translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+              Read Now
+            </span>
+          </div>
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <p className="text-sm text-gray-300 line-clamp-2">{comic.description}</p>
           </div>
