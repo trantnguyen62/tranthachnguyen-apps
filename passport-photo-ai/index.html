@@ -119,10 +119,8 @@
       "softwareVersion": "1.0",
       "datePublished": "2026-03-13",
       "dateModified": "2026-03-17",
-      "creator": {
-        "@type": "Organization",
-        "name": "PassportLens"
-      }
+      "creator": { "@id": "https://passportphoto.tranthachnguyen.com/#organization" },
+      "mainEntityOfPage": { "@id": "https://passportphoto.tranthachnguyen.com/#webpage" }
     }
     </script>
     <script type="application/ld+json">
@@ -241,7 +239,12 @@
           "url": "https://passportphoto.tranthachnguyen.com/",
           "name": "PassportLens",
           "description": "Free AI passport photo checker and editor for passports, visas, and ID cards in 100+ countries.",
-          "inLanguage": "en"
+          "inLanguage": "en",
+          "publisher": { "@id": "https://passportphoto.tranthachnguyen.com/#organization" },
+          "potentialAction": {
+            "@type": "UseAction",
+            "target": "https://passportphoto.tranthachnguyen.com/"
+          }
         },
         {
           "@type": "Organization",
@@ -250,7 +253,31 @@
           "url": "https://passportphoto.tranthachnguyen.com/",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://passportphoto.tranthachnguyen.com/favicon.svg"
+            "@id": "https://passportphoto.tranthachnguyen.com/#logo",
+            "url": "https://passportphoto.tranthachnguyen.com/favicon.svg",
+            "caption": "PassportLens"
+          }
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://passportphoto.tranthachnguyen.com/#webpage",
+          "url": "https://passportphoto.tranthachnguyen.com/",
+          "name": "PassportLens — AI Passport Photo Checker & Editor",
+          "description": "Don't get rejected at the counter. Free AI passport photo checker instantly verifies background, lighting, face position, and glasses — for passports, visas, and ID cards in 100+ countries.",
+          "isPartOf": { "@id": "https://passportphoto.tranthachnguyen.com/#website" },
+          "about": { "@id": "https://passportphoto.tranthachnguyen.com/#organization" },
+          "primaryImageOfPage": {
+            "@type": "ImageObject",
+            "url": "https://passportphoto.tranthachnguyen.com/og-image.svg",
+            "width": 1200,
+            "height": 630
+          },
+          "datePublished": "2026-03-13",
+          "dateModified": "2026-03-17",
+          "inLanguage": "en",
+          "potentialAction": {
+            "@type": "ReadAction",
+            "target": "https://passportphoto.tranthachnguyen.com/"
           }
         }
       ]
