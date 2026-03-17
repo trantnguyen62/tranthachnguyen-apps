@@ -11,6 +11,13 @@ interface Props {
   onCancel: () => void;
 }
 
+// Cache the background-removal module import so it's only fetched once per session
+let bgRemovalPromise: Promise<typeof import('@imgly/background-removal')> | null = null;
+const getBgRemoval = () => {
+  if (!bgRemovalPromise) bgRemovalPromise = import('@imgly/background-removal');
+  return bgRemovalPromise;
+};
+
 // Background color options
 const BG_COLORS = ['#FFFFFF', '#F5F5F5', '#E8E8E8', '#DCE8F0'] as const;
 const BG_COLOR_NAMES: Record<string, string> = {
@@ -100,7 +107,7 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
       const blob = await fetch(image.data).then(r => r.blob());
       setProgress(30);
       
-      const { removeBackground } = await import('@imgly/background-removal');
+      const { removeBackground } = await getBgRemoval();
       const removed = await removeBackground(blob, {
         progress: (_, cur, total) => setProgress(30 + (total > 0 ? Math.round((cur / total) * 50) : 0)),
       });

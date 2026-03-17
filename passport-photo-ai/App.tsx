@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { ImageUploader } from './components/ImageUploader';
 const PhotoEditor = lazy(() => import('./components/PhotoEditor').then(m => ({ default: m.PhotoEditor })));
 import { PassportImage, PassportCheckResult, AppStatus } from './types';
@@ -91,6 +91,12 @@ export default function App() {
 
   const { accentPink, accentGold, accentPurple, darkBg } = THEME;
 
+  const steps = useMemo(() => [
+    { step: 1, label: 'Upload', color: accentGold, done: !!image, active: !image },
+    { step: 2, label: 'Check', color: accentPink, done: !!result, active: !!image && !result && status === AppStatus.IDLE },
+    { step: 3, label: 'Fix', color: accentPurple, done: false, active: !!result },
+  ] as const, [image, result, status, accentGold, accentPink, accentPurple]);
+
   return (
     <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
       {/* Artistic background elements */}
@@ -153,11 +159,7 @@ export default function App() {
 
           {/* Dynamic step progress indicator */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 20, flexWrap: 'wrap' }} aria-label="Current step">
-            {([
-              { step: 1, label: 'Upload', color: accentGold, done: !!image, active: !image },
-              { step: 2, label: 'Check', color: accentPink, done: !!result, active: !!image && !result && status === AppStatus.IDLE },
-              { step: 3, label: 'Fix', color: accentPurple, done: false, active: !!result },
-            ] as const).map(({ step, label, color, done, active }, i) => (
+            {steps.map(({ step, label, color, done, active }, i) => (
               <React.Fragment key={step}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: active || done ? 1 : 0.38, transition: 'opacity 0.4s ease' }} {...(active ? { 'aria-current': 'step' } : {})}>
                   <div style={{
@@ -250,8 +252,7 @@ export default function App() {
                   fontFamily: "'Space Grotesk', sans-serif",
                   animation: image && status === AppStatus.IDLE ? 'ctaPulse 2.5s ease-in-out infinite' : 'none'
                 }}
-                onMouseEnter={e => { if (image && status !== AppStatus.CHECKING) { e.currentTarget.style.filter = 'brightness(1.1)'; e.currentTarget.style.boxShadow = `0 12px 32px ${accentPink}55`; } }}
-                onMouseLeave={e => { if (image) { e.currentTarget.style.filter = ''; e.currentTarget.style.boxShadow = `0 8px 24px ${accentPink}33`; } }}
+                className={image && status !== AppStatus.CHECKING ? 'btn-cta-active' : ''}
               >
                 {status === AppStatus.CHECKING ? (
                   <>
@@ -481,8 +482,7 @@ export default function App() {
                       fontSize: 13, transition: 'all 0.2s ease',
                       animation: 'fadeSlideIn 0.5s ease both',
                     }}
-                    onMouseEnter={e => { const el = e.currentTarget; el.style.background = `linear-gradient(135deg, ${accentPurple}44, ${accentPurple}18)`; el.style.borderColor = `${accentPurple}88`; }}
-                    onMouseLeave={e => { const el = e.currentTarget; el.style.background = `linear-gradient(135deg, ${accentPurple}22, ${accentPurple}0a)`; el.style.borderColor = `${accentPurple}44`; }}
+                    className="btn-fix"
                   >
                     <span aria-hidden="true">✨</span>
                     Fix Background with AI
@@ -597,6 +597,8 @@ export default function App() {
         @keyframes iconBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .result-item { transition: background 0.15s ease; }
         .result-item:hover { background: rgba(255,255,255,0.06) !important; }
+        .btn-cta-active:hover { filter: brightness(1.1); box-shadow: 0 12px 32px #E9456055 !important; }
+        .btn-fix:hover { background: linear-gradient(135deg, #9D4EDD44, #9D4EDD18) !important; border-color: #9D4EDD88 !important; }
         .upload-zone:hover .upload-icon { animation: iconBounce 0.6s ease; }
         button:focus-visible, [role="button"]:focus-visible {
           outline: 2px solid rgba(255,255,255,0.55);
