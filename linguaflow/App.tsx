@@ -185,7 +185,7 @@ function App() {
       </a>
 
       {/* Left Panel: Controls & Visuals */}
-      <div className="flex-1 flex flex-col p-6 gap-8 relative z-10">
+      <div role="main" className="flex-1 flex flex-col p-6 gap-8 relative z-10">
         
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -239,7 +239,7 @@ function App() {
         </div>
 
         {/* Main Interaction Area */}
-        <div id="main-content" className="flex-1 flex flex-col items-center justify-center gap-8 min-h-[300px]">
+        <div id="main-content" tabIndex={-1} className="flex-1 flex flex-col items-center justify-center gap-8 min-h-[300px] focus:outline-none">
            <Visualizer
              analyserRef={analyserRef}
              inputVolumeRef={inputVolumeRef}

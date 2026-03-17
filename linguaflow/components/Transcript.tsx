@@ -30,9 +30,10 @@ const CopyButton = memo<{ text: string }>(({ text }) => {
   return (
     <button
       onClick={handleCopy}
-      aria-label={copied ? 'Copied!' : 'Copy message'}
+      aria-label="Copy message"
       className="opacity-50 group-hover:opacity-100 transition-opacity duration-150 w-6 h-6 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-slate-700 focus:opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-500"
     >
+      <span aria-live="polite" aria-atomic="true" className="sr-only">{copied ? 'Copied!' : ''}</span>
       {copied ? (
         <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D0D0D"/>
+      <stop offset="50%" stop-color="#1A1A2E"/>
+      <stop offset="100%" stop-color="#16213E"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#E94560"/>
+      <stop offset="100%" stop-color="#F4A261"/>
+    </linearGradient>
+    <linearGradient id="accentV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E94560"/>
+      <stop offset="100%" stop-color="#F4A261"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid overlay -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- Accent glow circles -->
+  <circle cx="200" cy="315" r="220" fill="#E94560" opacity="0.06"/>
+  <circle cx="1000" cy="315" r="180" fill="#9D4EDD" opacity="0.07"/>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="1200" height="4" fill="url(#accent)"/>
+
+  <!-- Left: Passport card mockup -->
+  <g transform="translate(80, 160)">
+    <!-- Card shadow -->
+    <rect x="8" y="8" width="280" height="310" rx="16" fill="rgba(0,0,0,0.4)"/>
+    <!-- Card body -->
+    <rect width="280" height="310" rx="16" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+    <!-- Card top stripe -->
+    <rect width="280" height="40" rx="16 16 0 0" fill="url(#accent)" opacity="0.85"/>
+    <!-- Card top stripe bottom square corners -->
+    <rect y="24" width="280" height="16" fill="url(#accent)" opacity="0.85"/>
+    <!-- Passport text on stripe -->
+    <text x="20" y="27" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="rgba(255,255,255,0.9)" letter-spacing="3">PASSPORT</text>
+
+    <!-- Photo area -->
+    <rect x="20" y="56" width="100" height="120" rx="8" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+    <!-- Silhouette head -->
+    <circle cx="70" cy="96" r="24" fill="rgba(255,255,255,0.25)"/>
+    <!-- Silhouette body -->
+    <ellipse cx="70" cy="148" rx="32" ry="28" fill="rgba(255,255,255,0.18)"/>
+
+    <!-- Check mark badge -->
+    <circle cx="104" cy="160" r="18" fill="#22C55E" opacity="0.9"/>
+    <path d="M 96 160 L 101 165 L 112 154" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Info lines -->
+    <rect x="136" y="60" width="124" height="10" rx="5" fill="rgba(255,255,255,0.4)"/>
+    <rect x="136" y="78" width="90" height="8" rx="4" fill="rgba(255,255,255,0.25)"/>
+    <rect x="136" y="94" width="110" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+    <rect x="136" y="110" width="80" height="8" rx="4" fill="rgba(255,255,255,0.15)"/>
+    <rect x="136" y="126" width="100" height="8" rx="4" fill="rgba(255,255,255,0.15)"/>
+    <rect x="136" y="142" width="70" height="8" rx="4" fill="rgba(255,255,255,0.1)"/>
+
+    <!-- MRZ area -->
+    <rect x="20" y="196" width="240" height="1" fill="rgba(255,255,255,0.1)"/>
+    <rect x="20" y="210" width="240" height="7" rx="3" fill="rgba(255,255,255,0.12)"/>
+    <rect x="20" y="224" width="240" height="7" rx="3" fill="rgba(255,255,255,0.12)"/>
+    <rect x="20" y="238" width="200" height="7" rx="3" fill="rgba(255,255,255,0.08)"/>
+
+    <!-- Compliance indicators -->
+    <g transform="translate(20, 264)">
+      <circle cx="8" cy="8" r="8" fill="#22C55E" opacity="0.9"/>
+      <path d="M 4 8 L 6.5 10.5 L 12 5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="22" y="12" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">Background</text>
+    </g>
+    <g transform="translate(20, 284)">
+      <circle cx="8" cy="8" r="8" fill="#22C55E" opacity="0.9"/>
+      <path d="M 4 8 L 6.5 10.5 L 12 5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="22" y="12" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">Lighting</text>
+    </g>
+    <g transform="translate(140, 264)">
+      <circle cx="8" cy="8" r="8" fill="#22C55E" opacity="0.9"/>
+      <path d="M 4 8 L 6.5 10.5 L 12 5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="22" y="12" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">Expression</text>
+    </g>
+    <g transform="translate(140, 284)">
+      <circle cx="8" cy="8" r="8" fill="#22C55E" opacity="0.9"/>
+      <path d="M 4 8 L 6.5 10.5 L 12 5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="22" y="12" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">Framing</text>
+    </g>
+  </g>
+
+  <!-- Right: Text content -->
+  <g transform="translate(460, 0)">
+    <!-- Logo area -->
+    <g transform="translate(0, 130)">
+      <!-- Logo icon (passport card) -->
+      <rect width="52" height="52" rx="12" fill="url(#bg)"/>
+      <rect width="52" height="52" rx="12" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <rect x="6" y="11" width="40" height="30" rx="5" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <rect x="10" y="15" width="14" height="16" rx="2.5" fill="url(#accent)" opacity="0.9"/>
+      <circle cx="17" cy="21" r="4" fill="white" opacity="0.9"/>
+      <rect x="28" y="17" width="12" height="2.5" rx="1.25" fill="rgba(255,255,255,0.5)"/>
+      <rect x="28" y="22" width="9" height="2.5" rx="1.25" fill="rgba(255,255,255,0.3)"/>
+      <rect x="28" y="27" width="11" height="2.5" rx="1.25" fill="rgba(255,255,255,0.2)"/>
+      <text x="62" y="35" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="white">PassportLens</text>
+    </g>
+
+    <!-- Main headline -->
+    <text x="0" y="260" font-family="Arial, sans-serif" font-size="52" font-weight="800" fill="white">AI Passport Photo</text>
+    <text x="0" y="322" font-family="Arial, sans-serif" font-size="52" font-weight="800">
+      <tspan fill="url(#accent)">Checker</tspan>
+      <tspan fill="white"> &amp; Editor</tspan>
+    </text>
+
+    <!-- Subtext -->
+    <text x="0" y="378" font-family="Arial, sans-serif" font-size="22" fill="rgba(255,255,255,0.65)">Instantly verify ICAO compliance for passports,</text>
+    <text x="0" y="408" font-family="Arial, sans-serif" font-size="22" fill="rgba(255,255,255,0.65)">visas &amp; ID cards in 100+ countries — free.</text>
+
+    <!-- Feature pills -->
+    <g transform="translate(0, 440)">
+      <!-- Pill 1 -->
+      <rect width="148" height="36" rx="18" fill="rgba(233,69,96,0.2)" stroke="rgba(233,69,96,0.5)" stroke-width="1"/>
+      <text x="22" y="23" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#F4A261">AI-Powered</text>
+
+      <!-- Pill 2 -->
+      <rect x="160" width="112" height="36" rx="18" fill="rgba(157,78,221,0.2)" stroke="rgba(157,78,221,0.5)" stroke-width="1"/>
+      <text x="182" y="23" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#C084FC">100% Free</text>
+
+      <!-- Pill 3 -->
+      <rect x="284" width="142" height="36" rx="18" fill="rgba(34,197,94,0.2)" stroke="rgba(34,197,94,0.5)" stroke-width="1"/>
+      <text x="306" y="23" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#4ADE80">100% Private</text>
+    </g>
+  </g>
+
+  <!-- Bottom border -->
+  <rect x="0" y="626" width="1200" height="4" fill="url(#accent)" opacity="0.5"/>
+</svg>
