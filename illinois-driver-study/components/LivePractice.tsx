@@ -440,7 +440,7 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
             </div>
           </div>
         ) : isActive && status === 'connected' ? (
-           <div className="text-slate-400 italic text-sm text-center max-w-xs">
+           <div aria-live="polite" aria-atomic="true" className="text-slate-400 italic text-sm text-center max-w-xs">
              "{language === 'en' ? "Say 'Quiz me' to start practicing questions!" : "Nói 'Kiểm tra tôi' để bắt đầu luyện tập!"}"
            </div>
         ) : null}

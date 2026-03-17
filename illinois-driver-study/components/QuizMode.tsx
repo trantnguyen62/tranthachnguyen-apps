@@ -293,7 +293,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
             onClick={playAudio}
             disabled={isPlayingAudio}
             aria-label={language === 'vi' ? (isPlayingAudio ? 'Đang đọc...' : 'Đọc câu hỏi') : (isPlayingAudio ? 'Playing...' : 'Read question aloud')}
-            className={`flex-shrink-0 p-2 rounded-full transition-colors ${isPlayingAudio ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+            className={`flex-shrink-0 p-2 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 outline-none ${isPlayingAudio ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
             title={language === 'vi' ? "Đọc câu hỏi" : "Read question aloud"}
           >
              {isPlayingAudio ? (
@@ -319,7 +319,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
           </div>
         )}
 
-        <div role="radiogroup" aria-label={language === 'vi' ? 'Các lựa chọn' : 'Answer options'} className="space-y-3">
+        <div role="radiogroup" aria-label={language === 'vi' ? 'Các lựa chọn' : 'Answer options'} aria-describedby={!showResult ? 'kb-hint' : undefined} className="space-y-3">
           {question.options.map((option, idx) => {
             let className = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer disabled:cursor-default ";
             const isCorrect = showResult && idx === question.correctIndex;
@@ -369,7 +369,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
           })}
         </div>
         {!showResult && (
-          <p className="mt-3 text-xs text-slate-400 text-right select-none">
+          <p id="kb-hint" className="mt-3 text-xs text-slate-400 text-right select-none">
             {language === 'vi' ? 'Nhấn A–D để chọn' : 'Press A–D to select'}
           </p>
         )}
