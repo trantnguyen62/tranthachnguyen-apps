@@ -50,6 +50,8 @@ function makeRateLimiter(windowMs, maxRequests) {
       return next();
     }
     if (entry.count >= maxRequests) {
+      const retryAfterSecs = Math.ceil((windowMs - (now - entry.start)) / 1000);
+      res.setHeader('Retry-After', retryAfterSecs);
       return res.status(429).json({ error: 'Too many requests' });
     }
     entry.count++;
