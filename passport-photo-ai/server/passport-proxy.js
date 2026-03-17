@@ -206,9 +206,9 @@ app.post('/api/passport/check', apiRateLimit, async (req, res) => {
       contents: {
         parts: [
           { inlineData: { data: clean, mimeType } },
-          { text: `Analyze this passport photo. Return JSON only:
+          { text: `Analyze this passport photo for ICAO biometric compliance. Return JSON only:
 {"compliant":boolean,"summary":"string","issues":["string"],"suggestions":["string"]}
-Check: plain background, neutral expression, proper lighting, no glasses glare, face centered.` }
+Check all 7 requirements: (1) face fills 70-80% of frame height, centered horizontally; (2) neutral expression, mouth closed, eyes fully open; (3) plain white or off-white background with no patterns, shadows, or objects; (4) even lighting, no harsh shadows on face or background; (5) sharp focus, no blur or pixelation; (6) no glasses, tinted lenses, or reflections on lenses; (7) no head coverings except for documented religious reasons. In issues, state specifically what is wrong. In suggestions, give one actionable step per issue.` }
         ]
       }
     });

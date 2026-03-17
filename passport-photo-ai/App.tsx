@@ -145,7 +145,7 @@ export default function App() {
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Free AI photo check against official ICAO biometric standards. Results in seconds — no sign-up required.
+            Check if your passport or visa photo will be accepted. Free AI analysis against official biometric standards — results in seconds, no sign-up required.
           </p>
           <p style={{ marginTop: 10, fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
@@ -449,6 +449,20 @@ export default function App() {
                       </li>
                     ))}
                     </ul>
+                  </div>
+                )}
+
+                {/* Next-step tip for compliant results */}
+                {result.compliant && (
+                  <div style={{
+                    marginTop: 4, padding: '12px 16px', borderRadius: 12,
+                    background: 'rgba(16,185,129,0.07)',
+                    border: '1px solid rgba(16,185,129,0.18)',
+                    animation: 'fadeSlideIn 0.5s ease both',
+                  }}>
+                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+                      <strong style={{ color: 'rgba(255,255,255,0.75)' }}>Next step:</strong> Save or screenshot your photo, then submit it with your passport or visa application. Most countries require photos taken within the last 6 months.
+                    </p>
                   </div>
                 )}
 

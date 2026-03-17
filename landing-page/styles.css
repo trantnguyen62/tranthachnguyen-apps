@@ -148,6 +148,9 @@ main:focus { outline: none; }
     will-change: transform;
     display: flex;
     flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+    touch-action: manipulation;
 }
 .glass-card:hover, .glass-card:focus-within {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 16px 48px rgba(0, 0, 0, 0.4);
