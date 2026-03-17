@@ -358,7 +358,7 @@ function ComicDetail() {
                       ))}
                     </ul>
                     {comic.panels.length > 3 && (
-                      <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-white/5 to-transparent pointer-events-none rounded-b-lg" aria-hidden="true" />
+                      <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-dark-200/90 to-transparent pointer-events-none rounded-b-lg" aria-hidden="true" />
                     )}
                     </div>
                   </div>

@@ -71,14 +71,15 @@ function ComicCard({ comic, index = 0 }) {
             {comic.genre}
           </span>
         )}
-        <div className="flex items-center gap-3 mt-2">
+        <div className="flex items-center gap-2 mt-2 text-sm">
           <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" aria-hidden="true" />
-            <span className="text-sm text-gray-300" aria-label={`Rating: ${comic.rating}`}>{comic.rating}</span>
+            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" aria-hidden="true" />
+            <span className="text-gray-300 font-medium" aria-label={`Rating: ${comic.rating}`}>{comic.rating}</span>
           </div>
+          <span className="text-gray-600" aria-hidden="true">·</span>
           <div className="flex items-center gap-1 text-gray-400">
-            <BookOpen className="w-4 h-4" aria-hidden="true" />
-            <span className="text-sm" aria-label={`${comic.chapters} chapters`}>{comic.chapters} ch</span>
+            <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
+            <span aria-label={`${comic.chapters} chapters`}>{comic.chapters} ch</span>
           </div>
         </div>
       </div>

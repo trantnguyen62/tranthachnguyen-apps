@@ -183,7 +183,7 @@ function Library() {
               ))}
             </div>
             {/* Fade hint to indicate more genres on mobile */}
-            <div className="absolute right-0 top-0 bottom-1 w-8 bg-gradient-to-l from-white/5 to-transparent pointer-events-none md:hidden" aria-hidden="true" />
+            <div className="absolute right-0 top-0 bottom-1 w-12 bg-gradient-to-l from-dark-200 to-transparent pointer-events-none md:hidden" aria-hidden="true" />
           </div>
 
           <div className="md:ml-auto flex items-center gap-2">
