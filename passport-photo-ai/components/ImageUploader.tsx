@@ -39,30 +39,27 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result !== 'string') return;
-      const dataUrl = reader.result;
-
-      const img = new Image();
-      img.onerror = () => {
-        setCameraError('The selected file could not be read as an image. Please try a different file.');
-      };
-      img.onload = () => {
-        let w = img.width, h = img.height;
-        if (w > h) { h = Math.round(h * Math.min(MAX_IMAGE_DIMENSION, w) / w); w = Math.min(MAX_IMAGE_DIMENSION, w); }
-        else { w = Math.round(w * Math.min(MAX_IMAGE_DIMENSION, h) / h); h = Math.min(MAX_IMAGE_DIMENSION, h); }
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        ctx.drawImage(img, 0, 0, w, h);
-        onImageSelected({ data: canvas.toDataURL('image/jpeg', 0.88), mimeType: 'image/jpeg' });
-      };
-      img.src = dataUrl;
+    // Use an object URL to avoid keeping the full original file as base64 in memory
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      setCameraError('The selected file could not be read as an image. Please try a different file.');
     };
-    reader.readAsDataURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      let w = img.width, h = img.height;
+      if (w > h) { h = Math.round(h * Math.min(MAX_IMAGE_DIMENSION, w) / w); w = Math.min(MAX_IMAGE_DIMENSION, w); }
+      else { w = Math.round(w * Math.min(MAX_IMAGE_DIMENSION, h) / h); h = Math.min(MAX_IMAGE_DIMENSION, h); }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, w, h);
+      onImageSelected({ data: canvas.toDataURL('image/jpeg', 0.88), mimeType: 'image/jpeg' });
+    };
+    img.src = objectUrl;
   }, [onImageSelected]);
 
   useEffect(() => {
@@ -110,20 +107,25 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     setCameraMode(false);
   }, []);
 
-  /** Draws the current video frame onto a canvas, converts it to JPEG, and stops the stream. */
+  /** Draws the current video frame onto a canvas, resizes (max 1500 px), converts to JPEG, and stops the stream. */
   const capturePhoto = useCallback(() => {
     if (!videoRef.current) return;
 
     const video = videoRef.current;
     if (!video.videoWidth || !video.videoHeight) return; // video not ready yet
+
+    let w = video.videoWidth, h = video.videoHeight;
+    if (w > h) { h = Math.round(h * Math.min(MAX_IMAGE_DIMENSION, w) / w); w = Math.min(MAX_IMAGE_DIMENSION, w); }
+    else { w = Math.round(w * Math.min(MAX_IMAGE_DIMENSION, h) / h); h = Math.min(MAX_IMAGE_DIMENSION, h); }
+
     const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
+    canvas.width = w;
+    canvas.height = h;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    ctx.drawImage(video, 0, 0, w, h);
     const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
     
     onImageSelected({ data: dataUrl, mimeType: 'image/jpeg' });
