@@ -569,6 +569,119 @@ try {
   if (err.code !== 'ENOENT') console.error('Failed to read dist/index.html:', err);
 }
 
+// Pre-compute SSR HTML at startup (comics are static, so no need to rebuild per request)
+const comicSsrHtmlCache = new Map();
+let librarySsrHtml = '';
+let noindexHtml = '';
+
+if (indexHtmlTemplate) {
+  // Build comic detail pages
+  for (const comic of comics) {
+    const pageTitle = `${comic.title} - Comic News`;
+    const imgUrl = `${baseUrl}${comic.coverImage}`;
+    const canonicalUrl = `${baseUrl}/comic/${comic.id}`;
+    const articleLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+      headline: comic.title,
+      description: comic.description,
+      author: { '@type': 'Person', name: comic.author },
+      publisher: { '@type': 'Organization', name: 'Comic News', url: baseUrl, logo: { '@type': 'ImageObject', url: `${baseUrl}/favicon.svg` } },
+      image: { '@type': 'ImageObject', url: imgUrl },
+      genre: comic.genre,
+      inLanguage: 'en-US',
+      url: canonicalUrl,
+      datePublished: comic.publishedDate,
+      dateModified: today,
+      ...(comic.hasTextVersion && comic.textStory ? { wordCount: comic.textStory.trim().split(/\s+/).length } : {}),
+      ...(comic.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: comic.rating, bestRating: 5, worstRating: 1, ratingCount: Math.round(comic.rating * comic.chapters * 15) } } : {}),
+    };
+    const breadcrumbLd = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
+        { '@type': 'ListItem', position: 2, name: 'Library', item: `${baseUrl}/library` },
+        { '@type': 'ListItem', position: 3, name: comic.title, item: canonicalUrl },
+      ],
+    };
+    const html = indexHtmlTemplate
+      .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(pageTitle)}</title>`)
+      .replace(/(<meta name="description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
+      .replace(/(<meta property="og:type" content=")[^"]*(")/,  `$1article$2`)
+      .replace(/(<meta property="og:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
+      .replace(/(<meta property="og:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
+      .replace(/(<meta property="og:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
+      .replace(/(<meta property="og:image:secure_url" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
+      .replace(/(<meta property="og:url" content=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
+      .replace(/(<meta property="og:image:alt" content=")[^"]*(")/,  `$1${escapeHtml(comic.title)}$2`)
+      .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
+      .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
+      .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
+      .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/,  `$1${escapeHtml(comic.title)}$2`)
+      .replace(/(<meta name="keywords" content=")[^"]*(")/,  `$1${escapeHtml([comic.genre, comic.author, 'comic news', 'visual storytelling', 'news comics'].join(', '))}$2`)
+      .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
+      .replace(
+        /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
+        `$1\n    <script type="application/ld+json">${safeJsonLd(articleLd)}</script>\n    <script type="application/ld+json">${safeJsonLd(breadcrumbLd)}</script>`
+      )
+      .replace(/<meta property="og:image:width" content="[^"]*" \/>\n?/, '')
+      .replace(/<meta property="og:image:height" content="[^"]*" \/>\n?/, '');
+    comicSsrHtmlCache.set(comic.id, html);
+  }
+
+  // Build library page
+  const libPageTitle = 'Story Library - Comic News';
+  const libPageDesc = 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
+  const libCanonical = `${baseUrl}/library`;
+  const topComic = featuredComics[0];
+  const libraryImgUrl = topComic ? `${baseUrl}${topComic.coverImage}` : null;
+  const collectionLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: libPageTitle,
+    url: libCanonical,
+    description: libPageDesc,
+    hasPart: comicsSortedByRating.slice(0, 20).map(c => ({
+      '@type': 'Article',
+      headline: c.title,
+      url: `${baseUrl}/comic/${c.id}`,
+      image: `${baseUrl}${c.coverImage}`,
+      author: { '@type': 'Person', name: c.author },
+      genre: c.genre,
+    })),
+  };
+  let libHtml = indexHtmlTemplate
+    .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(libPageTitle)}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(")/,  `$1${escapeHtml(libPageDesc)}$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(")/,  `$1${escapeHtml(libPageTitle)}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(")/,  `$1${escapeHtml(libPageDesc)}$2`)
+    .replace(/(<meta property="og:url" content=")[^"]*(")/,  `$1${escapeHtml(libCanonical)}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(libPageTitle)}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(libPageDesc)}$2`)
+    .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(libCanonical)}$2`);
+  if (libraryImgUrl) {
+    libHtml = libHtml
+      .replace(/(<meta property="og:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
+      .replace(/(<meta property="og:image:secure_url" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
+      .replace(/(<meta property="og:image:alt" content=")[^"]*(")/,  `$1Story Library - Comic News$2`)
+      .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
+      .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/,  `$1Story Library - Comic News$2`);
+  }
+  librarySsrHtml = libHtml
+    .replace(
+      /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
+      `$1\n    <script type="application/ld+json">${safeJsonLd(collectionLd)}</script>`
+    )
+    .replace(/<meta property="og:image:width" content="[^"]*" \/>\n?/, '')
+    .replace(/<meta property="og:image:height" content="[^"]*" \/>\n?/, '');
+
+  // Build noindex page (reader/bookmarks)
+  noindexHtml = indexHtmlTemplate
+    .replace(/(<meta name="robots" content=")[^"]*(")/,  '$1noindex, follow$2');
+}
+
 const _escapedBaseUrl = escapeHtml(baseUrl);
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
@@ -728,148 +841,44 @@ app.get('/sitemap.xml', (req, res) => {
 });
 
 // SSR meta injection for comic detail pages (improves crawler visibility)
+// HTML is pre-computed at startup; serve from cache for zero per-request regex work.
 app.get('/comic/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const comic = comicsMap.get(id);
-  if (!comic || !indexHtmlTemplate) {
+  const html = comicSsrHtmlCache.get(id);
+  if (!html) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.sendFile(join(__dirname, 'dist', 'index.html'), (err) => {
       if (err && !res.headersSent) res.status(500).end();
     });
   }
-
-  const pageTitle = `${comic.title} - Comic News`;
-  const imgUrl = `${baseUrl}${comic.coverImage}`;
-  const canonicalUrl = `${baseUrl}/comic/${id}`;
-
-  const articleLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
-    headline: comic.title,
-    description: comic.description,
-    author: { '@type': 'Person', name: comic.author },
-    publisher: { '@type': 'Organization', name: 'Comic News', url: baseUrl, logo: { '@type': 'ImageObject', url: `${baseUrl}/favicon.svg` } },
-    image: { '@type': 'ImageObject', url: imgUrl },
-    genre: comic.genre,
-    inLanguage: 'en-US',
-    url: canonicalUrl,
-    datePublished: comic.publishedDate,
-    dateModified: today,
-    ...(comic.hasTextVersion && comic.textStory ? { wordCount: comic.textStory.trim().split(/\s+/).length } : {}),
-    ...(comic.rating ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: comic.rating, bestRating: 5, worstRating: 1, ratingCount: Math.round(comic.rating * comic.chapters * 15) } } : {}),
-  };
-
-  const breadcrumbLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: baseUrl },
-      { '@type': 'ListItem', position: 2, name: 'Library', item: `${baseUrl}/library` },
-      { '@type': 'ListItem', position: 3, name: comic.title, item: canonicalUrl },
-    ],
-  };
-
-  const html = indexHtmlTemplate
-    .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(pageTitle)}</title>`)
-    .replace(/(<meta name="description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
-    .replace(/(<meta property="og:type" content=")[^"]*(")/,  `$1article$2`)
-    .replace(/(<meta property="og:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
-    .replace(/(<meta property="og:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
-    .replace(/(<meta property="og:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
-    .replace(/(<meta property="og:image:secure_url" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
-    .replace(/(<meta property="og:url" content=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
-    .replace(/(<meta property="og:image:alt" content=")[^"]*(")/,  `$1${escapeHtml(comic.title)}$2`)
-    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
-    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(comic.description)}$2`)
-    .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(imgUrl)}$2`)
-    .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/,  `$1${escapeHtml(comic.title)}$2`)
-    .replace(/(<meta name="keywords" content=")[^"]*(")/,  `$1${escapeHtml([comic.genre, comic.author, 'comic news', 'visual storytelling', 'news comics'].join(', '))}$2`)
-    .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
-    .replace(
-      /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
-      `$1\n    <script type="application/ld+json">${safeJsonLd(articleLd)}</script>\n    <script type="application/ld+json">${safeJsonLd(breadcrumbLd)}</script>`
-    )
-    .replace(/<meta property="og:image:width" content="[^"]*" \/>\n?/, '')
-    .replace(/<meta property="og:image:height" content="[^"]*" \/>\n?/, '');
-
   res.set('Cache-Control', 'public, max-age=3600');
   res.type('html').send(html);
 });
 
 // SSR meta injection for library page (improves crawler visibility)
+// HTML is pre-computed at startup; serve from cache for zero per-request regex work.
 app.get('/library', (req, res) => {
-  if (!indexHtmlTemplate) {
+  if (!librarySsrHtml) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.sendFile(join(__dirname, 'dist', 'index.html'), (err) => {
       if (err && !res.headersSent) res.status(500).end();
     });
   }
-
-  const pageTitle = 'Story Library - Comic News';
-  const pageDesc = 'Browse all news stories transformed into comics. Filter by genre, sort by rating, and discover visual storytelling at its best.';
-  const canonicalUrl = `${baseUrl}/library`;
-
-  const topComic = featuredComics[0];
-  const libraryImgUrl = topComic ? `${baseUrl}${topComic.coverImage}` : null;
-
-  const collectionLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: pageTitle,
-    url: canonicalUrl,
-    description: pageDesc,
-    hasPart: comicsSortedByRating.slice(0, 20).map(c => ({
-      '@type': 'Article',
-      headline: c.title,
-      url: `${baseUrl}/comic/${c.id}`,
-      image: `${baseUrl}${c.coverImage}`,
-      author: { '@type': 'Person', name: c.author },
-      genre: c.genre,
-    })),
-  };
-
-  let html = indexHtmlTemplate
-    .replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(pageTitle)}</title>`)
-    .replace(/(<meta name="description" content=")[^"]*(")/,  `$1${escapeHtml(pageDesc)}$2`)
-    .replace(/(<meta property="og:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
-    .replace(/(<meta property="og:description" content=")[^"]*(")/,  `$1${escapeHtml(pageDesc)}$2`)
-    .replace(/(<meta property="og:url" content=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`)
-    .replace(/(<meta name="twitter:title" content=")[^"]*(")/,  `$1${escapeHtml(pageTitle)}$2`)
-    .replace(/(<meta name="twitter:description" content=")[^"]*(")/,  `$1${escapeHtml(pageDesc)}$2`)
-    .replace(/(<link id="canonical-link" rel="canonical" href=")[^"]*(")/,  `$1${escapeHtml(canonicalUrl)}$2`);
-  if (libraryImgUrl) {
-    html = html
-      .replace(/(<meta property="og:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
-      .replace(/(<meta property="og:image:secure_url" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
-      .replace(/(<meta property="og:image:alt" content=")[^"]*(")/,  `$1Story Library - Comic News$2`)
-      .replace(/(<meta name="twitter:image" content=")[^"]*(")/,  `$1${escapeHtml(libraryImgUrl)}$2`)
-      .replace(/(<meta name="twitter:image:alt" content=")[^"]*(")/,  `$1Story Library - Comic News$2`);
-  }
-  html = html
-    .replace(
-      /(<script type="application\/ld\+json">[\s\S]*?<\/script>)/,
-      `$1\n    <script type="application/ld+json">${safeJsonLd(collectionLd)}</script>`
-    )
-    .replace(/<meta property="og:image:width" content="[^"]*" \/>\n?/, '')
-    .replace(/<meta property="og:image:height" content="[^"]*" \/>\n?/, '');
-
   res.set('Cache-Control', 'public, max-age=3600');
-  res.type('html').send(html);
+  res.type('html').send(librarySsrHtml);
 });
 
 // SSR noindex injection for reader and bookmarks pages (prevents duplicate/thin content indexing)
+// HTML is pre-computed at startup; serve from cache for zero per-request regex work.
 function serveNoindex(res) {
-  if (!indexHtmlTemplate) {
+  if (!noindexHtml) {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.sendFile(join(__dirname, 'dist', 'index.html'), (err) => {
       if (err && !res.headersSent) res.status(500).end();
     });
   }
-  const html = indexHtmlTemplate
-    .replace(/(<meta name="robots" content=")[^"]*(")/,  '$1noindex, follow$2');
   res.set('Cache-Control', 'no-store');
-  res.type('html').send(html);
+  res.type('html').send(noindexHtml);
 }
 
 app.get('/read/:id', (req, res) => serveNoindex(res));
