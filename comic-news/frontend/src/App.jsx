@@ -1,6 +1,15 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+
+function FocusReset() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const main = document.getElementById('main-content');
+    if (main) main.focus({ preventScroll: true });
+  }, [pathname]);
+  return null;
+}
 
 const Home = lazy(() => import('./pages/Home'));
 const Library = lazy(() => import('./pages/Library'));
@@ -14,7 +23,8 @@ function App() {
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <div className="min-h-screen bg-dark-300">
         <Navbar />
-        <main id="main-content" className="pt-16">
+        <main id="main-content" tabIndex="-1" className="pt-16 outline-none">
+          <FocusReset />
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center" role="status" aria-label="Loading page">
               <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" aria-hidden="true"></div>
