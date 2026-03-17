@@ -141,11 +141,12 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
   // Show captured/uploaded image
   if (currentImage) {
     return (
-      <div style={{ 
-        position: 'relative', borderRadius: 20, overflow: 'hidden', 
-        border: '1px solid rgba(255,255,255,0.1)', 
+      <div style={{
+        position: 'relative', borderRadius: 20, overflow: 'hidden',
+        border: '1px solid rgba(255,255,255,0.1)',
         background: '#0D0D0D',
-        boxShadow: `0 8px 32px rgba(0,0,0,0.4)`
+        boxShadow: `0 8px 32px rgba(0,0,0,0.4)`,
+        animation: 'fadeSlideIn 0.35s ease'
       }}>
         <img src={currentImage.data} alt="Your uploaded passport photo" loading="eager" style={{ width: '100%', maxHeight: 400, objectFit: 'contain', display: 'block' }} />
         <button
@@ -242,6 +243,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
         role="button"
         tabIndex={0}
         aria-label="Upload photo — click or drag and drop an image here"
+        className="upload-zone"
         onClick={() => inputRef.current?.click()}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
         onDragOver={onDragOver}
@@ -264,7 +266,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
           style={{ display: 'none' }}
           onChange={(e) => { handleFile(e.target.files?.[0] || null); e.target.value = ''; }}
         />
-        <div style={{
+        <div className="upload-icon" style={{
           width: 72, height: 72, borderRadius: 20,
           background: `linear-gradient(135deg, ${accentPink}22, ${accentGold}22)`,
           border: `1px solid ${accentPink}33`,

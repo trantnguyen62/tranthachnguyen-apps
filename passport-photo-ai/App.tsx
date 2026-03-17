@@ -140,12 +140,14 @@ export default function App() {
           </div>
           <p style={{
             color: 'rgba(255,255,255,0.8)',
-            fontSize: '1.1rem',
-            maxWidth: 520,
+            fontSize: '1.05rem',
+            maxWidth: 460,
             margin: '0 auto',
             lineHeight: 1.6
           }}>
-            Get your photo approved the first time — free AI checks your passport, visa, or ID photo against official ICAO biometric standards for 100+ countries. Results in seconds, no sign-up required.<br/>
+            Free AI photo check against official ICAO biometric standards. Results in seconds — no sign-up required.
+          </p>
+          <p style={{ marginTop: 10, fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.04em' }}>
             <span style={{ color: accentGold }}>Upload</span> · <span style={{ color: accentPink }}>Check</span> · <span style={{ color: accentPurple }}>Fix</span>
           </p>
 
@@ -174,7 +176,7 @@ export default function App() {
                     {label}
                   </span>
                 </div>
-                {i < 2 && <div aria-hidden="true" style={{ width: 18, height: 1.5, background: done ? color : 'rgba(255,255,255,0.1)', borderRadius: 1, transition: 'background 0.4s ease' }} />}
+                {i < 2 && <div aria-hidden="true" style={{ width: 32, height: 1.5, background: done ? color : 'rgba(255,255,255,0.12)', borderRadius: 1, transition: 'background 0.4s ease' }} />}
               </React.Fragment>
             ))}
           </div>
@@ -578,8 +580,15 @@ export default function App() {
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes ctaPulse { 0%, 100% { box-shadow: 0 8px 24px #E9456033; } 50% { box-shadow: 0 8px 32px #E9456066, 0 0 0 4px #E9456018; } }
+        @keyframes iconBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .result-item { transition: background 0.15s ease; }
         .result-item:hover { background: rgba(255,255,255,0.06) !important; }
+        .upload-zone:hover .upload-icon { animation: iconBounce 0.6s ease; }
+        button:focus-visible, [role="button"]:focus-visible {
+          outline: 2px solid rgba(255,255,255,0.55);
+          outline-offset: 3px;
+          border-radius: 8px;
+        }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after {
             animation-duration: 0.01ms !important;
