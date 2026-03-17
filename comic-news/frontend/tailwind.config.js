@@ -7,6 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Brand red used for CTAs, active nav indicators, and accent highlights
         primary: {
           50: '#fef2f2',
           100: '#fee2e2',
@@ -19,11 +20,12 @@ export default {
           800: '#991b1b',
           900: '#7f1d1d',
         },
+        // Dark palette for the app's near-black background layers (lightest → darkest)
         dark: {
-          100: '#1e1e2e',
-          200: '#181825',
-          300: '#11111b',
-          400: '#0a0a0f',
+          100: '#1e1e2e', // card / glass surfaces
+          200: '#181825', // secondary backgrounds
+          300: '#11111b', // page background
+          400: '#0a0a0f', // deepest shadow areas
         }
       }
     },

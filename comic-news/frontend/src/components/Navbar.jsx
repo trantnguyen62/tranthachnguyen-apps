@@ -6,17 +6,24 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  // showSearch toggles the inline search field in the top bar
   const [showSearch, setShowSearch] = useState(false);
+  // scrolled adds a drop-shadow once the page scrolls past the navbar height
   const [scrolled, setScrolled] = useState(false);
 
+  // Passive listener avoids blocking the main thread during scroll
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Returns true when the given path exactly matches the current route;
+  // used to set aria-current="page" and apply the active highlight style.
   const isActive = (path) => location.pathname === path;
 
+  // Submits the search by navigating to /library with a ?search= query param,
+  // which Library.jsx reads to pre-populate and run the filter.
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {

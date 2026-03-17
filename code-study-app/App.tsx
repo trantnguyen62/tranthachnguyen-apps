@@ -13,6 +13,7 @@ import {
   MessageSquare,
   Search,
   ChevronLeft,
+  ChevronRight,
   Loader2,
   AlertCircle,
   BookOpen,
@@ -41,6 +42,7 @@ function App() {
 
   // UI state
   const [showSidebar, setShowSidebar] = useState(true);
+  const [showChatPanel, setShowChatPanel] = useState(true);
   const [activeTab, setActiveTab] = useState<'files' | 'search'>('files');
 
   // Loading / error
@@ -212,6 +214,7 @@ function App() {
   const handleTabFiles = useCallback(() => setActiveTab('files'), []);
   const handleTabSearch = useCallback(() => setActiveTab('search'), []);
   const handleToggleSidebar = useCallback(() => setShowSidebar(s => !s), []);
+  const handleToggleChatPanel = useCallback(() => setShowChatPanel(s => !s), []);
 
   // Auto-focus search input when switching to Search tab
   useEffect(() => {
@@ -471,6 +474,18 @@ function App() {
           {/* Connection Status */}
           <div className="flex items-center gap-2">
             <button
+              onClick={handleToggleChatPanel}
+              aria-label={showChatPanel ? 'Hide AI chat panel' : 'Show AI chat panel'}
+              title={showChatPanel ? 'Hide chat panel' : 'Show chat panel'}
+              aria-expanded={showChatPanel}
+              className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors text-slate-400 hover:text-slate-200"
+            >
+              {showChatPanel
+                ? <ChevronRight className="w-5 h-5" aria-hidden="true" />
+                : <MessageSquare className="w-5 h-5" aria-hidden="true" />
+              }
+            </button>
+            <button
               onClick={isConnected ? disconnect : connect}
               disabled={isConnecting}
               aria-label={isConnecting ? 'Connecting to AI tutor' : isConnected ? 'End voice session' : 'Start voice session'}
@@ -564,7 +579,7 @@ function App() {
           </div>
 
           {/* Chat Panel */}
-          <div className="w-96 bg-slate-800/30 border-l border-slate-700/50 flex flex-col">
+          {showChatPanel && <div className="w-96 bg-slate-800/30 border-l border-slate-700/50 flex flex-col">
             {/* Visualizer */}
             <div className="p-4 border-b border-slate-700/50">
               <div className="flex items-center justify-between mb-3">
@@ -651,7 +666,7 @@ function App() {
                 </div>
               </div>
             )}
-          </div>
+          </div>}
         </div>
       </main>
     </div>

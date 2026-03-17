@@ -2,6 +2,8 @@ import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 
+// Moves keyboard focus to #main-content on every route change so screen-reader
+// users are not left at an arbitrary position after client-side navigation.
 function FocusReset() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -11,6 +13,8 @@ function FocusReset() {
   return null;
 }
 
+// All pages are code-split so the initial JS bundle stays small; each chunk is
+// fetched on first visit and then served from the browser cache.
 const Home = lazy(() => import('./pages/Home'));
 const Library = lazy(() => import('./pages/Library'));
 const Bookmarks = lazy(() => import('./pages/Bookmarks'));

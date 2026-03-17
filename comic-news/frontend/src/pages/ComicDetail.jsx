@@ -119,6 +119,8 @@ function ComicDetail() {
       }
     };
     fetchData();
+    // Remove injected <script> and <link> tags when the component unmounts or
+    // the id param changes, preventing stale meta from leaking to other pages.
     return () => {
       document.getElementById('page-jsonld')?.remove();
       document.getElementById('page-breadcrumb-jsonld')?.remove();

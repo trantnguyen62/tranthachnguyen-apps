@@ -68,7 +68,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
     if (file?.content) {
       await navigator.clipboard.writeText(file.content);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 3000);
     }
   }, [file?.content]);
 
@@ -129,15 +129,20 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
         <span className="hidden lg:block text-xs text-slate-600 mr-1" aria-hidden="true">Drag to select · add as context</span>
         <button
           onClick={handleCopy}
-          className="p-1.5 hover:bg-slate-600/50 rounded transition-colors"
+          className={`flex items-center gap-1.5 px-2 py-1.5 rounded transition-all text-xs font-medium ${
+            copied
+              ? 'bg-green-500/20 text-green-400'
+              : 'hover:bg-slate-600/50 text-slate-400 hover:text-slate-200'
+          }`}
           title={copied ? 'Copied!' : 'Copy code'}
           aria-label={copied ? 'Copied!' : 'Copy code'}
         >
           {copied ? (
-            <Check className="w-4 h-4 text-green-400" aria-hidden="true" />
+            <Check className="w-3.5 h-3.5" aria-hidden="true" />
           ) : (
-            <Copy className="w-4 h-4 text-slate-400" aria-hidden="true" />
+            <Copy className="w-3.5 h-3.5" aria-hidden="true" />
           )}
+          <span aria-hidden="true">{copied ? 'Copied!' : 'Copy'}</span>
           <span className="sr-only" role="status" aria-live="assertive">
             {copied ? 'Copied to clipboard' : ''}
           </span>
