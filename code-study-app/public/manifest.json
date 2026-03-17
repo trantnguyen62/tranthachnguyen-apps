@@ -7,12 +7,13 @@
   "theme_color": "#10B981",
   "background_color": "#0f172a",
   "lang": "en",
+  "scope": "/",
   "icons": [
     {
       "src": "/og-image.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
