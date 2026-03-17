@@ -63,14 +63,10 @@ function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [featuredRes, comicsRes] = await Promise.all([
-          fetch('/api/featured'),
-          fetch('/api/comics?sort=rating')
-        ]);
-        if (!featuredRes.ok || !comicsRes.ok) return;
-        const featuredData = await featuredRes.json();
+        const comicsRes = await fetch('/api/comics?sort=rating');
+        if (!comicsRes.ok) return;
         const comicsData = await comicsRes.json();
-        setFeatured(featuredData);
+        setFeatured(comicsData.slice(0, 4));
         const topComics = comicsData.slice(0, 8);
         setComics(topComics);
 

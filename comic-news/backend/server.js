@@ -623,6 +623,7 @@ I thought about this for the rest of the weekend. Not with embarrassment — wit
 // in the write endpoints to prevent unbounded memory growth.
 let bookmarks = new Set();
 let readingProgress = {};
+let progressCount = 0;
 
 // Precomputed static data
 const genreList = ['All', ...new Set(comics.map(c => c.genre))];
@@ -934,9 +935,10 @@ app.post('/api/progress/:id', writeRateLimit, (req, res) => {
   if (!comicsMap.has(id)) return res.status(404).json({ error: 'Comic not found' });
   const page = parseInt(req.body.page, 10);
   if (isNaN(page) || page < 1 || page > 10000) return res.status(400).json({ error: 'Invalid page' });
-  if (Object.keys(readingProgress).length >= 1000 && !(id in readingProgress)) {
+  if (progressCount >= 1000 && !(id in readingProgress)) {
     return res.status(429).json({ error: 'Progress storage limit reached' });
   }
+  if (!(id in readingProgress)) progressCount++;
   readingProgress[id] = page;
   res.json({ success: true });
 });
