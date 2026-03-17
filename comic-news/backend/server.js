@@ -10,6 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+app.disable('x-powered-by');
 const PORT = process.env.PORT || 5187;
 
 const allowedOrigin = process.env.ALLOWED_ORIGIN || 'https://comic-news.tranthachnguyen.com';
@@ -624,7 +625,7 @@ I thought about this for the rest of the weekend. Not with embarrassment — wit
 // across all users. Limits (500 bookmarks, 1000 progress entries) are enforced
 // in the write endpoints to prevent unbounded memory growth.
 let bookmarks = new Set();
-let readingProgress = {};
+let readingProgress = Object.create(null);
 let progressCount = 0;
 
 // Precomputed static data
@@ -684,9 +685,11 @@ function escapeHtml(str) {
 }
 
 // Safely serialize an object as JSON for embedding in an HTML <script> tag.
-// Escapes </ to prevent </script> from terminating the script block prematurely.
+// Escapes < and > to prevent </script> injection and comply with OWASP JSON-in-HTML guidance.
 function safeJsonLd(obj) {
-  return JSON.stringify(obj).replace(/</g, '\\u003c');
+  return JSON.stringify(obj)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e');
 }
 
 let indexHtmlTemplate = '';
@@ -830,6 +833,9 @@ app.get('/api/comics', readRateLimit, (req, res) => {
 
   if (sort !== undefined && !VALID_SORT_VALUES.has(sort)) {
     return res.status(400).json({ error: 'Invalid sort value' });
+  }
+  if (genre !== undefined && String(genre).length > 50) {
+    return res.status(400).json({ error: 'Invalid genre value' });
   }
 
   // Fast path: no filters — serve precomputed results with ETag

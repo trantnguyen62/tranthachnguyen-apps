@@ -252,13 +252,17 @@ function App() {
                {isConnected ? (
                  <>
                    <span role="img" aria-hidden="true">{activeLanguage.flag}</span>
+                   <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
+                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-60"></span>
+                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                   </span>
                    <span>Listening...</span>
                  </>
                ) : isConnecting ? 'Connecting to your AI tutor…' : 'Practice real conversations with AI'}
              </h2>
              <p className="text-slate-400 text-sm max-w-md mx-auto">
                {isConnected
-                 ? `Your AI tutor is listening. Speak naturally — corrections come right away, so just focus on talking.`
+                 ? `Speaking ${activeLanguage.name}. Your AI tutor is listening — speak naturally and corrections will come right away.`
                  : isConnecting
                  ? 'Setting up your session. This usually takes a few seconds.'
                  : 'Choose a language below, then press Start Conversation. Your AI tutor will speak with you, guide your pronunciation, and help you improve.'}
@@ -293,6 +297,7 @@ function App() {
 
            <div className="flex justify-center pt-2">
              {!isConnected ? (
+               <div className="flex flex-col items-center gap-2">
                <button
                  onClick={handleConnect}
                  disabled={isConnecting}
@@ -318,6 +323,13 @@ function App() {
                    </span>
                  )}
                </button>
+               {!isConnecting && (
+                 <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                   <svg className="w-3 h-3" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                   Your browser will ask for microphone access
+                 </p>
+               )}
+               </div>
              ) : (
                <div className="flex flex-col gap-4 w-full">
                  {/* Live Session Controls - only for Vietnamese English */}
