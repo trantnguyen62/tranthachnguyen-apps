@@ -137,7 +137,7 @@ function Home() {
       </section>
 
       {/* Featured Section */}
-      <section aria-label="Featured stories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section aria-label="Featured stories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <Sparkles className="w-6 h-6 text-yellow-500" aria-hidden="true" />
@@ -156,7 +156,7 @@ function Home() {
       </section>
 
       {/* Popular Section */}
-      <section aria-label="Top rated stories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section aria-label="Top rated stories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <TrendingUp className="w-6 h-6 text-red-500" aria-hidden="true" />
@@ -175,7 +175,7 @@ function Home() {
       </section>
 
       {/* Features Section */}
-      <section aria-label="App features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <section aria-label="App features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="glass-effect rounded-2xl p-6 text-center relative overflow-hidden transition-transform duration-200 hover:-translate-y-1">
             <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-red-500 to-red-400" aria-hidden="true" />

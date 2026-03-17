@@ -300,14 +300,24 @@ function Reader() {
 
           {/* End of comic indicator */}
           <div className="text-center py-12 border-t border-gray-800 mt-4">
-            <p className="text-gray-400 mb-4">End of comic</p>
-            <Link
-              to={`/comic/${id}`}
-              aria-label={`Back to ${comic.title} details`}
-              className="inline-block px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors"
-            >
-              Back to Details
-            </Link>
+            <p className="text-gray-500 text-sm mb-1">You've reached the end</p>
+            <p className="text-white font-semibold mb-6">{comic.title}</p>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <Link
+                to={`/comic/${id}`}
+                aria-label={`Back to ${comic.title} details`}
+                className="inline-block px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors"
+              >
+                Back to Details
+              </Link>
+              <Link
+                to="/library"
+                aria-label="Browse more stories"
+                className="inline-block px-6 py-3 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white rounded-xl transition-colors"
+              >
+                Browse Library
+              </Link>
+            </div>
           </div>
         </div>
       </div>

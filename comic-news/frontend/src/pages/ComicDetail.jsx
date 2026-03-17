@@ -251,7 +251,7 @@ function ComicDetail() {
                   aria-valuemax={100}
                 >
                   <div
-                    className="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full transition-[width] duration-700 ease-out"
                     style={{ width: comic.pages.length > 0 ? `${(progress / comic.pages.length) * 100}%` : '0%' }}
                   />
                 </div>
