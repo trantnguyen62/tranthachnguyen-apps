@@ -126,6 +126,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
           </span>
           <span className="text-xs text-slate-500 flex-shrink-0">{lines.length.toLocaleString()} lines</span>
         </div>
+        <span className="hidden lg:block text-xs text-slate-600 mr-1" aria-hidden="true">Drag to select · add as context</span>
         <button
           onClick={handleCopy}
           className="p-1.5 hover:bg-slate-600/50 rounded transition-colors"

@@ -212,6 +212,18 @@ function App() {
     }
   }, [activeTab]);
 
+  // Ctrl/Cmd+B toggles the sidebar
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+        e.preventDefault();
+        setShowSidebar(s => !s);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   const isConnected = connectionState === ConnectionState.CONNECTED;
   const isConnecting = connectionState === ConnectionState.CONNECTING;
 
@@ -412,7 +424,7 @@ function App() {
           <button
             onClick={handleToggleSidebar}
             aria-label={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
-            title={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
+            title={showSidebar ? 'Hide sidebar (Ctrl+B)' : 'Show sidebar (Ctrl+B)'}
             aria-expanded={showSidebar}
             aria-controls="sidebar"
             className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors"
@@ -522,12 +534,22 @@ function App() {
               <CodeViewer file={selectedFile} onCodeSelect={handleCodeSelect} />
             ) : (
               <div className="flex-1 flex items-center justify-center">
-                <div className="text-center space-y-3">
+                <div className="text-center space-y-4">
                   <div className="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center mx-auto">
                     <Code2 className="w-8 h-8 text-slate-600" aria-hidden="true" />
                   </div>
-                  <p className="text-slate-400 font-medium">No file open</p>
-                  <p className="text-xs text-slate-600">Select a file from the sidebar to view its contents</p>
+                  <div>
+                    <p className="text-slate-400 font-medium">No file open</p>
+                    <p className="text-xs text-slate-600 mt-1">Select a file from the sidebar to view its contents</p>
+                  </div>
+                  {!showSidebar && (
+                    <button
+                      onClick={handleToggleSidebar}
+                      className="text-xs px-3 py-1.5 bg-slate-700/50 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-lg transition-colors border border-slate-700/50"
+                    >
+                      Open sidebar
+                    </button>
+                  )}
                 </div>
               </div>
             )}
