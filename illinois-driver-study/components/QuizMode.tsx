@@ -222,14 +222,21 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
             </div>
           </div>
 
-          <div className="w-full bg-slate-100 rounded-full h-3 mb-2 relative overflow-hidden">
+          <div
+            role="progressbar"
+            aria-valuenow={pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`${t.yourScore}: ${pct}%. ${passed ? t.passing : t.needsWork}. ${t.passingNote}`}
+            className="w-full bg-slate-100 rounded-full h-3 mb-2 relative overflow-hidden"
+          >
             <div
               className={`h-3 rounded-full transition-all duration-700 ${passed ? 'bg-green-500' : 'bg-amber-400'}`}
               style={{ width: `${pct}%` }}
             />
-            <div className="absolute top-0 bottom-0 w-0.5 bg-slate-400/60" style={{ left: '80%' }} title="80% passing threshold" />
+            <div aria-hidden="true" className="absolute top-0 bottom-0 w-0.5 bg-slate-400/60" style={{ left: '80%' }} />
           </div>
-          <div className="flex justify-between text-xs text-slate-400 mb-6">
+          <div className="flex justify-between text-xs text-slate-400 mb-6" aria-hidden="true">
             <span>0%</span>
             <span className="text-slate-500">80% — {t.passingNote}</span>
             <span>100%</span>

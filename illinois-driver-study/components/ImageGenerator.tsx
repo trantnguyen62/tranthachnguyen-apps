@@ -45,6 +45,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
   const [size, setSize] = useState<ImageSize>(ImageSize.SIZE_1K);
   const [loading, setLoading] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [imageAlt, setImageAlt] = useState('');
   const [error, setError] = useState<string | null>(null);
   
   const t = TRANSLATIONS[language];
@@ -59,6 +60,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
     try {
       // Prepend context if Vietnamese to ensure better understanding, or rely on model
       const result = await generateStudyImage(trimmedPrompt, size);
+      setImageAlt(trimmedPrompt);
       setImageSrc(result);
     } catch (err) {
       setError(t.error);
@@ -140,7 +142,7 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({ language }) => {
 
           {imageSrc && (
             <div className="mt-8 rounded-lg overflow-hidden shadow-xl border border-slate-200">
-              <img src={imageSrc} alt="Generated driving scenario" className="w-full h-auto" />
+              <img src={imageSrc} alt={imageAlt} className="w-full h-auto" />
             </div>
           )}
         </div>
