@@ -1,3 +1,36 @@
+/**
+ * LinguaFlow WebSocket Proxy — secure gateway between the browser and the
+ * Gemini Live Audio API.
+ *
+ * Runs on port 3001. The browser never touches the Gemini API directly; all
+ * traffic is routed through this proxy so the GEMINI_API_KEY stays server-side.
+ *
+ * Connection lifecycle (browser → proxy → Gemini):
+ *   1. Browser opens a WebSocket to this server.
+ *   2. Browser sends  { type: 'connect', config: <LiveConnectConfig> }
+ *      — proxy authenticates with Gemini and opens a Live session.
+ *   3. Proxy replies  { type: 'open' }  once the Gemini session is ready.
+ *   4. Browser streams { type: 'realtimeInput', input: <RealtimeInput> }
+ *      — proxy forwards each chunk to Gemini.
+ *   5. Gemini responses (audio + transcription) are forwarded back as
+ *      { type: 'message', data: <LiveServerMessage> }.
+ *   6. Either side may close the session; proxy sends { type: 'close' }.
+ *
+ * Security features:
+ *   - Origin validation against an allowlist (+ Cloudflare Tunnel bypass)
+ *   - Per-IP rate limiting (default 5 new connections / 60 s)
+ *   - Global concurrent-connection cap (100)
+ *   - 30-minute session timeout
+ *   - Incoming message size limit (1 MB)
+ *   - Message type allowlist with per-type field validation
+ *   - Sanitised error messages (no internal details leaked to client)
+ *
+ * Environment:
+ *   GEMINI_API_KEY              — required; Gemini API credentials
+ *   NODE_ENV                    — set to 'production' to disable dev-mode
+ *                                 localhost wildcard
+ *   RATE_LIMIT_MAX_CONNECTIONS  — optional override (default 5)
+ */
 import { WebSocketServer } from 'ws';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';

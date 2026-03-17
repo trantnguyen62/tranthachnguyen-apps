@@ -113,4 +113,4 @@ Create `.env.local` in the project root:
 
 ## 📄 License
 
-© 2025 Tran Thach Nguyen. All rights reserved.
+© 2025–2026 Tran Thach Nguyen. All rights reserved.
