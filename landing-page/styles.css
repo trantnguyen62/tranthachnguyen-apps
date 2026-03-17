@@ -254,6 +254,15 @@ main:focus { outline: none; }
     background-color: rgba(255, 255, 255, 0.09);
     border-color: rgba(255, 255, 255, 0.12);
 }
+/* Per-card accent-tinted CTA hover — reinforces the card's color identity */
+.card-blue:hover .cta-row,    .card-blue:focus-within .cta-row    { background-color: rgba(59,130,246,0.13);  border-color: rgba(59,130,246,0.25); }
+.card-emerald:hover .cta-row, .card-emerald:focus-within .cta-row { background-color: rgba(16,185,129,0.13);  border-color: rgba(16,185,129,0.25); }
+.card-purple:hover .cta-row,  .card-purple:focus-within .cta-row  { background-color: rgba(168,85,247,0.13);  border-color: rgba(168,85,247,0.25); }
+.card-rose:hover .cta-row,    .card-rose:focus-within .cta-row    { background-color: rgba(244,63,94,0.13);   border-color: rgba(244,63,94,0.25); }
+.card-orange:hover .cta-row,  .card-orange:focus-within .cta-row  { background-color: rgba(249,115,22,0.13);  border-color: rgba(249,115,22,0.25); }
+.card-yellow:hover .cta-row,  .card-yellow:focus-within .cta-row  { background-color: rgba(234,179,8,0.13);   border-color: rgba(234,179,8,0.25); }
+.card-sky:hover .cta-row,     .card-sky:focus-within .cta-row     { background-color: rgba(14,165,233,0.13);  border-color: rgba(14,165,233,0.25); }
+.card-cyan:hover .cta-row,    .card-cyan:focus-within .cta-row    { background-color: rgba(6,182,212,0.13);   border-color: rgba(6,182,212,0.25); }
 .pulse-dot {
     position: relative;
 }
