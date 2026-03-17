@@ -42,13 +42,12 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 /** Cycles through processing messages and shows elapsed seconds without re-rendering the parent App. */
 const ProcessingMessage = memo(() => {
-  const [idx, setIdx] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
-    const msgId = setInterval(() => setIdx(prev => (prev + 1) % PROCESSING_MESSAGES.length), 3500);
     const timerId = setInterval(() => setElapsed(prev => prev + 1), 1000);
-    return () => { clearInterval(msgId); clearInterval(timerId); };
+    return () => clearInterval(timerId);
   }, []);
+  const idx = Math.floor(elapsed / 3) % PROCESSING_MESSAGES.length;
   return (
     <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5" role="status" aria-live="polite" aria-atomic="true">
       <Sparkles className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
@@ -206,8 +205,8 @@ const App: React.FC = () => {
   // Use refs so the keyboard listener is registered once and stays current
   const canUndoRef = useRef(canUndo);
   const canRedoRef = useRef(canRedo);
-  useEffect(() => { canUndoRef.current = canUndo; }, [canUndo]);
-  useEffect(() => { canRedoRef.current = canRedo; }, [canRedo]);
+  canUndoRef.current = canUndo;
+  canRedoRef.current = canRedo;
 
   // Global keyboard shortcuts for undo/redo
   useEffect(() => {

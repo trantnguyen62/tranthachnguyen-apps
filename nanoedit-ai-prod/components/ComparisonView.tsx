@@ -147,6 +147,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                  src={originalImage}
                  alt="Original image before editing"
                  className="w-full h-full object-contain"
+                 decoding="async"
                />
                <div className="absolute bottom-4 left-4 px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-white text-xs font-semibold tracking-wide" aria-hidden="true">
                  BEFORE
@@ -190,6 +191,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                    src={processedImage}
                    alt="AI-edited version of your photo"
                    className={`w-full h-full object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-30' : 'opacity-100'}`}
+                   decoding="async"
                  />
                )}
 
