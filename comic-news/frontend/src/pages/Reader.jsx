@@ -122,7 +122,7 @@ function Reader() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ page }),
       }).catch(() => {});
-    }, 1000);
+    }, 2500);
     return () => clearTimeout(timer);
   }, [id, comic, scrollProgress]);
 

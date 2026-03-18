@@ -17,21 +17,14 @@ function ComicDetail() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [comicRes, bookmarkRes, progressRes] = await Promise.all([
-          fetch(`/api/comics/${id}`),
-          fetch(`/api/bookmarks/check/${id}`),
-          fetch(`/api/progress/${id}`)
-        ]);
+        const detailRes = await fetch(`/api/comics/${id}/detail`);
+        if (!detailRes.ok) return;
 
-        if (!comicRes.ok) return;
-
-        const comicData = await comicRes.json();
-        const bookmarkData = bookmarkRes.ok ? await bookmarkRes.json() : {};
-        const progressData = progressRes.ok ? await progressRes.json() : {};
+        const { comic: comicData, isBookmarked, progress } = await detailRes.json();
 
         setComic(comicData);
-        setIsBookmarked(bookmarkData.isBookmarked || false);
-        setProgress(progressData.page || 1);
+        setIsBookmarked(isBookmarked || false);
+        setProgress(progress || 1);
 
         const pageTitle = `${comicData.title} - Comic News`;
         document.title = pageTitle;

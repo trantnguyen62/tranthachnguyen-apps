@@ -888,6 +888,20 @@ app.get('/api/comics/:id', readRateLimit, (req, res) => {
   res.json(comic);
 });
 
+// Combined detail endpoint: comic + bookmark status + reading progress in one round-trip
+app.get('/api/comics/:id/detail', readRateLimit, (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: 'Invalid id' });
+  const comic = comicsMap.get(id);
+  if (!comic) return res.status(404).json({ error: 'Comic not found' });
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    comic,
+    isBookmarked: bookmarks.has(id),
+    progress: readingProgress[id] || 1,
+  });
+});
+
 // Get genres
 app.get('/api/genres', readRateLimit, (req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
