@@ -161,7 +161,7 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 20, flexWrap: 'wrap' }} aria-label="Current step">
             {steps.map(({ step, label, color, done, active }, i) => (
               <React.Fragment key={step}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: active || done ? 1 : 0.38, transition: 'opacity 0.4s ease' }} {...(active ? { 'aria-current': 'step' } : {})}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: active || done ? 1 : 0.38, transition: 'opacity 0.4s ease, transform 0.4s ease', transform: active ? 'scale(1.08)' : 'scale(1)' }} {...(active ? { 'aria-current': 'step' } : {})}>
                   <div style={{
                     width: 26, height: 26, borderRadius: '50%',
                     background: done ? color : active ? `${color}28` : 'rgba(255,255,255,0.05)',
@@ -203,12 +203,12 @@ export default function App() {
               <span aria-hidden="true" style={{ fontSize: 20 }}>📸</span>
               <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 20, fontWeight: 600 }}>Your Photo</h2>
               {image && (
-                <span style={{ 
-                  marginLeft: 'auto', fontSize: 11, 
+                <span style={{
+                  marginLeft: 'auto', fontSize: 11,
                   background: `linear-gradient(135deg, ${accentPink}, ${accentGold})`,
                   padding: '4px 10px', borderRadius: 20, fontWeight: 600
                 }}>
-                  Ready
+                  ✓ Ready
                 </span>
               )}
             </div>
@@ -322,14 +322,15 @@ export default function App() {
               </div>
             ) : status === AppStatus.ERROR ? (
               <div style={{
-                height: 350,
+                minHeight: 260,
+                padding: '40px 20px',
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
                 textAlign: 'center'
               }}>
                 <div aria-hidden="true" style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
                 <p style={{ color: accentPink, fontWeight: 600, marginBottom: 8 }}>Analysis failed</p>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', maxWidth: 220, marginBottom: 20 }}>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', maxWidth: 270, marginBottom: 20 }}>
                   {errorMessage}
                 </p>
                 <button
@@ -511,7 +512,7 @@ export default function App() {
                     Ready for Compliance Check
                   </p>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 220 }}>
-                    Tap <strong style={{ color: accentPink }}>Check Photo</strong> to verify all 7 official ICAO biometric requirements in seconds.
+                    Click or tap <strong style={{ color: accentPink }}>Check Photo</strong> to verify all 7 official ICAO biometric requirements in seconds.
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', maxWidth: 280 }}>
