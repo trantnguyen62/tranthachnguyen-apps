@@ -750,7 +750,8 @@ function startGame(mode, topicId = null) {
     game.questionsAnswered = 0;
     game.correctAnswers = 0;
 
-    game.currentZone = topicId ? TOPICS.findIndex(t => t.id === topicId) : 0;
+    const foundZone = topicId ? TOPICS.findIndex(t => t.id === topicId) : -1;
+    game.currentZone = foundZone !== -1 ? foundZone : 0;
     game.currentWave = 1;
     game.enemiesDefeated = 0;
 
@@ -1268,8 +1269,11 @@ function checkAnswer(index) {
     const btns = domCache.answerBtns;
     const enemy = game.currentQuestion.enemy; // Save reference before closeQuestion
 
-    btns[game.currentQuestion.correctIndex].classList.add('correct');
-    if (!correct) {
+    const ci = game.currentQuestion.correctIndex;
+    if (ci >= 0 && ci < btns.length) {
+        btns[ci].classList.add('correct');
+    }
+    if (!correct && index >= 0 && index < btns.length) {
         btns[index].classList.add('incorrect');
     }
 
@@ -1358,7 +1362,10 @@ function handleTimeout() {
 
     // Show correct answer
     const btns = domCache.answerBtns;
-    btns[game.currentQuestion.correctIndex].classList.add('correct');
+    const tci = game.currentQuestion.correctIndex;
+    if (tci >= 0 && tci < btns.length) {
+        btns[tci].classList.add('correct');
+    }
 
     announce(`Time's up! −${CONFIG.DAMAGE_TIMEOUT} HP.`);
     takeDamage(CONFIG.DAMAGE_TIMEOUT);
