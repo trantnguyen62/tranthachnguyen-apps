@@ -49,76 +49,79 @@ export class ProxyLiveSession {
     console.log('[ProxyClient] Attempting to connect to:', PROXY_URL);
     return new Promise((resolve, reject) => {
       this.callbacks = config.callbacks || {};
-      
+      let settled = false;
+      const safeResolve = () => { if (!settled) { settled = true; resolve(); } };
+      const safeReject = (err: unknown) => { if (!settled) { settled = true; reject(err); } };
+
       try {
         this.ws = new WebSocket(PROXY_URL);
       } catch (err) {
         console.error('[ProxyClient] Failed to create WebSocket:', err);
-        reject(err);
+        safeReject(err);
         return;
       }
-      
+
       this.ws.onopen = () => {
         console.log('[ProxyClient] WebSocket connected to proxy server');
         this.isOpen = true;
-        
+
         const connectMessage = {
           type: 'connect',
           config: config.config
         };
         console.log('[ProxyClient] Sending connect message');
         this.ws!.send(JSON.stringify(connectMessage));
-        
+
         while (this.messageQueue.length > 0) {
           const msg = this.messageQueue.shift();
           this.ws!.send(JSON.stringify(msg));
         }
       };
-      
+
       this.ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          
+
           switch (data.type) {
             case 'open':
               if (this.callbacks.onopen) {
                 this.callbacks.onopen();
               }
-              resolve();
+              safeResolve();
               break;
-              
+
             case 'message':
               if (this.callbacks.onmessage) {
                 this.callbacks.onmessage(data.data);
               }
               break;
-              
+
             case 'close':
               if (this.callbacks.onclose) {
                 this.callbacks.onclose();
               }
               this.isOpen = false;
               break;
-              
+
             case 'error':
               console.error('[ProxyClient] Server error:', data.error);
               if (this.callbacks.onerror) {
                 this.callbacks.onerror(new Error(data.error));
               }
-              reject(new Error(data.error));
+              safeReject(new Error(data.error));
               break;
           }
         } catch (error) {
           console.error('Error parsing proxy message:', error);
         }
       };
-      
+
       this.ws.onerror = (error) => {
         console.error('[ProxyClient] WebSocket error:', error);
         if (this.callbacks.onerror) {
           this.callbacks.onerror(error);
         }
-        reject(error);
+        safeReject(error);
       };
       
       this.ws.onclose = (event) => {
