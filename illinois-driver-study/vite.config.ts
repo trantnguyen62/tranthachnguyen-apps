@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
       },
       build: {
         target: 'es2022',
+        modulePreload: { polyfill: false },
         esbuildOptions: {
           legalComments: 'none',
         },

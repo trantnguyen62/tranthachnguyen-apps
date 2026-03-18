@@ -314,6 +314,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
               src={question.image}
               alt={question.text}
               loading="lazy"
+              decoding="async"
               className="max-h-48 object-contain rounded-lg shadow-sm border border-slate-200"
             />
           </div>

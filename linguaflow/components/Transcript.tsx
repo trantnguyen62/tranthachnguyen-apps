@@ -94,8 +94,8 @@ const Transcript = memo<Props>(({ messages }) => {
             <span className={`text-xs font-medium ${msg.role === 'user' ? 'text-blue-400' : 'text-slate-400'}`}>
               {msg.role === 'user' ? 'You' : 'AI Tutor'}
             </span>
-            <span className="text-xs text-slate-600" aria-hidden="true">·</span>
-            <time dateTime={msg.timestamp.toISOString()} className="text-xs text-slate-400 tabular-nums">
+            <span className="text-xs text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity duration-150" aria-hidden="true">·</span>
+            <time dateTime={msg.timestamp.toISOString()} className="text-xs text-slate-400 tabular-nums opacity-0 group-hover:opacity-100 transition-opacity duration-150">
               {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </time>
             <CopyButton text={msg.text} />

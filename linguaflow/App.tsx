@@ -239,7 +239,8 @@ function App() {
         </div>
 
         {/* Main Interaction Area */}
-        <div id="main-content" tabIndex={-1} className="flex-1 flex flex-col items-center justify-center gap-8 min-h-[300px] focus:outline-none">
+        <div id="main-content" tabIndex={-1} className="flex-1 flex flex-col items-center justify-center gap-8 min-h-[300px] focus:outline-none relative">
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.07) 0%, transparent 70%)' }} aria-hidden="true" />
            <Visualizer
              analyserRef={analyserRef}
              inputVolumeRef={inputVolumeRef}
@@ -253,8 +254,8 @@ function App() {
                  <>
                    <span role="img" aria-hidden="true">{activeLanguage.flag}</span>
                    <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
-                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-60"></span>
-                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: visualizerColor }}></span>
+                     <span className="relative inline-flex rounded-full h-2.5 w-2.5" style={{ backgroundColor: visualizerColor }}></span>
                    </span>
                    <span>Listening...</span>
                  </>
@@ -262,7 +263,7 @@ function App() {
              </h2>
              <p className="text-slate-400 text-sm max-w-md mx-auto">
                {isConnected
-                 ? `Speaking ${activeLanguage.name}. Your AI tutor is listening — speak naturally and corrections will come right away.`
+                 ? `Speaking ${activeLanguage.name}. Speak naturally — your AI tutor will correct and guide you in real time.`
                  : isConnecting
                  ? 'Setting up your session. This usually takes a few seconds.'
                  : 'Choose a language below, then press Start Conversation. Your AI tutor will speak with you, guide your pronunciation, and help you improve.'}
@@ -391,7 +392,7 @@ function App() {
                      onClick={disconnect}
                      className="px-8 py-4 rounded-full font-semibold text-lg bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500 hover:text-white hover:scale-105 hover:shadow-[0_0_30px_-8px_rgba(239,68,68,0.5)] transition-all duration-300 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50"
                    >
-                     <svg className="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                     <svg className="w-5 h-5" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2" /></svg>
                      End Session
                    </button>
                  </div>
