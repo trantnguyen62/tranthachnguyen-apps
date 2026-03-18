@@ -850,8 +850,12 @@ function gameLoop() {
 
     if (!game.paused) {
         update();
+        render();
+    } else if (!game.pauseRendered) {
+        // Paused: render only once (frame is static, no physics updates)
+        render();
+        game.pauseRendered = true;
     }
-    render();
 
     game.animationId = requestAnimationFrame(gameLoop);
 }
@@ -863,7 +867,6 @@ function update() {
     if (game.player.velocity > CONFIG.TERMINAL_VELOCITY) game.player.velocity = CONFIG.TERMINAL_VELOCITY;
     game.player.y += game.player.velocity;
     game.player.rotation = Math.min(Math.max(game.player.velocity * 2.5, -20), 60);
-    game.player.flameOffset = Math.random() * 15; // Pre-computed for render; avoids RNG in draw path
 
     const stars = game.stars;
     for (let i = 0; i < stars.length; i++) {
@@ -1106,7 +1109,7 @@ function drawPlayer(ctx) {
         ctx.fillStyle = 'rgba(255, 200, 100, 0.8)';
         ctx.beginPath();
         ctx.moveTo(-25, -5);
-        ctx.lineTo(-40 - (game.player.flameOffset || 0), 0);
+        ctx.lineTo(-40 - Math.random() * 15, 0);
         ctx.lineTo(-25, 5);
         ctx.closePath();
         ctx.fill();
@@ -1714,6 +1717,7 @@ const AdManager = {
         // Set game state - USE PAUSED STATE until player taps
         game.running = true;
         game.paused = true;  // PAUSED until player taps
+        game.pauseRendered = false;
         game.questionActive = false;
 
         // EXPLICITLY hide game over screen and rewarded modal
@@ -1759,6 +1763,7 @@ const AdManager = {
 
             // Unpause the game
             game.paused = false;
+            game.pauseRendered = false;
 
             // Give initial boost
             game.player.velocity = CONFIG.BOOST_FORCE;
