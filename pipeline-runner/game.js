@@ -73,7 +73,7 @@ const LEARNABLE_CONTENT = {
         { cmd: 'docker stop', desc: 'Stops a running container' },
         { cmd: 'docker rm', desc: 'Removes a stopped container' },
         { cmd: 'docker images', desc: 'Lists all local images' },
-        { cmd: 'docker-compose up', desc: 'Starts multi-container application' },
+        { cmd: 'docker compose up', desc: 'Starts multi-container app (V2: built into Docker, no hyphen)' },
         { cmd: 'docker volume', desc: 'Manages persistent data storage' },
         { cmd: 'docker network', desc: 'Manages container networking' },
         { cmd: 'Dockerfile', desc: 'Blueprint for building images' },
@@ -164,7 +164,7 @@ const LEARNABLE_CONTENT = {
         { cmd: 'HCL', desc: 'HashiCorp Configuration Language' },
         { cmd: 'for_each', desc: 'Creates multiple resources from a map or set' },
         { cmd: 'locals', desc: 'Named values computed within a module to reduce repetition' },
-        { cmd: 'terraform taint', desc: 'Marks a resource for forced recreation on next apply' },
+        { cmd: 'terraform taint', desc: 'Marks resource for forced recreation (deprecated: use terraform apply -replace)' },
         { cmd: 'depends_on', desc: 'Declares explicit dependencies between resources' }
     ],
     git: [
@@ -174,7 +174,7 @@ const LEARNABLE_CONTENT = {
         { cmd: 'git push', desc: 'Upload commits to remote repo' },
         { cmd: 'git pull', desc: 'Download and merge remote changes' },
         { cmd: 'git branch', desc: 'Create/list/delete branches' },
-        { cmd: 'git checkout', desc: 'Switch branches or restore files' },
+        { cmd: 'git checkout', desc: 'Switch branches or restore files (modern: git switch / git restore)' },
         { cmd: 'git merge', desc: 'Combine branch histories' },
         { cmd: 'git rebase', desc: 'Reapply commits on new base' },
         { cmd: 'git stash', desc: 'Temporarily save uncommitted work' },
@@ -326,7 +326,7 @@ const QUESTIONS = {
         { q: "Where should Terraform state be stored in teams?", a: ["Remote backend like S3", "Local filesystem", "Git repository", "Environment variable"], c: 0, fact: "Never commit tfstate to Git — it can contain sensitive values in plaintext." },
         { q: "What does 'for_each' do in Terraform?", a: ["Creates multiple resource instances from a map or set", "Loops through all state files", "Iterates provider configurations", "Repeats plan operations"], c: 0, fact: "for_each assigns each instance a unique key, making it easier to manage than count." },
         { q: "What are Terraform 'locals'?", a: ["Named values computed within a module", "Local state files on disk", "Variables passed from the CLI", "Provider-specific settings"], c: 0, fact: "Locals reduce repetition by naming complex expressions once and reusing them throughout a module." },
-        { q: "What does 'terraform taint' do?", a: ["Marks a resource for forced recreation on next apply", "Marks a resource as read-only", "Skips a resource during plan", "Locks a resource in the state file"], c: 0, fact: "terraform taint is useful when a resource is degraded but Terraform doesn't detect it automatically." },
+        { q: "What does 'terraform taint' do?", a: ["Marks a resource for forced recreation on next apply", "Marks a resource as read-only", "Skips a resource during plan", "Locks a resource in the state file"], c: 0, fact: "terraform taint is deprecated since Terraform v1.0 — use 'terraform apply -replace=<resource>' instead." },
         { q: "What is 'depends_on' used for in Terraform?", a: ["Declaring explicit dependencies between resources", "Setting resource creation order globally", "Specifying provider version constraints", "Defining module output order"], c: 0, fact: "Terraform usually infers dependencies automatically; use depends_on only when implicit references are insufficient." }
     ],
     git: [
