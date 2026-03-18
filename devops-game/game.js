@@ -1196,6 +1196,7 @@ function drawEnemy(enemy) {
  */
 function showQuestion(enemy) {
     const topic = TOPICS[game.currentZone];
+    if (!topic) return;
     const questions = QUESTIONS[topic.id];
     const question = questions[Math.floor(Math.random() * questions.length)];
 
@@ -1657,6 +1658,7 @@ function spawnWave() {
 
     const enemyCount = CONFIG.ENEMIES_PER_WAVE_BASE + Math.floor(game.currentWave / 2);
     const topic = TOPICS[game.currentZone];
+    if (!topic) return;
 
     for (let i = 0; i < enemyCount; i++) {
         setTimeout(() => {
@@ -1718,6 +1720,7 @@ function completeWave() {
  */
 function completeZone() {
     const topic = TOPICS[game.currentZone];
+    if (!topic) return;
 
     domCache.zoneCompleteIcon.textContent = topic.icon;
     domCache.zoneCompleteName.textContent = topic.name;
