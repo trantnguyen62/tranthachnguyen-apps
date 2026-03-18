@@ -3779,10 +3779,13 @@ function loadProgress() {
 // Save progress to localStorage
 function saveProgress() {
     const serializable = {};
+    let viewedCards = 0;
     for (const topicId in state.progress) {
         const p = state.progress[topicId];
+        const isSet = p.flashcardsViewed instanceof Set;
+        if (isSet) viewedCards += p.flashcardsViewed.size;
         serializable[topicId] = {
-            flashcardsViewed: p.flashcardsViewed instanceof Set ? [...p.flashcardsViewed] : [],
+            flashcardsViewed: isSet ? [...p.flashcardsViewed] : [],
             quizBestScore: p.quizBestScore,
             quizAttempts: p.quizAttempts
         };
@@ -3792,7 +3795,10 @@ function saveProgress() {
     } catch (e) {
         console.warn('Could not save progress to localStorage:', e);
     }
-    updateHeaderStats();
+    // Update header stats using count already computed in the loop above
+    const totalProgress = totalFlashcardsCount > 0 ? Math.round((viewedCards / totalFlashcardsCount) * 100) : 0;
+    dom.totalProgress.textContent = totalProgress + '%';
+    dom.cardsStudied.textContent = viewedCards;
 }
 
 // Calculate overall progress
@@ -4623,9 +4629,11 @@ function handleSearch(event) {
         results = [];
         searchIndex.forEach(({ topic, nameLower, cards }) => {
             const topicMatch = nameLower.includes(query);
-            const matchCount = cards.filter(c =>
-                c.termLower.includes(query) || c.defLower.includes(query)
-            ).length;
+            let matchCount = 0;
+            for (let i = 0; i < cards.length; i++) {
+                const c = cards[i];
+                if (c.termLower.includes(query) || c.defLower.includes(query)) matchCount++;
+            }
 
             if (topicMatch || matchCount > 0) {
                 results.push({
