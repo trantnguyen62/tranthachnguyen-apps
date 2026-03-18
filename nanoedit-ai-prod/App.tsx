@@ -161,7 +161,7 @@ const App: React.FC = () => {
 
         // Add to history, removing any future redo states if we were in the middle.
         // Cap at MAX_HISTORY entries to prevent unbounded memory growth from base64 strings.
-        const truncated = history.slice(0, historyIndex + 1);
+        const truncated = historyRef.current.slice(0, historyIndexRef.current + 1);
         truncated.push(newImage);
         const newHistory = truncated.length > MAX_HISTORY
           ? truncated.slice(truncated.length - MAX_HISTORY)
@@ -185,7 +185,7 @@ const App: React.FC = () => {
       setErrorDismissed(false);
       setStatus(AppStatus.ERROR);
     }
-  }, [currentImage, prompt, history, historyIndex, status, clearError]);
+  }, [currentImage, prompt, status, clearError]);
 
   const handleUndo = useCallback(() => {
     if (canUndo) {
@@ -215,6 +215,12 @@ const App: React.FC = () => {
   canUndoRef.current = canUndo;
   canRedoRef.current = canRedo;
   clearErrorRef.current = clearError;
+
+  // Refs for history state used inside handleGenerate — avoids recreating the callback on every edit
+  const historyRef = useRef(history);
+  const historyIndexRef = useRef(historyIndex);
+  historyRef.current = history;
+  historyIndexRef.current = historyIndex;
 
   // Global keyboard shortcuts for undo/redo
   useEffect(() => {

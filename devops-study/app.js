@@ -3843,6 +3843,8 @@ function loadProgress() {
             for (const topicId in parsed) {
                 const fv = parsed[topicId].flashcardsViewed;
                 parsed[topicId].flashcardsViewed = Array.isArray(fv) ? new Set(fv) : new Set();
+                parsed[topicId].quizBestScore = parsed[topicId].quizBestScore || 0;
+                parsed[topicId].quizAttempts = parsed[topicId].quizAttempts || 0;
             }
             state.progress = parsed;
         } catch (e) {
@@ -4036,6 +4038,10 @@ function goBack() {
     if (state.currentTopic) {
         const item = sidebarItemMap.get(state.currentTopic.id);
         if (item) item.classList.remove('active');
+    }
+    if (matchState.timerInterval) {
+        clearInterval(matchState.timerInterval);
+        matchState.timerInterval = null;
     }
     state.currentTopic = null;
     state.currentView = 'welcome';

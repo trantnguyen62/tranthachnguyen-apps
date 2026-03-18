@@ -22,8 +22,8 @@ const ALLOWED_MIME_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'im
 
 // Keep-alive agents reuse TCP connections to the upstream proxy, reducing
 // per-request connection overhead (especially important for local loopback).
-const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10, maxFreeSockets: 5 });
-const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 10, maxFreeSockets: 5 });
+const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 50, maxFreeSockets: 10 });
+const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 50, maxFreeSockets: 10 });
 const fetchOptions = (url) => (url.startsWith('https://') ? { agent: httpsAgent } : { agent: httpAgent });
 
 app.use(compression());
