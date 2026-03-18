@@ -1062,6 +1062,28 @@ body {
     border: 0;
 }
 
+/* Eliminate 300ms tap delay on touch devices */
+.topic-btn,
+.start-btn,
+.answer-btn,
+.retry-btn,
+.menu-btn,
+.watch-ad-btn,
+.skip-ad-btn {
+    touch-action: manipulation;
+}
+
+/* Prevent accidental text selection during gameplay */
+.game-hud,
+.score-display,
+.lives-display,
+.streak-display,
+.topic-badge,
+.tip-banner {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
 /* Focus styles for keyboard navigation */
 .topic-btn:focus-visible,
 .start-btn:focus-visible,
@@ -1072,6 +1094,21 @@ body {
 .skip-ad-btn:focus-visible {
     outline: 3px solid #60a5fa;
     outline-offset: 3px;
+}
+
+/* Hide keyboard-specific hints on touch/coarse pointer devices */
+@media (pointer: coarse) {
+    .keyboard-hint {
+        display: none;
+    }
+
+    .pointer-only {
+        display: none;
+    }
+
+    .touch-only {
+        display: inline !important;
+    }
 }
 
 /* Reduced motion for users who prefer it */
