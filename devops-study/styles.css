@@ -1469,12 +1469,22 @@ body {
         transition-duration: 0.01ms !important;
     }
 
+    html {
+        scroll-behavior: auto;
+    }
+
     .bg-orb {
         animation: none;
+        will-change: auto;
     }
 
     .logo-icon {
         animation: none;
+        will-change: auto;
+    }
+
+    .flashcard-inner {
+        will-change: auto;
     }
 
     .welcome-title {
