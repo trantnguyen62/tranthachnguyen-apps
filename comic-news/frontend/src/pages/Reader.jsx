@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { injectHeadElement } from '../utils/meta';
 import { 
   X, 
   Maximize2, 
@@ -33,20 +34,10 @@ function Reader() {
         document.title = `Reading: ${comicData.title} - Comic News`;
 
         // Canonical points to comic detail to avoid duplicate content
-        document.getElementById('canonical-link')?.remove();
-        const canonical = document.createElement('link');
-        canonical.id = 'canonical-link';
-        canonical.rel = 'canonical';
-        canonical.href = `${window.location.origin}/comic/${id}`;
-        document.head.appendChild(canonical);
+        injectHeadElement('link', { id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/comic/${id}` });
 
         // Noindex reader view - it's a UX page, not a content page
-        document.getElementById('meta-robots-reader')?.remove();
-        const robotsMeta = document.createElement('meta');
-        robotsMeta.id = 'meta-robots-reader';
-        robotsMeta.name = 'robots';
-        robotsMeta.content = 'noindex, follow';
-        document.head.appendChild(robotsMeta);
+        injectHeadElement('meta', { id: 'meta-robots-reader', name: 'robots', content: 'noindex, follow' });
       } catch (error) {
         console.error('Error fetching comic:', error);
       } finally {

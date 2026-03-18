@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, BookOpen, User, Tag, Bookmark, BookmarkCheck, Play, ArrowLeft, FileText, Image } from 'lucide-react';
-import { setMeta } from '../utils/meta';
+import { setMeta, injectHeadElement, injectJsonLd } from '../utils/meta';
 
 // Scales rating × chapters to produce a plausible aggregateRating ratingCount for schema.org
 const RATING_COUNT_FACTOR = 15;
@@ -44,28 +44,18 @@ function ComicDetail() {
         setMeta('meta[property="og:image:alt"]', comicData.title);
 
         // Keywords meta
-        document.getElementById('meta-keywords')?.remove();
-        const kwMeta = document.createElement('meta');
-        kwMeta.id = 'meta-keywords';
-        kwMeta.name = 'keywords';
-        kwMeta.content = [comicData.genre, 'comic news', 'news comic', comicData.author].filter(Boolean).join(', ');
-        document.head.appendChild(kwMeta);
+        injectHeadElement('meta', {
+          id: 'meta-keywords',
+          name: 'keywords',
+          content: [comicData.genre, 'comic news', 'news comic', comicData.author].filter(Boolean).join(', '),
+        });
 
         // Canonical link
-        document.getElementById('canonical-link')?.remove();
-        const canonical = document.createElement('link');
-        canonical.id = 'canonical-link';
-        canonical.rel = 'canonical';
-        canonical.href = canonicalHref;
-        document.head.appendChild(canonical);
+        injectHeadElement('link', { id: 'canonical-link', rel: 'canonical', href: canonicalHref });
 
         // JSON-LD structured data
-        document.getElementById('page-jsonld')?.remove();
-        const ld = document.createElement('script');
-        ld.id = 'page-jsonld';
-        ld.type = 'application/ld+json';
         const today = new Date().toISOString().split('T')[0];
-        ld.textContent = JSON.stringify({
+        injectJsonLd('page-jsonld', {
           '@context': 'https://schema.org',
           '@type': 'Article',
           mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalHref },
@@ -88,14 +78,9 @@ function ComicDetail() {
             ratingCount: Math.round(comicData.rating * (comicData.chapters || 1) * RATING_COUNT_FACTOR),
           } : undefined,
         });
-        document.head.appendChild(ld);
 
         // BreadcrumbList structured data
-        document.getElementById('page-breadcrumb-jsonld')?.remove();
-        const ldBreadcrumb = document.createElement('script');
-        ldBreadcrumb.id = 'page-breadcrumb-jsonld';
-        ldBreadcrumb.type = 'application/ld+json';
-        ldBreadcrumb.textContent = JSON.stringify({
+        injectJsonLd('page-breadcrumb-jsonld', {
           '@context': 'https://schema.org',
           '@type': 'BreadcrumbList',
           itemListElement: [
@@ -104,7 +89,6 @@ function ComicDetail() {
             { '@type': 'ListItem', position: 3, name: comicData.title, item: `${window.location.origin}/comic/${id}` },
           ],
         });
-        document.head.appendChild(ldBreadcrumb);
       } catch (error) {
         console.error('Error fetching comic:', error);
       } finally {

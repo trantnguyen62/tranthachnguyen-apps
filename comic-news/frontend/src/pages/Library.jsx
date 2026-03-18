@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Filter, SortAsc, SearchX, X } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 import SkeletonCard from '../components/SkeletonCard';
-import { setMeta } from '../utils/meta';
+import { setMeta, injectHeadElement, injectJsonLd } from '../utils/meta';
 
 // Module-level cache: genres are static, so we fetch once per page load
 // and skip the network request if the Library component remounts (e.g. nav back).
@@ -39,19 +39,12 @@ function Library() {
     setMeta('meta[name="twitter:title"]', title);
     setMeta('meta[name="twitter:description"]', description);
 
-    document.getElementById('canonical-link')?.remove();
-    const canonical = Object.assign(document.createElement('link'), {
-      id: 'canonical-link', rel: 'canonical', href: url,
-    });
-    document.head.appendChild(canonical);
+    const canonical = injectHeadElement('link', { id: 'canonical-link', rel: 'canonical', href: url });
 
     // Noindex search result pages to avoid thin/duplicate content indexing
     document.getElementById('meta-robots-library')?.remove();
     if (searchQuery) {
-      const robotsMeta = Object.assign(document.createElement('meta'), {
-        id: 'meta-robots-library', name: 'robots', content: 'noindex, follow',
-      });
-      document.head.appendChild(robotsMeta);
+      injectHeadElement('meta', { id: 'meta-robots-library', name: 'robots', content: 'noindex, follow' });
     }
 
     return () => {
@@ -99,11 +92,7 @@ function Library() {
         setComics(data);
 
         // ItemList structured data
-        document.getElementById('library-jsonld')?.remove();
-        const ld = document.createElement('script');
-        ld.id = 'library-jsonld';
-        ld.type = 'application/ld+json';
-        ld.textContent = JSON.stringify({
+        injectJsonLd('library-jsonld', {
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
           name: selectedGenre !== 'All' ? `${selectedGenre} Comics - Comic News` : 'Story Library - Comic News',
@@ -119,7 +108,6 @@ function Library() {
             author: { '@type': 'Person', name: comic.author },
           })),
         });
-        document.head.appendChild(ld);
       } catch (error) {
         if (error.name !== 'AbortError') console.error('Error fetching comics:', error);
       } finally {

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { TrendingUp, Sparkles, ArrowRight, BookOpen, Bookmark, Monitor } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 import SkeletonCard from '../components/SkeletonCard';
-import { setMeta } from '../utils/meta';
+import { setMeta, injectHeadElement, injectJsonLd } from '../utils/meta';
 
 function Home() {
   const [featured, setFeatured] = useState([]);
@@ -29,18 +29,12 @@ function Home() {
     setMeta('meta[name="description"]', defaultDesc);
 
     // Canonical link
-    document.getElementById('canonical-link')?.remove();
-    const canonical = Object.assign(document.createElement('link'), {
+    const canonical = injectHeadElement('link', {
       id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/`,
     });
-    document.head.appendChild(canonical);
 
     // WebSite structured data
-    document.getElementById('page-jsonld')?.remove();
-    const ld = document.createElement('script');
-    ld.id = 'page-jsonld';
-    ld.type = 'application/ld+json';
-    ld.textContent = JSON.stringify({
+    injectJsonLd('page-jsonld', {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: 'Comic News',
@@ -52,7 +46,6 @@ function Home() {
         'query-input': 'required name=search_term_string',
       },
     });
-    document.head.appendChild(ld);
 
     return () => {
       canonical.remove();
@@ -71,11 +64,7 @@ function Home() {
         setComics(topComics);
 
         // ItemList structured data for comic collection
-        document.getElementById('page-itemlist-jsonld')?.remove();
-        const ldList = document.createElement('script');
-        ldList.id = 'page-itemlist-jsonld';
-        ldList.type = 'application/ld+json';
-        ldList.textContent = JSON.stringify({
+        injectJsonLd('page-itemlist-jsonld', {
           '@context': 'https://schema.org',
           '@type': 'ItemList',
           name: 'Trending Comics',
@@ -87,7 +76,6 @@ function Home() {
             url: `${window.location.origin}/comic/${comic.id}`,
           })),
         });
-        document.head.appendChild(ldList);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {

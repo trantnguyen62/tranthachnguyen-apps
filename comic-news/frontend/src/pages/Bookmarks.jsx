@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Bookmark, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ComicCard from '../components/ComicCard';
+import { injectHeadElement } from '../utils/meta';
 
 function Bookmarks() {
   const [bookmarks, setBookmarks] = useState([]);
@@ -9,18 +10,12 @@ function Bookmarks() {
 
   useEffect(() => {
     document.title = 'My Bookmarks - Comic News';
-    document.getElementById('canonical-link')?.remove();
-    const canonical = Object.assign(document.createElement('link'), {
+    const canonical = injectHeadElement('link', {
       id: 'canonical-link', rel: 'canonical', href: `${window.location.origin}/bookmarks`,
     });
-    document.head.appendChild(canonical);
 
     // Noindex: bookmarks are user-specific, not indexable content
-    document.getElementById('meta-robots-bookmarks')?.remove();
-    const robotsMeta = Object.assign(document.createElement('meta'), {
-      id: 'meta-robots-bookmarks', name: 'robots', content: 'noindex, nofollow',
-    });
-    document.head.appendChild(robotsMeta);
+    injectHeadElement('meta', { id: 'meta-robots-bookmarks', name: 'robots', content: 'noindex, nofollow' });
 
     return () => {
       canonical.remove();
