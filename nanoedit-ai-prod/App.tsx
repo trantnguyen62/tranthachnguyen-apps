@@ -50,10 +50,10 @@ const ProcessingMessage = memo(() => {
   }, []);
   const idx = Math.floor(elapsed / PROCESSING_MESSAGE_INTERVAL_SECS) % PROCESSING_MESSAGES.length;
   return (
-    <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5" role="status" aria-live="polite" aria-atomic="true">
+    <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5">
       <Sparkles className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
-      {PROCESSING_MESSAGES[idx]}
-      <span className="text-slate-400 tabular-nums">{elapsed}s</span>
+      <span role="status" aria-live="polite" aria-atomic="true">{PROCESSING_MESSAGES[idx]}</span>
+      <span className="text-slate-400 tabular-nums" aria-hidden="true">{elapsed}s</span>
     </span>
   );
 });
@@ -416,8 +416,12 @@ const App: React.FC = () => {
                           <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Enter</kbd> to generate <span className="text-slate-300">·</span> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-mono">Shift+Enter</kbd> for newline
                         </span>
                         <span className="sm:hidden">Tap Generate to apply</span>
+                        <span className="sr-only">Maximum 2000 characters.</span>
                         {prompt.length > 0 && (
-                          <span aria-live="polite" aria-atomic="true" className={`tabular-nums transition-all ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-300'}`}>{prompt.length} / 2000</span>
+                          <span aria-live="polite" aria-atomic="true" className={`tabular-nums transition-all ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-300'}`}>
+                            {prompt.length} / 2000
+                            {prompt.length > 1800 && <span className="sr-only"> — character limit nearly reached</span>}
+                          </span>
                         )}
                       </span>
                     )}
