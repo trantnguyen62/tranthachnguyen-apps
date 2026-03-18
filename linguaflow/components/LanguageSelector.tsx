@@ -174,7 +174,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
       {selected.code === 'en-vi' && selected.selectedLevel && (
         <div role="group" aria-labelledby="topic-selector-label" className="flex flex-col gap-2">
           <span id="topic-selector-label" className="text-sm font-medium text-slate-400">Chủ đề / Topic <span className="font-normal text-slate-500">(optional — skip to let the conversation flow freely)</span></span>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {CONVERSATION_TOPICS.map((topic) => {
               const isSelected = selected.selectedTopic === topic.id;
               return (
@@ -184,7 +184,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
                   disabled={disabled}
                   aria-pressed={isSelected}
                   className={`
-                    flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400
+                    w-full flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400
                     ${isSelected
                       ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg'
                       : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700/80 hover:border-indigo-500'}

@@ -83,7 +83,7 @@ const Transcript = memo<Props>(({ messages }) => {
           className={`msg-fade-in group flex flex-col max-w-[85%] ${msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'}`}
         >
           <div className={`
-            px-4 py-2.5 rounded-2xl text-sm leading-relaxed
+            px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words min-w-0
             ${msg.role === 'user'
               ? 'bg-blue-600 text-white rounded-br-sm'
               : 'bg-slate-700 text-slate-100 rounded-bl-sm'}
@@ -94,8 +94,8 @@ const Transcript = memo<Props>(({ messages }) => {
             <span className={`text-xs font-medium ${msg.role === 'user' ? 'text-blue-400' : 'text-slate-400'}`}>
               {msg.role === 'user' ? 'You' : 'AI Tutor'}
             </span>
-            <span className="text-xs text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity duration-150" aria-hidden="true">·</span>
-            <time dateTime={msg.timestamp.toISOString()} className="text-xs text-slate-400 tabular-nums opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <span className="text-xs text-slate-600 opacity-40 group-hover:opacity-100 transition-opacity duration-150" aria-hidden="true">·</span>
+            <time dateTime={msg.timestamp.toISOString()} className="text-xs text-slate-500 tabular-nums opacity-40 group-hover:opacity-100 transition-opacity duration-150">
               {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </time>
             <CopyButton text={msg.text} />

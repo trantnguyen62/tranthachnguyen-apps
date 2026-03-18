@@ -204,9 +204,14 @@ function App() {
           </div>
           <div className="flex items-center gap-3">
             {userProfile && (
-              <div role="img" className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0" aria-label={`User: ${userProfile.name}`} title={userProfile.name}>
+              <button
+                onClick={() => setShowProfileModal(true)}
+                className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0 hover:bg-indigo-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                aria-label={`View profile: ${userProfile.name}`}
+                title={`${userProfile.name} — view profile`}
+              >
                 <span aria-hidden="true">{userProfile.name.charAt(0).toUpperCase()}</span>
-              </div>
+              </button>
             )}
             <div className="flex items-center gap-2 text-xs">
               <span className="sr-only" aria-live="polite" aria-atomic="true">
