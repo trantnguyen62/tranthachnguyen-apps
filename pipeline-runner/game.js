@@ -777,7 +777,8 @@ function resizeCanvas() {
 
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById(screenId).classList.remove('hidden');
+    const el = document.getElementById(screenId);
+    if (el) el.classList.remove('hidden');
 }
 
 function showStartScreen() {
@@ -886,8 +887,10 @@ function update() {
             pulseStat(game.elScore);
 
             // Show learned content as floating text
-            game.learnedItems.push(obs.content);
-            showLearnedContent(obs.content);
+            if (obs.content) {
+                game.learnedItems.push(obs.content);
+                showLearnedContent(obs.content);
+            }
 
             if (game.score % CONFIG.QUESTION_INTERVAL === 0) {
                 showQuestion();
@@ -1143,6 +1146,7 @@ function spawnObstacle() {
     const gapY = Math.random() * (maxGapY - minGapY) + minGapY;
 
     const content = getNextLearnableContent();
+    if (!content) return;
 
     game.obstacles.push({
         x: game.width + 50,
