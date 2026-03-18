@@ -49,6 +49,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
 
   const t = TRANSLATIONS[language];
 
+  /** Requests microphone access, sets up MediaRecorder, and begins capturing audio chunks. */
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -77,6 +78,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
     }
   };
 
+  /** Stops the active MediaRecorder and clears the auto-stop timer. Triggers `onstop` → `handleTranscription`. */
   const stopRecording = () => {
     if (recordingTimerRef.current) {
       clearTimeout(recordingTimerRef.current);
@@ -89,6 +91,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
     }
   };
 
+  /** Sends the recorded audio blob to Gemini for transcription and stores the result. */
   const handleTranscription = async (blob: Blob) => {
     try {
       const text = await transcribeAudio(blob);

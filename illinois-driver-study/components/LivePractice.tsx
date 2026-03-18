@@ -83,6 +83,22 @@ function decodeAudioData(data: Uint8Array, ctx: AudioContext): AudioBuffer {
   return buffer;
 }
 
+/**
+ * LivePractice — real-time AI driving instructor powered by the Gemini Live API.
+ *
+ * Architecture overview:
+ * - Opens a persistent WebSocket session via `ai.live.connect()` for bidirectional
+ *   audio streaming. Microphone audio is captured at 16 kHz, converted to signed
+ *   16-bit PCM, and streamed to the API in real time via `sendRealtimeInput`.
+ * - AI responses arrive as base64-encoded 24 kHz PCM chunks, decoded and scheduled
+ *   back-to-back on a dedicated `outputAudioContext` to produce gapless playback.
+ * - The instructor uses the `displayQuestion` function-calling tool to signal which
+ *   question it is about to ask; the client handles the tool call by updating
+ *   `currentQuestion` state and returning a confirmation response.
+ *
+ * Session state machine:
+ *   idle → connecting → connected ↔ speaking → disconnected → idle
+ */
 export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const [isActive, setIsActive] = useState(false);
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'speaking' | 'disconnected'>('idle');
@@ -113,6 +129,10 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   
   const t = TRANSLATIONS[language];
 
+  /**
+   * Tears down all audio resources and resets component state.
+   * Safe to call multiple times; guards against null refs.
+   */
   const stopSession = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -162,6 +182,12 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const allQuestions = useMemo(() => getQuestions(language), [language]);
   const questionsMap = useMemo(() => new Map(allQuestions.map(q => [q.id, q])), [allQuestions]);
 
+  /**
+   * Requests microphone access, initializes both AudioContexts, then opens a
+   * Gemini Live session. Audio capture begins only after the `onopen` callback
+   * fires to ensure the session is ready to receive data.
+   * Sets `sessionError` on failure instead of throwing, so the UI can display it.
+   */
   const startSession = async () => {
     try {
       setStatus('connecting');
