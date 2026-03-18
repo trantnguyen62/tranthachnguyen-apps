@@ -177,8 +177,6 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
       
       const outputAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       outputAudioContextRef.current = outputAudioContext;
-      const outputNode = outputAudioContext.createGain();
-      outputNode.connect(outputAudioContext.destination);
 
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
@@ -273,22 +271,22 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
                 const responses = message.toolCall.functionCalls.map(fc => {
                   if (fc.name === 'displayQuestion') {
                     const rawId = fc.args['id'];
-                    const id = typeof rawId === 'number' && Number.isInteger(rawId) && rawId >= 1 && rawId <= allQuestions.length
+                    const validId = typeof rawId === 'number' && Number.isInteger(rawId) && rawId >= 1 && rawId <= allQuestions.length
                       ? rawId
-                      : NaN;
-                    const q = Number.isNaN(id) ? undefined : questionsMap.get(id);
-                    if (q) {
+                      : null;
+                    const q = validId !== null ? questionsMap.get(validId) : undefined;
+                    if (q && validId !== null) {
                       setCurrentQuestion(q);
                       return {
                         id: fc.id,
                         name: fc.name,
-                        response: { result: `Question ${id} displayed on screen: "${q.text}"` }
+                        response: { result: `Question ${validId} displayed on screen: "${q.text}"` }
                       };
                     } else {
                       return {
                         id: fc.id,
                         name: fc.name,
-                        response: { result: `Error: Question ID ${id} not found.` }
+                        response: { result: `Error: Question ID ${rawId} not found.` }
                       };
                     }
                   }
