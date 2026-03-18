@@ -386,7 +386,7 @@ function ComicDetail() {
                 <img
                   src={comic.pages[0].image}
                   alt={comic.title}
-                  className="w-full rounded-xl shadow-2xl border border-white/10"
+                  className="w-full max-h-[75vh] object-contain rounded-xl shadow-2xl border border-white/10"
                 />
                 {comic.pages[0].caption && (
                   <p className="text-gray-400 text-center mt-4">{comic.pages[0].caption}</p>

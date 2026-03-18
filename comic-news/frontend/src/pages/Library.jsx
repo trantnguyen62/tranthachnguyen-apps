@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Filter, SortAsc, SearchX } from 'lucide-react';
+import { Filter, SortAsc, SearchX, X } from 'lucide-react';
 import ComicCard from '../components/ComicCard';
 import SkeletonCard from '../components/SkeletonCard';
 import { setMeta } from '../utils/meta';
@@ -144,8 +144,19 @@ function Library() {
     <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          {searchQuery ? `Search: "${searchQuery}"` : 'Story Library'}
+        <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+          {searchQuery ? (
+            <>
+              <span>Search: &ldquo;{searchQuery}&rdquo;</span>
+              <button
+                onClick={() => navigate('/library')}
+                aria-label="Clear search"
+                className="text-gray-500 hover:text-white transition-colors flex-shrink-0"
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
+            </>
+          ) : 'Story Library'}
         </h1>
         <p className="text-gray-400" aria-live="polite" aria-atomic="true">
           {loading
