@@ -3809,10 +3809,12 @@ function calculateTopicProgress(topicId) {
     const topic = topicMap.get(topicId);
     if (!topic || !state.progress[topicId]) return 0;
 
-    const cardProgress = (state.progress[topicId].flashcardsViewed.size / topic.flashcards.length) * 50;
-    const quizProgress = (state.progress[topicId].quizBestScore / topic.quiz.length) * 50;
+    const cardProgress = topic.flashcards.length > 0 ? (state.progress[topicId].flashcardsViewed.size / topic.flashcards.length) * 100 : 0;
+    const quizWeight = topic.quiz.length > 0 ? 0.5 : 0;
+    const cardWeight = topic.quiz.length > 0 ? 0.5 : 1;
+    const quizProgress = topic.quiz.length > 0 ? (state.progress[topicId].quizBestScore / topic.quiz.length) * 100 : 0;
 
-    return Math.round(cardProgress + quizProgress);
+    return Math.round(cardProgress * cardWeight + quizProgress * quizWeight);
 }
 
 // Update header stats
@@ -4056,8 +4058,8 @@ function escapeHtml(text) {
 function copyCodebase(btn, index) {
     const codebase = state.currentTopic.codebase || [];
     if (codebase[index]) {
+        const originalText = btn.textContent;
         navigator.clipboard.writeText(codebase[index].code).then(() => {
-            const originalText = btn.textContent;
             btn.textContent = '✓ Copied!';
             btn.classList.add('copied');
             setTimeout(() => {
@@ -4066,7 +4068,7 @@ function copyCodebase(btn, index) {
             }, 1500);
         }).catch(() => {
             btn.textContent = '✗ Failed';
-            setTimeout(() => { btn.textContent = btn.textContent === '✗ Failed' ? '📋 Copy' : btn.textContent; }, 1500);
+            setTimeout(() => { btn.textContent = originalText; }, 1500);
         });
     }
 }
@@ -4430,6 +4432,15 @@ function renderQuizQuestion() {
     if (!state.currentTopic) return;
 
     const questions = state.currentTopic.quiz;
+    if (questions.length === 0) {
+        dom.quizQuestion.textContent = 'No quiz questions available for this topic yet.';
+        dom.quizOptions.innerHTML = '';
+        dom.quizFeedback.classList.add('hidden');
+        dom.quizNextBtn.classList.add('hidden');
+        dom.currentQuestionNum.textContent = '0';
+        dom.totalQuestions.textContent = '0';
+        return;
+    }
     const question = questions[state.currentQuestionIndex];
     if (!question) return;
 
