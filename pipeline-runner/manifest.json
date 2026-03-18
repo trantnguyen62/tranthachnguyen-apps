@@ -1,0 +1,19 @@
+{
+    "name": "Pipeline Runner - Learn DevOps Through Gaming",
+    "short_name": "Pipeline Runner",
+    "description": "Learn Docker, Kubernetes, CI/CD, AWS, Terraform and Git through an arcade game. Free DevOps training for beginners and certification prep.",
+    "start_url": "/pipeline-runner/",
+    "display": "standalone",
+    "background_color": "#0d1b2a",
+    "theme_color": "#0d1b2a",
+    "lang": "en-US",
+    "categories": ["education", "games"],
+    "icons": [
+        {
+            "src": "og-image.png",
+            "sizes": "any",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}

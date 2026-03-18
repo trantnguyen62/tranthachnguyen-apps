@@ -272,7 +272,7 @@
     <!-- Fonts -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'">
 
-    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="styles.css" as="style" fetchpriority="high">
     <link rel="preload" href="game.js" as="script">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -283,10 +283,17 @@
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <!-- Hreflang for language/region targeting -->
+    <link rel="alternate" hreflang="en" href="https://tranthachnguyen.com/pipeline-runner/">
+    <link rel="alternate" hreflang="x-default" href="https://tranthachnguyen.com/pipeline-runner/">
 
     <!-- Google AdSense - Replace with your actual ad client ID -->
     <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
@@ -437,7 +444,7 @@
 
         <footer class="site-footer">
             <p>Pipeline Runner &mdash; Free DevOps learning game. Master Docker, Kubernetes, CI/CD, AWS &amp; more.</p>
-            <p>&copy; 2026 Pipeline Runner</p>
+            <p>&copy; 2026 <a href="https://tranthachnguyen.com/" rel="author">Pipeline Runner</a></p>
         </footer>
     </main>
 
