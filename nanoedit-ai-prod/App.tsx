@@ -148,9 +148,10 @@ const App: React.FC = () => {
       const result = await generateEditedImage(currentImage.data, currentImage.mimeType, prompt, abortController.signal);
 
       if (result) {
+        const mimeMatch = result.match(/^data:([^;]+);/);
         const newImage: ProcessedImage = {
           data: result,
-          mimeType: 'image/png'
+          mimeType: mimeMatch ? mimeMatch[1] : 'image/png'
         };
 
         // Add to history, removing any future redo states if we were in the middle.
@@ -238,7 +239,8 @@ const App: React.FC = () => {
     const link = document.createElement('a');
     link.href = currentImage.data;
     const editLabel = historyIndex > 0 ? `edit${historyIndex}-` : '';
-    link.download = `nano-edit-${editLabel}${Date.now()}.png`;
+    const ext = currentImage.mimeType === 'image/jpeg' ? 'jpg' : 'png';
+    link.download = `nano-edit-${editLabel}${Date.now()}.${ext}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

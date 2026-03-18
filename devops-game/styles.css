@@ -445,6 +445,14 @@ body {
     margin-top: 0.5rem;
 }
 
+.streak-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--nano-cyan);
+    text-shadow: 0 0 6px var(--nano-cyan-glow);
+    margin-right: 0.3rem;
+}
+
 .multiplier {
     color: var(--nano-yellow);
     font-weight: 900;
@@ -849,6 +857,11 @@ body {
     background: rgba(15, 15, 22, 0.95);
 }
 
+.topic-card:active {
+    transform: translateY(-2px) scale(0.98);
+    transition-duration: 0.05s;
+}
+
 .topic-card:focus-visible {
     outline: 2px solid var(--nano-cyan);
     outline-offset: 3px;
@@ -974,13 +987,27 @@ body {
 }
 
 .game-over-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
     color: var(--danger);
     text-shadow: 0 0 20px var(--danger);
+    padding-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 0, 60, 0.25);
 }
 
 .level-complete-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
     color: var(--success);
     text-shadow: 0 0 20px var(--success);
+    padding-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 255, 157, 0.25);
 }
 
 /* Buttons in overlays */
