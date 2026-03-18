@@ -1805,12 +1805,14 @@ function updateHUD() {
     if (game.streak !== h.streak) {
         h.streak = game.streak;
         domCache.streakValue.textContent = game.streak;
+        domCache.streakValue.setAttribute('aria-label', `Streak: ${game.streak}`);
     }
     const mult = game.multiplier.toFixed(1);
     if (mult !== h.mult) {
         const prevMult = parseFloat(h.mult || '1.0');
         h.mult = mult;
         domCache.multiplier.textContent = `x${mult}`;
+        domCache.multiplier.setAttribute('aria-label', `Multiplier: x${mult}`);
         domCache.multiplier.classList.remove('pop');
         void domCache.multiplier.offsetWidth;
         domCache.multiplier.classList.add('pop');
