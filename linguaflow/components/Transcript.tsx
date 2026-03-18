@@ -31,7 +31,7 @@ const CopyButton = memo<{ text: string }>(({ text }) => {
     <button
       onClick={handleCopy}
       aria-label="Copy message"
-      className="opacity-50 group-hover:opacity-100 transition-opacity duration-150 w-6 h-6 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-300 hover:bg-slate-700 focus:opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-500"
+      className="opacity-60 group-hover:opacity-100 transition-opacity duration-150 w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-300 hover:bg-slate-700 focus:opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-slate-500"
     >
       <span aria-live="polite" aria-atomic="true" className="sr-only">{copied ? 'Copied!' : ''}</span>
       {copied ? (
@@ -94,8 +94,8 @@ const Transcript = memo<Props>(({ messages }) => {
             <span className={`text-xs font-medium ${msg.role === 'user' ? 'text-blue-400' : 'text-slate-400'}`}>
               {msg.role === 'user' ? 'You' : 'AI Tutor'}
             </span>
-            <span className="text-xs text-slate-600 opacity-40 group-hover:opacity-100 transition-opacity duration-150" aria-hidden="true">·</span>
-            <time dateTime={msg.timestamp.toISOString()} className="text-xs text-slate-500 tabular-nums opacity-40 group-hover:opacity-100 transition-opacity duration-150">
+            <span className="text-xs text-slate-500 opacity-60 group-hover:opacity-100 transition-opacity duration-150" aria-hidden="true">·</span>
+            <time dateTime={msg.timestamp.toISOString()} className="text-xs text-slate-400 tabular-nums opacity-60 group-hover:opacity-100 transition-opacity duration-150">
               {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </time>
             <CopyButton text={msg.text} />
