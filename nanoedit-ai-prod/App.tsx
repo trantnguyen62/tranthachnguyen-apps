@@ -253,7 +253,7 @@ const App: React.FC = () => {
     document.body.removeChild(link);
     setDownloadSuccess(true);
     if (downloadTimerRef.current !== null) clearTimeout(downloadTimerRef.current);
-    downloadTimerRef.current = setTimeout(() => setDownloadSuccess(false), 3500);
+    downloadTimerRef.current = setTimeout(() => setDownloadSuccess(false), 5000);
   }, [currentImage, historyIndex]);
 
   const handlePresetClick = useCallback((text: string) => {

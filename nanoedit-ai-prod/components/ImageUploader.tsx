@@ -7,7 +7,7 @@
  * Accepts PNG, JPEG, and WebP files up to 10 MB.
  */
 import React, { useRef, useState, useCallback, useEffect, memo } from 'react';
-import { Upload, X, Camera } from 'lucide-react';
+import { Upload, X, Camera, Loader2 } from 'lucide-react';
 import { ProcessedImage } from '../types';
 
 interface ImageUploaderProps {
@@ -62,6 +62,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
 
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
@@ -93,11 +94,14 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
       return;
     }
 
+    setIsCompressing(true);
     try {
       const { data, mimeType } = await compressImage(file);
       onImageSelected({ data, mimeType });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to read file.");
+    } finally {
+      setIsCompressing(false);
     }
   }, [onImageSelected]);
 
@@ -266,7 +270,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
     <div className="w-full">
       <div
         role="button"
-        tabIndex={0}
+        tabIndex={isCompressing ? -1 : 0}
         aria-label="Upload image — click or drag and drop"
         aria-describedby="upload-format-hint"
         onClick={() => inputRef.current?.click()}
@@ -276,7 +280,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
         onDrop={onDrop}
         className={`
           group relative w-full h-64 sm:h-80 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 ease-in-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2
-          ${isDragging
+          ${isCompressing ? 'border-brand-400 bg-brand-50/60 cursor-default pointer-events-none' : isDragging
             ? 'border-brand-500 bg-brand-50'
             : 'border-slate-300 bg-white hover:border-brand-400 hover:bg-brand-50/40'
           }
@@ -294,6 +298,13 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
         />
         
         <div className="flex flex-col items-center p-6 text-center space-y-6 z-10">
+          {isCompressing ? (
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="w-10 h-10 text-brand-500 animate-spin" aria-hidden="true" />
+              <p className="text-sm font-medium text-brand-700" role="status" aria-live="polite">Preparing image…</p>
+            </div>
+          ) : (
+          <>
           <div className="space-y-2">
             <div
               className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${isDragging ? 'bg-brand-200 text-brand-600' : 'bg-slate-100 text-slate-400 group-hover:bg-brand-50 group-hover:text-brand-500'}`}
@@ -322,6 +333,8 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
             <Camera className="w-4 h-4" aria-hidden="true" />
             Take a Photo
           </button>
+          </>
+          )}
         </div>
       </div>
       {error && (

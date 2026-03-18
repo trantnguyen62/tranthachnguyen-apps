@@ -90,12 +90,13 @@ export const ComparisonView = memo<ComparisonViewProps>(({
     >
       
       {isExpanded && (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+          <span className="text-white/50 text-xs font-medium hidden sm:block" aria-hidden="true">Esc to close</span>
            <button
             ref={closeButtonRef}
             onClick={closeDialog}
             className="p-2 bg-white/10 text-white rounded-full hover:bg-white/20 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white"
-            aria-label="Exit fullscreen"
+            aria-label="Exit fullscreen (Esc)"
           >
             <X className="w-6 h-6" aria-hidden="true" />
           </button>
@@ -190,7 +191,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                  <img
                    src={processedImage}
                    alt="AI-edited version of your photo"
-                   className={`w-full h-full object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-30' : 'opacity-100'}`}
+                   className={`w-full h-full object-contain transition-all duration-300 ${isProcessing ? 'opacity-25 blur-sm' : 'opacity-100'}`}
                    decoding="async"
                  />
                )}
