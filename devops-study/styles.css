@@ -971,7 +971,7 @@ body {
 
 .keyboard-hint {
     font-size: var(--font-size-xs);
-    color: var(--text-muted);
+    color: var(--text-tertiary);
     letter-spacing: 0.03em;
 }
 
@@ -1446,6 +1446,15 @@ body {
 
 .skip-link:focus {
     top: var(--space-md);
+}
+
+.storage-warning {
+    font-size: var(--font-size-sm);
+    color: #1a1a25;
+    background: #f59e0b;
+    border-radius: var(--radius-sm);
+    padding: var(--space-xs) var(--space-sm);
+    margin-left: var(--space-sm);
 }
 
 /* =====================================================

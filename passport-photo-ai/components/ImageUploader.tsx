@@ -12,6 +12,16 @@ interface Props {
 /** Maximum pixel dimension (longest edge) for resized images sent to the API. */
 const MAX_IMAGE_DIMENSION = 1500;
 
+/** Detect WebP encoding support once at module load — avoids per-image checks. */
+const SUPPORTS_WEBP_ENCODE: boolean = (() => {
+  try {
+    const c = document.createElement('canvas');
+    c.width = 1; c.height = 1;
+    return c.toDataURL('image/webp').startsWith('data:image/webp');
+  } catch { return false; }
+})();
+const IMG_MIME = SUPPORTS_WEBP_ENCODE ? 'image/webp' : 'image/jpeg';
+
 /**
  * Handles photo input via file upload, drag-and-drop, or live camera capture.
  *
@@ -57,7 +67,9 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
       ctx.drawImage(img, 0, 0, w, h);
-      onImageSelected({ data: canvas.toDataURL('image/jpeg', 0.88), mimeType: 'image/jpeg' });
+      const data = canvas.toDataURL(IMG_MIME, 0.88);
+      canvas.width = 0; canvas.height = 0; // free backing store
+      onImageSelected({ data, mimeType: IMG_MIME });
     };
     img.src = objectUrl;
   }, [onImageSelected]);
@@ -126,9 +138,9 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     if (!ctx) return;
 
     ctx.drawImage(video, 0, 0, w, h);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-    
-    onImageSelected({ data: dataUrl, mimeType: 'image/jpeg' });
+    const dataUrl = canvas.toDataURL(IMG_MIME, 0.88);
+    canvas.width = 0; canvas.height = 0; // free backing store
+    onImageSelected({ data: dataUrl, mimeType: IMG_MIME });
     stopCamera();
   }, [onImageSelected, stopCamera]);
 

@@ -4705,6 +4705,18 @@ function init() {
         resultsContent: document.querySelector('#quizResults .results-content'),
     };
 
+    // Warn users in private/incognito mode that progress won't be saved
+    try {
+        localStorage.setItem('_ls_test', '1');
+        localStorage.removeItem('_ls_test');
+    } catch (e) {
+        const warning = document.createElement('div');
+        warning.setAttribute('role', 'alert');
+        warning.className = 'storage-warning';
+        warning.textContent = 'Progress saving is disabled in private/incognito mode.';
+        document.querySelector('header').appendChild(warning);
+    }
+
     loadProgress();
     renderSidebarTopics();
     renderTopicGrid();

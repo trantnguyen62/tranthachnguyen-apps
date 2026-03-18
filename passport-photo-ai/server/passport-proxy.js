@@ -36,7 +36,7 @@ if (!process.env.GEMINI_API_KEY) {
 
 const app = express();
 app.set('trust proxy', 1);
-app.use(compression());
+app.use(compression({ level: 4 })); // level 4: faster than default 6, negligible size difference for small JSON
 const allowedOrigins = ['https://passportphoto.tranthachnguyen.com'];
 if (process.env.NODE_ENV !== 'production') {
   allowedOrigins.push('http://localhost:5186', 'http://localhost:5173');

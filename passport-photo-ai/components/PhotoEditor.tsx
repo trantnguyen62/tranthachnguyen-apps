@@ -50,7 +50,8 @@ const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promi
       const canvas = document.createElement('canvas');
       canvas.width = 600;
       canvas.height = 750;
-      const ctx = canvas.getContext('2d');
+      // alpha:false — background is always a solid fill, skipping alpha channel saves memory
+      const ctx = canvas.getContext('2d', { alpha: false });
       if (!ctx) { reject(new Error('Canvas 2D context unavailable')); return; }
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, 600, 750);
@@ -68,7 +69,9 @@ const createPassport = (imgUrl: string, bg: string, b: number, c: number): Promi
 
       ctx.filter = `brightness(${b}%) contrast(${c}%)`;
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 600, 750);
-      resolve(canvas.toDataURL('image/jpeg', 0.90));
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.90);
+      canvas.width = 0; canvas.height = 0; // free backing store
+      resolve(dataUrl);
     };
     img.src = imgUrl;
   });
