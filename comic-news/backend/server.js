@@ -1,3 +1,18 @@
+/**
+ * Comic News — Express API server
+ *
+ * Responsibilities:
+ *   - REST API for comics, bookmarks, and reading progress
+ *   - Static file serving for comic images and the pre-built React frontend
+ *   - SEO assets (robots.txt, sitemap.xml)
+ *
+ * Storage model: all mutable state (bookmarks, reading progress) lives in
+ * process memory. Data is shared across all visitors and is lost on restart.
+ * See the Maps defined near the bottom of this file for capacity limits.
+ *
+ * Port/origin are configured via PORT, BASE_URL, and ALLOWED_ORIGIN env vars
+ * (see .env.example).
+ */
 import compression from 'compression';
 import crypto from 'crypto';
 import express from 'express';

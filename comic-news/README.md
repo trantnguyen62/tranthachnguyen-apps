@@ -114,11 +114,13 @@ List endpoints (`/api/comics`, `/api/featured`, `/api/bookmarks`) omit `pages` t
 
 ## Environment Variables
 
+Copy `.env.example` to `.env` or pass variables directly to the process.
+
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `5187` | Backend server port |
-| `BASE_URL` | `https://comic-news.tranthachnguyen.com` | Base URL used in sitemap.xml |
-| `ALLOWED_ORIGIN` | `https://comic-news.tranthachnguyen.com` | CORS allowed origin for API requests |
+| `BASE_URL` | `https://comic-news.tranthachnguyen.com` | Base URL used in sitemap.xml. No trailing slash. |
+| `ALLOWED_ORIGIN` | `https://comic-news.tranthachnguyen.com` | CORS allowed origin. Set to `http://localhost:5187` in development. |
 
 ## Tech Stack
 
