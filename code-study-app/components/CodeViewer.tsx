@@ -154,7 +154,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
           <span className="text-xs text-slate-500 flex-shrink-0">{lines.length.toLocaleString()} lines</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="hidden lg:block text-xs text-slate-600 mr-1" aria-hidden="true">Drag to select · add as context</span>
+          <span className="hidden md:block text-xs text-slate-600 mr-1" aria-hidden="true">Drag to select · add as context</span>
           <button
             onClick={() => setWordWrap(w => !w)}
             title={wordWrap ? 'Disable word wrap' : 'Enable word wrap'}
