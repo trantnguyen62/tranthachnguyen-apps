@@ -42,6 +42,7 @@ function ComicDetail() {
         setMeta('meta[name="twitter:description"]', comicData.description);
         setMeta('meta[name="twitter:image"]', imgUrl);
         setMeta('meta[property="og:image:alt"]', comicData.title);
+        setMeta('meta[name="twitter:image:alt"]', comicData.title);
 
         // Keywords meta
         injectHeadElement('meta', {
@@ -57,7 +58,7 @@ function ComicDetail() {
         const today = new Date().toISOString().split('T')[0];
         injectJsonLd('page-jsonld', {
           '@context': 'https://schema.org',
-          '@type': 'Article',
+          '@type': 'NewsArticle',
           mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalHref },
           headline: comicData.title,
           description: comicData.description,

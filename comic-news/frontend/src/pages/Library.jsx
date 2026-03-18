@@ -41,9 +41,9 @@ function Library() {
 
     const canonical = injectHeadElement('link', { id: 'canonical-link', rel: 'canonical', href: url });
 
-    // Noindex search result pages to avoid thin/duplicate content indexing
+    // Noindex search/filtered pages to avoid thin/duplicate content indexing
     document.getElementById('meta-robots-library')?.remove();
-    if (searchQuery) {
+    if (searchQuery || selectedGenre !== 'All') {
       injectHeadElement('meta', { id: 'meta-robots-library', name: 'robots', content: 'noindex, follow' });
     }
 
