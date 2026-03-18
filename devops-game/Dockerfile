@@ -4,10 +4,10 @@ WORKDIR /assets
 COPY assets/ ./
 # Ship sprites displayed at 80px — 160×160 is sufficient for 2× HiDPI displays
 # Background covers full viewport but is dimmed at 0.5 alpha and upscaled anyway; 900×900 is fine
-RUN convert player_ship.png  -resize 160x160  -strip player_ship.png  && \
-    convert enemy_ship.png   -resize 160x160  -strip enemy_ship.png   && \
-    convert menu_icon.png    -resize 128x128  -strip menu_icon.png    && \
-    convert background.png   -resize 900x900  -strip background.png
+RUN convert player_ship.png  -resize 160x160  -strip -quality 82 JPEG:player_ship.png  && \
+    convert enemy_ship.png   -resize 160x160  -strip -quality 82 JPEG:enemy_ship.png   && \
+    convert menu_icon.png    -resize 128x128  -strip -quality 82 JPEG:menu_icon.png    && \
+    convert background.png   -resize 900x900  -strip -quality 82 JPEG:background.png
 
 FROM node:20-alpine
 RUN npm install -g serve@14.2.6
@@ -33,8 +33,8 @@ RUN cat > serve.json << 'SERVEJSON'
         { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" }
       ]
     },
-    { "source": "**/*.css",  "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }] },
-    { "source": "**/*.js",   "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }] },
+    { "source": "**/*.css",  "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }] },
+    { "source": "**/*.js",   "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, stale-while-revalidate=86400" }] },
     { "source": "**/*.html", "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }] },
     { "source": "**/*.png",  "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
   ]
