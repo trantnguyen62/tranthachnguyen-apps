@@ -625,8 +625,8 @@ function setupEventListeners() {
         game.keys[e.key.toLowerCase()] = true;
 
         if (game.running) {
-            // Pause toggle works in both directions
-            if (e.key.toLowerCase() === 'p') {
+            // Pause toggle works in both directions; Escape also resumes
+            if (e.key.toLowerCase() === 'p' || (e.key === 'Escape' && game.paused)) {
                 togglePause();
             }
 
@@ -651,6 +651,25 @@ function setupEventListeners() {
 
     document.addEventListener('keyup', (e) => {
         game.keys[e.key.toLowerCase()] = false;
+    });
+
+    // Focus trap: keep keyboard focus inside open modal dialogs
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab') return;
+        const dialogs = [domCache.pauseMenu, domCache.gameOver, domCache.levelComplete];
+        const openDialog = dialogs.find(d => d && !d.classList.contains('hidden'));
+        if (!openDialog) return;
+        const focusable = Array.from(openDialog.querySelectorAll(
+            'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter(el => el.offsetParent !== null);
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+            if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        } else {
+            if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
     });
 
     // Auto-pause when user switches tabs or minimises the window
