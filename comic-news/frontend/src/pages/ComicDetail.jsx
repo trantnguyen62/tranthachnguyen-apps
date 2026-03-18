@@ -293,7 +293,7 @@ function ComicDetail() {
                   Comic Version
                 </h2>
                 {/* Seamless vertical scroll container */}
-                <div className="max-h-[70vh] overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-dark-200" aria-label="Comic panels" tabIndex="0">
+                <div className="max-h-[70vh] overflow-y-auto rounded-xl scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-dark-200" role="region" aria-label="Comic panels" tabIndex="0">
                   <div className="flex flex-col">
                     {comic.pages.map((page, index) => (
                       <img

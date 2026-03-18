@@ -127,6 +127,12 @@ body {
     scroll-behavior: auto;
   }
 
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+
   .comic-card {
     animation: none;
   }

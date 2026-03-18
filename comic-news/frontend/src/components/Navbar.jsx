@@ -89,7 +89,11 @@ function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-40 md:w-64 px-4 py-2 bg-dark-200 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 focus:bg-dark-100 transition-colors"
                   autoFocus
-                  onBlur={() => !searchQuery && setShowSearch(false)}
+                  onBlur={(e) => {
+                    // Only close if focus leaves the whole search form, not when tabbing to the X button
+                    const form = e.currentTarget.closest('form');
+                    if (!searchQuery && !form?.contains(e.relatedTarget)) setShowSearch(false);
+                  }}
                 />
                 <button
                   type="button"
