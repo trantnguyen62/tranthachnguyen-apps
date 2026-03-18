@@ -571,10 +571,69 @@ export default function App() {
           </section>
         </main>
 
+        {/* FAQ Section */}
+        <section style={{ marginTop: 60 }} aria-labelledby="faq-heading">
+          <h2 id="faq-heading" style={{
+            textAlign: 'center',
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 'clamp(1.3rem, 3vw, 1.7rem)',
+            fontWeight: 700,
+            marginBottom: 6,
+            color: 'rgba(255,255,255,0.9)'
+          }}>
+            Frequently Asked Questions
+          </h2>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 28 }}>
+            Common questions about PassportLens
+          </p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+            gap: 14
+          }}>
+            {[
+              {
+                q: 'Is PassportLens free?',
+                a: 'Yes — completely free with no sign-up required. AI compliance checking, background removal, and photo editing are all available at no cost.'
+              },
+              {
+                q: 'Are my photos stored or shared?',
+                a: 'No. Your photos are processed instantly and never stored, logged, or shared with third parties. Background removal runs entirely in your browser.'
+              },
+              {
+                q: 'What exactly does the AI check?',
+                a: 'Face centering (70–80% of frame height), neutral expression with open eyes, plain white or off-white background, even lighting, sharp focus, no glasses, and no head coverings — the 7 official ICAO biometric standards.'
+              },
+              {
+                q: 'Which countries are supported?',
+                a: 'PassportLens checks compliance with biometric standards used in 100+ countries, including the US, UK, EU, Canada, and Australia.'
+              },
+              {
+                q: 'How accurate is the AI check?',
+                a: 'The AI detects common issues like incorrect background, poor lighting, glasses, and face positioning with high accuracy. Always verify with your country\'s official requirements before submitting your application.'
+              },
+              {
+                q: 'Can PassportLens fix my background?',
+                a: 'Yes. The built-in AI tool removes any background and replaces it with a compliant plain white or off-white colour — entirely in your browser, no upload to any server.'
+              },
+            ].map(({ q, a }) => (
+              <div key={q} style={{
+                background: darkBg,
+                borderRadius: 16,
+                padding: '18px 22px',
+                border: '1px solid rgba(255,255,255,0.07)',
+              }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: accentGold, marginBottom: 7, lineHeight: 1.4 }}>{q}</p>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.58)', lineHeight: 1.65 }}>{a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Footer */}
-        <footer style={{ 
-          marginTop: 60, textAlign: 'center', 
-          padding: '24px 0', 
+        <footer style={{
+          marginTop: 60, textAlign: 'center',
+          padding: '24px 0',
           borderTop: '1px solid rgba(255,255,255,0.06)',
           color: 'rgba(255,255,255,0.7)', fontSize: 13
         }}>
