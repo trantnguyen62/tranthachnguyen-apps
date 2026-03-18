@@ -53,12 +53,18 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
+        "@type": ["WebApplication", "VideoGame"],
         "name": "Pipeline Runner",
         "alternateName": "DevOps Learning Game",
         "url": "https://tranthachnguyen.com/pipeline-runner/",
         "description": "An interactive arcade-style game that teaches DevOps concepts including Docker, Kubernetes, CI/CD pipelines, AWS, Terraform, and Git.",
         "applicationCategory": "EducationalGame",
+        "gamePlatform": "Web Browser",
+        "numberOfPlayers": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 1
+        },
         "operatingSystem": "Any",
         "offers": {
             "@type": "Offer",
@@ -96,7 +102,7 @@
         ],
         "image": "https://tranthachnguyen.com/pipeline-runner/og-image.png",
         "datePublished": "2025-01-01",
-        "dateModified": "2026-03-17"
+        "dateModified": "2026-03-18"
     }
     </script>
 
@@ -126,7 +132,7 @@
         "educationalUse": ["self-assessment", "practice"],
         "competencyRequired": "None",
         "datePublished": "2025-01-01",
-        "dateModified": "2026-03-17",
+        "dateModified": "2026-03-18",
         "publisher": {
             "@type": "Organization",
             "name": "Pipeline Runner Team"
