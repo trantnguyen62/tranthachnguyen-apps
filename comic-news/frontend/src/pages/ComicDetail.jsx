@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Star, BookOpen, User, Tag, Bookmark, BookmarkCheck, Play, ArrowLeft, FileText, Image } from 'lucide-react';
 import { setMeta } from '../utils/meta';

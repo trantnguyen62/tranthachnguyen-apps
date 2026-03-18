@@ -650,8 +650,8 @@ for (const genre of genreList) {
   });
 }
 
-// Precomputed lowercase strings for search
-const comicsWithLower = comics.map(c => ({
+// Precomputed lowercase strings for search (pages excluded upfront — search results never need them)
+const comicsWithLower = comics.map(({ pages, ...c }) => ({
   ...c, titleLower: c.title.toLowerCase(), authorLower: c.author.toLowerCase(),
 }));
 
@@ -871,8 +871,8 @@ app.get('/api/comics', readRateLimit, (req, res) => {
     result.sort((a, b) => a.title.localeCompare(b.title));
   }
 
-  // Return without pages or internal fields
-  res.json(result.map(({ pages, titleLower, authorLower, ...comic }) => comic));
+  // Return without internal fields (pages already excluded from comicsWithLower)
+  res.json(result.map(({ titleLower, authorLower, ...comic }) => comic));
 });
 
 // Get single comic with pages
@@ -913,10 +913,7 @@ app.get('/api/genres', readRateLimit, (req, res) => {
 // Bookmarks
 app.get('/api/bookmarks', readRateLimit, (req, res) => {
   res.set('Cache-Control', 'no-store');
-  const bookmarkedComics = comics
-    .filter(c => bookmarks.has(c.id))
-    .map(({ pages, ...comic }) => comic);
-  res.json(bookmarkedComics);
+  res.json(comicsListDefault.filter(c => bookmarks.has(c.id)));
 });
 
 app.get('/api/bookmarks/check/:id', readRateLimit, (req, res) => {

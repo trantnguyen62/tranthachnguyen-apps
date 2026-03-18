@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   X, 
@@ -150,14 +150,16 @@ function Reader() {
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleImageLoad = (index) => {
+  const handleImageLoad = useCallback((e) => {
+    const index = parseInt(e.currentTarget.dataset.index, 10);
     setLoadedImages(prev => ({ ...prev, [index]: true }));
-  };
+  }, []);
 
-  const handleImageError = (index) => {
+  const handleImageError = useCallback((e) => {
+    const index = parseInt(e.currentTarget.dataset.index, 10);
     setErrorImages(prev => ({ ...prev, [index]: true }));
     setLoadedImages(prev => ({ ...prev, [index]: true }));
-  };
+  }, []);
 
   if (loading) {
     return (
@@ -282,11 +284,12 @@ function Reader() {
                   <img
                     src={page.image}
                     alt={page.caption || `Panel ${index + 1}`}
+                    data-index={index}
                     className={`w-full transition-opacity duration-300 ${
                       loadedImages[index] ? 'opacity-100' : 'opacity-0'
                     }`}
-                    onLoad={() => handleImageLoad(index)}
-                    onError={() => handleImageError(index)}
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
                     // First 3 panels load eagerly; the rest are lazy to save bandwidth.
                     // Panel 0 gets sync decoding and high fetch priority for fastest first paint.
                     loading={index < 3 ? "eager" : "lazy"}

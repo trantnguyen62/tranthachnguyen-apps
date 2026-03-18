@@ -1,6 +1,6 @@
 import { useState, useCallback, memo, useMemo, useRef, useEffect } from 'react';
 import { FileNode } from '../types';
-import { Copy, Check, Code2 } from 'lucide-react';
+import { Copy, Check, Code2, ChevronUp, WrapText } from 'lucide-react';
 
 const LANG_COLORS: Record<string, string> = {
   typescript: 'bg-blue-500/20 text-blue-400',
@@ -26,6 +26,8 @@ const BUFFER = 15;      // extra lines rendered above/below viewport
 
 const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   const [copied, setCopied] = useState(false);
+  const [wordWrap, setWordWrap] = useState(false);
+  const [showScrollTopBtn, setShowScrollTopBtn] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(600);
@@ -61,7 +63,16 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const top = e.currentTarget.scrollTop;
     cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => setScrollTop(top));
+    rafRef.current = requestAnimationFrame(() => {
+      setScrollTop(top);
+      setShowScrollTopBtn(top > 300);
+    });
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }, []);
 
   const handleCopy = useCallback(async () => {
@@ -80,10 +91,11 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   }, [onCodeSelect]);
 
   // Virtual window — only render lines visible in the viewport + buffer
-  const visibleStart = Math.max(0, Math.floor(scrollTop / LINE_HEIGHT) - BUFFER);
-  const visibleEnd = Math.min(lines.length, Math.ceil((scrollTop + viewportHeight) / LINE_HEIGHT) + BUFFER);
-  const paddingTop = visibleStart * LINE_HEIGHT;
-  const paddingBottom = Math.max(0, (lines.length - visibleEnd) * LINE_HEIGHT);
+  // Disabled in word-wrap mode since line heights are variable
+  const visibleStart = wordWrap ? 0 : Math.max(0, Math.floor(scrollTop / LINE_HEIGHT) - BUFFER);
+  const visibleEnd = wordWrap ? lines.length : Math.min(lines.length, Math.ceil((scrollTop + viewportHeight) / LINE_HEIGHT) + BUFFER);
+  const paddingTop = wordWrap ? 0 : visibleStart * LINE_HEIGHT;
+  const paddingBottom = wordWrap ? 0 : Math.max(0, (lines.length - visibleEnd) * LINE_HEIGHT);
   const lineNumWidth = lines.length >= 10000 ? 'w-16' : lines.length >= 1000 ? 'w-14' : 'w-10';
 
   if (!file) {
@@ -106,7 +118,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-800/50 rounded-lg overflow-hidden">
+    <div className="flex-1 flex flex-col bg-slate-800/50 rounded-lg overflow-hidden relative">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-slate-700/50 border-b border-slate-600/50">
         <div className="flex items-center gap-2 min-w-0">
@@ -126,27 +138,42 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
           </span>
           <span className="text-xs text-slate-500 flex-shrink-0">{lines.length.toLocaleString()} lines</span>
         </div>
-        <span className="hidden lg:block text-xs text-slate-600 mr-1" aria-hidden="true">Drag to select · add as context</span>
-        <button
-          onClick={handleCopy}
-          className={`flex items-center gap-1.5 px-2 py-1.5 rounded transition-all text-xs font-medium ${
-            copied
-              ? 'bg-green-500/20 text-green-400'
-              : 'hover:bg-slate-600/50 text-slate-400 hover:text-slate-200'
-          }`}
-          title={copied ? 'Copied!' : 'Copy code'}
-          aria-label={copied ? 'Copied!' : 'Copy code'}
-        >
-          {copied ? (
-            <Check className="w-3.5 h-3.5" aria-hidden="true" />
-          ) : (
-            <Copy className="w-3.5 h-3.5" aria-hidden="true" />
-          )}
-          <span aria-hidden="true">{copied ? 'Copied!' : 'Copy'}</span>
-          <span className="sr-only" role="status" aria-live="assertive">
-            {copied ? 'Copied to clipboard' : ''}
-          </span>
-        </button>
+        <div className="flex items-center gap-1">
+          <span className="hidden lg:block text-xs text-slate-600 mr-1" aria-hidden="true">Drag to select · add as context</span>
+          <button
+            onClick={() => setWordWrap(w => !w)}
+            title={wordWrap ? 'Disable word wrap' : 'Enable word wrap'}
+            aria-label={wordWrap ? 'Disable word wrap' : 'Enable word wrap'}
+            aria-pressed={wordWrap}
+            className={`flex items-center gap-1 px-2 py-1.5 rounded transition-all text-xs font-medium ${
+              wordWrap
+                ? 'bg-emerald-500/20 text-emerald-400'
+                : 'hover:bg-slate-600/50 text-slate-500 hover:text-slate-200'
+            }`}
+          >
+            <WrapText className="w-3.5 h-3.5" aria-hidden="true" />
+          </button>
+          <button
+            onClick={handleCopy}
+            className={`flex items-center gap-1.5 px-2 py-1.5 rounded transition-all text-xs font-medium ${
+              copied
+                ? 'bg-green-500/20 text-green-400'
+                : 'hover:bg-slate-600/50 text-slate-400 hover:text-slate-200'
+            }`}
+            title={copied ? 'Copied!' : 'Copy code'}
+            aria-label={copied ? 'Copied!' : 'Copy code'}
+          >
+            {copied ? (
+              <Check className="w-3.5 h-3.5" aria-hidden="true" />
+            ) : (
+              <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+            )}
+            <span aria-hidden="true">{copied ? 'Copied!' : 'Copy'}</span>
+            <span className="sr-only" role="status" aria-live="assertive">
+              {copied ? 'Copied to clipboard' : ''}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Code content */}
@@ -165,11 +192,11 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
             {lines.slice(visibleStart, visibleEnd).map((line, i) => {
               const lineIndex = visibleStart + i;
               return (
-                <div key={lineIndex} className="flex hover:bg-slate-700/40 group" style={{ height: `${LINE_HEIGHT}px` }}>
+                <div key={lineIndex} className="flex hover:bg-slate-700/40 group" style={wordWrap ? undefined : { height: `${LINE_HEIGHT}px` }}>
                   <span className={`${lineNumWidth} text-right pr-3 text-slate-600 group-hover:text-slate-500 select-none leading-5 flex-shrink-0`} aria-hidden="true">
                     {lineIndex + 1}
                   </span>
-                  <span className="text-slate-300 whitespace-pre leading-5">{line || ' '}</span>
+                  <span className={`text-slate-300 leading-5 ${wordWrap ? 'whitespace-pre-wrap' : 'whitespace-pre'}`}>{line || ' '}</span>
                 </div>
               );
             })}
@@ -177,6 +204,18 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
           </code>
         </pre>
       </div>
+
+      {/* Scroll to top button */}
+      {showScrollTopBtn && (
+        <button
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+          title="Scroll to top"
+          className="absolute bottom-4 right-4 z-10 p-2 bg-slate-700/90 hover:bg-slate-600 border border-slate-600/50 text-slate-300 hover:text-white rounded-full shadow-lg transition-all"
+        >
+          <ChevronUp className="w-4 h-4" aria-hidden="true" />
+        </button>
+      )}
     </div>
   );
 });
