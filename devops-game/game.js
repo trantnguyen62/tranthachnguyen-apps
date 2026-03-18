@@ -1808,11 +1808,15 @@ function updateHUD() {
     }
     const mult = game.multiplier.toFixed(1);
     if (mult !== h.mult) {
+        const prevMult = parseFloat(h.mult || '1.0');
         h.mult = mult;
         domCache.multiplier.textContent = `x${mult}`;
         domCache.multiplier.classList.remove('pop');
         void domCache.multiplier.offsetWidth;
         domCache.multiplier.classList.add('pop');
+        if (game.multiplier > prevMult && game.multiplier > 1) {
+            announce(`Streak bonus! Multiplier x${mult}`);
+        }
     }
     if (game.currentZone !== h.zone) {
         h.zone = game.currentZone;

@@ -3009,7 +3009,17 @@ all:
                 { term: 'ARM Template', definition: 'Azure Resource Manager JSON templates that define infrastructure as code, enabling repeatable, declarative deployments of Azure resources.' },
                 { term: 'Azure Policy', definition: 'A governance service that creates, assigns, and manages policies to enforce standards and compliance across Azure resources.' },
                 { term: 'Managed Identity', definition: 'An automatically managed identity in Azure AD that applications can use to authenticate to services without storing credentials in code.' },
-                { term: 'Azure Logic Apps', definition: 'A serverless workflow automation service that integrates apps, data, services, and systems using a visual designer and 400+ pre-built connectors.' }
+                { term: 'Azure Logic Apps', definition: 'A serverless workflow automation service that integrates apps, data, services, and systems using a visual designer and 400+ pre-built connectors.' },
+                { term: 'Bicep', definition: 'A domain-specific language (DSL) that transpiles to ARM templates. Cleaner syntax than JSON, with modules, loops, and conditions. The recommended way to write Azure infrastructure as code.' },
+                { term: 'Azure Application Gateway', definition: 'A Layer 7 (HTTP/HTTPS) web traffic load balancer with URL-based routing, SSL termination, session affinity, and an integrated Web Application Firewall (WAF).' },
+                { term: 'Azure Event Grid', definition: 'A fully managed event routing service using a publish-subscribe model. Enables reactive, event-driven architectures with near real-time delivery and built-in retry.' },
+                { term: 'Azure Event Hubs', definition: 'A big-data streaming platform and event ingestion service capable of ingesting millions of events per second. Often used as the entry point for data pipelines and telemetry.' },
+                { term: 'Azure Container Instances', definition: 'A serverless container service for running Docker containers on demand without managing VMs or orchestrators. Ideal for short-lived tasks, burst workloads, and CI agents.' },
+                { term: 'Azure VPN Gateway', definition: 'A managed VPN gateway that establishes encrypted cross-premises connections between Azure virtual networks and on-premises networks over IPsec/IKE tunnels.' },
+                { term: 'Azure ExpressRoute', definition: 'A dedicated private connection from on-premises networks to Azure datacenters via a connectivity provider, bypassing the public internet for higher reliability and lower latency.' },
+                { term: 'Azure Cache for Redis', definition: 'A fully managed in-memory data store based on Redis, used for caching, session storage, and message brokering to improve application performance and scalability.' },
+                { term: 'Azure Front Door', definition: 'A global Layer 7 load balancer and CDN that routes HTTP traffic using Anycast, with built-in WAF, caching, SSL offload, and health probes across regions.' },
+                { term: 'Azure Data Factory', definition: 'A cloud-based ETL and data integration service for orchestrating and automating data movement and transformation pipelines across cloud and on-premises stores.' }
             ],
             commands: [
                 { command: 'az login', description: 'Login to Azure CLI' },
@@ -3024,7 +3034,12 @@ all:
                 { command: 'az monitor log-analytics query -w workspace --analytics-query "AzureActivity | limit 10"', description: 'Query Log Analytics workspace' },
                 { command: 'az aks create -g mygroup -n cluster --node-count 3 --enable-addons monitoring', description: 'Create AKS cluster with monitoring' },
                 { command: 'az role assignment create --assignee user@domain.com --role Contributor --scope /subscriptions/sub-id', description: 'Assign RBAC role to a user' },
-                { command: 'az storage account create -n mystorage -g mygroup -l eastus --sku Standard_LRS', description: 'Create a storage account' }
+                { command: 'az storage account create -n mystorage -g mygroup -l eastus --sku Standard_LRS', description: 'Create a storage account' },
+                { command: 'az bicep build --file main.bicep', description: 'Compile Bicep to ARM template JSON' },
+                { command: 'az container create -g mygroup -n myaci --image myapp:latest --cpu 1 --memory 1.5', description: 'Run a container with Azure Container Instances' },
+                { command: 'az eventgrid topic create -n mytopic -g mygroup -l eastus', description: 'Create an Event Grid topic' },
+                { command: 'az redis create -n myredis -g mygroup -l eastus --sku Basic --vm-size c0', description: 'Create an Azure Cache for Redis instance' },
+                { command: 'az network application-gateway create -n myagw -g mygroup -l eastus --sku WAF_v2 --public-ip-address myagw-pip', description: 'Create an Application Gateway with WAF' }
             ],
             quiz: [
                 { question: 'What is Azure Functions?', options: ['Database service', 'Serverless compute', 'Container service', 'Storage service'], correct: 1, explanation: 'Azure Functions is a serverless compute service that runs event-driven code without managing infrastructure. Functions scale automatically and you pay only for execution time. Triggers include HTTP, timers, queues, and blob storage events.' },
@@ -3184,6 +3199,76 @@ stages:
     }
   }
 }`
+                },
+                {
+                    title: 'Bicep Infrastructure as Code',
+                    filename: 'main.bicep',
+                    language: 'bicep',
+                    description: 'Bicep template deploying a web app with Key Vault and Managed Identity',
+                    code: `param appName string
+param location string = resourceGroup().location
+param sku string = 'P1v3'
+
+// App Service Plan
+resource plan 'Microsoft.Web/serverfarms@2022-03-01' = {
+  name: '\${appName}-plan'
+  location: location
+  sku: {
+    name: sku
+  }
+  kind: 'linux'
+  properties: {
+    reserved: true
+  }
+}
+
+// Web App with system-assigned Managed Identity
+resource app 'Microsoft.Web/sites@2022-03-01' = {
+  name: appName
+  location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    serverFarmId: plan.id
+    httpsOnly: true
+    siteConfig: {
+      linuxFxVersion: 'NODE|20-lts'
+      alwaysOn: true
+      appSettings: [
+        {
+          name: 'KEY_VAULT_URI'
+          value: vault.properties.vaultUri
+        }
+      ]
+    }
+  }
+}
+
+// Key Vault
+resource vault 'Microsoft.KeyVault/vaults@2023-02-01' = {
+  name: '\${appName}-kv'
+  location: location
+  properties: {
+    sku: { family: 'A', name: 'standard' }
+    tenantId: subscription().tenantId
+    enableRbacAuthorization: true
+  }
+}
+
+// Grant app's Managed Identity "Key Vault Secrets User" role
+resource kvRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(vault.id, app.id, '4633458b-17de-408a-b874-0445c86b69e6')
+  scope: vault
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
+    principalId: app.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+output appUrl string = 'https://\${app.properties.defaultHostName}'
+output vaultUri string = vault.properties.vaultUri`
                 }
             ]
         },
