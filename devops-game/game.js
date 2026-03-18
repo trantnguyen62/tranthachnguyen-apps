@@ -519,6 +519,7 @@ function init() {
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
             btn.setAttribute('aria-describedby', 'questionText');
+            btn.setAttribute('aria-pressed', 'false');
             const keySpan = document.createElement('span');
             keySpan.className = 'answer-key';
             keySpan.setAttribute('aria-hidden', 'true');
@@ -1247,6 +1248,7 @@ function showQuestion(enemy) {
         const btn = domCache.answerBtns[i];
         btn.className = 'answer-btn';
         btn.disabled = false;
+        btn.setAttribute('aria-pressed', 'false');
         btn.setAttribute('aria-label', `${i + 1}: ${answer.text}`);
         btn.lastChild.textContent = answer.text;
     });
@@ -1271,7 +1273,7 @@ function selectAnswer(index) {
     btns.forEach((btn, i) => {
         btn.classList.add('disabled');
         btn.disabled = true;
-        if (i === index) btn.classList.add('selected');
+        if (i === index) { btn.classList.add('selected'); btn.setAttribute('aria-pressed', 'true'); }
     });
 
     // Check answer after short delay
@@ -1717,6 +1719,8 @@ function completeWave() {
             game.currentZone = (game.currentZone + 1) % TOPICS.length;
             game.currentWave = 1;
             updateHUD();
+            const nextTopic = TOPICS[game.currentZone];
+            if (nextTopic) announce(`Now entering ${nextTopic.name} zone.`);
             setTimeout(() => spawnWave(), 2000);
         } else {
             // Next wave
