@@ -156,7 +156,8 @@ function App() {
 
       fileCache.current.set(filePath, { content: data.content, language: data.language });
       if (fileCache.current.size > 50) {
-        fileCache.current.delete(fileCache.current.keys().next().value!);
+        const firstKey = fileCache.current.keys().next().value;
+        if (firstKey !== undefined) fileCache.current.delete(firstKey);
       }
       setSelectedFile({
         ...file,

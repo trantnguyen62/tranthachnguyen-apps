@@ -32,6 +32,7 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
   const [scrollTop, setScrollTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(600);
   const rafRef = useRef<number>(0);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const lines = useMemo(() => file?.content?.split('\n') || [], [file?.content]);
   const dirPath = useMemo(() => {
@@ -75,11 +76,16 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
     }
   }, []);
 
+  useEffect(() => () => {
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+  }, []);
+
   const handleCopy = useCallback(async () => {
     if (file?.content) {
       await navigator.clipboard.writeText(file.content);
       setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopied(false), 3000);
     }
   }, [file?.content]);
 
