@@ -46,7 +46,7 @@ app.use(cors({
   methods: ['POST'],
   allowedHeaders: ['Content-Type'],
 }));
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({ limit: '6mb' }));
 
 // Security headers
 app.use((req, res, next) => {
