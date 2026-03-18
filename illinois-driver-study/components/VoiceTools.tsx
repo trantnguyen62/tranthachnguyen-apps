@@ -43,6 +43,9 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const recordingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const MAX_RECORDING_MS = 120_000; // 2 minutes
 
   const t = TRANSLATIONS[language];
 
@@ -67,6 +70,7 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setTranscription(null);
+      recordingTimerRef.current = setTimeout(() => stopRecording(), MAX_RECORDING_MS);
     } catch (err) {
       console.error("Error accessing microphone:", err);
       setMicError(t.micError);
@@ -74,6 +78,10 @@ export const VoiceTools: React.FC<VoiceToolsProps> = ({ language }) => {
   };
 
   const stopRecording = () => {
+    if (recordingTimerRef.current) {
+      clearTimeout(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);

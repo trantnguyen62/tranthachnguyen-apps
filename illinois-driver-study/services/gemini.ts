@@ -24,7 +24,11 @@ const getAI = async (requireSelection: boolean = false) => {
        }
     }
   }
-  if (!_ai) _ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (!_ai) {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) throw new Error("Gemini API key is not configured.");
+    _ai = new GoogleGenAI({ apiKey });
+  }
   return _ai;
 };
 
@@ -130,7 +134,10 @@ export const generateStudyImage = async (prompt: string, size: ImageSize): Promi
  * Transcribes an audio Blob to text using Gemini's multimodal content API.
  * Returns the transcribed string, or an empty string if no text was produced.
  */
+const MAX_AUDIO_BYTES = 20 * 1024 * 1024; // 20 MB
+
 export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
+  if (audioBlob.size > MAX_AUDIO_BYTES) throw new Error("Audio recording is too large to transcribe.");
   const ai = await getAI(false);
   const arrayBuffer = await audioBlob.arrayBuffer();
   const base64Data = arrayBufferToBase64(arrayBuffer);
