@@ -342,7 +342,7 @@ const App: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="w-5 h-5 bg-brand-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" aria-hidden="true">2</span>
-                    <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Describe Changes</h3>
+                    <h3 id="describe-changes-heading" className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Describe Changes</h3>
                   </div>
 
                   {/* History Controls */}
@@ -382,7 +382,7 @@ const App: React.FC = () => {
                     <textarea
                       value={prompt}
                       onChange={handlePromptChange}
-                      aria-label="Describe the image changes you want"
+                      aria-labelledby="describe-changes-heading"
                       aria-describedby="prompt-hint"
                       onKeyDown={handleKeyDown}
                       placeholder="E.g., 'Remove the background', 'Make it look vintage', or 'Smooth skin'"
@@ -410,7 +410,7 @@ const App: React.FC = () => {
                         </span>
                         <span className="sm:hidden">Tap Generate to apply</span>
                         {prompt.length > 0 && (
-                          <span className={`tabular-nums transition-all ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-300'}`}>{prompt.length} / 2000</span>
+                          <span aria-live="polite" aria-atomic="true" className={`tabular-nums transition-all ${prompt.length > 1800 ? 'text-red-500 font-medium' : prompt.length > 1500 ? 'text-amber-500 font-medium' : 'text-slate-300'}`}>{prompt.length} / 2000</span>
                         )}
                       </span>
                     )}

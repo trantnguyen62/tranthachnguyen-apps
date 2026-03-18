@@ -268,6 +268,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
         role="button"
         tabIndex={0}
         aria-label="Upload image — click or drag and drop"
+        aria-describedby="upload-format-hint"
         onClick={() => inputRef.current?.click()}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click(); } }}
         onDragOver={onDragOver}
@@ -302,7 +303,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
             <p className="text-lg font-semibold text-slate-700">
               {isDragging ? 'Drop it here!' : 'Drag & drop or click to upload'}
             </p>
-            <p className="text-xs text-slate-500">
+            <p id="upload-format-hint" className="text-xs text-slate-500">
               PNG, JPG, WebP (Max 10MB)
             </p>
           </div>
