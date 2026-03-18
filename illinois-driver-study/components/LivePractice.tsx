@@ -108,6 +108,8 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   const sessionRef = useRef<any>(null);
   const resolvedSessionRef = useRef<any>(null);
   const lastVolumeRef = useRef<number>(0);
+  // Pre-allocated reusable buffer for PCM conversion — avoids per-frame Int16Array allocation
+  const pcmBufferRef = useRef<Int16Array>(new Int16Array(4096));
   
   const t = TRANSLATIONS[language];
 
@@ -247,8 +249,12 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
                 setVolume(newVolume);
               }
 
-              const pcmData = createPcmData(inputData);
-              const base64Data = arrayBufferToBase64(pcmData.buffer);
+              const pcmBuffer = pcmBufferRef.current;
+              for (let i = 0; i < inputData.length; i++) {
+                const s = Math.max(-1, Math.min(1, inputData[i]));
+                pcmBuffer[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+              }
+              const base64Data = arrayBufferToBase64(pcmBuffer.buffer);
               
               resolvedSessionRef.current?.sendRealtimeInput({
                 media: {

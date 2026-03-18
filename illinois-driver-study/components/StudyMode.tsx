@@ -46,14 +46,23 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
     return () => clearTimeout(timer);
   }, [search]);
 
+  // Pre-compute lowercase strings once per language change, not on every keystroke
+  const searchIndex = useMemo(() =>
+    questions.map(q => ({
+      text: q.text.toLowerCase(),
+      options: q.options.map(o => o.toLowerCase()),
+    })),
+    [questions]
+  );
+
   const filtered = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
     if (!q) return questions;
-    return questions.filter(qn =>
-      qn.text.toLowerCase().includes(q) ||
-      qn.options.some(o => o.toLowerCase().includes(q))
+    return questions.filter((_, i) =>
+      searchIndex[i].text.includes(q) ||
+      searchIndex[i].options.some(o => o.includes(q))
     );
-  }, [questions, debouncedSearch]);
+  }, [questions, searchIndex, debouncedSearch]);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
