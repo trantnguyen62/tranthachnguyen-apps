@@ -119,6 +119,7 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
                   src={q.image}
                   alt={q.text}
                   loading="lazy"
+                  decoding="async"
                   className="max-h-36 object-contain rounded-lg border border-slate-200"
                 />
               </div>
