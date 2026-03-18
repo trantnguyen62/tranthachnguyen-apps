@@ -270,8 +270,10 @@ function App() {
             <select
               value={selectedProject?.path || ''}
               onChange={handleProjectChange}
+              disabled={isLoadingTree}
               aria-label="Select project"
-              className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              aria-busy={isLoadingTree}
+              className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 disabled:opacity-60 disabled:cursor-wait"
             >
               <option value="">Select a project...</option>
               {projects.map(project => (
@@ -479,11 +481,19 @@ function App() {
               aria-label={showChatPanel ? 'Hide AI chat panel' : 'Show AI chat panel'}
               title={showChatPanel ? 'Hide chat panel' : 'Show chat panel'}
               aria-expanded={showChatPanel}
-              className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors text-slate-400 hover:text-slate-200"
+              className="flex items-center gap-1.5 p-2 hover:bg-slate-700/50 rounded-lg transition-colors text-slate-400 hover:text-slate-200"
             >
               {showChatPanel
                 ? <ChevronRight className="w-5 h-5" aria-hidden="true" />
-                : <MessageSquare className="w-5 h-5" aria-hidden="true" />
+                : (
+                  <span className="relative flex items-center gap-1.5">
+                    <MessageSquare className="w-5 h-5" aria-hidden="true" />
+                    {isConnected && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                    )}
+                    <span className="text-xs hidden sm:inline">AI Chat</span>
+                  </span>
+                )
               }
             </button>
             <button
