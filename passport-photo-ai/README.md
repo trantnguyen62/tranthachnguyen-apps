@@ -38,6 +38,9 @@ npm run dev
 ### Run with Docker
 
 ```bash
+# Build the frontend first (Docker copies dist/ — it does not run Vite)
+npm run build
+
 docker build -t passport-photo-ai .
 docker run -p 5185:5185 -e GEMINI_API_KEY=your_key_here passport-photo-ai
 ```
@@ -63,9 +66,9 @@ Browser (React + Vite)
 
 The API server also exposes `POST /api/passport/analyze` which returns an overall quality
 score and brightness/contrast adjustment recommendations used to pre-populate the editor sliders.
-Results from `/check` are cached in-memory (SHA-256 keyed, 30-minute TTL) to avoid duplicate
+Results from `/check` are cached in-memory (SHA-256 keyed, 60-minute TTL) to avoid duplicate
 Gemini calls for the same image. The `/check` endpoint caps Gemini output at 512 tokens;
-`/analyze` uses the model default.
+`/analyze` caps at 256 tokens.
 
 ## 📁 Project Structure
 
