@@ -115,7 +115,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                <button
                 ref={expandButtonRef}
                 onClick={() => setIsExpanded(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors text-xs font-medium"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors text-xs font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1"
                 aria-label="View fullscreen"
               >
                 <Maximize2 className="w-4 h-4" aria-hidden="true" />
@@ -138,8 +138,8 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           {/* Original */}
           <div className="space-y-3">
             {!isExpanded && (
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5" aria-hidden="true">
-                <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" />
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" aria-hidden="true" />
                 Before
               </p>
             )}
@@ -171,8 +171,8 @@ export const ComparisonView = memo<ComparisonViewProps>(({
           {/* Processed (Image or Video) */}
           <div className="space-y-3 relative">
             {!isExpanded && (
-              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wider flex items-center gap-1.5" aria-hidden="true">
-                <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" aria-hidden="true" />
                 {isProcessing ? 'Generating…' : 'After AI Edit'}
               </p>
             )}

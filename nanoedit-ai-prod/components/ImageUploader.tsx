@@ -235,7 +235,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
         <div className="absolute top-4 right-4 z-10">
           <button
             onClick={stopCamera}
-            className="p-2 bg-black/40 text-white rounded-full hover:bg-black/60 backdrop-blur-sm transition-colors"
+            className="p-2 bg-black/40 text-white rounded-full hover:bg-black/60 backdrop-blur-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             aria-label="Close camera"
           >
             <X className="w-6 h-6" aria-hidden="true" />
@@ -245,7 +245,7 @@ export const ImageUploader = memo<ImageUploaderProps>(({ onImageSelected, curren
         <div className="absolute bottom-6 left-0 right-0 z-10 flex items-center justify-center gap-8">
            <button
              onClick={stopCamera}
-             className="text-white text-sm font-medium px-4 py-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm"
+             className="text-white text-sm font-medium px-4 py-2 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
              aria-label="Cancel and close camera"
            >
              Cancel
