@@ -69,6 +69,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const questionRef = useRef<HTMLHeadingElement>(null);
   const nextButtonRef = useRef<HTMLButtonElement>(null);
+  const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const optionsLengthRef = useRef(4);
@@ -91,6 +92,11 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
   useEffect(() => {
     questionRef.current?.focus();
   }, [currentQuestionIndex]);
+
+  // Move focus to results heading when quiz completes
+  useEffect(() => {
+    if (quizCompleted) resultsHeadingRef.current?.focus();
+  }, [quizCompleted]);
 
   // Reset quiz when language changes to avoid index mismatch if arrays were different lengths (though they are same here)
   useEffect(() => {
@@ -202,7 +208,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
               <svg aria-hidden="true" className="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" /></svg>
             )}
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-1">{t.quizComplete}</h2>
+          <h2 ref={resultsHeadingRef} tabIndex={-1} className="text-2xl font-bold text-slate-800 mb-1 outline-none">{t.quizComplete}</h2>
           <p className={`text-lg font-semibold mb-6 ${passed ? 'text-green-600' : 'text-amber-600'}`}>{passed ? t.passing : t.needsWork}</p>
 
           <div className="flex justify-center gap-4 sm:gap-8 mb-6">
@@ -322,7 +328,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
 
         <div role="radiogroup" aria-label={language === 'vi' ? 'Các lựa chọn' : 'Answer options'} aria-describedby={!showResult ? 'kb-hint' : undefined} className="space-y-3">
           {question.options.map((option, idx) => {
-            let className = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer disabled:cursor-default ";
+            let className = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer disabled:cursor-default focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 outline-none ";
             const isCorrect = showResult && idx === question.correctIndex;
             const isWrong = showResult && idx === selectedOption && idx !== question.correctIndex;
             if (showResult) {
@@ -342,6 +348,7 @@ export const QuizMode = memo<QuizModeProps>(({ language, onSwitchToStudy }) => {
             return (
               <button
                 key={idx}
+                type="button"
                 role="radio"
                 aria-checked={selectedOption === idx}
                 aria-label={ariaLabel}
