@@ -59,6 +59,11 @@ export const generateEditedImage = async (
     return data.imageData;
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
+      // Preserve the AbortError when the caller cancelled (externalSignal.aborted),
+      // so App.tsx can distinguish user cancellation from a genuine timeout.
+      if (externalSignal?.aborted) {
+        throw error;
+      }
       throw new Error('Request timed out. Please try again.');
     }
     console.error('Error generating edited image:', error);

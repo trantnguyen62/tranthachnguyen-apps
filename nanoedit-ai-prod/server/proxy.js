@@ -199,7 +199,17 @@ app.get('/health', (req, res) => {
  */
 app.get('/api/status', async (req, res) => {
   try {
-    const response = await fetch(`${GEMINI_PROXY_URL}/api/status`, fetchOptions(GEMINI_PROXY_URL));
+    const statusController = new AbortController();
+    const statusTimeout = setTimeout(() => statusController.abort(), 5_000);
+    let response;
+    try {
+      response = await fetch(`${GEMINI_PROXY_URL}/api/status`, {
+        signal: statusController.signal,
+        ...fetchOptions(GEMINI_PROXY_URL),
+      });
+    } finally {
+      clearTimeout(statusTimeout);
+    }
     const data = await response.json();
     res.json({
       proxyStatus: 'connected',
