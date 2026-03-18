@@ -122,6 +122,11 @@ function ComicDetail() {
     };
   }, [id]);
 
+  const textParagraphs = useMemo(
+    () => comic?.textStory?.split('\n\n') ?? [],
+    [comic]
+  );
+
   const toggleBookmark = async () => {
     if (isBookmarking) return;
     setIsBookmarking(true);
@@ -330,7 +335,7 @@ function ComicDetail() {
                   The Story
                 </h2>
                 <div className="prose prose-invert max-w-none">
-                  {comic.textStory.split('\n\n').map((paragraph, index) => (
+                  {textParagraphs.map((paragraph, index) => (
                     <p key={index} className="text-gray-300 text-base leading-relaxed mb-4">
                       {paragraph}
                     </p>
