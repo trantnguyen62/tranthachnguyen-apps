@@ -1224,72 +1224,86 @@ spec:
                 {
                     question: 'What type of service is AWS Lambda?',
                     options: ['Database', 'Serverless compute', 'Storage', 'Networking'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'AWS Lambda is a serverless compute service. You upload your code and Lambda runs it on demand without provisioning or managing servers. You pay only for the compute time consumed.'
                 },
                 {
                     question: 'What does S3 stand for?',
                     options: ['Simple Server Service', 'Simple Storage Service', 'Secure Storage System', 'Server Storage Service'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'S3 stands for Simple Storage Service. It is an object storage service that stores data as objects in buckets. It offers 11 nines (99.999999999%) of durability and scales to virtually unlimited storage.'
                 },
                 {
                     question: 'Which service is used for managing access to AWS resources?',
                     options: ['VPC', 'IAM', 'EC2', 'S3'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'IAM (Identity and Access Management) controls who can do what in your AWS account. It uses users, groups, roles, and policies to grant least-privilege access to services and resources.'
                 },
                 {
                     question: 'What is AWS EKS?',
                     options: ['A database service', 'A managed Kubernetes service', 'A storage service', 'A monitoring tool'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'EKS (Elastic Kubernetes Service) is a managed Kubernetes service. AWS handles the control plane—including upgrades, patching, and high availability—so you only manage the worker nodes and workloads.'
                 },
                 {
                     question: 'Which service provides Infrastructure as Code on AWS?',
                     options: ['Lambda', 'EC2', 'CloudFormation', 'RDS'],
-                    correct: 2
+                    correct: 2,
+                    explanation: 'CloudFormation is AWS\'s native IaC service. You define resources in JSON or YAML templates, and CloudFormation provisions and manages them as a stack, handling dependencies and rollback automatically.'
                 },
                 {
                     question: 'What is Route 53 used for?',
                     options: ['Load balancing', 'Container orchestration', 'DNS and domain routing', 'Serverless functions'],
-                    correct: 2
+                    correct: 2,
+                    explanation: 'Route 53 is a highly available DNS service. It resolves domain names to AWS resources (or any IP), supports routing policies like latency-based, weighted, and failover, and can also register domain names.'
                 },
                 {
                     question: 'What is the difference between ECS and EKS?',
                     options: ['ECS is for VMs, EKS is for containers', 'ECS uses AWS-native orchestration, EKS runs managed Kubernetes', 'EKS is serverless, ECS requires EC2', 'No difference'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'ECS uses AWS\'s own container orchestration engine with task definitions and services. EKS runs upstream Kubernetes, giving you portability and the full Kubernetes ecosystem. Both can use Fargate for serverless compute.'
                 },
                 {
                     question: 'What does AWS Fargate eliminate?',
                     options: ['The need for VPCs', 'The need to manage EC2 instances for containers', 'The need for IAM roles', 'The need for load balancers'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'Fargate is a serverless compute engine for containers. You specify CPU/memory requirements and Fargate provisions the underlying infrastructure, eliminating cluster capacity planning and OS patching entirely.'
                 },
                 {
                     question: 'What is SQS used for?',
                     options: ['DNS routing', 'Decoupling services with a message queue', 'Container storage', 'Logging'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'SQS (Simple Queue Service) decouples producers from consumers by buffering messages in a managed queue. This smooths out traffic spikes and prevents data loss if a downstream service is temporarily unavailable.'
                 },
                 {
                     question: 'What is the difference between SQS and SNS?',
                     options: ['No difference', 'SQS is a queue for point-to-point; SNS is pub/sub for fan-out to multiple subscribers', 'SNS is a database, SQS is a queue', 'SQS is synchronous, SNS is asynchronous'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'SQS is a pull-based queue where one consumer processes each message. SNS is a push-based pub/sub topic that fans out a single message to multiple subscribers simultaneously—including SQS queues, Lambda functions, and email endpoints.'
                 },
                 {
                     question: 'What does AWS CloudTrail provide?',
                     options: ['Network routing', 'API call audit logs for security and compliance', 'Container deployment', 'Load balancing'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'CloudTrail records every API call made in your AWS account—who made it, from which IP, and what changed. These logs are essential for security investigations, compliance audits, and detecting unauthorized activity.'
                 },
                 {
                     question: 'What is the purpose of an AWS NAT Gateway?',
                     options: ['Translate DNS records', 'Allow private subnet instances to reach the internet without inbound exposure', 'Balance traffic across AZs', 'Manage SSL certificates'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'A NAT Gateway performs network address translation so EC2 instances in private subnets can initiate outbound internet traffic (e.g., package downloads) while remaining unreachable from the public internet.'
                 },
                 {
                     question: 'Which AWS service is used for in-memory caching?',
                     options: ['RDS', 'DynamoDB', 'ElastiCache', 'EBS'],
-                    correct: 2
+                    correct: 2,
+                    explanation: 'ElastiCache is a managed in-memory caching service supporting Redis and Memcached. It reduces database load and improves latency by caching frequently accessed data in memory, with sub-millisecond response times.'
                 },
                 {
                     question: 'What does AWS Cognito provide?',
                     options: ['Container orchestration', 'User sign-up, sign-in, and identity management', 'DNS routing', 'Event-driven workflow'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'Cognito handles user identity for web and mobile apps. It provides user pools for authentication (sign-up, login, MFA) and identity pools for granting users temporary AWS credentials to access services directly.'
                 }
             ],
             codebase: [
@@ -1568,77 +1582,92 @@ echo "Deployed \$ECR_REPO:\$IMAGE_TAG to \$SERVICE_NAME"`
                 {
                     question: 'What is Infrastructure as Code (IaC)?',
                     options: ['Manual server configuration', 'Managing infrastructure through code/configuration files', 'A type of database', 'Container orchestration'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'IaC means defining infrastructure in machine-readable configuration files that can be version-controlled, reviewed, and automated—just like application code. Terraform uses declarative HCL files to describe desired infrastructure state.'
                 },
                 {
                     question: 'What does a Terraform provider do?',
                     options: ['Stores state', 'Interacts with cloud platforms and APIs', 'Runs containers', 'Manages secrets'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'A provider is a plugin that translates Terraform resource declarations into API calls for a specific platform (e.g., AWS, Azure, GCP, GitHub). Providers are declared in the required_providers block and downloaded by terraform init.'
                 },
                 {
                     question: 'What is stored in the Terraform state file?',
                     options: ['Source code', 'Mapping of resources to configuration', 'Container images', 'User credentials'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'The state file (terraform.tfstate) maps your configuration\'s resource blocks to real-world resource IDs and attributes. Terraform uses it to calculate diffs during plan and to track metadata like dependencies.'
                 },
                 {
                     question: 'What does "terraform plan" do?',
                     options: ['Applies changes', 'Shows proposed changes', 'Destroys resources', 'Initializes modules'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'terraform plan compares the desired state in your configuration against the current state and generates an execution plan showing exactly which resources will be created, updated, or destroyed—without making any changes.'
                 },
                 {
                     question: 'What is a Terraform module?',
                     options: ['A single resource', 'A container for reusable resources', 'A variable', 'A provider'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'A module is a directory of .tf files that can be called from other configurations. Modules encapsulate related resources for reuse—for example, a VPC module that creates subnets, route tables, and gateways together.'
                 },
                 {
                     question: 'What does a Terraform workspace allow you to do?',
                     options: ['Edit code online', 'Manage multiple environments with separate state files', 'Share providers between teams', 'Run containers'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'Workspaces let you use the same Terraform configuration with isolated state files for different environments (dev, staging, prod). Each workspace has its own state so changes in one cannot affect another.'
                 },
                 {
                     question: 'What is the purpose of a data source in Terraform?',
                     options: ['Create new resources', 'Fetch read-only information about existing infrastructure', 'Store secrets', 'Define variables'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'Data sources query existing infrastructure not managed by the current configuration. For example, a data "aws_vpc" block can look up an existing VPC by tag so you can reference its ID in new resources.'
                 },
                 {
                     question: 'What does "terraform import" do?',
                     options: ['Downloads modules', 'Brings existing infrastructure under Terraform management', 'Exports state to JSON', 'Initializes the backend'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'terraform import reads an existing resource from the provider API and adds it to the state file so Terraform can manage it going forward. You must also write the matching configuration block manually.'
                 },
                 {
                     question: 'What is the difference between count and for_each?',
                     options: ['No difference', 'count uses an integer; for_each iterates over a map or set for named instances', 'for_each is deprecated', 'count only works with modules'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'count creates N identical instances indexed by number (count.index). for_each creates named instances keyed by map keys or set values, making state more stable—removing one item doesn\'t reindex the others.'
                 },
                 {
                     question: 'What does the lifecycle create_before_destroy setting do?',
                     options: ['Prevents resource deletion', 'Ensures a replacement resource is created before the old one is destroyed', 'Creates a backup first', 'Runs a pre-destroy script'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'By default Terraform destroys a resource before creating its replacement, causing downtime. create_before_destroy reverses this order—the new resource is fully created first, then the old one is removed, enabling zero-downtime replacements.'
                 },
                 {
                     question: 'What is the .terraform.lock.hcl file used for?',
                     options: ['Locking the state file during apply', 'Recording exact provider versions for reproducible runs', 'Storing workspace names', 'Encrypting the backend config'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'The lock file records the exact provider versions and checksums selected during terraform init. Committing it to version control ensures every team member and CI run uses the same provider versions, preventing surprise upgrades.'
                 },
                 {
                     question: 'What is the modern replacement for terraform taint?',
                     options: ['terraform refresh', 'terraform apply -replace=<resource>', 'terraform state rm', 'terraform plan -destroy'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'terraform taint was deprecated in Terraform 0.15.2. The replacement is terraform apply -replace=<resource_address> (or terraform plan -replace=...), which forces recreation of a specific resource in a single targeted operation.'
                 },
                 {
                     question: 'What is the difference between a precondition and a check block in Terraform?',
                     options: ['No difference; they are aliases', 'precondition runs before plan; check runs after apply', 'precondition aborts the run on failure; check emits a warning and continues', 'check blocks only work in modules'],
-                    correct: 2
+                    correct: 2,
+                    explanation: 'A precondition (inside a lifecycle block) halts the Terraform run with an error if the condition fails, acting as a hard gate. A check block (Terraform 1.5+) runs assertions post-apply and emits a warning without stopping the run.'
                 },
                 {
                     question: 'What does the terraform test command (1.6+) do?',
                     options: ['Validates HCL syntax only', 'Provisions real infrastructure, runs assertions, then destroys it', 'Runs only against mock providers', 'Lints Terraform code for best practices'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'terraform test runs .tftest.hcl test files that provision actual infrastructure against a real provider, evaluate assertions on outputs and resource attributes, and then automatically destroy everything—replacing third-party tools like Terratest.'
                 },
                 {
                     question: 'What advantage does a declarative import block have over the terraform import CLI command?',
                     options: ['It is faster', 'It supports only AWS resources', 'It cannot be used with for_each', 'The import can be reviewed in a plan before being applied and supports for_each for bulk imports'],
-                    correct: 3
+                    correct: 3,
+                    explanation: 'The import block (Terraform 1.5+) is declared in .tf files like any other resource, so the import shows up in terraform plan for peer review before apply. It also supports for_each, enabling bulk imports of many resources in a single block.'
                 }
             ],
             codebase: [
@@ -1922,82 +1951,98 @@ resource "aws_ecs_service" "app" {
                 {
                     question: 'What is a Git commit?',
                     options: ['A branch', 'A snapshot of changes', 'A merge conflict', 'A remote repository'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'A commit is a point-in-time snapshot of all tracked files, identified by a unique SHA-1 hash. Each commit records the author, timestamp, commit message, and a pointer to its parent commit(s), forming the project history.'
                 },
                 {
                     question: 'What is the purpose of a branch in Git?',
                     options: ['Delete history', 'Independent line of development', 'Store backups', 'Connect to remote'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'A branch is a lightweight, movable pointer to a commit. It lets you work on features or fixes in isolation without affecting the main codebase. Creating a branch is nearly instant because Git just creates a new pointer.'
                 },
                 {
                     question: 'What does git rebase do?',
                     options: ['Deletes commits', 'Applies commits on top of another branch', 'Creates a backup', 'Merges conflicts'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'Rebase moves or replays your branch\'s commits onto a new base commit, creating a linear history. Unlike merge, it rewrites commit SHAs, so avoid rebasing commits already pushed to a shared branch.'
                 },
                 {
                     question: 'What is a Pull Request?',
                     options: ['Downloading code', 'A method for reviewing and merging changes', 'A type of branch', 'A commit message'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'A Pull Request (PR) is a collaboration feature on hosting platforms like GitHub. It proposes merging changes from one branch into another, enabling code review, discussion, CI checks, and approval workflows before merging.'
                 },
                 {
                     question: 'What is the difference between git fetch and git pull?',
                     options: ['No difference', 'fetch downloads without merging; pull fetches and merges', 'pull is faster', 'fetch only works with tags'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'git fetch downloads new commits and updates remote-tracking branches (origin/main) but does not touch your working branch. git pull is a shorthand for fetch followed by merge (or rebase), immediately integrating remote changes.'
                 },
                 {
                     question: 'What does git reset --hard do?',
                     options: ['Stages all files', 'Moves HEAD and discards all local changes', 'Creates a hard link', 'Resets remote branches'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'git reset --hard moves the current branch pointer to the specified commit and resets both the index and working tree to match it, permanently discarding all staged and unstaged changes. Use with caution—this is destructive.'
                 },
                 {
                     question: 'What is git cherry-pick used for?',
                     options: ['Selecting best commits to delete', 'Applying a specific commit onto the current branch', 'Picking merge conflicts', 'Choosing a base branch'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'git cherry-pick applies the diff introduced by a specific commit onto the current branch as a new commit. It\'s useful for backporting a bug fix to a release branch without merging all other changes from the source branch.'
                 },
                 {
                     question: 'What is the git reflog useful for?',
                     options: ['Listing remote repos', 'Recovering lost commits after a reset', 'Showing remote logs', 'Formatting commit messages'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'The reflog is a local log of every time HEAD moved—branch switches, commits, resets, rebases. Because it records the SHA before a destructive operation, you can use it with git reset or git checkout to recover "lost" commits.'
                 },
                 {
                     question: 'What does git stash do?',
                     options: ['Deletes uncommitted changes', 'Temporarily saves uncommitted changes', 'Sends changes to remote', 'Creates a new branch'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'git stash saves your uncommitted changes (both staged and unstaged) onto a stack and reverts the working tree to a clean state. Use git stash pop to restore them later. Handy when you need to quickly switch context.'
                 },
                 {
                     question: 'What is the Conventional Commits convention?',
                     options: ['A GUI tool', 'A commit message format with prefixes like feat: and fix:', 'A branching model', 'A merge strategy'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'Conventional Commits is a lightweight specification for commit messages using structured prefixes: feat: (new feature), fix: (bug fix), docs:, chore:, etc. This enables automated changelog generation and semantic versioning with tools like semantic-release.'
                 },
                 {
                     question: 'What are Git hooks?',
                     options: ['Network connections', 'Scripts that run automatically at Git events', 'Branch policies', 'Remote aliases'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'Git hooks are shell scripts placed in .git/hooks/ that Git executes automatically at lifecycle events. Common hooks include pre-commit (run linters/tests before a commit lands) and pre-push (run tests before pushing to remote).'
                 },
                 {
                     question: 'What does git bisect help you find?',
                     options: ['Duplicate files', 'The commit that introduced a bug', 'Merge conflicts', 'Deleted branches'],
-                    correct: 1
+                    correct: 1,
+                    explanation: 'git bisect performs a binary search through commit history. You mark a known good commit and a known bad one, then Git checks out the midpoint. You mark it good or bad, and Git halves the range until it pinpoints the first bad commit.'
                 },
                 {
                     question: 'What is Trunk-Based Development?',
                     options: ['Using a develop branch for all work', 'Using many long-lived feature branches', 'Committing frequently to a single shared main branch', 'A strategy exclusive to open-source projects'],
-                    correct: 2
+                    correct: 2,
+                    explanation: 'Trunk-Based Development has all developers integrate small, frequent changes directly into a single shared branch (trunk/main), avoiding long-lived feature branches. This enables true continuous integration and reduces merge conflicts.'
                 },
                 {
                     question: 'What is a Detached HEAD state in Git?',
                     options: ['A corrupted repository', 'A branch with no commits', 'HEAD pointing directly to a commit instead of a branch', 'A merge conflict state'],
-                    correct: 2
+                    correct: 2,
+                    explanation: 'Normally HEAD points to a branch name, which moves forward with each commit. In detached HEAD, HEAD points directly to a commit SHA. New commits are made but belong to no branch and become unreachable unless you create a branch first.'
                 },
                 {
                     question: 'What does Git LFS replace in a repository?',
                     options: ['Commit messages', 'Branch names', 'The git config file', 'Large binary files with lightweight text pointers'],
-                    correct: 3
+                    correct: 3,
+                    explanation: 'Git LFS (Large File Storage) replaces large binary files (images, videos, ML models) in the repository with small text pointer files. The actual binary content is stored on a separate LFS server, keeping the git repo itself small.'
                 },
                 {
                     question: 'What is a CODEOWNERS file used for?',
                     options: ['Listing contributors for the README', 'Encrypting repository secrets', 'Auto-requesting reviews from owners when their files are changed in a PR', 'Setting branch protection rules'],
-                    correct: 2
+                    correct: 2,
+                    explanation: 'CODEOWNERS (at .github/CODEOWNERS or the root) maps file path patterns to individuals or teams. When a PR modifies matching files, GitHub/GitLab automatically adds the listed owners as required reviewers.'
                 }
             ],
             codebase: [
