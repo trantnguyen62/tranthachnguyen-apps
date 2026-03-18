@@ -10,6 +10,7 @@ const ComparisonView = lazy(() => import('./components/ComparisonView').then(m =
 
 // Each history entry holds a full base64 image string; cap at 10 to avoid excessive memory use.
 const MAX_HISTORY = 10;
+const PROCESSING_MESSAGE_INTERVAL_SECS = 3;
 
 const PROCESSING_MESSAGES = [
   'Analyzing your image…',
@@ -47,7 +48,7 @@ const ProcessingMessage = memo(() => {
     const timerId = setInterval(() => setElapsed(prev => prev + 1), 1000);
     return () => clearInterval(timerId);
   }, []);
-  const idx = Math.floor(elapsed / 3) % PROCESSING_MESSAGES.length;
+  const idx = Math.floor(elapsed / PROCESSING_MESSAGE_INTERVAL_SECS) % PROCESSING_MESSAGES.length;
   return (
     <span className="text-xs text-brand-600 pl-2 flex items-center gap-1.5" role="status" aria-live="polite" aria-atomic="true">
       <Sparkles className="w-3.5 h-3.5 animate-pulse" aria-hidden="true" />
@@ -107,6 +108,11 @@ const App: React.FC = () => {
     }
   }, [errorMsg, errorDismissed]);
 
+  const clearError = useCallback(() => {
+    setErrorMsg(null);
+    setErrorDismissed(false);
+  }, []);
+
   // Derived state
   const currentImage = history[historyIndex] ?? null;
   const originalImage = history[0] ?? null;
@@ -124,10 +130,9 @@ const App: React.FC = () => {
       setHistoryIndex(-1);
       setStatus(AppStatus.IDLE);
     }
-    setErrorMsg(null);
-    setErrorDismissed(false);
+    clearError();
     setPrompt('');
-  }, []);
+  }, [clearError]);
 
   /**
    * Sends the current image and prompt to the AI service.
@@ -139,7 +144,7 @@ const App: React.FC = () => {
     if (status === AppStatus.PROCESSING) return;
 
     setStatus(AppStatus.PROCESSING);
-    setErrorMsg(null);
+    clearError();
     userCancelledRef.current = false;
     const abortController = new AbortController();
     cancelControllerRef.current = abortController;
@@ -174,40 +179,42 @@ const App: React.FC = () => {
       if (err instanceof Error && err.name === 'AbortError' && userCancelledRef.current) {
         return;
       }
-      console.error(err);
+      console.error('[handleGenerate]', err);
       const message = err instanceof Error ? err.message : "Something went wrong. Please try a different prompt or image.";
       setErrorMsg(message);
       setErrorDismissed(false);
       setStatus(AppStatus.ERROR);
     }
-  }, [currentImage, prompt, history, historyIndex, status]);
+  }, [currentImage, prompt, history, historyIndex, status, clearError]);
 
   const handleUndo = useCallback(() => {
     if (canUndo) {
       setHistoryIndex(prev => prev - 1);
-      setErrorMsg(null);
+      clearError();
     }
-  }, [canUndo]);
+  }, [canUndo, clearError]);
 
   const handleRedo = useCallback(() => {
     if (canRedo) {
       setHistoryIndex(prev => prev + 1);
-      setErrorMsg(null);
+      clearError();
     }
-  }, [canRedo]);
+  }, [canRedo, clearError]);
 
   const handleCancel = useCallback(() => {
     userCancelledRef.current = true;
     cancelControllerRef.current?.abort();
     setStatus(AppStatus.READY_TO_EDIT);
-    setErrorMsg(null);
-  }, []);
+    clearError();
+  }, [clearError]);
 
   // Use refs so the keyboard listener is registered once and stays current
   const canUndoRef = useRef(canUndo);
   const canRedoRef = useRef(canRedo);
+  const clearErrorRef = useRef(clearError);
   canUndoRef.current = canUndo;
   canRedoRef.current = canRedo;
+  clearErrorRef.current = clearError;
 
   // Global keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -219,13 +226,13 @@ const App: React.FC = () => {
         e.preventDefault();
         if (canUndoRef.current) {
           setHistoryIndex(prev => prev - 1);
-          setErrorMsg(null);
+          clearErrorRef.current();
         }
       } else if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) {
         e.preventDefault();
         if (canRedoRef.current) {
           setHistoryIndex(prev => prev + 1);
-          setErrorMsg(null);
+          clearErrorRef.current();
         }
       }
     };

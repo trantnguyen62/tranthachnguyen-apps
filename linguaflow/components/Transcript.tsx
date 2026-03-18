@@ -65,10 +65,10 @@ const Transcript = memo<Props>(({ messages }) => {
         </div>
         <div className="space-y-1">
           <p className="text-sm font-medium text-slate-400">No messages yet</p>
-          <p className="text-xs text-slate-500 leading-relaxed">Start a conversation and your dialogue<br />will appear here in real time.</p>
+          <p className="text-xs text-slate-500 leading-relaxed">Start a conversation and your exchange<br />will appear here in real time.</p>
         </div>
         <p className="text-xs text-slate-500 leading-relaxed max-w-[200px]">
-          Tip: mistakes are how you improve — your tutor catches and corrects every one.
+          Tip: making mistakes is part of learning — your tutor will catch and correct them.
         </p>
       </div>
     );

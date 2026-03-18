@@ -173,7 +173,7 @@ const LanguageSelector = memo<Props>(({ selected, onSelect, disabled }) => {
       {/* Topic Selection - shows when Vietnamese English is selected and has a level */}
       {selected.code === 'en-vi' && selected.selectedLevel && (
         <div role="group" aria-labelledby="topic-selector-label" className="flex flex-col gap-2">
-          <span id="topic-selector-label" className="text-sm font-medium text-slate-400">Chủ đề / Topic <span className="font-normal text-slate-500">(optional — leave blank for free conversation)</span></span>
+          <span id="topic-selector-label" className="text-sm font-medium text-slate-400">Chủ đề / Topic <span className="font-normal text-slate-500">(optional — skip to let the conversation flow freely)</span></span>
           <div className="flex flex-wrap gap-2">
             {CONVERSATION_TOPICS.map((topic) => {
               const isSelected = selected.selectedTopic === topic.id;

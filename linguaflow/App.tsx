@@ -210,7 +210,7 @@ function App() {
             )}
             <div className="flex items-center gap-2 text-xs">
               <span className="sr-only" aria-live="polite" aria-atomic="true">
-                {isConnected ? 'Connected' : isConnecting ? 'Connecting' : 'Ready'}
+                {isConnected ? 'Connected' : isConnecting ? 'Connecting' : 'Ready to start'}
               </span>
               {isConnected ? (
                 <span aria-hidden="true" className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 rounded-full px-2 py-0.5">
@@ -231,7 +231,7 @@ function App() {
               ) : (
                 <span aria-hidden="true" className="flex items-center gap-1.5">
                   <span className="inline-flex rounded-full h-2 w-2 bg-slate-500"></span>
-                  <span className="text-slate-400">Ready</span>
+                  <span className="text-slate-400">Ready to start</span>
                 </span>
               )}
             </div>
@@ -259,7 +259,7 @@ function App() {
                    </span>
                    <span>Listening...</span>
                  </>
-               ) : isConnecting ? 'Connecting to your AI tutor…' : 'Practice real conversations with AI'}
+               ) : isConnecting ? 'Connecting to your AI tutor…' : 'Your AI tutor is ready to listen'}
              </h2>
              <p className="text-slate-400 text-sm max-w-md mx-auto">
                {isConnected
