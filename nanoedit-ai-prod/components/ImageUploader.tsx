@@ -39,7 +39,7 @@ const compressImage = (file: File): Promise<{ data: string; mimeType: string }> 
     img.onload = () => {
       URL.revokeObjectURL(objectUrl);
       const { width, height } = capDimensions(img.width, img.height);
-      const outMime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+      const outMime = (file.type === 'image/png' || file.type === 'image/webp') ? 'image/png' : 'image/jpeg';
       const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;

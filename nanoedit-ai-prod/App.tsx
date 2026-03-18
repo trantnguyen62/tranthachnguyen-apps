@@ -247,7 +247,7 @@ const App: React.FC = () => {
     setDownloadSuccess(true);
     if (downloadTimerRef.current !== null) clearTimeout(downloadTimerRef.current);
     downloadTimerRef.current = setTimeout(() => setDownloadSuccess(false), 3500);
-  }, [currentImage]);
+  }, [currentImage, historyIndex]);
 
   const handlePresetClick = useCallback((text: string) => {
     setPrompt(text);
