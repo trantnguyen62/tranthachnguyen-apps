@@ -132,9 +132,10 @@ export const PhotoEditor = memo<Props>(({ image, onSave, onCancel }) => {
   }, [image, bgColor, brightness, contrast]);
 
   useEffect(() => {
-    if (step === 'done' && removedBgRef.current) {
+    const bgUrl = removedBgRef.current;
+    if (step === 'done' && bgUrl) {
       const id = setTimeout(() => {
-        createPassport(removedBgRef.current!, bgColor, brightness, contrast).then(setResult);
+        createPassport(bgUrl, bgColor, brightness, contrast).then(setResult);
       }, 400);
       return () => clearTimeout(id);
     }

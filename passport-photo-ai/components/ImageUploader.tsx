@@ -61,6 +61,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
       let w = img.width, h = img.height;
       if (w > h) { h = Math.round(h * Math.min(MAX_IMAGE_DIMENSION, w) / w); w = Math.min(MAX_IMAGE_DIMENSION, w); }
       else { w = Math.round(w * Math.min(MAX_IMAGE_DIMENSION, h) / h); h = Math.min(MAX_IMAGE_DIMENSION, h); }
+      w = Math.max(1, w); h = Math.max(1, h);
       const canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
@@ -129,6 +130,7 @@ export const ImageUploader = memo<Props>(({ onImageSelected, currentImage }) => 
     let w = video.videoWidth, h = video.videoHeight;
     if (w > h) { h = Math.round(h * Math.min(MAX_IMAGE_DIMENSION, w) / w); w = Math.min(MAX_IMAGE_DIMENSION, w); }
     else { w = Math.round(w * Math.min(MAX_IMAGE_DIMENSION, h) / h); h = Math.min(MAX_IMAGE_DIMENSION, h); }
+    w = Math.max(1, w); h = Math.max(1, h);
 
     const canvas = document.createElement('canvas');
     canvas.width = w;
