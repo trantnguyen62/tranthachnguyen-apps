@@ -1901,6 +1901,9 @@ function togglePause() {
 function resumeGame() {
     game.paused = false;
     domCache.pauseMenu.classList.add('hidden');
+    if (game.questionActive) {
+        domCache.questionPanel.classList.remove('hidden');
+    }
     domCache.globalMenuBtn.focus();
 }
 
