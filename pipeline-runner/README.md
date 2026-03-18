@@ -9,6 +9,7 @@ An endless runner game that teaches DevOps concepts through gameplay. Navigate t
 - [Quick Start](#-quick-start)
 - [Project Structure](#-project-structure)
 - [Tech Stack](#️-tech-stack)
+- [Architecture](#️-architecture)
 - [Gameplay](#-gameplay)
 - [Docker](#-docker)
 - [Mobile Deployment](#-mobile-deployment)
@@ -95,6 +96,38 @@ pipeline-runner/
 - **Styling**: Custom CSS with animations
 - **Fonts**: Orbitron, Outfit (Google Fonts)
 - **Mobile**: Capacitor for native builds
+
+## 🗺️ Architecture
+
+All game logic lives in a single `game.js` file organised around a central `game` state object and a `requestAnimationFrame` loop.
+
+```
+DOMContentLoaded
+  └─ init()
+       ├─ cache DOM nodes → game.*
+       ├─ loadProgress()        — read localStorage (best score, learned count)
+       ├─ renderTopicButtons()  — build topic picker UI
+       ├─ setupEventListeners() — keyboard / click / touch / resize / visibility
+       └─ resizeCanvas()        — set logical + physical canvas size (DPI scaling)
+
+startGame()
+  ├─ reset game state
+  ├─ setInterval(spawnObstacle, …)   — drops a new gate pair on a timer
+  └─ gameLoop()  ─── requestAnimationFrame loop
+       ├─ update()   — physics (gravity, terminal velocity, star parallax),
+       │               obstacle movement, gate-pass scoring, question trigger
+       └─ render()   — background → stars → pipeline lanes → obstacles →
+                        player (blitted from offscreen cache) → particles →
+                        floating text
+
+Question flow (every QUESTION_INTERVAL gates):
+  showQuestion() → modal shown, loop suspended
+  selectAnswer() / handleTimeout()
+  checkAnswer()  → score / life update
+  closeQuestion() → loop resumed
+```
+
+**Offscreen canvas caching** (`updateTopicCache`): the player sprite and obstacle column gradient are pre-rendered to small `<canvas>` elements whenever the topic or canvas height changes. The hot `render()` path then uses `drawImage` instead of recomputing gradients and shadows each frame.
 
 ## 🎮 Gameplay
 

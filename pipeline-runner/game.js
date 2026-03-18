@@ -464,6 +464,8 @@ let game = {
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
 
+// Entry point: caches DOM nodes, wires event listeners, and sets up the canvas.
+// Called once on DOMContentLoaded.
 function init() {
     game.canvas = document.getElementById('gameCanvas');
     if (!game.canvas) return;
@@ -551,6 +553,8 @@ function init() {
     });
 }
 
+// Reads best score and cumulative learned count from localStorage into game state.
+// Silently falls back to zero if localStorage is unavailable or the stored value is invalid.
 function loadProgress() {
     try {
         const rawBest = parseInt(localStorage.getItem('pipeline-runner-best') || '0', 10);
@@ -567,6 +571,7 @@ function loadProgress() {
     if (elLearned) elLearned.textContent = game.totalLearned;
 }
 
+// Persists best score and cumulative learned count to localStorage at the end of a run.
 function saveProgress() {
     try {
         if (game.score > game.bestScore) {
@@ -581,6 +586,8 @@ function saveProgress() {
     }
 }
 
+// Builds the topic-picker buttons on the start screen using the TOPICS array.
+// Uses a roving-tabindex pattern so arrow keys move focus within the group.
 function renderTopicButtons() {
     const container = document.getElementById('topicButtons');
     if (!container) return;
@@ -1238,6 +1245,8 @@ function showQuestion() {
     if (firstAnswer) firstAnswer.focus();
 }
 
+// Starts a 1-second countdown interval that updates the on-screen timer and
+// calls handleTimeout() when the clock reaches zero.
 function startQuestionTimer() {
     if (game.questionTimerInterval) {
         clearInterval(game.questionTimerInterval);
@@ -1380,6 +1389,8 @@ function handleTimeout() {
     setTimeout(closeQuestion, 1200);
 }
 
+// Hides the question modal and resumes the game loop.
+// Returns focus to the canvas so Space/click input works immediately.
 function closeQuestion() {
     if (game.questionTimerInterval) {
         clearInterval(game.questionTimerInterval);
@@ -1409,6 +1420,8 @@ function pulseStat(el) {
 // Tips
 let _tipHideTimer = null;
 let _tipFadeTimer = null;
+// Shows text in the tip banner for 3 seconds, then fades it out.
+// Safe to call while a tip is already visible; the timer is restarted.
 function showTip(text) {
     if (_tipHideTimer) { clearTimeout(_tipHideTimer); _tipHideTimer = null; }
     if (_tipFadeTimer) { clearTimeout(_tipFadeTimer); _tipFadeTimer = null; }
