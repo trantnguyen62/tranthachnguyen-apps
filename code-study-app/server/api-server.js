@@ -142,7 +142,7 @@ const SEARCH_RESULTS_LIMIT = 50;
 const SEARCH_CONTENT_CONCURRENCY = 20;
 
 // Get list of projects
-app.get('/api/projects', (req, res) => {
+app.get('/api/projects', async (req, res) => {
   if (projectsCache && Date.now() - projectsCacheTs < PROJECTS_CACHE_TTL) {
     return res.json(projectsCache);
   }
@@ -150,36 +150,40 @@ app.get('/api/projects', (req, res) => {
   const projects = [];
 
   try {
-    const entries = fs.readdirSync(CODEBASE_PATH, { withFileTypes: true });
+    const entries = await fs.promises.readdir(CODEBASE_PATH, { withFileTypes: true });
 
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      if (IGNORED_DIRS.includes(entry.name)) continue;
-      if (entry.name.startsWith('.')) continue;
-      if (entry.name === 'services') continue;
-      if (entry.name === 'code-study-app') continue;
+    const checks = entries
+      .filter(entry => entry.isDirectory()
+        && !IGNORED_DIRS.includes(entry.name)
+        && !entry.name.startsWith('.')
+        && entry.name !== 'services'
+        && entry.name !== 'code-study-app')
+      .map(async entry => {
+        const projectPath = path.join(CODEBASE_PATH, entry.name);
+        const pkgPath = path.join(projectPath, 'package.json');
+        const idxPath = path.join(projectPath, 'index.html');
 
-      const projectPath = path.join(CODEBASE_PATH, entry.name);
-      const hasPackageJson = fs.existsSync(path.join(projectPath, 'package.json'));
-      const hasIndexHtml = fs.existsSync(path.join(projectPath, 'index.html'));
+        const [hasPkg, hasIdx] = await Promise.all([
+          fs.promises.access(pkgPath).then(() => true, () => false),
+          fs.promises.access(idxPath).then(() => true, () => false),
+        ]);
 
-      if (hasPackageJson || hasIndexHtml) {
+        if (!hasPkg && !hasIdx) return null;
+
         let description = '';
-
-        // Try to read description from package.json
-        if (hasPackageJson) {
+        if (hasPkg) {
           try {
-            const pkg = JSON.parse(fs.readFileSync(path.join(projectPath, 'package.json'), 'utf-8'));
+            const pkg = JSON.parse(await fs.promises.readFile(pkgPath, 'utf-8'));
             description = pkg.description || '';
           } catch (e) {}
         }
 
-        projects.push({
-          name: entry.name,
-          path: entry.name,
-          description
-        });
-      }
+        return { name: entry.name, path: entry.name, description };
+      });
+
+    const results = await Promise.all(checks);
+    for (const r of results) {
+      if (r) projects.push(r);
     }
   } catch (err) {
     console.error('Error reading projects:', err.message);
@@ -342,10 +346,13 @@ app.get('/api/search', async (req, res) => {
       const batch = contentChecks.slice(i, i + SEARCH_CONTENT_CONCURRENCY);
       await Promise.all(batch.map(async ({ name, fullPath, relativePath }) => {
         if (results.length >= SEARCH_RESULTS_LIMIT) return;
+        let fh;
         try {
-          const stat = await fs.promises.stat(fullPath);
-          if (stat.size <= 512 * 1024) {
-            const content = await fs.promises.readFile(fullPath, 'utf-8');
+          // Open once, stat + read via the same handle — avoids two open/close cycles
+          fh = await fs.promises.open(fullPath, 'r');
+          const { size } = await fh.stat();
+          if (size <= 512 * 1024) {
+            const content = await fh.readFile({ encoding: 'utf-8' });
             if (content.toLowerCase().includes(query) && results.length < SEARCH_RESULTS_LIMIT) {
               results.push({
                 name,
@@ -356,7 +363,10 @@ app.get('/api/search', async (req, res) => {
               });
             }
           }
-        } catch (e) {}
+        } catch (e) {
+        } finally {
+          if (fh) await fh.close().catch(() => {});
+        }
       }));
     }
 

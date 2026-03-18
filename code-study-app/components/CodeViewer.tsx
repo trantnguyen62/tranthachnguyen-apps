@@ -96,12 +96,21 @@ const CodeViewer = memo<CodeViewerProps>(({ file, onCodeSelect }) => {
     }
   }, [onCodeSelect]);
 
-  // Virtual window — only render lines visible in the viewport + buffer
-  // Disabled in word-wrap mode since line heights are variable
-  const visibleStart = wordWrap ? 0 : Math.max(0, Math.floor(scrollTop / LINE_HEIGHT) - BUFFER);
-  const visibleEnd = wordWrap ? lines.length : Math.min(lines.length, Math.ceil((scrollTop + viewportHeight) / LINE_HEIGHT) + BUFFER);
-  const paddingTop = wordWrap ? 0 : visibleStart * LINE_HEIGHT;
-  const paddingBottom = wordWrap ? 0 : Math.max(0, (lines.length - visibleEnd) * LINE_HEIGHT);
+  // Virtual window — only render lines visible in the viewport + buffer.
+  // In word-wrap mode, line heights are variable so we use a generous fixed estimate
+  // (1.5× LINE_HEIGHT) to avoid rendering all lines in large files while keeping
+  // scroll position approximately correct.
+  const WRAP_LINE_HEIGHT = LINE_HEIGHT * 1.5;
+  const visibleStart = wordWrap
+    ? Math.max(0, Math.floor(scrollTop / WRAP_LINE_HEIGHT) - BUFFER * 2)
+    : Math.max(0, Math.floor(scrollTop / LINE_HEIGHT) - BUFFER);
+  const visibleEnd = wordWrap
+    ? Math.min(lines.length, Math.ceil((scrollTop + viewportHeight) / WRAP_LINE_HEIGHT) + BUFFER * 2)
+    : Math.min(lines.length, Math.ceil((scrollTop + viewportHeight) / LINE_HEIGHT) + BUFFER);
+  const paddingTop = wordWrap ? visibleStart * WRAP_LINE_HEIGHT : visibleStart * LINE_HEIGHT;
+  const paddingBottom = wordWrap
+    ? Math.max(0, (lines.length - visibleEnd) * WRAP_LINE_HEIGHT)
+    : Math.max(0, (lines.length - visibleEnd) * LINE_HEIGHT);
   const lineNumWidth = lines.length >= 10000 ? 'w-16' : lines.length >= 1000 ? 'w-14' : 'w-10';
 
   if (!file) {
