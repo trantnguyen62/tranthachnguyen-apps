@@ -193,6 +193,7 @@ export const ComparisonView = memo<ComparisonViewProps>(({
                    alt="AI-edited version of your photo"
                    className={`w-full h-full object-contain transition-all duration-300 ${isProcessing ? 'opacity-25 blur-sm' : 'opacity-100'}`}
                    decoding="async"
+                   fetchPriority="high"
                  />
                )}
 
