@@ -669,6 +669,9 @@ for (const genre of genreList) {
 const comicsWithLower = comics.map(({ pages, ...c }) => ({
   ...c, titleLower: c.title.toLowerCase(), authorLower: c.author.toLowerCase(),
 }));
+// Fast lookup from comic id to the clean (no-pages, no-lowercase) list entry.
+// Used in the search path to avoid per-request object-spread to strip internal fields.
+const comicsListMap = new Map(comicsListDefault.map(c => [c.id, c]));
 
 // ETags for static endpoints (computed once at startup)
 const dataHash = crypto.createHash('sha1').update(JSON.stringify(comics)).digest('hex').slice(0, 16);
@@ -887,7 +890,7 @@ app.get('/api/comics', readRateLimit, (req, res) => {
   }
 
   // Return without internal fields (pages already excluded from comicsWithLower)
-  res.json(result.map(({ titleLower, authorLower, ...comic }) => comic));
+  res.json(result.map(c => comicsListMap.get(c.id)));
 });
 
 // Get single comic with pages
