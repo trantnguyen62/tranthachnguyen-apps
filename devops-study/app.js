@@ -4600,6 +4600,7 @@ function renderQuizQuestion() {
         btn.className = 'quiz-option';
         btn.setAttribute('role', 'radio');
         btn.setAttribute('aria-checked', 'false');
+        btn.setAttribute('tabindex', index === 0 ? '0' : '-1');
         btn.setAttribute('aria-label', `Option ${letters[index]}: ${option}`);
         btn.innerHTML = `
             <span class="option-letter">${letters[index]}</span>
@@ -4658,8 +4659,9 @@ function selectAnswer(selectedIndex) {
         ? '✓ Correct! Well done!'
         : `✗ Incorrect. The correct answer is: ${question.options[question.correct]}`;
 
-    // Show next button
+    // Show next button and focus it for keyboard users
     dom.quizNextBtn.classList.remove('hidden');
+    dom.quizNextBtn.focus();
 }
 
 // Next quiz question
@@ -4676,6 +4678,7 @@ function nextQuizQuestion() {
 function showQuizResults() {
     dom.quizView.classList.add('hidden');
     dom.quizResults.classList.remove('hidden');
+    dom.quizResults.focus();
 
     const totalQuestions = state.currentTopic.quiz.length;
     const percentage = Math.round((state.quizScore / totalQuestions) * 100);
@@ -4948,6 +4951,18 @@ function init() {
             if (keyIndex !== undefined) {
                 e.preventDefault();
                 selectAnswer(keyIndex);
+                return;
+            }
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                const opts = [...dom.quizOptions.querySelectorAll('.quiz-option')];
+                const idx = opts.indexOf(document.activeElement);
+                if (idx === -1) return;
+                e.preventDefault();
+                const next = (e.key === 'ArrowDown' || e.key === 'ArrowRight')
+                    ? (idx + 1) % opts.length
+                    : (idx - 1 + opts.length) % opts.length;
+                opts.forEach((o, i) => o.setAttribute('tabindex', i === next ? '0' : '-1'));
+                opts[next].focus();
             }
         }
     });

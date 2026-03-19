@@ -2071,3 +2071,56 @@ body {
     text-decoration: underline;
     opacity: 0.8;
 }
+
+/* =====================================================
+   Windows High Contrast Mode
+   ===================================================== */
+@media (forced-colors: active) {
+    .flashcard-front,
+    .flashcard-back {
+        border: 2px solid ButtonText;
+    }
+
+    .quiz-option {
+        border: 2px solid ButtonText;
+        forced-color-adjust: none;
+        background: ButtonFace;
+        color: ButtonText;
+    }
+
+    .quiz-option.correct {
+        background: Mark;
+        color: MarkText;
+        border-color: Highlight;
+    }
+
+    .quiz-option.incorrect {
+        background: ButtonFace;
+        border-color: LinkText;
+    }
+
+    .topic-card,
+    .match-item {
+        border: 2px solid ButtonText;
+    }
+
+    .progress-fill,
+    .topic-card-progress-fill,
+    .topic-progress-fill {
+        forced-color-adjust: none;
+        background: Highlight;
+    }
+
+    .tab-btn.active {
+        border-bottom: 3px solid Highlight;
+    }
+
+    .match-item.matched {
+        border-color: Highlight;
+        color: HighlightText;
+    }
+
+    .match-item.selected {
+        border-color: Highlight;
+    }
+}
