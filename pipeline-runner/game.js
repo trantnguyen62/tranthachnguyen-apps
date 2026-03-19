@@ -508,7 +508,6 @@ function init() {
     renderTopicButtons();
     setupEventListeners();
     resizeCanvas();
-    initStars();
     updateTopicCache();
 
     // Debounce resize to avoid repeatedly recreating offscreen canvases
@@ -532,6 +531,11 @@ function init() {
                 game.obstacleInterval = null;
                 game._obstacleSuspended = true;
             }
+            if (game.questionTimerInterval) {
+                clearInterval(game.questionTimerInterval);
+                game.questionTimerInterval = null;
+                game._questionTimerSuspended = true;
+            }
         } else if (game._loopSuspended) {
             game._loopSuspended = false;
             if (game.running && !game.questionActive) gameLoop();
@@ -540,6 +544,10 @@ function init() {
                 if (game.running && !game.paused) {
                     game.obstacleInterval = setInterval(spawnObstacle, CONFIG.OBSTACLE_SPAWN_RATE);
                 }
+            }
+            if (game._questionTimerSuspended) {
+                game._questionTimerSuspended = false;
+                if (game.questionActive) startQuestionTimer();
             }
         }
     });
