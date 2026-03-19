@@ -121,8 +121,10 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
   // Tracks all currently scheduled/playing output audio sources so they can be
   // stopped immediately when the server signals an interruption.
   const activeOutputSourcesRef = useRef<AudioBufferSourceNode[]>([]);
-  const sessionRef = useRef<any>(null);
-  const resolvedSessionRef = useRef<any>(null);
+  const resolvedSessionRef = useRef<{
+    sendRealtimeInput(input: { media: { mimeType: string; data: string } }): void;
+    sendToolResponse(response: { functionResponses: unknown[] }): void;
+  } | null>(null);
   const lastVolumeRef = useRef<number>(0);
   // Pre-allocated reusable buffer for PCM conversion — avoids per-frame Int16Array allocation
   const pcmBufferRef = useRef<Int16Array>(new Int16Array(4096));
@@ -378,8 +380,6 @@ export const LivePractice = memo<LivePracticeProps>(({ language }) => {
         }
       });
       
-      sessionRef.current = sessionPromise;
-
     } catch (err) {
       console.error("Connection failed", err);
       setStatus('idle');

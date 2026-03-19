@@ -35,6 +35,8 @@ const TRANSLATIONS = {
   }
 } as const;
 
+const SEARCH_DEBOUNCE_MS = 200;
+
 export const StudyMode = memo<StudyModeProps>(({ language }) => {
   const questions = useMemo(() => getQuestions(language), [language]);
   const t = TRANSLATIONS[language];
@@ -42,7 +44,7 @@ export const StudyMode = memo<StudyModeProps>(({ language }) => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search), 200);
+    const timer = setTimeout(() => setDebouncedSearch(search), SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [search]);
 
