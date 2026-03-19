@@ -198,7 +198,9 @@ wss.on('connection', (clientWs, req) => {
       }
 
       else if (data.type === 'disconnect' && geminiSession) {
-        try { geminiSession.close(); } catch (e) {}
+        try { geminiSession.close(); } catch (e) {
+          console.warn(`[Session] Error closing Gemini session on disconnect for ${ip}:`, e.message);
+        }
         geminiSession = null;
       }
 
@@ -216,7 +218,9 @@ wss.on('connection', (clientWs, req) => {
     
     if (connectionTimeout) clearTimeout(connectionTimeout);
     if (geminiSession) {
-      try { geminiSession.close(); } catch (e) {}
+      try { geminiSession.close(); } catch (e) {
+        console.warn(`[Session] Error closing Gemini session on client disconnect for ${ip}:`, e.message);
+      }
       geminiSession = null;
     }
   });

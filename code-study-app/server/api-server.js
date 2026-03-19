@@ -139,7 +139,6 @@ let projectsCache = null;
 let projectsCacheTs = 0;
 const PROJECTS_CACHE_TTL = 60_000;
 const SEARCH_RESULTS_LIMIT = 50;
-const SEARCH_CONTENT_CONCURRENCY = 20;
 
 // Get list of projects
 app.get('/api/projects', async (req, res) => {
@@ -175,7 +174,9 @@ app.get('/api/projects', async (req, res) => {
           try {
             const pkg = JSON.parse(await fs.promises.readFile(pkgPath, 'utf-8'));
             description = pkg.description || '';
-          } catch (e) {}
+          } catch (e) {
+            console.warn(`[Projects] Failed to parse package.json for ${entry.name}:`, e.message);
+          }
         }
 
         return { name: entry.name, path: entry.name, description };
