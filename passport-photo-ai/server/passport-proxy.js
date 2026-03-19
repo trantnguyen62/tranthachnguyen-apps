@@ -54,12 +54,27 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains');
-  // Apply restrictive CSP and Permissions-Policy only to API responses (JSON),
-  // not to HTML/asset responses — "default-src 'none'" on the HTML document would
-  // block all scripts/styles from loading, and "camera=()" would break webcam capture.
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
   if (req.path.startsWith('/api/')) {
     res.setHeader('Content-Security-Policy', "default-src 'none'");
     res.setHeader('Permissions-Policy', 'geolocation=()');
+  } else {
+    // SPA document and assets: allow exactly what the app needs.
+    // 'wasm-unsafe-eval' is required for @imgly/background-removal WebAssembly.
+    // connect-src includes statics.imgly.com for background-removal model files.
+    res.setHeader('Content-Security-Policy',
+      "default-src 'none'; " +
+      "script-src 'self' 'wasm-unsafe-eval'; " +
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+      "font-src 'self' https://fonts.gstatic.com; " +
+      "img-src 'self' data: blob:; " +
+      "worker-src 'self' blob:; " +
+      "connect-src 'self' https://statics.imgly.com; " +
+      "frame-ancestors 'none'"
+    );
+    // Restrict unused browser features; camera is intentionally left unrestricted
+    // because the app offers webcam capture for passport photos.
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=()');
   }
   next();
 });
